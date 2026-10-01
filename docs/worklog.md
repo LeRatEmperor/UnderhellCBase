@@ -162,3 +162,37 @@ Artifacts:
 - Python preprocessor: /home/z/my-project/scripts/cuh_preprocess.py
 - Fixed source: /home/z/my-project/download/custom_uh_base/lua/weapons/weapon_cuh_base_gun.lua (lines 617-663)
 - Run with: `python3 /home/z/my-project/scripts/cuh_sim_driver.py`
+
+---
+Task ID: cuh-attachment-audit-v2
+Agent: main (Super Z)
+Task: User reports attachments STILL don't apply after the first fix. Do a complete audit of CUH base + TFA base + parent bases.
+
+Work Log:
+- Launched parallel Explore subagents to audit: (a) TFA base's actual attachment implementation, (b) CUH's parent base classes (weapon_custom_uh_base.lua + weapon_custom_uh_base_gun.lua)
+- TFA audit found the original TFA-based XM8 at /home/z/my-project/repos/m8a1_tfa/ — this is the REFERENCE implementation that works. Key differences from CUH port:
+  * TFA uses SWEP.VElements; CUH renamed to SWEP.ViewModelElements (to avoid conflict with parent Underhell base)
+  * TFA's CreateModels is called EVERY FRAME in ViewModelDrawn and detects model string changes, auto-creating new ClientsideModels
+  * CUH's InitVElements is called ONCE (guarded by _vElementsInit flag), only recreating csModels when CleanupVElements sets the flag to false
+  * Both approaches are valid; CUH's is more efficient but requires explicit CleanupVElements + InitVElements calls (which att:Attach does)
+- Parent base audit found NO method conflicts — parent classes do NOT define SetAttachment, ApplyAttachments, InitVElements, etc. The parent's PostDrawViewModel correctly calls self:InitVElements() and self:DrawVElements(), which resolve to CUH's methods via inheritance.
+- CRITICAL FINDING: ApplyAttachments is NEVER called on Deploy. The WeaponDeployed hook only calls CustomUH.LoadAttachments (which only calls ApplyAttachments if there's a save file). If there's no save file (first time using the weapon), defaults are NEVER materialized. The weapon shows its bare ViewModelElements with no model swaps or stat changes until the user manually opens the menu and clicks something.
+- This explains the "nothing changes" symptom — but only partially. The user says clicking buttons also doesn't work. So there may be additional issues.
+- Added 3 layers of defense:
+  1. SWEP:Deploy() override in weapon_cuh_base_gun.lua that calls ApplyAttachments after BaseClass.Deploy (via timer.Simple(0,...) to defer to next tick)
+  2. pcall wrapper around att:Attach() calls in ApplyAttachments step 5, so a buggy attachment's Attach function never breaks the entire pipeline
+  3. 4 diagnostic console commands: cuh_debug, cuh_apply, cuh_set, cuh_reset
+- Added load-confirmation prints to all 3 core files (sh_cuh_attachments.lua, weapon_cuh_base_gun.lua, weapon_m8a1_scotia.lua) so the user can verify the files load without syntax errors
+- Pushed commit 5a49a4b to GitHub
+
+Stage Summary:
+- Found and fixed "defaults never applied on Deploy" bug
+- Added pcall around att:Attach for crash resilience
+- Added diagnostic console commands for the user to pinpoint the issue
+- The user should test with: spawn M8A1 → run cuh_debug → run cuh_set 2 2 → run cuh_debug again → paste console output
+
+Artifacts:
+- Fixed source: /home/z/my-project/download/custom_uh_base/lua/weapons/weapon_cuh_base_gun.lua (Deploy override + pcall att:Attach)
+- Fixed source: /home/z/my-project/download/custom_uh_base/lua/autorun/sh_cuh_attachments.lua (4 console commands)
+- GitHub commit: 5a49a4b
+- TFA reference implementation: /home/z/my-project/repos/m8a1_tfa/
