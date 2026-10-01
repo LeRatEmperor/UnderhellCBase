@@ -81,23 +81,30 @@ function SWEP:Initialize()
 end
 
 -- ============================================================
--- DEPLOY — apply default attachments so the weapon looks correct
--- from the very first frame (not just after the user opens the menu).
--- Without this, SWEP.Attachments[*].default indices are never
--- materialized — the weapon shows its bare ViewModelElements with
--- no model swaps, no stat modifications, and no bodygroup changes
--- until the user manually opens the CUH menu and clicks something.
+-- ONE-SHOT APPLY ON FIRST THINK — applies default attachments
+-- the first time the weapon's Think runs. This is safer than
+-- overriding Deploy (which interfered with the parent's deploy/
+-- reload state machine and broke reloading).
 -- ============================================================
-function SWEP:Deploy()
-    BaseClass.Deploy(self)
-    -- Defer to next tick so the viewmodel is fully initialized
-    -- (InitVElements needs the viewmodel entity to exist on the client).
-    timer.Simple(0, function()
-        if IsValid(self) and self.ApplyAttachments then
-            self:ApplyAttachments()
+hook.Add("Think", "CUH2_ApplyDefaults", function()
+    -- This runs once per frame for ALL weapons; we filter to CUH
+    -- weapons that haven't had their defaults applied yet.
+    -- Using a global Think hook (rather than SWEP:Think) because
+    -- SWEP:Think is overridden by child weapons and might not
+    -- call BaseClass.Think.
+    for _, ply in ipairs(player.GetAll()) do
+        local wep = ply:GetActiveWeapon()
+        if IsValid(wep) and wep.IsCUHWeapon and not wep._cuhDefaultsApplied then
+            wep._cuhDefaultsApplied = true
+            -- Use a short timer so the viewmodel is fully initialized
+            timer.Simple(0.1, function()
+                if IsValid(wep) and wep.ApplyAttachments then
+                    wep:ApplyAttachments()
+                end
+            end)
         end
-    end)
-end
+    end
+end)
 
 -- ============================================================
 -- Stat cache is initialized lazily on first access (GetStat/SetStat)
@@ -826,9 +833,23 @@ function SWEP:SetAttachment(slot, index)
         net.SendToServer()
     end
 
-    -- Save on server
-    if SERVER and CustomUH.SaveAttachments then
-        CustomUH.SaveAttachments(self, self.Owner)
+    -- Save on server + broadcast to all clients
+    -- When SetAttachment is called directly on the server (e.g. via
+    -- the cuh_set console command, or via the CUH2_AttSelect net
+    -- receiver), we MUST broadcast CUH2_AttSync to all clients so
+    -- they apply the same attachment locally. Without this, the
+    -- server's copy of the weapon has the swapped model string,
+    -- but the clients' copies don't — so no visual change appears.
+    if SERVER then
+        if CustomUH.SaveAttachments then
+            CustomUH.SaveAttachments(self, self.Owner)
+        end
+        print("[CUH-DBG]   SERVER broadcasting CUH2_AttSync (slot=" .. slot .. " index=" .. index .. ")")
+        net.Start("CUH2_AttSync")
+            net.WriteEntity(self)
+            net.WriteUInt(slot, 8)
+            net.WriteUInt(index, 8)
+        net.Broadcast()
     end
 end
 
