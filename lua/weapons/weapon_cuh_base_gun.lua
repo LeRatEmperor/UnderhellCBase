@@ -254,11 +254,36 @@ function SWEP:DrawVElements(vm)
     if not self.ViewModelElements then return end
     if not self._vElementsInit then self:InitVElements() end
 
+    -- ONE-TIME diagnostic print (only prints once, then every 5 seconds)
+    -- so we can confirm DrawVElements IS being called every frame.
+    if not self._drawVElemLastPrint or CurTime() - self._drawVElemLastPrint > 5 then
+        self._drawVElemLastPrint = CurTime()
+        local activeCount = 0
+        local validCount = 0
+        for name, elem in pairs(self.ViewModelElements) do
+            if elem.active then
+                activeCount = activeCount + 1
+                if IsValid(elem._csModel) then
+                    validCount = validCount + 1
+                end
+            end
+        end
+        print("[CUH-DBG] DrawVElements running  vm=" .. tostring(vm) .. "  activeElems=" .. activeCount .. "  validCsModels=" .. validCount)
+    end
+
     for name, elem in pairs(self.ViewModelElements) do
         if not elem.active then continue end
 
         if elem.type == "Model" and IsValid(elem._csModel) then
             local model = elem._csModel
+
+            -- CRITICAL: SetModel must be called every frame in case the
+            -- model string was swapped by ApplyAttachments. The _csModel
+            -- was created with the OLD model; if we don't call SetModel
+            -- with the NEW string, the old model keeps drawing.
+            if elem.model and elem.model ~= "" then
+                model:SetModel(elem.model)
+            end
 
             if elem.bonemerge then
                 model:SetParent(vm)
