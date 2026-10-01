@@ -216,3 +216,23 @@ Stage Summary:
 - Reload should work again (no more Deploy override interference)
 - Attachments should now apply on the client when cuh_set is used from the server console (because the server broadcasts CUH2_AttSync)
 - Need user to test: pull latest, spawn M8A1, run cuh_set 2 2, look for CLIENT realm output in console
+
+---
+Task ID: cuh-fix-v4
+Agent: main (Super Z)
+Task: User reports reload still broken, attachments not visible, and saving doesn't persist between menu close/open. Console shows CLIENT ApplyAttachments IS running with valid _csModel.
+
+Work Log:
+- Analyzed user's console output: CLIENT ApplyAttachments IS running, _csModel = CSEntity [class C_BaseFlex] (valid), barrel.model = scotia_b_h.mdl (correct). So the attachment code IS working — model swap is happening on both server and client.
+- Identified the reload issue: my Think hook (CUH2_ApplyDefaults) called ApplyAttachments which calls RestoreStat, resetting Primary.ClipSize and Primary.Delay at random times. This broke the reload state machine. Removed the Think hook entirely.
+- Identified the save/load issue: 'WeaponDeployed' is NOT a standard GMod hook — it was registered but never called by any code. So LoadAttachments never ran, and saved attachments were never loaded back. Replaced with 'PlayerSwitchWeapon' which IS a real GMod hook.
+- Found ANOTHER bug: weapon_m8a1_scotia.lua Deploy() returns false. In GMod, Deploy() returning false CANCELS the deploy. Changed to return true.
+- Added ApplyAttachments call to Deploy (via timer.Simple(0,...)) so defaults materialize on deploy.
+- Added debug prints to SaveAttachments and LoadAttachments so the user can see when saves happen and what's loaded.
+- Pushed commit 9bcd90b
+
+Stage Summary:
+- Reload should work (Think hook removed)
+- Save/load should work (PlayerSwitchWeapon replaces nonexistent WeaponDeployed)
+- Deploy should work (return true instead of false)
+- Attachments should materialize on deploy (ApplyAttachments called from Deploy via timer)
