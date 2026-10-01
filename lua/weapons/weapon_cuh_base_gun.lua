@@ -78,33 +78,22 @@ end
 
 function SWEP:Initialize()
     BaseClass.Initialize(self)
+    -- Apply default attachments on init. Deferred to next tick so the
+    -- viewmodel entity exists on the client (needed by InitVElements
+    -- to create ClientsideModels).
+    timer.Simple(0, function()
+        if IsValid(self) and self.ApplyAttachments then
+            self:ApplyAttachments()
+        end
+    end)
 end
 
--- ============================================================
--- ONE-SHOT APPLY ON FIRST THINK — applies default attachments
--- the first time the weapon's Think runs. This is safer than
--- overriding Deploy (which interfered with the parent's deploy/
--- reload state machine and broke reloading).
--- ============================================================
-hook.Add("Think", "CUH2_ApplyDefaults", function()
-    -- This runs once per frame for ALL weapons; we filter to CUH
-    -- weapons that haven't had their defaults applied yet.
-    -- Using a global Think hook (rather than SWEP:Think) because
-    -- SWEP:Think is overridden by child weapons and might not
-    -- call BaseClass.Think.
-    for _, ply in ipairs(player.GetAll()) do
-        local wep = ply:GetActiveWeapon()
-        if IsValid(wep) and wep.IsCUHWeapon and not wep._cuhDefaultsApplied then
-            wep._cuhDefaultsApplied = true
-            -- Use a short timer so the viewmodel is fully initialized
-            timer.Simple(0.1, function()
-                if IsValid(wep) and wep.ApplyAttachments then
-                    wep:ApplyAttachments()
-                end
-            end)
-        end
-    end
-end)
+-- NOTE: Do NOT override Deploy here — the M8A1 weapon file has its own
+-- Deploy override that calls BaseClass.Deploy(self), and overriding it
+-- here would interfere with the deploy/reload state machine (broke
+-- reloading in a previous attempt). ApplyAttachments is called from
+-- Initialize above, and from the PlayerSwitchWeapon hook in
+-- sh_cuh_attachments.lua.
 
 -- ============================================================
 -- Stat cache is initialized lazily on first access (GetStat/SetStat)

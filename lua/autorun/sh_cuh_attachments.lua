@@ -134,15 +134,25 @@ function CustomUH.LoadAttachments(wep, ply)
     if not wep.Attachments then return end
 
     local path = CustomUH.GetSavePath(ply)
-    if not path or not file.Exists(path, "DATA") then return end
+    if not path or not file.Exists(path, "DATA") then
+        print("[CUH-DBG] LoadAttachments: no save file at " .. tostring(path))
+        return
+    end
 
     local data = util.JSONToTable(file.Read(path, "DATA") or "")
-    if not data then return end
+    if not data then
+        print("[CUH-DBG] LoadAttachments: save file is invalid JSON")
+        return
+    end
 
     local class = wep:GetClass()
     local saved = data[class]
-    if not saved then return end
+    if not saved then
+        print("[CUH-DBG] LoadAttachments: no save entry for " .. class)
+        return
+    end
 
+    print("[CUH-DBG] LoadAttachments: loading saved selections for " .. class)
     local changed = false
     local tempData = {}
 
@@ -153,6 +163,7 @@ function CustomUH.LoadAttachments(wep, ply)
                 wep.Attachments[slot].sel = index
                 changed = true
                 tempData[#tempData + 1] = { slot = slot, index = index }
+                print("[CUH-DBG]   loaded slot=" .. slot .. "  index=" .. index)
             end
         end
     end
@@ -209,6 +220,7 @@ function CustomUH.SaveAttachments(wep, ply)
     end
 
     file.Write(path, util.TableToJSON(data, true))
+    print("[CUH-DBG] SaveAttachments: saved to " .. path .. "  class=" .. class .. "  entries=" .. table.Count(current))
 end
 
 function CustomUH.SaveAllAttachments(ply)
@@ -361,14 +373,20 @@ end
 -- HOOKS — auto save/load
 -- ============================================================
 
--- Load on weapon deploy
-hook.Add("WeaponDeployed", "CUH2_LoadOnDeploy", function(wep, ply)
-    if not IsValid(wep) or not IsValid(ply) then return end
-    if not wep.Attachments then return end
+-- Load on weapon switch — PlayerSwitchWeapon is a real GMod hook
+-- that fires when a player switches TO a new weapon.
+-- The old code used "WeaponDeployed" which is NOT a standard GMod
+-- hook and was never called, so LoadAttachments never ran and saved
+-- attachments were never loaded back.
+hook.Add("PlayerSwitchWeapon", "CUH2_LoadOnSwitch", function(ply, oldWep, newWep)
+    if not IsValid(ply) or not IsValid(newWep) then return end
+    if not newWep.IsCUHWeapon then return end
+    if not newWep.Attachments then return end
     if SERVER then
-        timer.Simple(0.1, function()
-            if IsValid(wep) and IsValid(ply) then
-                CustomUH.LoadAttachments(wep, ply)
+        -- Defer to next tick so the weapon is fully initialized
+        timer.Simple(0, function()
+            if IsValid(newWep) and IsValid(ply) then
+                CustomUH.LoadAttachments(newWep, ply)
             end
         end)
     end

@@ -369,7 +369,14 @@ function SWEP:Deploy()
     self._mantleActive = nil
     self._mantleEndTime = nil
     self._justExitedSprint = false
-    return false
+    -- Apply attachments on deploy so defaults/saved selections materialize.
+    -- Deferred to next tick so viewmodel exists on client.
+    timer.Simple(0, function()
+        if IsValid(self) and self.ApplyAttachments then
+            self:ApplyAttachments()
+        end
+    end)
+    return true  -- FIXED: was false (false cancels the deploy in GMod)
 end
 
 -- ============================================================
