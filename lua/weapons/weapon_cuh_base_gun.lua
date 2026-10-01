@@ -118,6 +118,18 @@ function SWEP:InitStatCache()
     self.Primary   = table.Copy(self.Primary   or {})
     self.Secondary = table.Copy(self.Secondary or {})
 
+    -- Copy Animations per-instance AND snapshot the origin so attachments
+    -- can override anim keys (e.g. magazine swapping reload -> reload_ext02)
+    -- and we can restore them on detach.
+    self.Animations = table.Copy(self.Animations or {})
+    self._animationsOrigin = table.Copy(self.Animations)
+
+    -- AnimSounds likewise — mag swaps may want different reload sounds.
+    if self.AnimSounds then
+        self.AnimSounds = table.Copy(self.AnimSounds)
+        self._animSoundsOrigin = table.Copy(self.AnimSounds)
+    end
+
     self._statCache = {}
     self._statOrigins = {}
 
@@ -604,6 +616,16 @@ function SWEP:ApplyAttachments()
         self:RestoreStat(path)
     end
 
+    -- 1b. RESET ANIMATIONS to origin (per-instance snapshot taken in InitStatCache).
+    -- Attachments can override anim keys (e.g. magazine swapping
+    -- reload -> reload_ext02). Restore them before re-applying.
+    if self._animationsOrigin then
+        self.Animations = table.Copy(self._animationsOrigin)
+    end
+    if self._animSoundsOrigin then
+        self.AnimSounds = table.Copy(self._animSoundsOrigin)
+    end
+
     -- 2. RESET VELEMENTS to default state (full restore from snapshot)
     if self.ViewModelElements then
         for name, elem in pairs(self.ViewModelElements) do
@@ -757,6 +779,56 @@ function SWEP:ApplyAttachments()
                                 end
                             else
                                 self.WorldModelElements[name] = table.Copy(override)
+                            end
+                        end
+                    end
+
+                    -- Animations overrides — merges per-key into self.Animations.
+                    -- Values can be either:
+                    --   * a string (sequence name or ACT_VM_* name) -> direct assignment
+                    --   * a function(wep, val) -> called, result stored
+                    -- Example:
+                    --   ATTACHMENT.WeaponTable = {
+                    --       ["Animations"] = {
+                    --           ["reload"]       = "reload_ext02",
+                    --           ["reload_empty"] = "reload_empty_ext02",
+                    --       },
+                    --   }
+                    if att.WeaponTable and att.WeaponTable.Animations then
+                        if not self.Animations then self.Animations = {} end
+                        for animKey, animVal in pairs(att.WeaponTable.Animations) do
+                            if isfunction(animVal) then
+                                local cur = self.Animations[animKey]
+                                local ok, newVal = pcall(animVal, self, cur)
+                                if ok and newVal ~= nil then
+                                    self.Animations[animKey] = newVal
+                                elseif not ok then
+                                    ErrorNoHalt("[CUH] Attachment " .. tostring(attId)
+                                        .. " Animations[" .. tostring(animKey)
+                                        .. "] function crashed: " .. tostring(newVal) .. "\n")
+                                end
+                            else
+                                self.Animations[animKey] = animVal
+                            end
+                        end
+                    end
+
+                    -- AnimSounds overrides — same pattern as Animations.
+                    if att.WeaponTable and att.WeaponTable.AnimSounds then
+                        if not self.AnimSounds then self.AnimSounds = {} end
+                        for key, val in pairs(att.WeaponTable.AnimSounds) do
+                            if isfunction(val) then
+                                local cur = self.AnimSounds[key]
+                                local ok, newVal = pcall(val, self, cur)
+                                if ok and newVal ~= nil then
+                                    self.AnimSounds[key] = newVal
+                                elseif not ok then
+                                    ErrorNoHalt("[CUH] Attachment " .. tostring(attId)
+                                        .. " AnimSounds[" .. tostring(key)
+                                        .. "] function crashed: " .. tostring(newVal) .. "\n")
+                                end
+                            else
+                                self.AnimSounds[key] = val
                             end
                         end
                     end
