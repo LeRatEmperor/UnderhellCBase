@@ -1,0 +1,13 @@
+# Lua / Python intermediate files
+__pycache__/
+*.pyc
+*.pyo
+
+# Editor / OS junk
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# GMod data folder (don't commit user save data)
+data/
