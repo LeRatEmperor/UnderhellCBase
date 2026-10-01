@@ -196,3 +196,23 @@ Artifacts:
 - Fixed source: /home/z/my-project/download/custom_uh_base/lua/autorun/sh_cuh_attachments.lua (4 console commands)
 - GitHub commit: 5a49a4b
 - TFA reference implementation: /home/z/my-project/repos/m8a1_tfa/
+
+---
+Task ID: cuh-fix-v3
+Agent: main (Super Z)
+Task: User reports reload broken + attachments still not working. Console output shows only SERVER realm.
+
+Work Log:
+- Analyzed user's console output: ALL prints show realm=SERVER, no realm=CLIENT output at all
+- Identified two bugs:
+  1. RELOAD BROKEN: My Deploy override (timer.Simple(0, ApplyAttachments)) interfered with the parent base's deploy/reload state machine. ApplyAttachments resets Primary.ClipSize/Delay/etc. on the next tick, which confused the reload timer.
+  2. NO CLIENT OUTPUT: The cuh_set console command runs on the SERVER (listen server behavior). SetAttachment on the server called ApplyAttachments on the server but NEVER broadcast CUH2_AttSync to clients. The server's weapon had the swapped model string, but the clients' copies didn't.
+- Fixed both:
+  1. Replaced Deploy override with a global Think hook (CUH2_ApplyDefaults) that applies defaults once per weapon (guarded by _cuhDefaultsApplied flag). Uses timer.Simple(0.1, ...) to ensure viewmodel is ready. No interference with Deploy/Reload.
+  2. Added server-side broadcast in SetAttachment: when called on the server, it now broadcasts CUH2_AttSync to all clients (in addition to saving). This means cuh_set from the server console now propagates to clients.
+- Pushed commit 09a4949
+
+Stage Summary:
+- Reload should work again (no more Deploy override interference)
+- Attachments should now apply on the client when cuh_set is used from the server console (because the server broadcasts CUH2_AttSync)
+- Need user to test: pull latest, spawn M8A1, run cuh_set 2 2, look for CLIENT realm output in console
