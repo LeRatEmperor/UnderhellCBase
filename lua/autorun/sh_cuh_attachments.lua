@@ -13,6 +13,8 @@
 
 AddCSLuaFile()
 
+print("[CUH] sh_cuh_attachments.lua loading (realm=" .. (SERVER and "SERVER" or "CLIENT") .. ")")
+
 -- ============================================================
 -- NAMESPACE
 -- ============================================================
@@ -409,4 +411,139 @@ hook.Add("Think", "CUH2_Register", function()
     if CustomUH._registered then return end
     CustomUH._registered = true
     CustomUH.RegisterAttachments()
+end)
+
+-- ============================================================
+-- DIAGNOSTIC CONSOLE COMMANDS
+-- ============================================================
+-- These are for debugging attachment issues. They print detailed
+-- state info to the console so you can see exactly what's happening.
+
+-- cuh_debug — prints the full state of the active weapon's attachments,
+-- VElements, stat cache, and CustomUH.Attachments registration table.
+concommand.Add("cuh_debug", function(ply, cmd, args)
+    if not IsValid(ply) or not ply:IsPlayer() then return end
+    local wep = ply:GetActiveWeapon()
+    if not IsValid(wep) then
+        print("[CUH-DEBUG] No active weapon")
+        return
+    end
+
+    print("[CUH-DEBUG] === Active Weapon State ===")
+    print("  class:       " .. tostring(wep:GetClass()))
+    print("  PrintName:   " .. tostring(wep.PrintName))
+    print("  IsCUHWeapon: " .. tostring(wep.IsCUHWeapon))
+    print("  Base:        " .. tostring(wep.Base))
+    print("  has SetAttachment:       " .. tostring(wep.SetAttachment ~= nil))
+    print("  has ApplyAttachments:    " .. tostring(wep.ApplyAttachments ~= nil))
+    print("  has InitVElements:       " .. tostring(wep.InitVElements ~= nil))
+    print("  has InitStatCache:       " .. tostring(wep.InitStatCache ~= nil))
+    print("  has _statCache:          " .. tostring(wep._statCache ~= nil))
+    print("  has _statOrigins:        " .. tostring(wep._statOrigins ~= nil))
+    print("  has _vElementsInit:      " .. tostring(wep._vElementsInit))
+
+    print("")
+    print("[CUH-DEBUG] === CustomUH.Attachments Registration ===")
+    if CustomUH and CustomUH.Attachments then
+        print("  total registered: " .. table.Count(CustomUH.Attachments))
+        local sorted = {}
+        for id, _ in pairs(CustomUH.Attachments) do sorted[#sorted+1] = id end
+        table.sort(sorted)
+        for _, id in ipairs(sorted) do
+            local att = CustomUH.Attachments[id]
+            print(string.format("  %-20s  Name=%-20s  PartClass=%-12s  ModelPath=%s",
+                id, tostring(att.Name), tostring(att.PartClass), tostring(att.ModelPath)))
+        end
+    else
+        print("  CustomUH.Attachments is NIL!")
+    end
+
+    print("")
+    print("[CUH-DEBUG] === Weapon Attachments Slots ===")
+    if wep.Attachments then
+        for i, slotData in ipairs(wep.Attachments) do
+            local sel = wep.GetEffectiveAttachment and wep:GetEffectiveAttachment(i) or (slotData.sel or 0)
+            local atts = ""
+            for _, a in ipairs(slotData.atts or {}) do atts = atts .. a .. " " end
+            print(string.format("  slot %d  sel(eff)=%s  default=%s  atts=[%s]",
+                i, tostring(sel), tostring(slotData.default), atts))
+        end
+    else
+        print("  wep.Attachments is NIL!")
+    end
+
+    print("")
+    print("[CUH-DEBUG] === ViewModelElements ===")
+    if wep.ViewModelElements then
+        for name, elem in pairs(wep.ViewModelElements) do
+            print(string.format("  %-15s  model=%-50s  active=%s  _csModel=%s  _defaultSnapshot=%s",
+                name, tostring(elem.model), tostring(elem.active),
+                tostring(elem._csModel), tostring(elem._defaultSnapshot ~= nil)))
+        end
+    else
+        print("  wep.ViewModelElements is NIL!")
+    end
+
+    print("")
+    print("[CUH-DEBUG] === Stat Cache (key stats) ===")
+    if wep._statOrigins then
+        for _, path in ipairs({"Primary.Spread", "Primary.Delay", "Primary.Damage",
+                                "IronSightTime", "MoveSpeed", "Primary.IronAccuracy"}) do
+            print(string.format("  %-25s  origin=%s  current=%s",
+                path, tostring(wep._statOrigins[path]), tostring(wep.Primary and wep.Primary[string.match(path, "%.(.+)") or path])))
+        end
+    else
+        print("  _statOrigins is NIL — InitStatCache has not run!")
+    end
+    print("[CUH-DEBUG] === End ===")
+end)
+
+-- cuh_apply — manually triggers ApplyAttachments on the active weapon.
+-- Use this to test if ApplyAttachments works without clicking in the menu.
+concommand.Add("cuh_apply", function(ply, cmd, args)
+    if not IsValid(ply) or not ply:IsPlayer() then return end
+    local wep = ply:GetActiveWeapon()
+    if not IsValid(wep) then
+        print("[CUH] No active weapon")
+        return
+    end
+    if not wep.ApplyAttachments then
+        print("[CUH] Active weapon has no ApplyAttachments method — not a CUH weapon?")
+        return
+    end
+    print("[CUH] Manually calling wep:ApplyAttachments() ...")
+    wep:ApplyAttachments()
+    print("[CUH] Done.")
+end)
+
+-- cuh_set <slot> <index> — manually sets an attachment without the menu.
+-- Example: cuh_set 2 2  → selects Hvy-B barrel (slot 2, index 2)
+concommand.Add("cuh_set", function(ply, cmd, args)
+    if not IsValid(ply) or not ply:IsPlayer() then return end
+    local wep = ply:GetActiveWeapon()
+    if not IsValid(wep) then return end
+    if not wep.SetAttachment then
+        print("[CUH] Active weapon has no SetAttachment method")
+        return
+    end
+    local slot = tonumber(args[1] or "0")
+    local index = tonumber(args[2] or "0")
+    print("[CUH] Calling wep:SetAttachment(" .. slot .. ", " .. index .. ") ...")
+    wep:SetAttachment(slot, index)
+    print("[CUH] Done.")
+end)
+
+-- cuh_reset — resets all attachment selections to defaults (or None).
+concommand.Add("cuh_reset", function(ply, cmd, args)
+    if not IsValid(ply) or not ply:IsPlayer() then return end
+    local wep = ply:GetActiveWeapon()
+    if not IsValid(wep) then return end
+    if not wep.Attachments then return end
+    print("[CUH] Resetting all slots to defaults ...")
+    for slot, slotData in ipairs(wep.Attachments) do
+        if wep.SetAttachment then
+            wep:SetAttachment(slot, slotData.default or 0)
+        end
+    end
+    print("[CUH] Done.")
 end)

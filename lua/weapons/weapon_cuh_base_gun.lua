@@ -14,6 +14,8 @@
 
 AddCSLuaFile()
 
+print("[CUH] weapon_cuh_base_gun.lua loading (realm=" .. (SERVER and "SERVER" or "CLIENT") .. ")")
+
 DEFINE_BASECLASS("weapon_custom_uh_base_gun")
 SWEP.Base = "weapon_custom_uh_base_gun"
 
@@ -76,6 +78,25 @@ end
 
 function SWEP:Initialize()
     BaseClass.Initialize(self)
+end
+
+-- ============================================================
+-- DEPLOY — apply default attachments so the weapon looks correct
+-- from the very first frame (not just after the user opens the menu).
+-- Without this, SWEP.Attachments[*].default indices are never
+-- materialized — the weapon shows its bare ViewModelElements with
+-- no model swaps, no stat modifications, and no bodygroup changes
+-- until the user manually opens the CUH menu and clicks something.
+-- ============================================================
+function SWEP:Deploy()
+    BaseClass.Deploy(self)
+    -- Defer to next tick so the viewmodel is fully initialized
+    -- (InitVElements needs the viewmodel entity to exist on the client).
+    timer.Simple(0, function()
+        if IsValid(self) and self.ApplyAttachments then
+            self:ApplyAttachments()
+        end
+    end)
 end
 
 -- ============================================================
@@ -710,11 +731,19 @@ function SWEP:ApplyAttachments()
 
                     -- Call attachment's Attach function for side effects
                     -- (e.g. model swap via wep.ViewModelElements[PartClass].model = newModel)
+                    -- Wrapped in pcall so a buggy attachment never breaks the
+                    -- entire ApplyAttachments pipeline (which would prevent
+                    -- ALL subsequent slots from being applied).
                     if att.Attach then
                         print("[CUH-DBG]       calling att:Attach(self) ...")
-                        att:Attach(self)
-                        print("[CUH-DBG]       att:Attach returned. elem.model now = "
-                            .. tostring(self.ViewModelElements and self.ViewModelElements[att.PartClass] and self.ViewModelElements[att.PartClass].model))
+                        local ok, err = pcall(att.Attach, att, self)
+                        if not ok then
+                            print("[CUH-DBG]       ERROR in att:Attach: " .. tostring(err))
+                            ErrorNoHalt("[CUH] Attachment " .. tostring(attId) .. " Attach() failed: " .. tostring(err) .. "\n")
+                        else
+                            print("[CUH-DBG]       att:Attach returned. elem.model now = "
+                                .. tostring(self.ViewModelElements and self.ViewModelElements[att.PartClass] and self.ViewModelElements[att.PartClass].model))
+                        end
                     else
                         print("[CUH-DBG]       WARNING: att.Attach is nil — model swap will NOT happen")
                     end

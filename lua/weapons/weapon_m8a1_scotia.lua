@@ -4,6 +4,8 @@
 
 AddCSLuaFile()
 
+print("[CUH] weapon_m8a1_scotia.lua loading (realm=" .. (SERVER and "SERVER" or "CLIENT") .. ")")
+
 DEFINE_BASECLASS("weapon_cuh_base_gun")
 SWEP.Base = "weapon_cuh_base_gun"
 
