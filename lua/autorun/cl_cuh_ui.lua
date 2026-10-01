@@ -261,8 +261,19 @@ local function OpenMenu()
             nameLabel:SetContentAlignment(5)
 
             btn.DoClick = function()
+                print("[CUH-DBG] btn.DoClick CALLED  slot=" .. slot .. "  i=" .. i .. "  wep=" .. tostring(wep) .. "  IsValid=" .. tostring(IsValid(wep)))
                 surface.PlaySound("ui/buttonclick.wav")
+                if not IsValid(wep) then
+                    print("[CUH-DBG]   ERROR: wep is not valid!")
+                    return
+                end
+                if not wep.SetAttachment then
+                    print("[CUH-DBG]   ERROR: wep.SetAttachment is nil!")
+                    return
+                end
+                print("[CUH-DBG]   calling wep:SetAttachment(" .. slot .. ", " .. i .. ") ...")
                 wep:SetAttachment(slot, i)
+                print("[CUH-DBG]   SetAttachment returned")
                 cur = i
             end
 
