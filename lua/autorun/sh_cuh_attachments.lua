@@ -565,3 +565,44 @@ concommand.Add("cuh_reset", function(ply, cmd, args)
     end
     print("[CUH] Done.")
 end)
+
+-- cuh_save — manually saves the current attachment selections.
+-- Use this to test if saving works.
+concommand.Add("cuh_save", function(ply, cmd, args)
+    if not IsValid(ply) or not ply:IsPlayer() then return end
+    local wep = ply:GetActiveWeapon()
+    if not IsValid(wep) then return end
+    if not wep.Attachments then return end
+    if not CustomUH.SaveAttachments then
+        print("[CUH] SaveAttachments function not found!")
+        return
+    end
+    print("[CUH] Manually calling SaveAttachments ...")
+    CustomUH.SaveAttachments(wep, ply)
+    -- Verify the save file was written
+    local path = CustomUH.GetSavePath(ply)
+    if path and file.Exists(path, "DATA") then
+        print("[CUH] Save file exists at: " .. path)
+        local contents = file.Read(path, "DATA")
+        print("[CUH] Save file size: " .. #contents .. " bytes")
+        print("[CUH] Save file contents:")
+        print(contents)
+    else
+        print("[CUH] ERROR: Save file was NOT created!")
+    end
+end)
+
+-- cuh_load — manually loads saved attachments.
+concommand.Add("cuh_load", function(ply, cmd, args)
+    if not IsValid(ply) or not ply:IsPlayer() then return end
+    local wep = ply:GetActiveWeapon()
+    if not IsValid(wep) then return end
+    if not wep.Attachments then return end
+    if not CustomUH.LoadAttachments then
+        print("[CUH] LoadAttachments function not found!")
+        return
+    end
+    print("[CUH] Manually calling LoadAttachments ...")
+    CustomUH.LoadAttachments(wep, ply)
+    print("[CUH] Done. Run cuh_debug to see the loaded state.")
+end)

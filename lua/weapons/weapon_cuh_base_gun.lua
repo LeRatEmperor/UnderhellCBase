@@ -254,6 +254,17 @@ function SWEP:DrawVElements(vm)
     if not self.ViewModelElements then return end
     if not self._vElementsInit then self:InitVElements() end
 
+    -- CRITICAL: Apply viewmodel bodygroups EVERY FRAME.
+    -- The viewmodel (v_scotia.mdl) has the default barrel/stock/mag/pgrip
+    -- baked into its mesh. Without setting bodygroups to hide them, BOTH
+    -- the viewmodel's default parts AND the VElement attachment models
+    -- are visible at the same time — causing z-fighting/overlap that
+    -- makes it look like "nothing changed".
+    -- ApplyBodygroupsVM sets vm:SetBodygroup(bg, val) for each entry in
+    -- self.Bodygroups_V, hiding the default parts so only the VElement
+    -- attachment models show.
+    if self.ApplyBodygroupsVM then self:ApplyBodygroupsVM(vm) end
+
     -- ONE-TIME diagnostic print (only prints once, then every 5 seconds)
     -- so we can confirm DrawVElements IS being called every frame.
     if not self._drawVElemLastPrint or CurTime() - self._drawVElemLastPrint > 5 then
