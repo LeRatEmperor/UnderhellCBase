@@ -113,6 +113,27 @@ function SWEP:CalcView(ply, pos, ang, fov)
         local vm = IsValid(self.Owner) and self.Owner:GetViewModel() or nil
         if IsValid(vm) then
             local seq = self.m_CurrentSequence or vm:GetSequenceName(vm:GetSequence()) or ""
+            -- Throttled diagnostic print (every 2 seconds)
+            if not self._camDebugTime or CurTime() - self._camDebugTime > 2 then
+                self._camDebugTime = CurTime()
+                local attID = vm:LookupAttachment(self.CameraAttachment)
+                print("[CUH-CAM] CalcView running  seq=" .. tostring(seq)
+                    .. "  CameraAttachment=" .. tostring(self.CameraAttachment)
+                    .. "  attID=" .. tostring(attID))
+                if attID and attID > 0 then
+                    local att = vm:GetAttachment(attID)
+                    if att then
+                        local localAng = vm:WorldToLocalAngles(att.Ang)
+                        print("[CUH-CAM]   att.Ang=" .. tostring(att.Ang)
+                            .. "  localAng=" .. tostring(localAng))
+                    else
+                        print("[CUH-CAM]   att is nil!")
+                    end
+                else
+                    print("[CUH-CAM]   attachment NOT found!")
+                end
+            end
+
             if not string.find(seq, "Fire") and not string.find(seq, "Idle") then
                 local attID = vm:LookupAttachment(self.CameraAttachment)
                 if attID and attID > 0 then
