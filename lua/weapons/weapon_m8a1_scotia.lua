@@ -76,11 +76,11 @@ SWEP.IronSightsDipPos   = Vector(0, -1.5, -2.0)
 SWEP.IronSightsDipAng   = Angle(3, 0, 0)
 SWEP.IronSightsDipScale = 1.0
 
--- Camera bone system: the M8A1 viewmodel (v_scotia.mdl) has a
--- tag_camera_scripted bone that animates during reload/sprint/inspect
--- to drive procedural camera movement. Using the bone directly (not
--- the "camera" $attachment which points to tag_playerhelmet = wrong).
-SWEP.CameraBone = "tag_camera_scripted"
+-- Camera bone system: the M8A1 viewmodel (v_scotia.mdl) has a "camera"
+-- $attachment (points to tag_playerhelmet, which inherits the animated
+-- tag_camera bone's rotation). This drives procedural camera movement
+-- during reload/sprint/inspect.
+SWEP.CameraAttachment = "Camera"
 SWEP.CameraReserve = false
 SWEP.CameraOffset = Angle(0, 0, 0)
 

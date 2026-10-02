@@ -91,148 +91,54 @@ end
 -- ============================================================
 -- CAMERA BONE SYSTEM (BO3-style procedural camera animation)
 -- ============================================================
--- Weapons with a camera bone in their viewmodel can declare:
---   SWEP.CameraBone = "tag_camera_scripted"   -- bone name (preferred)
---   SWEP.CameraAttachment = "Camera"         -- OR attachment name
---   SWEP.CameraReserve    = false            -- invert the angle
---   SWEP.CameraOffset     = Angle(0,0,0)     -- extra angle offset
+-- This is a direct port of the proven working BO3 base implementation.
+-- Weapons declare:
+--   SWEP.CameraAttachment = "Camera"        -- $attachment name on VM
+--   SWEP.CameraReserve    = false          -- invert the angle
+--   SWEP.CameraOffset     = Angle(0,0,0)    -- extra angle offset
 --
--- HOW IT WORKS (matching the TFA BO4 implementation):
--- 1. ViewModelDrawn() computes self.CameraAngCache from the camera
---    bone/attachment every frame, smoothed via math.ApproachAngle.
--- 2. GetViewModelPosition() applies CameraAngCache to the viewmodel
---    angles (NOT the player view). This makes the GUN tilt/move
---    during reload/sprint/inspect, creating the BO3 camera effect.
+-- When CameraAttachment is nil/empty, the system does nothing.
 --
--- CameraBone is preferred because many BO3 viewmodels have the
--- scripted camera bone (tag_camera_scripted) but no $attachment
--- pointing to it. LookupBone + GetBonePosition reads the bone's
--- animated angle directly without needing an attachment.
---
--- When neither CameraBone nor CameraAttachment is set, the system
--- does nothing — no errors, no overhead.
---
--- ConVar: cl_cuh_camera_scale (default 1.0) — multiplies the camera
--- bone angle intensity. 0 = off, 1 = full BO3 intensity.
+-- ConVar: cl_cuh_camera_scale (default 1.0) — player-adjustable
+-- intensity multiplier. 0 = off, 1 = full BO3 intensity.
 -- ============================================================
 if CLIENT then
     CUH_CAMERA_SCALE = CreateClientConVar("cl_cuh_camera_scale", "1.0", true, false,
         "CUH camera bone animation scale (0 = off, 1 = full BO3 intensity)")
 end
 
--- Cache the camera bone angle every frame in ViewModelDrawn.
--- This runs AFTER the viewmodel is drawn, so bone positions are up-to-date.
-hook.Add("PostDrawViewModel", "CUH2_CameraBoneCache", function(vm, ply, wep)
-    if not IsValid(wep) then return end
-    if not wep.IsCUHWeapon then return end
-    if not IsValid(vm) then return end
-
-    local hasCameraBone = wep.CameraBone and wep.CameraBone ~= ""
-    local hasCameraAtt  = wep.CameraAttachment and wep.CameraAttachment ~= ""
-    if not (hasCameraBone or hasCameraAtt) then return end
-
-    -- Resolve the bone/attachment ID once and cache on the weapon
-    if not wep._cuhCameraBoneID then
-        if hasCameraBone then
-            wep._cuhCameraBoneID = vm:LookupBone(wep.CameraBone) or -1
-        end
-        if wep._cuhCameraBoneID == -1 and hasCameraAtt then
-            wep._cuhCameraAttID = vm:LookupAttachment(wep.CameraAttachment) or -1
-        end
-    end
-
-    -- Re-resolve if the viewmodel entity changed (weapon switch)
-    if wep._cuhCameraVM ~= vm then
-        wep._cuhCameraVM = vm
-        wep._cuhCameraBoneID = nil
-        wep._cuhCameraAttID = nil
-        return -- skip this frame, re-resolve next frame
-    end
-
-    local boneAng
-    if hasCameraBone and wep._cuhCameraBoneID and wep._cuhCameraBoneID >= 0 then
-        local _, ang = vm:GetBonePosition(wep._cuhCameraBoneID)
-        boneAng = ang
-    elseif hasCameraAtt then
-        if not wep._cuhCameraAttID then
-            wep._cuhCameraAttID = vm:LookupAttachment(wep.CameraAttachment) or -1
-        end
-        if wep._cuhCameraAttID > 0 then
-            local att = vm:GetAttachment(wep._cuhCameraAttID)
-            if att then boneAng = att.Ang end
+function SWEP:CalcView(ply, pos, ang, fov)
+    -- Camera bone angle tracking — applied to the PLAYER'S VIEW
+    if self.CameraAttachment and self.CameraAttachment ~= "" then
+        local vm = IsValid(self.Owner) and self.Owner:GetViewModel() or nil
+        if IsValid(vm) then
+            local seq = self.m_CurrentSequence or vm:GetSequenceName(vm:GetSequence()) or ""
+            if not string.find(seq, "Fire") and not string.find(seq, "Idle") then
+                local attID = vm:LookupAttachment(self.CameraAttachment)
+                if attID and attID > 0 then
+                    local att = vm:GetAttachment(attID)
+                    if att then
+                        if self.CameraOffset then
+                            ang:Add(self.CameraOffset)
+                        end
+                        local localAng = vm:WorldToLocalAngles(att.Ang)
+                        if self.CameraReserve then
+                            localAng:Mul(-1)
+                        end
+                        local scale = (CLIENT and CUH_CAMERA_SCALE and CUH_CAMERA_SCALE:GetFloat()) or 1
+                        localAng:Mul(scale)
+                        ang:Add(localAng)
+                    end
+                end
+            end
         end
     end
 
-    if not boneAng then
-        wep.CameraAngCache = wep.CameraAngCache or {p=0, y=0, r=0}
-        wep.CameraAngCache.p = 0
-        wep.CameraAngCache.y = 0
-        wep.CameraAngCache.r = 0
-        return
+    -- Pass to parent base for view bobbing and FOV zoom
+    if BaseClass.CalcView then
+        return BaseClass.CalcView(self, ply, pos, ang, fov)
     end
-
-    -- Compute the LOCAL angle offset (relative to the viewmodel)
-    local off = vm:WorldToLocalAngles(boneAng)
-    if wep.CameraReserve then
-        off.p = -off.p
-        off.y = -off.y
-        off.r = -off.r
-    end
-    -- Apply user-defined offset
-    if wep.CameraOffset then
-        off:RotateAroundAxis(off:Right(),   wep.CameraOffset.p or 0)
-        off:RotateAroundAxis(off:Up(),      wep.CameraOffset.y or 0)
-        off:RotateAroundAxis(off:Forward(), wep.CameraOffset.r or 0)
-    end
-    -- Apply scale ConVar
-    local scale = (CLIENT and CUH_CAMERA_SCALE and CUH_CAMERA_SCALE:GetFloat()) or 1
-    off.p = off.p * scale
-    off.y = off.y * scale
-    off.r = off.r * scale
-
-    -- Smooth toward the target angle (matching TFA BO4's ApproachAngle)
-    wep.CameraAngCache = wep.CameraAngCache or {p=0, y=0, r=0}
-    local spd = 15
-    wep.CameraAngCache.p = math.ApproachAngle(wep.CameraAngCache.p, off.p, (wep.CameraAngCache.p - off.p) * FrameTime() * spd)
-    wep.CameraAngCache.y = math.ApproachAngle(wep.CameraAngCache.y, off.y, (wep.CameraAngCache.y - off.y) * FrameTime() * spd)
-    wep.CameraAngCache.r = math.ApproachAngle(wep.CameraAngCache.r, off.r, (wep.CameraAngCache.r - off.r) * FrameTime() * spd)
-
-    -- Zero out during early deploy frames (matches TFA BO4 behavior)
-    local actind = vm:GetSequenceActivity(vm:GetSequence())
-    if (actind == ACT_VM_DRAW or actind == ACT_VM_DRAW_SILENCED) and vm:GetCycle() < 0.05 then
-        wep.CameraAngCache.p = 0
-        wep.CameraAngCache.y = 0
-        wep.CameraAngCache.r = 0
-    end
-end)
-
--- ============================================================
--- GetViewModelPosition — applies CameraAngCache to the viewmodel.
--- This makes the GUN tilt/move during reload/sprint/inspect,
--- creating the BO3 camera bone effect. The player's view stays
--- stable; only the viewmodel moves.
---
--- Child weapons that override GetViewModelPosition should call
--- BaseClass.GetViewModelPosition(self, pos, ang) FIRST so the
--- camera bone angle is applied, then do their own modifications.
--- ============================================================
-function SWEP:GetViewModelPosition(pos, ang)
-    -- Apply camera bone angle to the viewmodel
-    if self.CameraAngCache then
-        local cam = self.CameraAngCache
-        -- Only apply if there's a non-zero angle (avoids unnecessary rotation)
-        if cam.p ~= 0 or cam.y ~= 0 or cam.r ~= 0 then
-            ang:RotateAroundAxis(ang:Right(),   cam.p or 0)
-            ang:RotateAroundAxis(ang:Up(),      cam.y or 0)
-            ang:RotateAroundAxis(ang:Forward(), cam.r or 0)
-        end
-    end
-
-    -- Pass to parent base for its own viewmodel positioning
-    if BaseClass.GetViewModelPosition then
-        return BaseClass.GetViewModelPosition(self, pos, ang)
-    end
-    return pos, ang
+    return pos, ang, fov
 end
 
 -- NOTE: Do NOT override Deploy here — the M8A1 weapon file has its own
