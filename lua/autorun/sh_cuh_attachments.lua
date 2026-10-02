@@ -606,3 +606,52 @@ concommand.Add("cuh_load", function(ply, cmd, args)
     CustomUH.LoadAttachments(wep, ply)
     print("[CUH] Done. Run cuh_debug to see the loaded state.")
 end)
+
+-- cuh_camtest — diagnostic for camera bone system.
+-- Checks if CalcView exists on the weapon and where it comes from.
+concommand.Add("cuh_camtest", function(ply, cmd, args)
+    if not IsValid(ply) or not ply:IsPlayer() then return end
+    local wep = ply:GetActiveWeapon()
+    if not IsValid(wep) then return end
+
+    print("[CUH-CAM] === Camera Bone Diagnostic ===")
+    print("  weapon class: " .. tostring(wep:GetClass()))
+    print("  CameraAttachment: " .. tostring(wep.CameraAttachment))
+    print("  CameraReserve: " .. tostring(wep.CameraReserve))
+    print("  CameraOffset: " .. tostring(wep.CameraOffset))
+    print("  has CalcView method: " .. tostring(wep.CalcView ~= nil))
+
+    if wep.CalcView then
+        local info = debug.getinfo(wep.CalcView, "S")
+        if info then
+            print("  CalcView source: " .. tostring(info.short_src) .. ":" .. tostring(info.linedefined))
+            if string.find(info.short_src or "", "weapon_cuh_base_gun", 1, true) then
+                print("  → CalcView is OURS (CUH base)")
+            else
+                print("  → WARNING: CalcView is NOT from CUH base!")
+                print("  → Another addon is shadowing it.")
+            end
+        end
+    end
+
+    -- Check the viewmodel's "camera" attachment
+    local vm = ply:GetViewModel()
+    if IsValid(vm) then
+        print("  viewmodel: " .. tostring(vm))
+        print("  vm model: " .. tostring(vm:GetModel()))
+        -- Try both capitalizations
+        local attID1 = vm:LookupAttachment("Camera")
+        local attID2 = vm:LookupAttachment("camera")
+        print("  LookupAttachment('Camera') = " .. tostring(attID1))
+        print("  LookupAttachment('camera') = " .. tostring(attID2))
+        -- List all attachments
+        local atts = vm:GetAttachments()
+        print("  all attachments on VM:")
+        for _, a in ipairs(atts) do
+            print("    " .. tostring(a.name) .. " (id=" .. tostring(a.id) .. ")")
+        end
+    else
+        print("  viewmodel is NOT valid!")
+    end
+    print("[CUH-CAM] === End ===")
+end)
