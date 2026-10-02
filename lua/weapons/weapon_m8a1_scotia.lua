@@ -84,6 +84,9 @@ SWEP.CameraAttachment = "Camera"
 SWEP.CameraReserve = false
 SWEP.CameraOffset = Angle(0, 0, 0)
 
+print("[CUH-LOAD] weapon_m8a1_scotia.lua: SWEP.CameraAttachment = " .. tostring(SWEP.CameraAttachment)
+    .. "  (realm=" .. (SERVER and "SERVER" or "CLIENT") .. ")")
+
 SWEP.MuzzleFlashType = "particle"
 SWEP.MuzzleFlashParticle = "muzzleflash_6"
 SWEP.MuzzleFlashLightColor = Vector(255, 200, 100)
@@ -542,3 +545,7 @@ SWEP.Attachments = {
     [5] = { atts = {} },
     [6] = { atts = { "xm8_smag", "xm8_xmag", "xm8_xmaglrg" }, default = 1 },
 }
+
+-- END-OF-FILE CHECK: print CameraAttachment after all definitions
+print("[CUH-LOAD-END] weapon_m8a1_scotia.lua EOF: SWEP.CameraAttachment = " .. tostring(SWEP.CameraAttachment))
+

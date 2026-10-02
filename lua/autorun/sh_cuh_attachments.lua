@@ -627,6 +627,15 @@ concommand.Add("cuh_camtest", function(ply, cmd, args)
     if class then
         print("  CLASS table CameraAttachment: " .. tostring(class.CameraAttachment))
         print("  CLASS table Base: " .. tostring(class.Base))
+        -- Count how many keys are on the class table
+        local n = 0
+        for _ in pairs(class) do n = n + 1 end
+        print("  CLASS table key count: " .. n)
+        -- List the first 20 keys to see what IS there
+        local keys = {}
+        for k, _ in pairs(class) do keys[#keys+1] = tostring(k) end
+        table.sort(keys)
+        print("  CLASS table keys: " .. table.concat(keys, ", "))
     else
         print("  CLASS table NOT FOUND via weapons.GetStored!")
     end
