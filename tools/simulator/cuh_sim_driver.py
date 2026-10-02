@@ -29,10 +29,10 @@ from lupa import LuaRuntime
 
 ROOT = "/home/z/my-project/download/custom_uh_base"
 LUA  = "/home/z/my-project/download/custom_uh_base/lua"
-HARNESS = "/home/z/my-project/scripts/cuh_sim_harness.lua"
+HARNESS = "/home/z/my-project/download/custom_uh_base/tools/simulator/cuh_sim_harness.lua"
 
 # Local preprocessor (handles GMod LuaJIT-isms like `continue`)
-sys.path.insert(0, "/home/z/my-project/scripts")
+sys.path.insert(0, "/home/z/my-project/download/custom_uh_base/tools/simulator")
 from cuh_preprocess import preprocess as _preprocess
 
 
