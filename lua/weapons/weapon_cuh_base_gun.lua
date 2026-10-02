@@ -92,21 +92,25 @@ end
 -- CAMERA BONE SYSTEM (BO3-style procedural camera animation)
 -- ============================================================
 -- Weapons with a camera bone in their viewmodel can declare:
---   SWEP.CameraAttachment = "Camera"   -- attachment name on the VM
---   SWEP.CameraReserve    = false      -- invert the angle (some VMs use reversed bones)
---   SWEP.CameraOffset     = Angle(0,0,0) -- extra angle offset added each frame
+--   SWEP.CameraBone = "tag_camera_scripted"   -- bone name (preferred)
+--   SWEP.CameraAttachment = "Camera"         -- OR attachment name
+--   SWEP.CameraReserve    = false            -- invert the angle
+--   SWEP.CameraOffset     = Angle(0,0,0)     -- extra angle offset
 --
--- When CameraAttachment is nil/empty, the system does nothing — no
--- errors, no overhead. This lets non-camera-bone weapons coexist with
--- camera-bone weapons without any special handling.
+-- CameraBone is preferred because many BO3 viewmodels have the
+-- scripted camera bone (tag_camera_scripted) but no $attachment
+-- pointing to it. LookupBone + GetBonePosition reads the bone's
+-- animated angle directly without needing an attachment.
+--
+-- When neither CameraBone nor CameraAttachment is set, the system
+-- does nothing — no errors, no overhead.
 --
 -- The camera bone angle is applied to the view ONLY during non-fire,
 -- non-idle sequences (reload, sprint, inspect, draw, melee, mantle).
 -- During fire and idle, the view stays stable for accuracy.
 --
 -- ConVar: cl_cuh_camera_scale (default 1.0) — multiplies the camera
--- bone angle intensity. Players can reduce it if the camera movement
--- is too aggressive for their taste.
+-- bone angle intensity. 0 = off, 1 = full BO3 intensity.
 -- ============================================================
 if CLIENT then
     CUH_CAMERA_SCALE = CreateClientConVar("cl_cuh_camera_scale", "1.0", true, false,
@@ -115,27 +119,50 @@ end
 
 function SWEP:CalcView(ply, pos, ang, fov)
     -- Camera bone angle tracking
-    if self.CameraAttachment and self.CameraAttachment ~= "" then
+    local hasCameraBone = self.CameraBone and self.CameraBone ~= ""
+    local hasCameraAtt  = self.CameraAttachment and self.CameraAttachment ~= ""
+
+    if hasCameraBone or hasCameraAtt then
         local vm = IsValid(self.Owner) and self.Owner:GetViewModel() or nil
         if IsValid(vm) then
-            -- Only apply camera bone during non-fire, non-idle sequences
-            local seq = vm:GetSequenceName(vm:GetSequence()) or ""
-            if not string.find(seq, "Fire") and not string.find(seq, "Idle") then
-                local attID = vm:LookupAttachment(self.CameraAttachment)
-                if attID and attID > 0 then
-                    local att = vm:GetAttachment(attID)
-                    if att then
-                        if self.CameraOffset then
-                            ang:Add(self.CameraOffset)
-                        end
-                        local localAng = vm:WorldToLocalAngles(att.Ang)
-                        if self.CameraReserve then
-                            localAng:Mul(-1)
-                        end
-                        local scale = (CLIENT and CUH_CAMERA_SCALE and CUH_CAMERA_SCALE:GetFloat()) or 1
-                        localAng:Mul(scale)
-                        ang:Add(localAng)
+            -- Only apply camera bone during non-fire, non-idle sequences.
+            -- Use case-insensitive matching (BO3 models use "fire"/"idle",
+            -- some models use "Fire"/"Idle").
+            local seq = string.lower(vm:GetSequenceName(vm:GetSequence()) or "")
+            if not string.find(seq, "fire") and not string.find(seq, "idle") then
+                local bonePos, boneAng
+
+                -- Preferred: look up bone directly (no $attachment needed)
+                if hasCameraBone then
+                    local boneId = vm:LookupBone(self.CameraBone)
+                    if boneId and boneId >= 0 then
+                        bonePos, boneAng = vm:GetBonePosition(boneId)
                     end
+                end
+
+                -- Fallback: look up via $attachment name
+                if not boneAng and hasCameraAtt then
+                    local attID = vm:LookupAttachment(self.CameraAttachment)
+                    if attID and attID > 0 then
+                        local att = vm:GetAttachment(attID)
+                        if att then
+                            bonePos = att.Pos
+                            boneAng = att.Ang
+                        end
+                    end
+                end
+
+                if boneAng then
+                    if self.CameraOffset then
+                        ang:Add(self.CameraOffset)
+                    end
+                    local localAng = vm:WorldToLocalAngles(boneAng)
+                    if self.CameraReserve then
+                        localAng:Mul(-1)
+                    end
+                    local scale = (CLIENT and CUH_CAMERA_SCALE and CUH_CAMERA_SCALE:GetFloat()) or 1
+                    localAng:Mul(scale)
+                    ang:Add(localAng)
                 end
             end
         end
