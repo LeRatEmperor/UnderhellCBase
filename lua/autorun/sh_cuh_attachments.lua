@@ -621,15 +621,37 @@ concommand.Add("cuh_camtest", function(ply, cmd, args)
     print("  CameraOffset: " .. tostring(wep.CameraOffset))
     print("  has CalcView method: " .. tostring(wep.CalcView ~= nil))
 
+    -- Check if the class table has CameraAttachment
+    -- (instance should inherit via metatable)
+    local class = weapons.GetStored(wep:GetClass())
+    if class then
+        print("  CLASS table CameraAttachment: " .. tostring(class.CameraAttachment))
+        print("  CLASS table Base: " .. tostring(class.Base))
+    else
+        print("  CLASS table NOT FOUND via weapons.GetStored!")
+    end
+
+    -- Walk the inheritance chain looking for CameraAttachment
+    print("  inheritance chain:")
+    local cur = class
+    local depth = 0
+    while cur and depth < 10 do
+        depth = depth + 1
+        print("    [depth " .. depth .. "] class=" .. tostring(cur.ClassName or cur.Base or "?")
+            .. "  CameraAttachment=" .. tostring(cur.CameraAttachment))
+        if not cur.Base then break end
+        cur = weapons.GetStored(cur.Base)
+    end
+
     if wep.CalcView then
         local info = debug.getinfo(wep.CalcView, "S")
         if info then
             print("  CalcView source: " .. tostring(info.short_src) .. ":" .. tostring(info.linedefined))
             if string.find(info.short_src or "", "weapon_cuh_base_gun", 1, true) then
-                print("  → CalcView is OURS (CUH base)")
+                print("  -> CalcView is OURS (CUH base)")
             else
-                print("  → WARNING: CalcView is NOT from CUH base!")
-                print("  → Another addon is shadowing it.")
+                print("  -> WARNING: CalcView is NOT from CUH base!")
+                print("  -> Another addon is shadowing it.")
             end
         end
     end
