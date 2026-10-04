@@ -104,6 +104,11 @@ local function OpenMenu()
         wep:SetNW2Bool("Inspecting", true)
         wep:EasySendWeaponAnim("inspect", ACT_VM_FIDGET)
 
+        -- Cache the inspect sequence name so we can detect when the
+        -- engine transitions AWAY from it (to idle) and replay it.
+        local inspectAnimName = wep.Animations["inspect"]
+        if istable(inspectAnimName) then inspectAnimName = inspectAnimName[1] end
+
         -- Loop the inspect animation
         hook.Add("Think", "CUH2_InspectLoop", function()
             if not IsValid(menuPanel) or not IsValid(wep) then
@@ -111,13 +116,21 @@ local function OpenMenu()
                 return
             end
             -- Check if the weapon is still the active weapon
-            if LocalPlayer():GetActiveWeapon() ~= wep then
+            if not IsValid(wep.Owner) or LocalPlayer():GetActiveWeapon() ~= wep then
                 hook.Remove("Think", "CUH2_InspectLoop")
                 return
             end
-            -- Replay inspect when current animation finishes
-            local vm = wep.Owner and wep.Owner:GetViewModel() or nil
-            if IsValid(vm) and vm:GetCycle() >= 1 then
+            local vm = wep.Owner:GetViewModel()
+            if not IsValid(vm) then return end
+
+            -- Get the current sequence name
+            local curSeq = vm:GetSequenceName(vm:GetSequence()) or ""
+            -- Replay inspect if:
+            --   (a) cycle reached 1 (animation finished), OR
+            --   (b) engine transitioned to a different sequence (e.g. idle)
+            --       that isn't the inspect sequence
+            local isInspectSeq = (curSeq == inspectAnimName)
+            if (vm:GetCycle() >= 1 and isInspectSeq) or (not isInspectSeq and not string.find(curSeq, "fire")) then
                 wep:EasySendWeaponAnim("inspect", ACT_VM_FIDGET)
             end
         end)
