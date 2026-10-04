@@ -539,12 +539,12 @@ SWEP.Bodygroups_V = { [2] = 1 }
 --   6: Magazine → default = xm8_smag (20 Round Mags)
 
 SWEP.Attachments = {
-    [1] = { atts = { "xm8_sight" }, default = 1 },
-    [2] = { atts = { "xm8_barrel_a", "xm8_barrel_h", "xm8_barrel_l", "xm8_barrel_m", "xm8_barrel_s", "xm8_barrel_xl" }, default = 2 },
-    [3] = { atts = { "xm8_psg_c", "xm8_psg_l", "xm8_psg_q", "xm8_psg_r", "xm8_psg_t" }, default = 1 },
-    [4] = { atts = { "xm8_stock_f", "xm8_stock_h", "xm8_stock_l", "xm8_stock_s", "xm8_stock_t" }, default = 1 },
-    [5] = { atts = {} },
-    [6] = { atts = { "xm8_smag", "xm8_xmag", "xm8_xmaglrg" }, default = 1 },
+    [1] = { name = "Optic",       atts = { "xm8_sight" }, default = 1 },
+    [2] = { name = "Barrel",      atts = { "xm8_barrel_a", "xm8_barrel_h", "xm8_barrel_l", "xm8_barrel_m", "xm8_barrel_s", "xm8_barrel_xl" }, default = 2 },
+    [3] = { name = "Pistol Grip", atts = { "xm8_psg_c", "xm8_psg_l", "xm8_psg_q", "xm8_psg_r", "xm8_psg_t" }, default = 1 },
+    [4] = { name = "Stock",       atts = { "xm8_stock_f", "xm8_stock_h", "xm8_stock_l", "xm8_stock_s", "xm8_stock_t" }, default = 1 },
+    [5] = { name = "Muzzle",      atts = {} },
+    [6] = { name = "Magazine",    atts = { "xm8_smag", "xm8_xmag", "xm8_xmaglrg" }, default = 1 },
 }
 
 -- END-OF-FILE CHECK: print CameraAttachment after all definitions

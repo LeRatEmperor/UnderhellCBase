@@ -151,7 +151,9 @@ local function OpenMenu()
         header:SetTall(25)
         header.Paint = function(self, w, h)
             draw.RoundedBox(4, 0, 0, w, h, CustomUH.Colors.AccentDim)
-            draw.SimpleText("Slot " .. slot .. (slotData.name and " — " .. slotData.name or ""),
+            -- Show slot name if defined, otherwise fall back to "Slot N"
+            local headerText = slotData.name or ("Slot " .. slot)
+            draw.SimpleText(headerText,
                 "DermaDefaultBold", 10, h / 2, CustomUH.Colors.TextBright, TEXT_ALIGN_LEFT, TEXT_ALIGN_CENTER)
         end
 
