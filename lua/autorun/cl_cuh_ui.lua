@@ -104,10 +104,12 @@ local function OpenMenu()
         wep:SetNW2Bool("Inspecting", true)
         wep:EasySendWeaponAnim("inspect", ACT_VM_FIDGET)
 
-        -- Cache the inspect sequence name so we can detect when the
-        -- engine transitions AWAY from it (to idle) and replay it.
+        -- Cache the inspect sequence name + duration so we know when to replay.
         local inspectAnimName = wep.Animations["inspect"]
         if istable(inspectAnimName) then inspectAnimName = inspectAnimName[1] end
+        -- Duration is measured on first loop iteration (needs the VM to be valid)
+        local inspectDuration = nil
+        local nextReplayTime = CurTime() + 0.5  -- grace period before first replay check
 
         -- Loop the inspect animation
         hook.Add("Think", "CUH2_InspectLoop", function()
@@ -123,15 +125,25 @@ local function OpenMenu()
             local vm = wep.Owner:GetViewModel()
             if not IsValid(vm) then return end
 
-            -- Get the current sequence name
-            local curSeq = vm:GetSequenceName(vm:GetSequence()) or ""
-            -- Replay inspect if:
-            --   (a) cycle reached 1 (animation finished), OR
-            --   (b) engine transitioned to a different sequence (e.g. idle)
-            --       that isn't the inspect sequence
-            local isInspectSeq = (curSeq == inspectAnimName)
-            if (vm:GetCycle() >= 1 and isInspectSeq) or (not isInspectSeq and not string.find(curSeq, "fire")) then
+            -- Measure duration on first valid frame
+            if not inspectDuration then
+                local seqIdx = vm:LookupSequence(inspectAnimName)
+                if seqIdx and seqIdx >= 0 then
+                    inspectDuration = vm:SequenceDuration(seqIdx)
+                    if inspectDuration and inspectDuration > 0 then
+                        nextReplayTime = CurTime() + inspectDuration
+                    end
+                end
+                return
+            end
+
+            -- Replay when the duration has elapsed.
+            -- Using a time-based check (not GetCycle) because the engine
+            -- may transition to idle before cycle reaches 1, and we don't
+            -- want to replay every frame.
+            if CurTime() >= nextReplayTime then
                 wep:EasySendWeaponAnim("inspect", ACT_VM_FIDGET)
+                nextReplayTime = CurTime() + inspectDuration
             end
         end)
     end
