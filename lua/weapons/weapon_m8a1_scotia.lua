@@ -1,6 +1,7 @@
 -- M8A1 (Scotia) — Ported from TFA to CUH base
 -- Inherits from weapon_cuh_base_gun (which adds customization)
 -- Uses animation-driven ironsights + animated sprinting.
+-- CUH BUILD: v0.5.4-camera-bone-diag (2026-10-02)
 
 AddCSLuaFile()
 

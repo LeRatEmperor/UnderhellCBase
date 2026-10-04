@@ -1,5 +1,6 @@
 -- weapon_cuh_base_gun.lua
 -- Customization UnderHell Base — Gun
+-- CUH BUILD: v0.5.4-camera-bone-diag (2026-10-02)
 -- ============================================================
 -- Third base layer that adds attachment customization to the
 -- Underhell Custom gun base. Inherits from weapon_custom_uh_base_gun.

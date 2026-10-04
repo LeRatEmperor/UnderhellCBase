@@ -1,5 +1,6 @@
 -- sh_cuh_attachments.lua
 -- CustomUH Attachment System — Autorun loader
+-- CUH BUILD: v0.5.4-camera-bone-diag (2026-10-02)
 -- ============================================================
 -- This file lives in lua/autorun/ and handles ONLY:
 --   1. Attachment data file registration (file.Find + include)

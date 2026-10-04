@@ -1,5 +1,6 @@
 -- cl_cuh_ui.lua
 -- CustomUH Customization UI — Client-side menu
+-- CUH BUILD: v0.5.4-camera-bone-diag (2026-10-02)
 -- ============================================================
 -- This file MUST only run on CLIENT. The autorun folder runs
 -- shared by default, so we guard with CLIENT.
