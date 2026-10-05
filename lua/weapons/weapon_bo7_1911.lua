@@ -97,14 +97,16 @@ SWEP.RunSightsAng = Vector(-15, 15, -15)
 -- ============================================================
 -- The 1911 model has additive delta blend sequences driven by these
 -- pose parameters. They blend ON TOP of the current animation, so
--- they never interrupt fire/reload/idle/inspect. This is how the TRM
--- and MW bases handle ironsights, sprint, empty, and walk — they're
--- all pose-parameter-driven overlay layers.
+-- they never interrupt fire/reload/idle/inspect.
+--
+-- Walk (jog_offset/jog_loop) is intentionally NOT driven here —
+-- the parent base's viewmodel bobbing handles walking instead.
+-- Driving both the pose parameter AND the parent base's bob causes
+-- a conflict where the gun switches between two positions every frame.
 SWEP.BasePoseParameter = {
     Sprint = { "sprint_loop", "sprint_offset" },
-    Empty   = { "empty_offset" },
-    Walk    = { "jog_offset", "jog_loop" },
-    Aim     = { "aim_offset" },
+    Empty  = { "empty_offset" },
+    Aim    = { "aim_offset" },
 }
 
 -- Disable the dip system — ironsights are pose-parameter-driven,
@@ -380,7 +382,7 @@ function SWEP:Think()
     self:HandleSprintingAnimations()
     self:HandleIdle()
     self:HandleInspect()
-    -- Drive pose parameters (ironsights, sprint, empty, walk)
+    -- Drive pose parameters (ironsights, sprint, empty)
     self:UpdatePoseParameters()
 end
 
