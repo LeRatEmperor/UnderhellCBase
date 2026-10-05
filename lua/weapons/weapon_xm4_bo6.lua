@@ -117,7 +117,7 @@ SWEP.Animations = {
     ["deploy"]       = "ACT_VM_DRAW_DEPLOYED",
     ["melee"]        = "ACT_VM_MELEE",
     ["inspect"]      = "ACT_VM_FIDGET",
-    ["mantle"]       = "ACT_VM_MELEE_SHOVE",
+    ["mantle"]       = "draw",
     ["sprint_idle"]  = "ACT_VM_SPRINT_IDLE",
     ["sprint_in"]    = "ACT_VM_SPRINT_ENTER",
     ["sprint_out"]   = "ACT_VM_SPRINT_LEAVE",
@@ -217,7 +217,7 @@ function SWEP:Think()
         local isVaulting = ply:GetNW2Bool("BO3_IsVaulting", false)
         local isMantling = ply:GetNW2Bool("BO3_IsMantling", false)
         local isInTraversal = isVaulting or isMantling
-        if isInTraversal and not self._mantleActive and ct > (self._mantleCooldown or 0) then
+        if isInTraversal and not self._mantleActive then
             if SERVER or IsFirstTimePredicted() then self:StartMantle() end
         end
         if not isInTraversal and self._mantleActive then self:EndMantle() end
@@ -225,7 +225,6 @@ function SWEP:Think()
 
     if self._mantleActive and self._mantleEndTime and ct >= self._mantleEndTime then
         self:EndMantle()
-        self._mantleCooldown = ct + 1
     end
 
     if self._meleeActive and not self._meleeHitDone and self._meleeHitTime and ct >= self._meleeHitTime then
@@ -271,7 +270,7 @@ function SWEP:StartMantle()
     end
     self._mantleActive = true
     self:ClearAnimSounds()
-    self:EasySendWeaponAnim("mantle", ACT_VM_MELEE_SHOVE)
+    self:EasySendWeaponAnim("mantle", ACT_VM_DRAW)
     local vm = self.Owner:GetViewModel()
     local dur = IsValid(vm) and vm:SequenceDuration() or 0.6
     self._mantleEndTime = ct + dur

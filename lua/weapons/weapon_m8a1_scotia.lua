@@ -123,7 +123,7 @@ SWEP.Animations = {
     ["deploy"]       = "ACT_VM_DRAW_DEPLOYED",
     ["melee"]        = "ACT_VM_MELEE",
     ["inspect"]      = "ACT_VM_FIDGET",
-    ["mantle"]       = "ACT_VM_MELEE_SHOVE",
+    ["mantle"]       = "draw",
     ["sprint_idle"]  = "ACT_VM_SPRINT_IDLE",
     ["sprint_in"]    = "ACT_VM_SPRINT_ENTER",
     ["sprint_out"]   = "ACT_VM_SPRINT_LEAVE",
@@ -229,7 +229,7 @@ function SWEP:Think()
         -- The cooldown prevents the mantle from restarting immediately
         -- after EndMantle if BO3_IsMantling is still true (the parkour
         -- addon may keep it true longer than the mantle animation).
-        if isInTraversal and not self._mantleActive and ct > (self._mantleCooldown or 0) then
+        if isInTraversal and not self._mantleActive then
             if SERVER or IsFirstTimePredicted() then self:StartMantle() end
         end
         if not isInTraversal and self._mantleActive then self:EndMantle() end
@@ -240,7 +240,6 @@ function SWEP:Think()
         -- Set cooldown so mantle doesn't restart while BO3_IsMantling
         -- is still true. 1 second should be enough for the parkour
         -- addon to clear the flag.
-        self._mantleCooldown = ct + 1
     end
 
     -- Melee timing
@@ -290,7 +289,7 @@ function SWEP:StartMantle()
     end
     self._mantleActive = true
     self:ClearAnimSounds()
-    self:EasySendWeaponAnim("mantle", ACT_VM_MELEE_SHOVE)
+    self:EasySendWeaponAnim("mantle", ACT_VM_DRAW)
     local vm = self.Owner:GetViewModel()
     local dur = IsValid(vm) and vm:SequenceDuration() or 0.6
     self._mantleEndTime = ct + dur
