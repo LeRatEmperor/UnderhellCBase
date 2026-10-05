@@ -505,36 +505,61 @@ function SWEP:DrawWElements(owner)
     if not self._wElementsInit then self:InitWElements() end
     if not IsValid(owner) then return end
 
-    local boneid = owner:LookupBone("ValveBiped.Bip01_R_Hand")
-    if not boneid then return end
-    local matrix = owner:GetBoneMatrix(boneid)
-    if not matrix then return end
-
-    local handPos = matrix:GetTranslation()
-    local handAng = matrix:GetAngles()
-
     for name, elem in pairs(self.WorldModelElements) do
         if not elem.active then continue end
 
         if elem.type == "Model" and IsValid(elem._csModel) then
             local model = elem._csModel
 
-            local pos = handPos
-            if elem.pos then
-                pos = pos + handAng:Right()   * elem.pos.x
-                pos = pos + handAng:Forward() * elem.pos.y
-                pos = pos + handAng:Up()      * elem.pos.z
+            -- SetModel every frame in case it was swapped
+            if elem.model and elem.model ~= "" then
+                model:SetModel(elem.model)
             end
 
-            local ang = Angle(handAng)
-            if elem.ang then
-                ang:RotateAroundAxis(ang:Right(),   elem.ang.p or 0)
-                ang:RotateAroundAxis(ang:Up(),       elem.ang.y or 0)
-                ang:RotateAroundAxis(ang:Forward(),  elem.ang.r or 0)
-            end
+            if elem.bonemerge then
+                -- Bonemerge: parent to the weapon entity itself (not the player).
+                -- The weapon entity is already positioned at the player's hand
+                -- by the engine, so bonemerged elements inherit the correct
+                -- position and rotation. This matches how TFA Base handles
+                -- world model bonemerging.
+                if model:GetParent() ~= self then
+                    model:SetParent(self)
+                end
+                if not model:IsEffectActive(EF_BONEMERGE) then
+                    model:AddEffects(EF_BONEMERGE)
+                end
+                model:SetLocalPos(vector_origin)
+                model:SetLocalAngles(angle_zero)
+            else
+                -- Manual positioning (for non-bonemerged elements)
+                local boneid = owner:LookupBone("ValveBiped.Bip01_R_Hand")
+                if boneid then
+                    local matrix = owner:GetBoneMatrix(boneid)
+                    if matrix then
+                        local handPos = matrix:GetTranslation()
+                        local handAng = matrix:GetAngles()
 
-            model:SetPos(pos)
-            model:SetAngles(ang)
+                        local pos = handPos
+                        if elem.pos then
+                            pos = pos + handAng:Right()   * elem.pos.x
+                            pos = pos + handAng:Forward() * elem.pos.y
+                            pos = pos + handAng:Up()      * elem.pos.z
+                        end
+
+                        local ang = Angle(handAng)
+                        if elem.ang then
+                            ang:RotateAroundAxis(ang:Right(),   elem.ang.p or 0)
+                            ang:RotateAroundAxis(ang:Up(),       elem.ang.y or 0)
+                            ang:RotateAroundAxis(ang:Forward(),  elem.ang.r or 0)
+                        end
+
+                        model:SetPos(pos)
+                        model:SetAngles(ang)
+                        model:SetParent(NULL)
+                        model:RemoveEffects(EF_BONEMERGE)
+                    end
+                end
+            end
 
             local scale = elem.scale or Vector(1, 1, 1)
             model:SetModelScale(scale.x, 0)
