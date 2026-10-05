@@ -71,8 +71,8 @@ SWEP.CUHInspectOnMenu       = true
 
 -- Ironsights — from TRM source: Sight.Pos = Vector(0, 2, 0.05), Angles = Angle(0, 90, 90)
 -- These are the default pistol iron sight positions.
-SWEP.IronSightsPos = Vector(0, 0, 0)
-SWEP.IronSightsAng = Vector(0, 0, 0)
+SWEP.IronSightsPos = Vector(0, 2, 0.05)
+SWEP.IronSightsAng = Vector(0, 90, 90)
 SWEP.IronSightTime = 0.25
 SWEP.SwayPosition = 2.0
 SWEP.AlternativePos = Vector(0, 0, 0)
@@ -85,14 +85,7 @@ SWEP.RunSightsAng = Vector(-15, 15, -15)
 -- TFA-style curved ironsight dip
 SWEP.IronSightsDipPos   = Vector(0, -1.5, -2.0)
 SWEP.IronSightsDipAng   = Angle(3, 0, 0)
-SWEP.IronSightsDipScale = 0
-
-SWEP.BasePoseParameter = {
-    Sprint = { "sprint_loop", "sprint_offset" },
-    Empty  = { "empty_offset" },
-    Walk    = { "jog_offset", "jog_loop" },
-    Aim     = { "aim_offset" },
-}
+SWEP.IronSightsDipScale = 1.0
 
 -- Camera bone system
 SWEP.CameraAttachment = "Camera"
@@ -203,70 +196,27 @@ function SWEP:HandleIronsightsAnimations()
     self.wasZooming = isZooming
 end
 
--- ============================================================
--- POSE PARAMETER SYSTEM (self-contained, from TRM base)
--- ============================================================
-function SWEP:UpdatePoseParameters()
-    if SERVER then return end
-    local vm = IsValid(self.Owner) and self.Owner:GetViewModel() or nil
-    if not IsValid(vm) then return end
-    if not self.BasePoseParameter then return end
-
-    local owner = self.Owner
-    local speed = IsValid(owner) and owner:GetVelocity():Length2D() or 0
-    local walkSpeed = IsValid(owner) and owner:GetWalkSpeed() or 1
-    local dt = FrameTime()
-
-    -- Aim Pose
-    if self.BasePoseParameter.Aim then
-        local aimTarget = (self.GetUHBool and self:GetUHBool("Zooming")) and 1 or 0
-        self.m_AimPose = Lerp(dt * 20, self.m_AimPose or 0, aimTarget)
-        for _, pose in ipairs(self.BasePoseParameter.Aim) do
-            vm:SetPoseParameter(pose, self.m_AimPose)
-        end
-    end
-
-    -- Sprint Pose
-    if self.BasePoseParameter.Sprint then
-        local isRunning = self.GetUHBool and self:GetUHBool("Running")
-        local sprintVal = (isRunning and speed > walkSpeed) and 1 or 0
-        self.m_SprintPose = Lerp(dt * 10, self.m_SprintPose or 0, sprintVal)
-        for _, pose in ipairs(self.BasePoseParameter.Sprint) do
-            vm:SetPoseParameter(pose, self.m_SprintPose)
-        end
-    end
-
-    -- Empty Pose
-    if self.BasePoseParameter.Empty then
-        local emptyTarget = (self:Clip1() <= 0) and 1 or 0
-        self.m_EmptyPose = Lerp(dt * 10, self.m_EmptyPose or 0, emptyTarget)
-        for _, pose in ipairs(self.BasePoseParameter.Empty) do
-            vm:SetPoseParameter(pose, self.m_EmptyPose)
-        end
-    end
-
-    -- Walk Pose
-    if self.BasePoseParameter.Walk then
-        local isZooming = self.GetUHBool and self:GetUHBool("Zooming")
-        local isRunning = self.GetUHBool and self:GetUHBool("Running")
-        local walkVal = 0
-        if not isZooming and not isRunning and speed > 1 then
-            walkVal = math.Clamp(speed / walkSpeed, 0, 1)
-        end
-        self.m_WalkPose = Lerp(dt * 10, self.m_WalkPose or 0, walkVal)
-        for _, pose in ipairs(self.BasePoseParameter.Walk) do
-            vm:SetPoseParameter(pose, self.m_WalkPose)
-        end
-    end
-end
-
 function SWEP:HandleSprintingAnimations()
-    -- 1911 uses pose parameters for sprint, not sequences.
-    -- Just track the state transition for _justExitedSprint.
+    local ply = self:GetOwner()
+    if not IsValid(ply) or not ply:IsPlayer() then return end
     local isRunning = self:GetUHBool("Running")
     if self.wasRunning == nil then self.wasRunning = false end
-    if not isRunning and self.wasRunning then
+    local vm = ply:GetViewModel()
+    if not IsValid(vm) then return end
+
+    if isRunning and not self.wasRunning then
+        if not self:GetUHBool("Reloading") then
+            self:EasySendWeaponAnim("sprint_in", ACT_VM_SPRINT_ENTER)
+        end
+    elseif not isRunning and self.wasRunning then
+        if not self:GetUHBool("Reloading") then
+            self:EasySendWeaponAnim("sprint_out", ACT_VM_SPRINT_LEAVE)
+        end
         self._justExitedSprint = true
+    elseif isRunning and not self:GetUHBool("Reloading") then
+        if vm:GetCycle() >= 1 then
+            self:EasySendWeaponAnim("sprint_idle", ACT_VM_SPRINT_IDLE)
+        end
     end
     self.wasRunning = isRunning
 end
@@ -328,7 +278,6 @@ function SWEP:Think()
     self:HandleSprintingAnimations()
     self:HandleIdle()
     self:HandleInspect()
-    self:UpdatePoseParameters()
 end
 
 -- ============================================================
@@ -467,17 +416,6 @@ function SWEP:HandleRunning(ct)
         self:SetHoldType(self.HoldType)
         self:SetUHBool("Running", false)
     end
-end
-
--- Override Sights() — pose parameters handle ironsights
-function SWEP:Sights(pos, ang, ft, iftp)
-    return pos, ang
-end
-
--- Override Movement() — pose parameters handle walk bob.
--- The parent base's position-based bob conflicts with jog_loop.
-function SWEP:Movement(pos, ang, ct, ft, iftp)
-    return pos, ang
 end
 
 function SWEP:GetViewModelPosition(pos, ang)
