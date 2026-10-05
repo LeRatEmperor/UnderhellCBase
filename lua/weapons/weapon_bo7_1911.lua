@@ -252,11 +252,22 @@ function SWEP:HandleIdle()
     if self:GetUHBool("Zooming") then return end
     local vm = ply:GetViewModel()
     if not IsValid(vm) then return end
-    if vm:GetCycle() < 1 then return end
-    -- Check what sequence is currently playing.
-    -- Don't restart idle if it's ALREADY playing idle/idle_empty —
-    -- restarting causes a visual snap because the jog_loop pose
-    -- parameter (realtime delta blend) resets with the sequence.
+
+    -- CRITICAL: For models with 'realtime' delta blend sequences (jog_loop,
+    -- sprint_loop, etc.), we must NOT let the idle sequence loop naturally.
+    -- When GMod loops a sequence (cycle 1 → 0), the realtime delta blend's
+    -- internal time accumulator resets, causing a visual snap/jitter every
+    -- loop cycle. This is most visible during walking when jog_loop is active.
+    --
+    -- Fix: Clamp the cycle to just below 1.0 so the sequence never reaches
+    -- the loop point. The idle animation effectively freezes at its end
+    -- frame, but the realtime delta blends (jog_loop, etc.) continue
+    -- advancing smoothly because the sequence doesn't restart.
+    if vm:GetCycle() >= 0.999 then
+        vm:SetCycle(0.999)
+    end
+
+    -- Don't restart idle if it's already playing — see comment above.
     local curSeq = string.lower(vm:GetSequenceName(vm:GetSequence()) or "")
     if self:Clip1() <= 0 and self.Animations["idle_empty"] then
         if curSeq ~= "idle_empty" then
@@ -523,20 +534,24 @@ function SWEP:HandleRunning(ct)
 end
 
 -- Override Sights() to do nothing — ironsights are pose-parameter-driven.
--- The parent base's Sights() applies position/angle offsets which would
--- conflict with the pose parameter system. The pose parameter
--- (aim_offset) handles the ironsight transition smoothly via the
--- model's delta blend sequence.
+-- The pose parameter (aim_offset) handles the ironsight transition.
 function SWEP:Sights(pos, ang, ft, iftp)
     return pos, ang
 end
 
--- GetViewModelPosition — for pose-parameter-driven weapons, we just
--- call the parent base (which handles Sway/Movement/Inspect/Grenade
--- but skips Sights() because UseViewModelBob = false). We do NOT
--- apply any of our own position offsets (LoweredPos, AlternativePos,
--- RunSightsPos) because those fight with the pose parameter system.
--- The pose parameters handle sprint, ironsights, and empty state.
+-- Override Movement() to do nothing — the parent base's position-based
+-- viewmodel bobbing fights with the model's jog_loop pose parameter
+-- (realtime delta blend), causing a rapid left-right jitter during
+-- walking. The pose parameters handle walk bob, sprint, ironsights,
+-- and empty state. Sway/Inspect/Grenade from the parent base still run.
+function SWEP:Movement(pos, ang, ct, ft, iftp)
+    return pos, ang
+end
+
+-- GetViewModelPosition — call the parent base normally. The parent base
+-- runs Inspect, Grenade, Sway, Movement (overridden to do nothing),
+-- and Sights (overridden to do nothing). The pose parameters handle
+-- all viewmodel movement.
 function SWEP:GetViewModelPosition(pos, ang)
     if BaseClass and BaseClass.GetViewModelPosition then
         return BaseClass.GetViewModelPosition(self, pos, ang)
