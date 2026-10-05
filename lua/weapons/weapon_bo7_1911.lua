@@ -531,60 +531,15 @@ function SWEP:Sights(pos, ang, ft, iftp)
     return pos, ang
 end
 
+-- GetViewModelPosition — for pose-parameter-driven weapons, we just
+-- call the parent base (which handles Sway/Movement/Inspect/Grenade
+-- but skips Sights() because UseViewModelBob = false). We do NOT
+-- apply any of our own position offsets (LoweredPos, AlternativePos,
+-- RunSightsPos) because those fight with the pose parameter system.
+-- The pose parameters handle sprint, ironsights, and empty state.
 function SWEP:GetViewModelPosition(pos, ang)
-    local ft = FrameTime()
     if BaseClass and BaseClass.GetViewModelPosition then
-        pos, ang = BaseClass.GetViewModelPosition(self, pos, ang)
-    end
-    local target = 0
-    if self:GetNWInt("FireMode") == 0 and not self:GetUHBool("Running") then target = 1 end
-    self._uhLower = Lerp(ft * 8, self._uhLower or 0, target)
-    if self._uhLower > 0.001 then
-        local lp = self.LoweredPos or vector_origin
-        local la = self.LoweredAng or angle_zero
-        local ap, ay, ar = 0, 0, 0
-        if isangle(la) then ap, ay, ar = la.p, la.y, la.r
-        elseif isvector(la) then ap, ay, ar = la.x, la.y, la.z end
-        ang:RotateAroundAxis(ang:Right(), ap * self._uhLower)
-        ang:RotateAroundAxis(ang:Up(), ay * self._uhLower)
-        ang:RotateAroundAxis(ang:Forward(), ar * self._uhLower)
-        pos = pos + ang:Right() * lp.x * self._uhLower
-            + ang:Forward() * lp.y * self._uhLower
-            + ang:Up() * lp.z * self._uhLower
-    end
-    local targetAlt = 1
-    if self:GetUHBool("Running") or self:GetUHBool("Zooming") or self:GetNWInt("FireMode") == 0 then
-        targetAlt = 0
-    end
-    self._altFactor = Lerp(ft * 10, self._altFactor or 0, targetAlt)
-    if (self.AlternativePos or self.AlternativeAng) and self._altFactor > 0.01 then
-        local ap = self.AlternativePos or vector_origin
-        local aa = self.AlternativeAng or angle_zero
-        pos = pos + ang:Right() * ap.x * self._altFactor
-            + ang:Forward() * ap.y * self._altFactor
-            + ang:Up() * ap.z * self._altFactor
-        local ap_p, ap_y, ap_r = 0, 0, 0
-        if isangle(aa) then ap_p, ap_y, ap_r = aa.p, aa.y, aa.r
-        elseif isvector(aa) then ap_p, ap_y, ap_r = aa.x, aa.y, aa.z end
-        ang:RotateAroundAxis(ang:Right(), ap_p * self._altFactor)
-        ang:RotateAroundAxis(ang:Up(), ap_y * self._altFactor)
-        ang:RotateAroundAxis(ang:Forward(), ap_r * self._altFactor)
-    end
-    local targetSprint = self:GetUHBool("Running") and 1 or 0
-    self._sprintFactor = Lerp(ft * 10, self._sprintFactor or 0, targetSprint)
-    if self._sprintFactor > 0.01 then
-        local sp = self.RunSightsPos or vector_origin
-        local sa = self.RunSightsAng or angle_zero
-        local sf = self._sprintFactor
-        pos = pos + ang:Right() * sp.x * sf
-            + ang:Forward() * sp.y * sf
-            + ang:Up() * sp.z * sf
-        local sp_p, sp_y, sp_r = 0, 0, 0
-        if isangle(sa) then sp_p, sp_y, sp_r = sa.p, sa.y, sa.r
-        elseif isvector(sa) then sp_p, sp_y, sp_r = sa.x, sa.y, sa.z end
-        ang:RotateAroundAxis(ang:Right(), sp_p * sf)
-        ang:RotateAroundAxis(ang:Up(), sp_y * sf)
-        ang:RotateAroundAxis(ang:Forward(), sp_r * sf)
+        return BaseClass.GetViewModelPosition(self, pos, ang)
     end
     return pos, ang
 end
