@@ -66,21 +66,11 @@ SWEP.Primary.KickHorizontal = 0.2
 SWEP.TwoHanded              = false
 SWEP.ReloadSpeed            = 1
 SWEP.Chambering             = true
-SWEP.AnimatedSprint         = true
+SWEP.AnimatedSprint         = false
 SWEP.CUHInspectOnMenu       = true
 
--- Disable the parent base's viewmodel bobbing/breathing.
--- The 1911 uses pose-parameter-driven additive animations for
--- ironsights, sprint, walk, and empty — the parent base's position-
--- based bobbing fights with the pose parameter system and causes
--- a visual "switching between two positions every frame" bug.
-SWEP.UseViewBob = false
-
--- Ironsights — the 1911 uses POSE-PARAMETER-BASED ironsights.
--- The "aim_offset" pose parameter drives a delta blend sequence that
--- smoothly raises the gun to the aim position. IronSightsPos/Ang are
--- zero so the parent base's Sights() function doesn't fight the pose
--- parameter system.
+-- Ironsights — from TRM source: Sight.Pos = Vector(0, 2, 0.05), Angles = Angle(0, 90, 90)
+-- These are the default pistol iron sight positions.
 SWEP.IronSightsPos = Vector(0, 0, 0)
 SWEP.IronSightsAng = Vector(0, 0, 0)
 SWEP.IronSightTime = 0.25
@@ -92,27 +82,17 @@ SWEP.AlternativeAng = Angle(0, 0, 0)
 SWEP.RunSightsPos = Vector(0, 0, 0)
 SWEP.RunSightsAng = Vector(-15, 15, -15)
 
--- ============================================================
--- POSE PARAMETER CONFIG (from TRM source)
--- ============================================================
--- The 1911 model has additive delta blend sequences driven by these
--- pose parameters. They blend ON TOP of the current animation, so
--- they never interrupt fire/reload/idle/inspect. This is how the TRM
--- and MW bases handle ironsights, sprint, empty, and walk — they're
--- all pose-parameter-driven overlay layers.
+-- TFA-style curved ironsight dip
+SWEP.IronSightsDipPos   = Vector(0, -1.5, -2.0)
+SWEP.IronSightsDipAng   = Angle(3, 0, 0)
+SWEP.IronSightsDipScale = 0
+
 SWEP.BasePoseParameter = {
     Sprint = { "sprint_loop", "sprint_offset" },
-    Empty   = { "empty_offset" },
+    Empty  = { "empty_offset" },
     Walk    = { "jog_offset", "jog_loop" },
     Aim     = { "aim_offset" },
 }
-
--- Disable the dip system — ironsights are pose-parameter-driven,
--- so the curved dip transition is not needed (the pose parameter
--- handles the smooth transition naturally).
-SWEP.IronSightsDipPos   = Vector(0, 0, 0)
-SWEP.IronSightsDipAng   = Angle(0, 0, 0)
-SWEP.IronSightsDipScale = 0
 
 -- Camera bone system
 SWEP.CameraAttachment = "Camera"
@@ -135,13 +115,9 @@ SWEP.MeleeHitSound  = {"weapons/blackops3/rifle_butt/rifle_hit_00.wav", "weapons
 SWEP.MeleeMissSound = ""
 SWEP.MeleeInterruptReload = true
 
--- No model-based shell ejection — the 1911 model has shell ejection
--- built into the fire animation via QC events (event 9001 MuzzleFlash).
--- Setting NoShell = true prevents the base from trying to load a shell
--- model that doesn't exist (which shows as an error).
-SWEP.NoShell  = true
+SWEP.NoShell  = false
 SWEP.ShellHeat = 0.8
-SWEP.Shell     = ""
+SWEP.Shell     = "models/shells/shell_pistol.mdl"
 
 -- Bodygroups (from TRM source)
 SWEP.Bodygroups_V = { Body = 0 }
@@ -227,14 +203,66 @@ function SWEP:HandleIronsightsAnimations()
     self.wasZooming = isZooming
 end
 
+-- ============================================================
+-- POSE PARAMETER SYSTEM (self-contained, from TRM base)
+-- ============================================================
+function SWEP:UpdatePoseParameters()
+    if SERVER then return end
+    local vm = IsValid(self.Owner) and self.Owner:GetViewModel() or nil
+    if not IsValid(vm) then return end
+    if not self.BasePoseParameter then return end
+
+    local owner = self.Owner
+    local speed = IsValid(owner) and owner:GetVelocity():Length2D() or 0
+    local walkSpeed = IsValid(owner) and owner:GetWalkSpeed() or 1
+    local dt = FrameTime()
+
+    -- Aim Pose
+    if self.BasePoseParameter.Aim then
+        local aimTarget = (self.GetUHBool and self:GetUHBool("Zooming")) and 1 or 0
+        self.m_AimPose = Lerp(dt * 20, self.m_AimPose or 0, aimTarget)
+        for _, pose in ipairs(self.BasePoseParameter.Aim) do
+            vm:SetPoseParameter(pose, self.m_AimPose)
+        end
+    end
+
+    -- Sprint Pose
+    if self.BasePoseParameter.Sprint then
+        local isRunning = self.GetUHBool and self:GetUHBool("Running")
+        local sprintVal = (isRunning and speed > walkSpeed) and 1 or 0
+        self.m_SprintPose = Lerp(dt * 10, self.m_SprintPose or 0, sprintVal)
+        for _, pose in ipairs(self.BasePoseParameter.Sprint) do
+            vm:SetPoseParameter(pose, self.m_SprintPose)
+        end
+    end
+
+    -- Empty Pose
+    if self.BasePoseParameter.Empty then
+        local emptyTarget = (self:Clip1() <= 0) and 1 or 0
+        self.m_EmptyPose = Lerp(dt * 10, self.m_EmptyPose or 0, emptyTarget)
+        for _, pose in ipairs(self.BasePoseParameter.Empty) do
+            vm:SetPoseParameter(pose, self.m_EmptyPose)
+        end
+    end
+
+    -- Walk Pose
+    if self.BasePoseParameter.Walk then
+        local isZooming = self.GetUHBool and self:GetUHBool("Zooming")
+        local isRunning = self.GetUHBool and self:GetUHBool("Running")
+        local walkVal = 0
+        if not isZooming and not isRunning and speed > 1 then
+            walkVal = math.Clamp(speed / walkSpeed, 0, 1)
+        end
+        self.m_WalkPose = Lerp(dt * 10, self.m_WalkPose or 0, walkVal)
+        for _, pose in ipairs(self.BasePoseParameter.Walk) do
+            vm:SetPoseParameter(pose, self.m_WalkPose)
+        end
+    end
+end
+
 function SWEP:HandleSprintingAnimations()
-    -- The 1911 uses POSE PARAMETERS for sprint (sprint_loop/sprint_offset),
-    -- NOT sequence-based sprint animations. The pose parameter is driven by
-    -- UpdatePoseParameters() based on the Running bool + velocity.
-    -- We do NOT play sprint_in/sprint_out/sprint_idle sequences here —
-    -- that would conflict with the pose parameter system and cause jitter.
-    -- Just track the state transition for _justExitedSprint (used by
-    -- HandleIronsightsAnimations to skip one frame after sprint exit).
+    -- 1911 uses pose parameters for sprint, not sequences.
+    -- Just track the state transition for _justExitedSprint.
     local isRunning = self:GetUHBool("Running")
     if self.wasRunning == nil then self.wasRunning = false end
     if not isRunning and self.wasRunning then
@@ -252,102 +280,11 @@ function SWEP:HandleIdle()
     if self:GetUHBool("Zooming") then return end
     local vm = ply:GetViewModel()
     if not IsValid(vm) then return end
-
-    -- CRITICAL: For models with 'realtime' delta blend sequences (jog_loop,
-    -- sprint_loop, etc.), we must NOT let the idle sequence loop naturally.
-    -- When GMod loops a sequence (cycle 1 → 0), the realtime delta blend's
-    -- internal time accumulator resets, causing a visual snap/jitter every
-    -- loop cycle. This is most visible during walking when jog_loop is active.
-    --
-    -- Fix: Clamp the cycle to just below 1.0 so the sequence never reaches
-    -- the loop point. The idle animation effectively freezes at its end
-    -- frame, but the realtime delta blends (jog_loop, etc.) continue
-    -- advancing smoothly because the sequence doesn't restart.
-    if vm:GetCycle() >= 0.999 then
-        vm:SetCycle(0.999)
-    end
-
-    -- Don't restart idle if it's already playing — see comment above.
-    local curSeq = string.lower(vm:GetSequenceName(vm:GetSequence()) or "")
+    if vm:GetCycle() < 1 then return end
     if self:Clip1() <= 0 and self.Animations["idle_empty"] then
-        if curSeq ~= "idle_empty" then
-            self:EasySendWeaponAnim("idle_empty", ACT_VM_IDLE)
-        end
+        self:EasySendWeaponAnim("idle_empty", ACT_VM_IDLE)
     else
-        if curSeq ~= "idle" then
-            self:EasySendWeaponAnim("idle", ACT_VM_IDLE)
-        end
-    end
-end
-
--- ============================================================
--- POSE PARAMETER SYSTEM (self-contained, from TRM base)
--- ============================================================
--- Drives the 1911's pose parameters every frame on the client.
--- This handles ironsights (aim_offset), sprint (sprint_loop/offset),
--- empty (empty_offset), and walk (jog_offset/loop) via delta blend
--- sequences that overlay on top of whatever animation is playing.
---
--- This is a self-contained port of the TRM base's UpdatePoseParameters
--- function. It does NOT require the TRM base to be installed.
--- ============================================================
-function SWEP:UpdatePoseParameters()
-    if SERVER then return end
-    local vm = IsValid(self.Owner) and self.Owner:GetViewModel() or nil
-    if not IsValid(vm) then return end
-    if not self.BasePoseParameter then return end
-
-    local owner = self.Owner
-    local speed = IsValid(owner) and owner:GetVelocity():Length2D() or 0
-    local runSpeed = IsValid(owner) and owner:GetRunSpeed() or 1
-    local walkSpeed = IsValid(owner) and owner:GetWalkSpeed() or 1
-    local dt = FrameTime()
-
-    -- Aim Pose — drives the aim_offset pose parameter based on ironsight state.
-    -- Uses the _ironBlendLat value from the parent base's Sights() function
-    -- (which lerps toward 1 when zooming, 0 when not).
-    if self.BasePoseParameter.Aim then
-        local aimTarget = (self.GetUHBool and self:GetUHBool("Zooming")) and 1 or 0
-        self.m_AimPose = Lerp(dt * 20, self.m_AimPose or 0, aimTarget)
-        for _, pose in ipairs(self.BasePoseParameter.Aim) do
-            vm:SetPoseParameter(pose, self.m_AimPose)
-        end
-    end
-
-    -- Sprint Pose — drives sprint_loop and sprint_offset.
-    -- Active when the player is sprinting (Running bool) and moving.
-    if self.BasePoseParameter.Sprint then
-        local isRunning = self.GetUHBool and self:GetUHBool("Running")
-        local sprintVal = (isRunning and speed > walkSpeed) and 1 or 0
-        self.m_SprintPose = Lerp(dt * 10, self.m_SprintPose or 0, sprintVal)
-        for _, pose in ipairs(self.BasePoseParameter.Sprint) do
-            vm:SetPoseParameter(pose, self.m_SprintPose)
-        end
-    end
-
-    -- Empty Pose — drives empty_offset.
-    -- 1 when the magazine is empty, 0 when there are rounds.
-    if self.BasePoseParameter.Empty then
-        local emptyTarget = (self:Clip1() <= 0) and 1 or 0
-        self.m_EmptyPose = Lerp(dt * 10, self.m_EmptyPose or 0, emptyTarget)
-        for _, pose in ipairs(self.BasePoseParameter.Empty) do
-            vm:SetPoseParameter(pose, self.m_EmptyPose)
-        end
-    end
-
-    -- Walk Pose — drives jog_offset and jog_loop.
-    -- Active when moving (but not sprinting or aiming).
-    if self.BasePoseParameter.Walk then
-        local isZooming = self.GetUHBool and self:GetUHBool("Zooming")
-        local isRunning = self.GetUHBool and self:GetUHBool("Running")
-        local walkVal = 0
-        if not isZooming and not isRunning and speed > 1 then
-            walkVal = math.Clamp(speed / walkSpeed, 0, 1)
-        end
-        self.m_WalkPose = Lerp(dt * 10, self.m_WalkPose or 0, walkVal)
-        for _, pose in ipairs(self.BasePoseParameter.Walk) do
-            vm:SetPoseParameter(pose, self.m_WalkPose)
-        end
+        self:EasySendWeaponAnim("idle", ACT_VM_IDLE)
     end
 end
 
@@ -391,7 +328,6 @@ function SWEP:Think()
     self:HandleSprintingAnimations()
     self:HandleIdle()
     self:HandleInspect()
-    -- Drive pose parameters (ironsights, sprint, empty, walk)
     self:UpdatePoseParameters()
 end
 
@@ -509,11 +445,11 @@ end
 
 function SWEP:HandleRunning(ct)
     if self:GetUHBool("Reloading") then return end
-    -- NOTE: Removed the fireDelay > 0.3 gate from the M8A1 version.
-    -- That gate caused the Running bool to flicker on/off rapidly when
-    -- the fire delay was between 0 and 0.3 seconds, which in turn
-    -- caused the sprint pose parameter to jitter.
-    -- For pose-parameter-driven weapons, the Running bool must be stable.
+    local vm = self.Owner:GetViewModel()
+    if IsValid(vm) then
+        local fireDelay = self:GetNextPrimaryFire() - ct
+        if fireDelay > 0.3 then return end
+    end
     local dist = self.Owner:GetVelocity():LengthSqr()
     local isSprinting = self.Owner:KeyDown(IN_SPEED) and dist > self.Owner:GetWalkSpeed()^2
     if isSprinting then
@@ -533,28 +469,71 @@ function SWEP:HandleRunning(ct)
     end
 end
 
--- Override Sights() to do nothing — ironsights are pose-parameter-driven.
--- The pose parameter (aim_offset) handles the ironsight transition.
+-- Override Sights() — pose parameters handle ironsights
 function SWEP:Sights(pos, ang, ft, iftp)
     return pos, ang
 end
 
--- Override Movement() to do nothing — the parent base's position-based
--- viewmodel bobbing fights with the model's jog_loop pose parameter
--- (realtime delta blend), causing a rapid left-right jitter during
--- walking. The pose parameters handle walk bob, sprint, ironsights,
--- and empty state. Sway/Inspect/Grenade from the parent base still run.
+-- Override Movement() — pose parameters handle walk bob.
+-- The parent base's position-based bob conflicts with jog_loop.
 function SWEP:Movement(pos, ang, ct, ft, iftp)
     return pos, ang
 end
 
--- GetViewModelPosition — call the parent base normally. The parent base
--- runs Inspect, Grenade, Sway, Movement (overridden to do nothing),
--- and Sights (overridden to do nothing). The pose parameters handle
--- all viewmodel movement.
 function SWEP:GetViewModelPosition(pos, ang)
+    local ft = FrameTime()
     if BaseClass and BaseClass.GetViewModelPosition then
-        return BaseClass.GetViewModelPosition(self, pos, ang)
+        pos, ang = BaseClass.GetViewModelPosition(self, pos, ang)
+    end
+    local target = 0
+    if self:GetNWInt("FireMode") == 0 and not self:GetUHBool("Running") then target = 1 end
+    self._uhLower = Lerp(ft * 8, self._uhLower or 0, target)
+    if self._uhLower > 0.001 then
+        local lp = self.LoweredPos or vector_origin
+        local la = self.LoweredAng or angle_zero
+        local ap, ay, ar = 0, 0, 0
+        if isangle(la) then ap, ay, ar = la.p, la.y, la.r
+        elseif isvector(la) then ap, ay, ar = la.x, la.y, la.z end
+        ang:RotateAroundAxis(ang:Right(), ap * self._uhLower)
+        ang:RotateAroundAxis(ang:Up(), ay * self._uhLower)
+        ang:RotateAroundAxis(ang:Forward(), ar * self._uhLower)
+        pos = pos + ang:Right() * lp.x * self._uhLower
+            + ang:Forward() * lp.y * self._uhLower
+            + ang:Up() * lp.z * self._uhLower
+    end
+    local targetAlt = 1
+    if self:GetUHBool("Running") or self:GetUHBool("Zooming") or self:GetNWInt("FireMode") == 0 then
+        targetAlt = 0
+    end
+    self._altFactor = Lerp(ft * 10, self._altFactor or 0, targetAlt)
+    if (self.AlternativePos or self.AlternativeAng) and self._altFactor > 0.01 then
+        local ap = self.AlternativePos or vector_origin
+        local aa = self.AlternativeAng or angle_zero
+        pos = pos + ang:Right() * ap.x * self._altFactor
+            + ang:Forward() * ap.y * self._altFactor
+            + ang:Up() * ap.z * self._altFactor
+        local ap_p, ap_y, ap_r = 0, 0, 0
+        if isangle(aa) then ap_p, ap_y, ap_r = aa.p, aa.y, aa.r
+        elseif isvector(aa) then ap_p, ap_y, ap_r = aa.x, aa.y, aa.z end
+        ang:RotateAroundAxis(ang:Right(), ap_p * self._altFactor)
+        ang:RotateAroundAxis(ang:Up(), ap_y * self._altFactor)
+        ang:RotateAroundAxis(ang:Forward(), ap_r * self._altFactor)
+    end
+    local targetSprint = self:GetUHBool("Running") and 1 or 0
+    self._sprintFactor = Lerp(ft * 10, self._sprintFactor or 0, targetSprint)
+    if self._sprintFactor > 0.01 then
+        local sp = self.RunSightsPos or vector_origin
+        local sa = self.RunSightsAng or angle_zero
+        local sf = self._sprintFactor
+        pos = pos + ang:Right() * sp.x * sf
+            + ang:Forward() * sp.y * sf
+            + ang:Up() * sp.z * sf
+        local sp_p, sp_y, sp_r = 0, 0, 0
+        if isangle(sa) then sp_p, sp_y, sp_r = sa.p, sa.y, sa.r
+        elseif isvector(sa) then sp_p, sp_y, sp_r = sa.x, sa.y, sa.z end
+        ang:RotateAroundAxis(ang:Right(), sp_p * sf)
+        ang:RotateAroundAxis(ang:Up(), sp_y * sf)
+        ang:RotateAroundAxis(ang:Forward(), sp_r * sf)
     end
     return pos, ang
 end
