@@ -69,12 +69,12 @@ SWEP.Chambering             = true
 SWEP.AnimatedSprint         = false
 SWEP.CUHInspectOnMenu       = true
 
--- Disable the parent base's viewmodel bob/sway/sights system.
+-- Disable the parent base's viewmodel bobbing/breathing.
 -- The 1911 uses pose-parameter-driven additive animations for
 -- ironsights, sprint, walk, and empty — the parent base's position-
 -- based bobbing fights with the pose parameter system and causes
 -- a visual "switching between two positions every frame" bug.
-SWEP.UseViewModelBob = false
+SWEP.UseViewBob = false
 
 -- Ironsights — the 1911 uses POSE-PARAMETER-BASED ironsights.
 -- The "aim_offset" pose parameter drives a delta blend sequence that
