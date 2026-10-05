@@ -533,6 +533,12 @@ end
 -- magazine drop effect works during reload. This matches the TRM
 -- source's Effects.Mag.Model = "models/weapons/1911_mag.mdl".
 
+SWEP.Offset = {
+    Pos = { Up = -2, Right = 19, Forward = 1 },
+    Ang = { Up = 0, Right = 0, Forward = 180 },
+    Scale = 1
+}
+
 SWEP.ViewModelElements = {
     ["mag"] = {
         type = "Model", model = "models/weapons/1911_mag.mdl",

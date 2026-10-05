@@ -593,12 +593,43 @@ end
 function SWEP:DrawWorldModel()
     local owner = self:GetOwner()
     if IsValid(owner) then
-        -- Draw the base world model
+        -- Position the weapon entity at the player's hand bone using
+        -- SWEP.Offset (same system as TFA Base). This is needed because
+        -- GMod doesn't automatically attach the weapon entity to the
+        -- player's hand — it floats at the player's origin.
+        if self.Offset and self.Offset.Pos and self.Offset.Ang then
+            local handBone = owner:LookupBone("ValveBiped.Bip01_R_Hand")
+            if handBone then
+                local matrix = owner:GetBoneMatrix(handBone)
+                if matrix then
+                    local pos = matrix:GetTranslation()
+                    local ang = matrix:GetAngles()
+                    pos = pos + ang:Forward() * (self.Offset.Pos.Forward or 0)
+                         + ang:Right()   * (self.Offset.Pos.Right or 0)
+                         + ang:Up()      * (self.Offset.Pos.Up or 0)
+                    ang:RotateAroundAxis(ang:Up(),      self.Offset.Ang.Up or 0)
+                    ang:RotateAroundAxis(ang:Right(),    self.Offset.Ang.Right or 0)
+                    ang:RotateAroundAxis(ang:Forward(),  self.Offset.Ang.Forward or 0)
+                    self:SetRenderOrigin(pos)
+                    self:SetRenderAngles(ang)
+                    if self.Offset.Scale then
+                        self:SetModelScale(self.Offset.Scale, 0)
+                    end
+                end
+            else
+                self:SetRenderOrigin(nil)
+                self:SetRenderAngles(nil)
+            end
+        end
+
+        -- Draw the base world model (receiver)
         self:DrawModel()
         -- Draw attachment elements on top
         self:DrawWElements(owner)
     else
         -- No owner — draw at weapon position (ground spawn)
+        self:SetRenderOrigin(nil)
+        self:SetRenderAngles(nil)
         self:DrawModel()
     end
 end
