@@ -66,7 +66,7 @@ SWEP.Primary.KickHorizontal = 0.2
 SWEP.TwoHanded              = false
 SWEP.ReloadSpeed            = 1
 SWEP.Chambering             = true
-SWEP.AnimatedSprint         = false
+SWEP.AnimatedSprint         = true
 SWEP.CUHInspectOnMenu       = true
 
 -- Disable the parent base's viewmodel bobbing/breathing.
@@ -97,16 +97,14 @@ SWEP.RunSightsAng = Vector(-15, 15, -15)
 -- ============================================================
 -- The 1911 model has additive delta blend sequences driven by these
 -- pose parameters. They blend ON TOP of the current animation, so
--- they never interrupt fire/reload/idle/inspect.
---
--- Walk (jog_offset/jog_loop) is intentionally NOT driven here —
--- the parent base's viewmodel bobbing handles walking instead.
--- Driving both the pose parameter AND the parent base's bob causes
--- a conflict where the gun switches between two positions every frame.
+-- they never interrupt fire/reload/idle/inspect. This is how the TRM
+-- and MW bases handle ironsights, sprint, empty, and walk — they're
+-- all pose-parameter-driven overlay layers.
 SWEP.BasePoseParameter = {
     Sprint = { "sprint_loop", "sprint_offset" },
-    Empty  = { "empty_offset" },
-    Aim    = { "aim_offset" },
+    Empty   = { "empty_offset" },
+    Walk    = { "jog_offset", "jog_loop" },
+    Aim     = { "aim_offset" },
 }
 
 -- Disable the dip system — ironsights are pose-parameter-driven,
@@ -230,26 +228,17 @@ function SWEP:HandleIronsightsAnimations()
 end
 
 function SWEP:HandleSprintingAnimations()
-    local ply = self:GetOwner()
-    if not IsValid(ply) or not ply:IsPlayer() then return end
+    -- The 1911 uses POSE PARAMETERS for sprint (sprint_loop/sprint_offset),
+    -- NOT sequence-based sprint animations. The pose parameter is driven by
+    -- UpdatePoseParameters() based on the Running bool + velocity.
+    -- We do NOT play sprint_in/sprint_out/sprint_idle sequences here —
+    -- that would conflict with the pose parameter system and cause jitter.
+    -- Just track the state transition for _justExitedSprint (used by
+    -- HandleIronsightsAnimations to skip one frame after sprint exit).
     local isRunning = self:GetUHBool("Running")
     if self.wasRunning == nil then self.wasRunning = false end
-    local vm = ply:GetViewModel()
-    if not IsValid(vm) then return end
-
-    if isRunning and not self.wasRunning then
-        if not self:GetUHBool("Reloading") then
-            self:EasySendWeaponAnim("sprint_in", ACT_VM_SPRINT_ENTER)
-        end
-    elseif not isRunning and self.wasRunning then
-        if not self:GetUHBool("Reloading") then
-            self:EasySendWeaponAnim("sprint_out", ACT_VM_SPRINT_LEAVE)
-        end
+    if not isRunning and self.wasRunning then
         self._justExitedSprint = true
-    elseif isRunning and not self:GetUHBool("Reloading") then
-        if vm:GetCycle() >= 1 then
-            self:EasySendWeaponAnim("sprint_idle", ACT_VM_SPRINT_IDLE)
-        end
     end
     self.wasRunning = isRunning
 end
@@ -382,7 +371,7 @@ function SWEP:Think()
     self:HandleSprintingAnimations()
     self:HandleIdle()
     self:HandleInspect()
-    -- Drive pose parameters (ironsights, sprint, empty)
+    -- Drive pose parameters (ironsights, sprint, empty, walk)
     self:UpdatePoseParameters()
 end
 
@@ -500,11 +489,11 @@ end
 
 function SWEP:HandleRunning(ct)
     if self:GetUHBool("Reloading") then return end
-    local vm = self.Owner:GetViewModel()
-    if IsValid(vm) then
-        local fireDelay = self:GetNextPrimaryFire() - ct
-        if fireDelay > 0.3 then return end
-    end
+    -- NOTE: Removed the fireDelay > 0.3 gate from the M8A1 version.
+    -- That gate caused the Running bool to flicker on/off rapidly when
+    -- the fire delay was between 0 and 0.3 seconds, which in turn
+    -- caused the sprint pose parameter to jitter.
+    -- For pose-parameter-driven weapons, the Running bool must be stable.
     local dist = self.Owner:GetVelocity():LengthSqr()
     local isSprinting = self.Owner:KeyDown(IN_SPEED) and dist > self.Owner:GetWalkSpeed()^2
     if isSprinting then
