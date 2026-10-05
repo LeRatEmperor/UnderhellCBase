@@ -531,21 +531,16 @@ function SWEP:Sights(pos, ang, ft, iftp)
     return pos, ang
 end
 
--- GetViewModelPosition — for pose-parameter-driven weapons, return
--- pos/ang UNCHANGED. Do NOT call BaseClass.GetViewModelPosition
--- because the parent base's Movement() function applies position-based
--- viewmodel bobbing that fights with the model's jog_loop/sprint_loop
--- pose parameter delta blend sequences, causing a per-frame jitter.
---
--- The model's pose parameters handle:
---   aim_offset  → ironsights
---   sprint_loop → sprint
---   jog_loop    → walk bob
---   empty_offset → empty state
---
--- Sway is handled by the model's own bone setup (not position offset).
--- Camera bone is handled by the CUH base's CalcView override.
+-- GetViewModelPosition — for pose-parameter-driven weapons, we just
+-- call the parent base (which handles Sway/Movement/Inspect/Grenade
+-- but skips Sights() because UseViewModelBob = false). We do NOT
+-- apply any of our own position offsets (LoweredPos, AlternativePos,
+-- RunSightsPos) because those fight with the pose parameter system.
+-- The pose parameters handle sprint, ironsights, and empty state.
 function SWEP:GetViewModelPosition(pos, ang)
+    if BaseClass and BaseClass.GetViewModelPosition then
+        return BaseClass.GetViewModelPosition(self, pos, ang)
+    end
     return pos, ang
 end
 
