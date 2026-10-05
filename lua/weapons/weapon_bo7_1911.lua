@@ -252,22 +252,11 @@ function SWEP:HandleIdle()
     if self:GetUHBool("Zooming") then return end
     local vm = ply:GetViewModel()
     if not IsValid(vm) then return end
-
-    -- CRITICAL: For models with 'realtime' delta blend sequences (jog_loop,
-    -- sprint_loop, etc.), we must NOT let the idle sequence loop naturally.
-    -- When GMod loops a sequence (cycle 1 → 0), the realtime delta blend's
-    -- internal time accumulator resets, causing a visual snap/jitter every
-    -- loop cycle. This is most visible during walking when jog_loop is active.
-    --
-    -- Fix: Clamp the cycle to just below 1.0 so the sequence never reaches
-    -- the loop point. The idle animation effectively freezes at its end
-    -- frame, but the realtime delta blends (jog_loop, etc.) continue
-    -- advancing smoothly because the sequence doesn't restart.
-    if vm:GetCycle() >= 0.999 then
-        vm:SetCycle(0.999)
-    end
-
-    -- Don't restart idle if it's already playing — see comment above.
+    if vm:GetCycle() < 1 then return end
+    -- Check what sequence is currently playing.
+    -- Don't restart idle if it's ALREADY playing idle/idle_empty —
+    -- restarting causes a visual snap because the jog_loop pose
+    -- parameter (realtime delta blend) resets with the sequence.
     local curSeq = string.lower(vm:GetSequenceName(vm:GetSequence()) or "")
     if self:Clip1() <= 0 and self.Animations["idle_empty"] then
         if curSeq ~= "idle_empty" then
@@ -542,21 +531,16 @@ function SWEP:Sights(pos, ang, ft, iftp)
     return pos, ang
 end
 
--- GetViewModelPosition — for pose-parameter-driven weapons, return
--- pos/ang UNCHANGED. Do NOT call BaseClass.GetViewModelPosition
--- because the parent base's Movement() function applies position-based
--- viewmodel bobbing that fights with the model's jog_loop/sprint_loop
--- pose parameter delta blend sequences, causing a per-frame jitter.
---
--- The model's pose parameters handle:
---   aim_offset  → ironsights
---   sprint_loop → sprint
---   jog_loop    → walk bob
---   empty_offset → empty state
---
--- Sway is handled by the model's own bone setup (not position offset).
--- Camera bone is handled by the CUH base's CalcView override.
+-- GetViewModelPosition — for pose-parameter-driven weapons, we just
+-- call the parent base (which handles Sway/Movement/Inspect/Grenade
+-- but skips Sights() because UseViewModelBob = false). We do NOT
+-- apply any of our own position offsets (LoweredPos, AlternativePos,
+-- RunSightsPos) because those fight with the pose parameter system.
+-- The pose parameters handle sprint, ironsights, and empty state.
 function SWEP:GetViewModelPosition(pos, ang)
+    if BaseClass and BaseClass.GetViewModelPosition then
+        return BaseClass.GetViewModelPosition(self, pos, ang)
+    end
     return pos, ang
 end
 
