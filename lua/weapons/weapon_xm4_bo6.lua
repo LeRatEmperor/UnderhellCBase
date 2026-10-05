@@ -100,7 +100,7 @@ SWEP.MeleeInterruptReload = true
 
 SWEP.NoShell  = false
 SWEP.ShellHeat = 0.8
-SWEP.Shell     = "models/dqr/bo6/xm4/xm4_shell.mdl"
+SWEP.Shell     = "models/dqr/bo6/xm4/545s.mdl"
 
 -- ============================================================
 -- ANIMATIONS
@@ -482,7 +482,7 @@ SWEP.ViewModelElements = {
     },
     ["default_stock"] = {
         type = "Model", model = "models/dqr/bo6/xm4/xm4_stock_def.mdl",
-        bone = "", pos = Vector(0,0,0), ang = Angle(0,0,0),
+        bone = "", pos = Vector(0,0.1,0), ang = Angle(0,0,0),
         scale = Vector(1,1,1), material = "", skin = 0,
         bodygroups = {[1]=0}, bonemerge = true,
         active = true, _defaultActive = true,
