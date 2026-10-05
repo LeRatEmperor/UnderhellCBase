@@ -225,7 +225,11 @@ function SWEP:Think()
         local isVaulting = ply:GetNW2Bool("BO3_IsVaulting", false)
         local isMantling = ply:GetNW2Bool("BO3_IsMantling", false)
         local isInTraversal = isVaulting or isMantling
-        if isInTraversal and not self._mantleActive then
+        -- Only start mantle if not already mantling AND not on cooldown.
+        -- The cooldown prevents the mantle from restarting immediately
+        -- after EndMantle if BO3_IsMantling is still true (the parkour
+        -- addon may keep it true longer than the mantle animation).
+        if isInTraversal and not self._mantleActive and ct > (self._mantleCooldown or 0) then
             if SERVER or IsFirstTimePredicted() then self:StartMantle() end
         end
         if not isInTraversal and self._mantleActive then self:EndMantle() end
@@ -233,6 +237,10 @@ function SWEP:Think()
 
     if self._mantleActive and self._mantleEndTime and ct >= self._mantleEndTime then
         self:EndMantle()
+        -- Set cooldown so mantle doesn't restart while BO3_IsMantling
+        -- is still true. 1 second should be enough for the parkour
+        -- addon to clear the flag.
+        self._mantleCooldown = ct + 1
     end
 
     -- Melee timing

@@ -217,7 +217,7 @@ function SWEP:Think()
         local isVaulting = ply:GetNW2Bool("BO3_IsVaulting", false)
         local isMantling = ply:GetNW2Bool("BO3_IsMantling", false)
         local isInTraversal = isVaulting or isMantling
-        if isInTraversal and not self._mantleActive then
+        if isInTraversal and not self._mantleActive and ct > (self._mantleCooldown or 0) then
             if SERVER or IsFirstTimePredicted() then self:StartMantle() end
         end
         if not isInTraversal and self._mantleActive then self:EndMantle() end
@@ -225,6 +225,7 @@ function SWEP:Think()
 
     if self._mantleActive and self._mantleEndTime and ct >= self._mantleEndTime then
         self:EndMantle()
+        self._mantleCooldown = ct + 1
     end
 
     if self._meleeActive and not self._meleeHitDone and self._meleeHitTime and ct >= self._meleeHitTime then
