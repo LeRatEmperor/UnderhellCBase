@@ -69,10 +69,11 @@ SWEP.Chambering             = true
 SWEP.AnimatedSprint         = false
 SWEP.CUHInspectOnMenu       = true
 
--- Ironsights — the 1911 uses ANIMATION-BASED ironsights.
--- The ads_in/ads_out sequences animate the gun to the correct position.
--- IronSightsPos/Ang MUST be zero so the parent base's Sights() function
--- doesn't apply any additional position offset on top of the animation.
+-- Ironsights — the 1911 uses POSE-PARAMETER-BASED ironsights.
+-- The "aim_offset" pose parameter drives a delta blend sequence that
+-- smoothly raises the gun to the aim position. IronSightsPos/Ang are
+-- zero so the parent base's Sights() function doesn't fight the pose
+-- parameter system.
 SWEP.IronSightsPos = Vector(0, 0, 0)
 SWEP.IronSightsAng = Vector(0, 0, 0)
 SWEP.IronSightTime = 0.25
@@ -84,10 +85,27 @@ SWEP.AlternativeAng = Angle(0, 0, 0)
 SWEP.RunSightsPos = Vector(0, 0, 0)
 SWEP.RunSightsAng = Vector(-15, 15, -15)
 
--- TFA-style curved ironsight dip
-SWEP.IronSightsDipPos   = Vector(0, -1.5, -2.0)
-SWEP.IronSightsDipAng   = Angle(3, 0, 0)
-SWEP.IronSightsDipScale = 1.0
+-- ============================================================
+-- POSE PARAMETER CONFIG (from TRM source)
+-- ============================================================
+-- The 1911 model has additive delta blend sequences driven by these
+-- pose parameters. They blend ON TOP of the current animation, so
+-- they never interrupt fire/reload/idle/inspect. This is how the TRM
+-- and MW bases handle ironsights, sprint, empty, and walk — they're
+-- all pose-parameter-driven overlay layers.
+SWEP.BasePoseParameter = {
+    Sprint = { "sprint_loop", "sprint_offset" },
+    Empty   = { "empty_offset" },
+    Walk    = { "jog_offset", "jog_loop" },
+    Aim     = { "aim_offset" },
+}
+
+-- Disable the dip system — ironsights are pose-parameter-driven,
+-- so the curved dip transition is not needed (the pose parameter
+-- handles the smooth transition naturally).
+SWEP.IronSightsDipPos   = Vector(0, 0, 0)
+SWEP.IronSightsDipAng   = Angle(0, 0, 0)
+SWEP.IronSightsDipScale = 0
 
 -- Camera bone system
 SWEP.CameraAttachment = "Camera"
@@ -245,6 +263,77 @@ function SWEP:HandleIdle()
 end
 
 -- ============================================================
+-- POSE PARAMETER SYSTEM (self-contained, from TRM base)
+-- ============================================================
+-- Drives the 1911's pose parameters every frame on the client.
+-- This handles ironsights (aim_offset), sprint (sprint_loop/offset),
+-- empty (empty_offset), and walk (jog_offset/loop) via delta blend
+-- sequences that overlay on top of whatever animation is playing.
+--
+-- This is a self-contained port of the TRM base's UpdatePoseParameters
+-- function. It does NOT require the TRM base to be installed.
+-- ============================================================
+function SWEP:UpdatePoseParameters()
+    if SERVER then return end
+    local vm = IsValid(self.Owner) and self.Owner:GetViewModel() or nil
+    if not IsValid(vm) then return end
+    if not self.BasePoseParameter then return end
+
+    local owner = self.Owner
+    local speed = IsValid(owner) and owner:GetVelocity():Length2D() or 0
+    local runSpeed = IsValid(owner) and owner:GetRunSpeed() or 1
+    local walkSpeed = IsValid(owner) and owner:GetWalkSpeed() or 1
+    local dt = FrameTime()
+
+    -- Aim Pose — drives the aim_offset pose parameter based on ironsight state.
+    -- Uses the _ironBlendLat value from the parent base's Sights() function
+    -- (which lerps toward 1 when zooming, 0 when not).
+    if self.BasePoseParameter.Aim then
+        local aimTarget = (self.GetUHBool and self:GetUHBool("Zooming")) and 1 or 0
+        self.m_AimPose = Lerp(dt * 20, self.m_AimPose or 0, aimTarget)
+        for _, pose in ipairs(self.BasePoseParameter.Aim) do
+            vm:SetPoseParameter(pose, self.m_AimPose)
+        end
+    end
+
+    -- Sprint Pose — drives sprint_loop and sprint_offset.
+    -- Active when the player is sprinting (Running bool) and moving.
+    if self.BasePoseParameter.Sprint then
+        local isRunning = self.GetUHBool and self:GetUHBool("Running")
+        local sprintVal = (isRunning and speed > walkSpeed) and 1 or 0
+        self.m_SprintPose = Lerp(dt * 10, self.m_SprintPose or 0, sprintVal)
+        for _, pose in ipairs(self.BasePoseParameter.Sprint) do
+            vm:SetPoseParameter(pose, self.m_SprintPose)
+        end
+    end
+
+    -- Empty Pose — drives empty_offset.
+    -- 1 when the magazine is empty, 0 when there are rounds.
+    if self.BasePoseParameter.Empty then
+        local emptyTarget = (self:Clip1() <= 0) and 1 or 0
+        self.m_EmptyPose = Lerp(dt * 10, self.m_EmptyPose or 0, emptyTarget)
+        for _, pose in ipairs(self.BasePoseParameter.Empty) do
+            vm:SetPoseParameter(pose, self.m_EmptyPose)
+        end
+    end
+
+    -- Walk Pose — drives jog_offset and jog_loop.
+    -- Active when moving (but not sprinting or aiming).
+    if self.BasePoseParameter.Walk then
+        local isZooming = self.GetUHBool and self:GetUHBool("Zooming")
+        local isRunning = self.GetUHBool and self:GetUHBool("Running")
+        local walkVal = 0
+        if not isZooming and not isRunning and speed > 1 then
+            walkVal = math.Clamp(speed / walkSpeed, 0, 1)
+        end
+        self.m_WalkPose = Lerp(dt * 10, self.m_WalkPose or 0, walkVal)
+        for _, pose in ipairs(self.BasePoseParameter.Walk) do
+            vm:SetPoseParameter(pose, self.m_WalkPose)
+        end
+    end
+end
+
+-- ============================================================
 -- THINK
 -- ============================================================
 
@@ -284,6 +373,8 @@ function SWEP:Think()
     self:HandleSprintingAnimations()
     self:HandleIdle()
     self:HandleInspect()
+    -- Drive pose parameters (ironsights, sprint, empty, walk)
+    self:UpdatePoseParameters()
 end
 
 -- ============================================================
@@ -422,6 +513,15 @@ function SWEP:HandleRunning(ct)
         self:SetHoldType(self.HoldType)
         self:SetUHBool("Running", false)
     end
+end
+
+-- Override Sights() to do nothing — ironsights are pose-parameter-driven.
+-- The parent base's Sights() applies position/angle offsets which would
+-- conflict with the pose parameter system. The pose parameter
+-- (aim_offset) handles the ironsight transition smoothly via the
+-- model's delta blend sequence.
+function SWEP:Sights(pos, ang, ft, iftp)
+    return pos, ang
 end
 
 function SWEP:GetViewModelPosition(pos, ang)
