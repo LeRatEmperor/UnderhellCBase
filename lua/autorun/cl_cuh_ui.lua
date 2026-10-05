@@ -216,10 +216,31 @@ local function OpenMenu()
                 draw.RoundedBox(4, 0, 0, w, h, Color(0, 0, 0, 100))
             end
         end
+        -- Helper: call SetAttachment with TFA shadowing bypass
+        local function DoSetAttachment(slotNum, index)
+            if not IsValid(wep) then return end
+            if not wep.SetAttachment then return end
+            -- Check if SetAttachment is shadowed by TFA
+            local ourSrc = debug.getinfo(wep.SetAttachment, "S")
+            if ourSrc and not string.find(ourSrc.short_src or "", "weapon_cuh_base_gun", 1, true) then
+                -- Shadowed — bypass directly
+                wep.Attachments[slotNum].sel = index
+                wep:ApplyAttachments()
+                net.Start("CUH2_AttSelect")
+                    net.WriteEntity(wep)
+                    net.WriteUInt(slotNum, 8)
+                    net.WriteUInt(index, 8)
+                net.SendToServer()
+            else
+                -- Ours — call normally
+                wep:SetAttachment(slotNum, index)
+            end
+        end
+
         noneBtn.DoClick = function()
             if slotData.forceDefault then return end
             surface.PlaySound("ui/buttonclickrelease.wav")
-            wep:SetAttachment(slot, 0)
+            DoSetAttachment(slot, 0)
             cur = 0
         end
 
@@ -289,42 +310,8 @@ local function OpenMenu()
             nameLabel:SetContentAlignment(5)
 
             btn.DoClick = function()
-                print("[CUH-DBG] btn.DoClick CALLED  slot=" .. slot .. "  i=" .. i .. "  wep=" .. tostring(wep) .. "  IsValid=" .. tostring(IsValid(wep)))
                 surface.PlaySound("ui/buttonclick.wav")
-                if not IsValid(wep) then
-                    print("[CUH-DBG]   ERROR: wep is not valid!")
-                    return
-                end
-                if not wep.SetAttachment then
-                    print("[CUH-DBG]   ERROR: wep.SetAttachment is nil!")
-                    return
-                end
-                -- Check if SetAttachment is OURS or has been shadowed by
-                -- another addon (e.g. TFA Base patches the weapon metatable)
-                local ourSrc = debug.getinfo(wep.SetAttachment, "S")
-                if ourSrc then
-                    print("[CUH-DBG]   SetAttachment source: " .. tostring(ourSrc.short_src) .. ":" .. tostring(ourSrc.linedefined))
-                    if not string.find(ourSrc.short_src or "", "weapon_cuh_base_gun", 1, true) then
-                        print("[CUH-DBG]   WARNING: SetAttachment is NOT from weapon_cuh_base_gun.lua!")
-                        print("[CUH-DBG]   Another addon (probably TFA Base) is shadowing it.")
-                        print("[CUH-DBG]   Calling ApplyAttachments directly instead...")
-                        -- Bypass the shadowed SetAttachment: set sel directly
-                        -- and call ApplyAttachments
-                        wep.Attachments[slot].sel = i
-                        wep:ApplyAttachments()
-                        -- Network to server
-                        net.Start("CUH2_AttSelect")
-                            net.WriteEntity(wep)
-                            net.WriteUInt(slot, 8)
-                            net.WriteUInt(i, 8)
-                        net.SendToServer()
-                        cur = i
-                        return
-                    end
-                end
-                print("[CUH-DBG]   calling wep:SetAttachment(" .. slot .. ", " .. i .. ") ...")
-                wep:SetAttachment(slot, i)
-                print("[CUH-DBG]   SetAttachment returned")
+                DoSetAttachment(slot, i)
                 cur = i
             end
 
