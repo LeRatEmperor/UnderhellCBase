@@ -15,8 +15,8 @@ ATTACHMENT.WeaponTable = {
         ["ClipSize"] = 10,
     },
     ["Animations"] = {
-        ["reload"] = "reload_xmag",
-        ["reload_empty"] = "reload_empty_xmag",
+        ["reload"] = "reload_ext01",
+        ["reload_empty"] = "reload_empty_ext01",
     },
 }
 

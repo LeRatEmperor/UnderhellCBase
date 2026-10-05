@@ -69,6 +69,8 @@ SWEP.Chambering             = true
 SWEP.AnimatedSprint         = false
 SWEP.CUHInspectOnMenu       = true
 
+-- Ironsights — from TRM source: Sight.Pos = Vector(0, 2, 0.05), Angles = Angle(0, 90, 90)
+-- These are the default pistol iron sight positions.
 SWEP.IronSightsPos = Vector(0, 2, 0.05)
 SWEP.IronSightsAng = Vector(0, 90, 90)
 SWEP.IronSightTime = 0.25
@@ -108,7 +110,7 @@ SWEP.MeleeInterruptReload = true
 
 SWEP.NoShell  = false
 SWEP.ShellHeat = 0.8
-SWEP.Shell     = "models/dqr/bo7/1911/1911_shell.mdl"
+SWEP.Shell     = "models/shells/shell_pistol.mdl"
 
 -- Bodygroups (from TRM source)
 SWEP.Bodygroups_V = { Body = 0 }
