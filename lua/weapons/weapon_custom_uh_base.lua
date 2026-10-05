@@ -188,11 +188,14 @@ function SWEP:GetViewModelPosition(pos, ang)
     pos, ang = self:Inspect(pos, ang, ct)
     pos, ang = self:Grenade(pos, ang, ct, ft, iftp)
     pos, ang = self:Sway(pos, ang, ft, iftp)
-    pos, ang = self:Movement(pos, ang, ct, ft, iftp)
+    -- Skip Movement() for weapons that use pose-parameter-driven walk/jog
+    -- animations (SWEP.UseViewModelBob = false). The parent base's Movement()
+    -- applies position-based viewmodel bobbing that fights with the model's
+    -- jog_loop/jog_offset pose parameter delta blend sequences.
+    if self.UseViewModelBob ~= false then
+        pos, ang = self:Movement(pos, ang, ct, ft, iftp)
+    end
     -- Skip Sights() for weapons that use pose-parameter-driven ironsights
-    -- (SWEP.UseViewModelBob = false). The pose parameter handles the
-    -- ironsight transition; the parent base's position-based Sights()
-    -- fights with it and causes a "switching positions every frame" bug.
     if self.UseViewModelBob ~= false then
         if self.IronSightsPos and self.IronSightsAng then
             pos, ang = self:Sights(pos, ang, ft, iftp)
