@@ -185,6 +185,17 @@ function SWEP:GetViewModelPosition(pos, ang)
 
     if not self._ironBlendLat then self:ResetViewState() end
 
+    -- Per-weapon toggle: if UseViewModelBob is false, skip ALL viewmodel
+    -- position modifications (Sway, Movement, Sights, Inspect, Grenade).
+    -- This is for weapons that use pose-parameter-driven additive animations
+    -- (like TRM/MW base weapons) where the model handles ironsights,
+    -- sprint, walk, and empty via pose parameters — the parent base's
+    -- position-based bobbing/sway fights with the pose parameter system
+    -- and causes a visual "switching between two positions every frame" bug.
+    if self.UseViewModelBob == false then
+        return pos, ang
+    end
+
     pos, ang = self:Inspect(pos, ang, ct)
     pos, ang = self:Grenade(pos, ang, ct, ft, iftp)
     pos, ang = self:Sway(pos, ang, ft, iftp)
