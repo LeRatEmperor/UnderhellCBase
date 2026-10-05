@@ -451,12 +451,20 @@ end
 function SWEP:Holster(wep)
     if self.CleanupVElements then self:CleanupVElements() end
     if self.CleanupWElements then self:CleanupWElements() end
+    if CLIENT and IsValid(self._wmClientModel) then
+        self._wmClientModel:Remove()
+        self._wmClientModel = nil
+    end
     return BaseClass.Holster(self, wep)
 end
 
 function SWEP:OnRemove()
     if self.CleanupVElements then self:CleanupVElements() end
     if self.CleanupWElements then self:CleanupWElements() end
+    if CLIENT and IsValid(self._wmClientModel) then
+        self._wmClientModel:Remove()
+        self._wmClientModel = nil
+    end
     if BaseClass.OnRemove then BaseClass.OnRemove(self) end
 end
 
@@ -517,13 +525,12 @@ function SWEP:DrawWElements(owner)
             end
 
             if elem.bonemerge then
-                -- Bonemerge: parent to the weapon entity itself (not the player).
-                -- The weapon entity is already positioned at the player's hand
-                -- by the engine, so bonemerged elements inherit the correct
-                -- position and rotation. This matches how TFA Base handles
-                -- world model bonemerging.
-                if model:GetParent() ~= self then
-                    model:SetParent(self)
+                -- Bonemerge: parent to the world model ClientsideModel (not self).
+                -- The ClientsideModel is positioned at the player's hand bone,
+                -- so bonemerged elements inherit the correct position and rotation.
+                local parent = IsValid(self._wmClientModel) and self._wmClientModel or self
+                if model:GetParent() ~= parent then
+                    model:SetParent(parent)
                 end
                 if not model:IsEffectActive(EF_BONEMERGE) then
                     model:AddEffects(EF_BONEMERGE)
@@ -589,48 +596,72 @@ end
 -- ============================================================
 -- DRAW WORLD MODEL — render weapon + WElements
 -- ============================================================
+-- Uses a ClientsideModel for the receiver (not self:DrawModel) so we
+-- can position it at the player's hand bone via LocalToWorld.
+-- The bonemerged attachment elements are parented to this ClientsideModel.
+--
+-- Per-weapon config:
+--   SWEP.WorldModelOffset = Vector(0, -2, -1)    -- local offset from hand bone
+--   SWEP.WorldModelAngle  = Angle(180, 90, 0)    -- local angle from hand bone
+--   SWEP.WorldModelSkin   = 1                     -- skin index (optional)
+-- ============================================================
+if CLIENT then
+    -- Create the world model ClientsideModel lazily per weapon instance.
+    -- We store it on the weapon table and create it on first DrawWorldModel.
+end
 
 function SWEP:DrawWorldModel()
     local owner = self:GetOwner()
+
+    -- Ensure we have a ClientsideModel for the receiver
+    if CLIENT and not IsValid(self._wmClientModel) then
+        self._wmClientModel = ClientsideModel(self.WorldModel, RENDERGROUP_OPAQUE)
+        if IsValid(self._wmClientModel) then
+            self._wmClientModel:SetNoDraw(true)
+            if self.WorldModelSkin then
+                self._wmClientModel:SetSkin(self.WorldModelSkin)
+            end
+        end
+    end
+
     if IsValid(owner) then
-        -- Position the weapon entity at the player's hand bone using
-        -- SWEP.Offset (same system as TFA Base). This is needed because
-        -- GMod doesn't automatically attach the weapon entity to the
-        -- player's hand — it floats at the player's origin.
-        if self.Offset and self.Offset.Pos and self.Offset.Ang then
-            local handBone = owner:LookupBone("ValveBiped.Bip01_R_Hand")
-            if handBone then
-                local matrix = owner:GetBoneMatrix(handBone)
-                if matrix then
-                    local pos = matrix:GetTranslation()
-                    local ang = matrix:GetAngles()
-                    pos = pos + ang:Forward() * (self.Offset.Pos.Forward or 0)
-                         + ang:Right()   * (self.Offset.Pos.Right or 0)
-                         + ang:Up()      * (self.Offset.Pos.Up or 0)
-                    ang:RotateAroundAxis(ang:Up(),      self.Offset.Ang.Up or 0)
-                    ang:RotateAroundAxis(ang:Right(),    self.Offset.Ang.Right or 0)
-                    ang:RotateAroundAxis(ang:Forward(),  self.Offset.Ang.Forward or 0)
-                    self:SetRenderOrigin(pos)
-                    self:SetRenderAngles(ang)
-                    if self.Offset.Scale then
-                        self:SetModelScale(self.Offset.Scale, 0)
+        -- Position the receiver at the player's hand bone
+        local boneid = owner:LookupBone("ValveBiped.Bip01_R_Hand")
+        if boneid then
+            local matrix = owner:GetBoneMatrix(boneid)
+            if matrix then
+                local offsetVec = self.WorldModelOffset or Vector(0, -2, -1)
+                local offsetAng = self.WorldModelAngle or Angle(180, 90, 0)
+                local newPos, newAng = LocalToWorld(offsetVec, offsetAng, matrix:GetTranslation(), matrix:GetAngles())
+
+                if IsValid(self._wmClientModel) then
+                    self._wmClientModel:SetPos(newPos)
+                    self._wmClientModel:SetAngles(newAng)
+                    self._wmClientModel:SetupBones()
+
+                    -- Update the model in case it was changed
+                    if self._wmClientModel:GetModel() ~= self.WorldModel then
+                        self._wmClientModel:SetModel(self.WorldModel)
                     end
+
+                    self._wmClientModel:DrawModel()
+                else
+                    self:DrawModel()
                 end
-            else
-                self:SetRenderOrigin(nil)
-                self:SetRenderAngles(nil)
             end
         end
 
-        -- Draw the base world model (receiver)
-        self:DrawModel()
-        -- Draw attachment elements on top
+        -- Draw attachment elements (bonemerged to the weapon entity)
         self:DrawWElements(owner)
     else
         -- No owner — draw at weapon position (ground spawn)
-        self:SetRenderOrigin(nil)
-        self:SetRenderAngles(nil)
-        self:DrawModel()
+        if IsValid(self._wmClientModel) then
+            self._wmClientModel:SetPos(self:GetPos())
+            self._wmClientModel:SetAngles(self:GetAngles())
+            self._wmClientModel:DrawModel()
+        else
+            self:DrawModel()
+        end
     end
 end
 

@@ -550,11 +550,13 @@ end
 -- VELEMENTS — attachment models (bonemerged parts)
 -- ============================================================
 
-SWEP.Offset = {
-    Pos = { Up = -4, Right = 9, Forward = 4 },
+,
     Ang = { Up = 180, Right = 90, Forward = 0 },
     Scale = 1
 }
+
+SWEP.WorldModelOffset = Vector(4, 9, -4)
+SWEP.WorldModelAngle = Angle(180, 90, 0)
 
 SWEP.ViewModelElements = {
     ["barrel"] = {
