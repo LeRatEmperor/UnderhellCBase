@@ -276,7 +276,7 @@ function SWEP:Sights(pos, ang, ft, iftp)
     if iftp then
         local target = self:GetUHBool("Zooming") and self.Owner:OnGround() and 1 or 0
 
-        -- Phase 1: Lateral blend (X/Y screen position) — moves FASTER
+        -- Phase 1: Lateral blend (X/Z screen position) — moves FASTER
         local currentLat = self._ironBlendLat or 0
         local remainingLat = math.abs(target - currentLat)
         local baseSpeed = self.IronsightSpeed or 10
@@ -285,41 +285,16 @@ function SWEP:Sights(pos, ang, ft, iftp)
         local speedLat = math.min(ft * baseSpeed * latSpeedMult * (1 + (1 - remainingLat) * easeIn), 1)
         self._ironBlendLat = Lerp(speedLat, currentLat, target)
 
-        -- Phase 2: Forward blend (Z depth) — moves SLOWER, starts after lateral is partly done
-        -- The forward motion only begins once the lateral blend has progressed
-        -- past a threshold (e.g. 0.4). This creates the "present then push" feel.
+        -- Phase 2: Forward blend (Y depth) — moves SLOWER
+        -- No hold/threshold logic — just a slower speed multiplier.
+        -- The lateral arrives at the target first because it's 3x faster,
+        -- creating the "present then push" effect naturally without
+        -- any oscillation from threshold checks.
         local currentFwd = self._ironBlendFwd or 0
-        local latProgress = self._ironBlendLat or 0
-        local fwdThreshold = 0.4  -- lateral must reach 40% before forward starts
-        if target > 0 then
-            -- Aiming IN — forward follows lateral with a delay
-            if latProgress < fwdThreshold then
-                -- Hold forward at 0 until lateral reaches threshold
-                self._ironBlendFwd = 0
-            else
-                -- Scale the target so forward starts from 0 when lateral = threshold,
-                -- reaching 1 when lateral = 1
-                local fwdTarget = (latProgress - fwdThreshold) / (1 - fwdThreshold)
-                local remainingFwd = math.abs(fwdTarget - currentFwd)
-                local fwdSpeedMult = self.IronsightForwardSpeed or 0.6
-                local speedFwd = math.min(ft * baseSpeed * fwdSpeedMult * (1 + (1 - remainingFwd) * easeIn), 1)
-                self._ironBlendFwd = Lerp(speedFwd, currentFwd, fwdTarget)
-            end
-        else
-            -- Aiming OUT — forward retreats FIRST (reverse of aim-in)
-            -- Forward goes to 0 quickly, then lateral follows
-            local remainingFwd = math.abs(0 - currentFwd)
-            local fwdSpeedMult = (self.IronsightForwardSpeed or 0.6) * 1.5  -- faster on aim-out
-            local speedFwd = math.min(ft * baseSpeed * fwdSpeedMult * (1 + (1 - remainingFwd) * easeIn), 1)
-            self._ironBlendFwd = Lerp(speedFwd, currentFwd, 0)
-            -- Lateral only starts retreating once forward is mostly back
-            if currentFwd < 0.3 then
-                self._ironBlendLat = Lerp(speedLat, currentLat, target)
-            else
-                -- Hold lateral in place while forward retreats
-                self._ironBlendLat = currentLat
-            end
-        end
+        local remainingFwd = math.abs(target - currentFwd)
+        local fwdSpeedMult = self.IronsightForwardSpeed or 0.6
+        local speedFwd = math.min(ft * baseSpeed * fwdSpeedMult * (1 + (1 - remainingFwd) * easeIn), 1)
+        self._ironBlendFwd = Lerp(speedFwd, currentFwd, target)
     end
 
     local pLat = self._ironBlendLat or 0  -- lateral blend (X/Y)

@@ -69,10 +69,12 @@ SWEP.Chambering             = true
 SWEP.AnimatedSprint         = false
 SWEP.CUHInspectOnMenu       = true
 
--- Ironsights — from TRM source: Sight.Pos = Vector(0, 2, 0.05), Angles = Angle(0, 90, 90)
--- These are the default pistol iron sight positions.
-SWEP.IronSightsPos = Vector(0, 2, 0.05)
-SWEP.IronSightsAng = Vector(0, 90, 90)
+-- Ironsights — the 1911 uses ANIMATION-BASED ironsights.
+-- The ads_in/ads_out sequences animate the gun to the correct position.
+-- IronSightsPos/Ang MUST be zero so the parent base's Sights() function
+-- doesn't apply any additional position offset on top of the animation.
+SWEP.IronSightsPos = Vector(0, 0, 0)
+SWEP.IronSightsAng = Vector(0, 0, 0)
 SWEP.IronSightTime = 0.25
 SWEP.SwayPosition = 2.0
 SWEP.AlternativePos = Vector(0, 0, 0)
@@ -108,9 +110,13 @@ SWEP.MeleeHitSound  = {"weapons/blackops3/rifle_butt/rifle_hit_00.wav", "weapons
 SWEP.MeleeMissSound = ""
 SWEP.MeleeInterruptReload = true
 
-SWEP.NoShell  = false
+-- No model-based shell ejection — the 1911 model has shell ejection
+-- built into the fire animation via QC events (event 9001 MuzzleFlash).
+-- Setting NoShell = true prevents the base from trying to load a shell
+-- model that doesn't exist (which shows as an error).
+SWEP.NoShell  = true
 SWEP.ShellHeat = 0.8
-SWEP.Shell     = "models/shells/shell_pistol.mdl"
+SWEP.Shell     = ""
 
 -- Bodygroups (from TRM source)
 SWEP.Bodygroups_V = { Body = 0 }
