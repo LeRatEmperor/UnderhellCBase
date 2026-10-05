@@ -253,10 +253,19 @@ function SWEP:HandleIdle()
     local vm = ply:GetViewModel()
     if not IsValid(vm) then return end
     if vm:GetCycle() < 1 then return end
+    -- Check what sequence is currently playing.
+    -- Don't restart idle if it's ALREADY playing idle/idle_empty —
+    -- restarting causes a visual snap because the jog_loop pose
+    -- parameter (realtime delta blend) resets with the sequence.
+    local curSeq = string.lower(vm:GetSequenceName(vm:GetSequence()) or "")
     if self:Clip1() <= 0 and self.Animations["idle_empty"] then
-        self:EasySendWeaponAnim("idle_empty", ACT_VM_IDLE)
+        if curSeq ~= "idle_empty" then
+            self:EasySendWeaponAnim("idle_empty", ACT_VM_IDLE)
+        end
     else
-        self:EasySendWeaponAnim("idle", ACT_VM_IDLE)
+        if curSeq ~= "idle" then
+            self:EasySendWeaponAnim("idle", ACT_VM_IDLE)
+        end
     end
 end
 
