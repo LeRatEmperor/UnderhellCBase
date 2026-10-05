@@ -124,6 +124,8 @@ SWEP.LeftBones = { ["Left_U_Arm"] = Angle(-50, 50, -50) }
 -- ============================================================
 function SWEP:ResetViewState()
     self._ironBlend    = 0
+    self._ironBlendLat = 0
+    self._ironBlendFwd = 0
     self._swayAng      = Angle(0, 0, 0)
     self._oldEyeAng    = Angle(0, 0, 0)
     self._viewBobP     = 0
@@ -181,7 +183,7 @@ function SWEP:GetViewModelPosition(pos, ang)
     if sp then iftp = true end
     if CLIENT then iftp = true end
 
-    if not self._ironBlend then self:ResetViewState() end
+    if not self._ironBlendLat then self:ResetViewState() end
 
     pos, ang = self:Inspect(pos, ang, ct)
     pos, ang = self:Grenade(pos, ang, ct, ft, iftp)
@@ -251,20 +253,78 @@ function SWEP:Grenade(pos, ang, ct, ft, iftp)
 end
 
 -- ============================================================
--- Sights — ease-in ironsight blend
+-- Sights — staged ironsight blend (X/Y first, then Z)
+-- ============================================================
+-- Two-phase ADS movement matching good FPS game feel:
+--   Phase 1: Gun snaps to the correct screen position (IronSightsPos.x/y)
+--            quickly — the lateral/vertical alignment.
+--   Phase 2: Gun eases forward into the eye (IronSightsPos.z) AFTER
+--            the screen position is established.
+--
+-- This produces a "present then push" motion that feels more natural
+-- than a single linear lerp moving all 3 axes at once.
+--
+-- Tunables per-weapon:
+--   SWEP.IronsightSpeed       — base lerp speed (default 10)
+--   SWEP.IronsightEaseIn      — ease-in factor (default 1.5)
+--   SWEP.IronsightLateralSpeed — multiplier for X/Y phase (default 1.8x faster)
+--   SWEP.IronsightForwardDelay — how long to wait before Z starts (default 0.0 = immediate, but slower speed handles it)
+--   SWEP.IronsightForwardSpeed — multiplier for Z phase (default 0.6x slower)
 -- ============================================================
 function SWEP:Sights(pos, ang, ft, iftp)
     if not IsValid(self.Owner) then return pos, ang end
     if iftp then
         local target = self:GetUHBool("Zooming") and self.Owner:OnGround() and 1 or 0
-        local current = self._ironBlend or 0
-        local remaining = math.abs(target - current)
+
+        -- Phase 1: Lateral blend (X/Y screen position) — moves FASTER
+        local currentLat = self._ironBlendLat or 0
+        local remainingLat = math.abs(target - currentLat)
         local baseSpeed = self.IronsightSpeed or 10
         local easeIn = self.IronsightEaseIn or 1.5
-        local speed = math.min(ft * baseSpeed * (1 + (1 - remaining) * easeIn), 1)
-        self._ironBlend = Lerp(speed, current, target)
+        local latSpeedMult = self.IronsightLateralSpeed or 1.8
+        local speedLat = math.min(ft * baseSpeed * latSpeedMult * (1 + (1 - remainingLat) * easeIn), 1)
+        self._ironBlendLat = Lerp(speedLat, currentLat, target)
+
+        -- Phase 2: Forward blend (Z depth) — moves SLOWER, starts after lateral is partly done
+        -- The forward motion only begins once the lateral blend has progressed
+        -- past a threshold (e.g. 0.4). This creates the "present then push" feel.
+        local currentFwd = self._ironBlendFwd or 0
+        local latProgress = self._ironBlendLat or 0
+        local fwdThreshold = 0.4  -- lateral must reach 40% before forward starts
+        if target > 0 then
+            -- Aiming IN — forward follows lateral with a delay
+            if latProgress < fwdThreshold then
+                -- Hold forward at 0 until lateral reaches threshold
+                self._ironBlendFwd = 0
+            else
+                -- Scale the target so forward starts from 0 when lateral = threshold,
+                -- reaching 1 when lateral = 1
+                local fwdTarget = (latProgress - fwdThreshold) / (1 - fwdThreshold)
+                local remainingFwd = math.abs(fwdTarget - currentFwd)
+                local fwdSpeedMult = self.IronsightForwardSpeed or 0.6
+                local speedFwd = math.min(ft * baseSpeed * fwdSpeedMult * (1 + (1 - remainingFwd) * easeIn), 1)
+                self._ironBlendFwd = Lerp(speedFwd, currentFwd, fwdTarget)
+            end
+        else
+            -- Aiming OUT — forward retreats FIRST (reverse of aim-in)
+            -- Forward goes to 0 quickly, then lateral follows
+            local remainingFwd = math.abs(0 - currentFwd)
+            local fwdSpeedMult = (self.IronsightForwardSpeed or 0.6) * 1.5  -- faster on aim-out
+            local speedFwd = math.min(ft * baseSpeed * fwdSpeedMult * (1 + (1 - remainingFwd) * easeIn), 1)
+            self._ironBlendFwd = Lerp(speedFwd, currentFwd, 0)
+            -- Lateral only starts retreating once forward is mostly back
+            if currentFwd < 0.3 then
+                self._ironBlendLat = Lerp(speedLat, currentLat, target)
+            else
+                -- Hold lateral in place while forward retreats
+                self._ironBlendLat = currentLat
+            end
+        end
     end
-    local p = self._ironBlend or 0
+
+    local pLat = self._ironBlendLat or 0  -- lateral blend (X/Y)
+    local pFwd = self._ironBlendFwd or 0  -- forward blend (Z)
+    local p = pLat  -- for dip calculation, use lateral progress
 
     -- ============================================================
     -- TFA-STYLE CURVED IRONSIGHT TRANSITION
@@ -287,15 +347,18 @@ function SWEP:Sights(pos, ang, ft, iftp)
         ang:RotateAroundAxis(ang:Forward(),  dipAng.r * swoop)
     end
 
-    -- Linear ironsight lerp (existing logic)
+    -- Staged ironsight lerp:
+    --   X/Y (lateral) uses pLat — snaps to screen position first
+    --   Z (forward) uses pFwd — eases forward after lateral is in place
     local offset = self.IronSightsPos
-    local iron = p
     if self.IronSightsAng then
-        ang:RotateAroundAxis(ang:Right(),   self.IronSightsAng.x * iron)
-        ang:RotateAroundAxis(ang:Up(),       self.IronSightsAng.y * iron)
-        ang:RotateAroundAxis(ang:Forward(),  self.IronSightsAng.z * iron)
+        ang:RotateAroundAxis(ang:Right(),   self.IronSightsAng.x * pLat)
+        ang:RotateAroundAxis(ang:Up(),       self.IronSightsAng.y * pLat)
+        ang:RotateAroundAxis(ang:Forward(),  self.IronSightsAng.z * pLat)
     end
-    pos = pos + offset.x*iron*ang:Right() + offset.y*iron*ang:Forward() + offset.z*iron*ang:Up()
+    pos = pos + offset.x * pLat * ang:Right()
+            + offset.y * pLat * ang:Forward()
+            + offset.z * pFwd * ang:Up()
     return pos, ang
 end
 
