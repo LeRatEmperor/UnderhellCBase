@@ -89,6 +89,59 @@ function SWEP:Initialize()
     end)
 end
 
+-- ============================================================
+-- CAMERA BONE SYSTEM (BO3-style procedural camera animation)
+-- ============================================================
+-- This is a direct port of the proven working BO3 base implementation.
+-- Weapons declare:
+--   SWEP.CameraAttachment = "Camera"        -- $attachment name on VM
+--   SWEP.CameraReserve    = false            -- invert the angle
+--   SWEP.CameraOffset     = Angle(0,0,0)     -- extra angle offset
+--
+-- When CameraAttachment is nil/empty, the system does nothing.
+--
+-- ConVar: cl_cuh_camera_scale (default 1.0) — player-adjustable
+-- intensity multiplier. 0 = off, 1 = full BO3 intensity.
+-- ============================================================
+if CLIENT then
+    CUH_CAMERA_SCALE = CreateClientConVar("cl_cuh_camera_scale", "1.0", true, false,
+        "CUH camera bone animation scale (0 = off, 1 = full BO3 intensity)")
+end
+
+function SWEP:CalcView(ply, pos, ang, fov)
+    -- Camera bone angle tracking — applied to the PLAYER'S VIEW
+    if self.CameraAttachment and self.CameraAttachment ~= "" then
+        local vm = IsValid(self.Owner) and self.Owner:GetViewModel() or nil
+        if IsValid(vm) then
+            local seq = self.m_CurrentSequence or vm:GetSequenceName(vm:GetSequence()) or ""
+            if not string.find(seq, "Fire") and not string.find(seq, "Idle") then
+                local attID = vm:LookupAttachment(self.CameraAttachment)
+                if attID and attID > 0 then
+                    local att = vm:GetAttachment(attID)
+                    if att then
+                        if self.CameraOffset then
+                            ang:Add(self.CameraOffset)
+                        end
+                        local localAng = vm:WorldToLocalAngles(att.Ang)
+                        if self.CameraReserve then
+                            localAng:Mul(-1)
+                        end
+                        local scale = (CLIENT and CUH_CAMERA_SCALE and CUH_CAMERA_SCALE:GetFloat()) or 1
+                        localAng:Mul(scale)
+                        ang:Add(localAng)
+                    end
+                end
+            end
+        end
+    end
+
+    -- Pass to parent base for view bobbing and FOV zoom
+    if BaseClass.CalcView then
+        return BaseClass.CalcView(self, ply, pos, ang, fov)
+    end
+    return pos, ang, fov
+end
+
 -- NOTE: Do NOT override Deploy here — the M8A1 weapon file has its own
 -- Deploy override that calls BaseClass.Deploy(self), and overriding it
 -- here would interfere with the deploy/reload state machine (broke
