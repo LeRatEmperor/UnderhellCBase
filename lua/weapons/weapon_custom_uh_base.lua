@@ -348,17 +348,21 @@ function SWEP:Sights(pos, ang, ft, iftp)
     end
 
     -- Staged ironsight lerp:
-    --   X/Y (lateral) uses pLat — snaps to screen position first
-    --   Z (forward) uses pFwd — eases forward after lateral is in place
+    --   X/Z (horizontal + vertical) uses pLat — moves together to screen position
+    --   Y (forward/depth) uses pFwd — eases forward after X/Z is in place
+    -- GMod viewmodel coordinate system:
+    --   offset.x = right (horizontal)
+    --   offset.y = forward (depth, toward eye) — DELAYED
+    --   offset.z = up (vertical)
     local offset = self.IronSightsPos
     if self.IronSightsAng then
         ang:RotateAroundAxis(ang:Right(),   self.IronSightsAng.x * pLat)
-        ang:RotateAroundAxis(ang:Up(),       self.IronSightsAng.y * pLat)
+        ang:RotateAroundAxis(ang:Up(),       self.IronSightsAng.y * pFwd)
         ang:RotateAroundAxis(ang:Forward(),  self.IronSightsAng.z * pLat)
     end
     pos = pos + offset.x * pLat * ang:Right()
-            + offset.y * pLat * ang:Forward()
-            + offset.z * pFwd * ang:Up()
+            + offset.y * pFwd * ang:Forward()
+            + offset.z * pLat * ang:Up()
     return pos, ang
 end
 
