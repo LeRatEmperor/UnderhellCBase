@@ -19,6 +19,7 @@ CUH_DIR = "/home/z/my-project/worldwarii_underhell/lua/weapons"
 
 # Map ACT_VM_* constants to CUH animation keys.
 # These are the string keys that EasySendWeaponAnim uses in the CUH base.
+# EVERY ACT_* constant used in any TFA EventTable must be mapped here.
 ACT_TO_KEY = {
     "ACT_VM_DRAW":            "draw",
     "ACT_VM_DRAW_DEPLOYED":   "draw_first",
@@ -30,7 +31,10 @@ ACT_TO_KEY = {
     "ACT_VM_RELOAD_DEPLOYED": "reload_deployed",
     "ACT_VM_RELOAD_SILENCED": "reload_silenced",
     "ACT_VM_RELOAD_END":      "reload_end",
+    "ACT_VM_RELOAD2":         "reload2",
+    "ACT_RELOAD_LOW":         "reload_low",
     "ACT_VM_PRIMARYATTACK":          "shoot",
+    "ACT_VM_PRIMARYATTACK_1":        "shoot1",
     "ACT_VM_PRIMARYATTACK_EMPTY":    "shoot_last",
     "ACT_VM_PRIMARYATTACK_SILENCED": "shoot_silenced",
     "ACT_VM_PULLBACK_HIGH":   "rechamber",
@@ -41,6 +45,8 @@ ACT_TO_KEY = {
     "ACT_VM_HITCENTER":      "melee",
     "ACT_VM_MISSCENTER":     "melee",
     "ACT_VM_MISSLEFT":      "melee",
+    "ACT_SHOTGUN_RELOAD_START":  "shotgun_reload_start",
+    "ACT_SHOTGUN_RELOAD_FINISH": "shotgun_reload_finish",
 }
 
 
