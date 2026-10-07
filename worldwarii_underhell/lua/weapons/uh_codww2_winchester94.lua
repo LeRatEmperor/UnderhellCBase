@@ -123,9 +123,6 @@ SWEP.Animations = {
     ["reload"]       = "ACT_VM_RELOAD",
     ["reload_empty"] = "ACT_VM_RELOAD_EMPTY",
     ["iron_fire"]    = "fire_ads",
-    ["iron_in"]      = "ACT_VM_DEPLOY",  -- NOT suppressor_attach
-    ["iron_idle"]    = "idle",
-    ["iron_out"]     = "ACT_VM_UNDEPLOY",
     ["idle"]         = "idle",
     ["idle_empty"]   = "idle_empty",
     ["deploy"]       = "draw",
@@ -155,41 +152,6 @@ end
 -- ============================================================
 -- IRONSIGHTS / SPRINT / IDLE HANDLERS
 -- ============================================================
-
-function SWEP:HandleIronsightsAnimations()
-    local ply = self:GetOwner()
-    if not IsValid(ply) or not ply:IsPlayer() then return end
-    if self:GetUHBool("Running") then
-        self.wasZooming = self:GetUHBool("Zooming")
-        return
-    end
-    if self:GetUHBool("Reloading") then return end
-    if self._meleeActive then return end
-    if self._mantleActive then return end
-
-    local isZooming = self:GetUHBool("Zooming")
-    if self.wasZooming == nil then self.wasZooming = false end
-
-    local vm = ply:GetViewModel()
-    if not IsValid(vm) then return end
-
-    if self._justExitedSprint then
-        self._justExitedSprint = false
-        if isZooming then self.wasZooming = false end
-        return
-    end
-
-    if isZooming and not self.wasZooming then
-        self:EasySendWeaponAnim("iron_in", ACT_VM_DEPLOY)
-    elseif not isZooming and self.wasZooming then
-        self:EasySendWeaponAnim("iron_out", ACT_VM_UNDEPLOY)
-    elseif isZooming then
-        if vm:GetCycle() >= 1 then
-            self:EasySendWeaponAnim("iron_idle", ACT_VM_IDLE_DEPLOYED)
-        end
-    end
-    self.wasZooming = isZooming
-end
 
 function SWEP:HandleSprintingAnimations()
     local ply = self:GetOwner()
@@ -249,7 +211,6 @@ end
 function SWEP:Think()
     local ct = CurTime()
     BaseClass.Think(self)
-    self:HandleIronsightsAnimations()
     self:HandleSprintingAnimations()
     self:HandleIdle()
     self:HandleInspect()
