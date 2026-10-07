@@ -249,6 +249,36 @@ end
 
 
 -- ============================================================
+-- ATTACK
+-- ============================================================
+function SWEP:PrimaryAttack()
+    if self._meleeActive then return end
+    if self._mantleActive then return end
+    if self.Owner:KeyDown(IN_USE) then
+        local ct = CurTime()
+        if ct < (self._nextMelee or 0) then return end
+        if self:GetUHBool("Reloading") then return end
+        if self:GetNWFloat("DeployTime") > ct then return end
+        if self:GetNWInt("FireMode") == 0 then return end
+        if SERVER or IsFirstTimePredicted() then self:MeleeAttack() end
+        return
+    end
+    BaseClass.PrimaryAttack(self)
+end
+
+function SWEP:SecondaryAttack()
+    if self._meleeActive then return end
+    if self._mantleActive then return end
+    return BaseClass.SecondaryAttack(self)
+end
+
+function SWEP:Reload()
+    if self._meleeActive or self._mantleActive then return end
+    if self.Owner:KeyDown(IN_USE) then return end
+    return BaseClass.Reload(self)
+end
+
+-- ============================================================
 -- HOLSTER / DEPLOY
 -- ============================================================
 

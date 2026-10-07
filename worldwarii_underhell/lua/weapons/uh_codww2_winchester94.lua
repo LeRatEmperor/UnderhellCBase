@@ -61,6 +61,8 @@ SWEP.TwoHanded              = true
 SWEP.ReloadSpeed            = 1
 SWEP.Chambering             = false
 SWEP.IsBoltAction = true
+SWEP.IsPump = true
+SWEP.PumpDelay = 0.6  -- lever cycle time
 SWEP.Shotgun = true  -- shotgun reload mechanics
 SWEP.AnimatedSprint         = true
 SWEP.CUHInspectOnMenu       = true
@@ -455,3 +457,63 @@ SWEP.Attachments = {
     [2] = { name = "Slot 2", atts = { "tfa_codww2_rapidfire_sg", "tfa_codww2_fmj" }, default = 0 },
 }
 
+-- ============================================================
+-- LEVER-ACTION RECHAMBER
+-- ============================================================
+function SWEP:PostShoot()
+    if not self.IsPump then return end
+    local ct = CurTime()
+    local pumpDelay = self.PumpDelay or 0.6
+    self:SetNextPrimaryFire(math.max(self:GetNextPrimaryFire(), ct + pumpDelay))
+    self:SetNextSecondaryFire(math.max(self:GetNextSecondaryFire(), ct + pumpDelay))
+    timer.Simple(pumpDelay, function()
+        if not IsValid(self) or not IsValid(self.Owner)
+           or not IsValid(self.Owner:GetActiveWeapon())
+           or self.Owner:GetActiveWeapon() ~= self then return end
+        if self:GetUHBool("Reloading") then return end
+        local animKey = self:GetUHBool("Zooming") and "rechamber_ads" or "rechamber"
+        self:EasySendWeaponAnim(animKey, ACT_SHOTGUN_PUMP)
+    end)
+end
+
+-- ============================================================
+-- SHOTGUN SHELL-BY-SHELL RELOAD
+-- ============================================================
+SWEP.Shotgun = true
+SWEP.ShellLoadTime = SWEP.ShellLoadTime or 0.5
+
+function SWEP:ReloadShotgun(ct)
+    if not self:GetUHBool("Reloading") then return end
+    if self:Clip1() >= self.Primary.ClipSize
+        or self.Owner:GetAmmoCount(self:GetPrimaryAmmoType()) <= 0
+        or self.Owner:KeyPressed(IN_ATTACK) then
+        self:ClearAnimSounds()
+        self:EasySendWeaponAnim("shotgun_reload_finish", ACT_SHOTGUN_RELOAD_FINISH)
+        local vm = IsValid(self.Owner) and self.Owner:GetViewModel() or nil
+        local endDur = IsValid(vm) and vm:SequenceDuration() or 0.8
+        self:SetUHBool("Reloading", false)
+        self:SetNWFloat("ReloadTime", 0)
+        self:SetNWFloat("ReloadEndTime", 0)
+        self:SetNextPrimaryFire(ct + endDur)
+        self:SetNextSecondaryFire(ct + endDur)
+        self.NextReload = ct + endDur
+        self.reloaddelay = nil
+        if self.PostReload then self:PostReload() end
+        return
+    end
+    local vm = IsValid(self.Owner) and self.Owner:GetViewModel() or nil
+    if IsValid(vm) and vm:GetCycle() >= 1 then
+        if SERVER then
+            self:SetClip1(self:Clip1() + 1)
+            self.Owner:RemoveAmmo(1, self.Primary.Ammo, false)
+        end
+        self:EasySendWeaponAnim("reload_loop", ACT_VM_RELOAD)
+    end
+end
+
+-- CustomThink: dispatches ReloadShotgun every tick while reloading
+SWEP.CustomThink = function(self, ct)
+    if self.Shotgun and self.ReloadShotgun and self:GetUHBool("Reloading") then
+        self:ReloadShotgun(ct)
+    end
+end

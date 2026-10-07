@@ -522,7 +522,7 @@ SWEP.Attachments = {
 -- ============================================================
 -- BOLT-ACTION RECHAMBER (KRM-style PostShoot override)
 -- ============================================================
-SWEP.PumpDelay = SWEP.PumpDelay or 0.8  -- bolt cycle time
+SWEP.PumpDelay = SWEP.PumpDelay or 0.5  -- bolt cycle time
 
 function SWEP:PostShoot()
     local ct = CurTime()

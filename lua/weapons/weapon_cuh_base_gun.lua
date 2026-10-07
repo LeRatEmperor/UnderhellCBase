@@ -1105,10 +1105,19 @@ end
 -- ============================================================
 -- TFA COMPATIBILITY STUBS
 -- ============================================================
--- TFA Base's keybind system calls GetActivityEnabled on
--- all weapons. We don't use TFA's activity system, so we
--- stub it out to prevent errors.
+-- TFA Base's keybind system calls GetActivityEnabled and GetStatL on
+-- all weapons. We don't use TFA's stat system, so we stub these out
+-- to prevent 'attempt to call method GetStatL (a nil value)' errors
+-- when the player presses TFA-bound keys (like T) while holding a CUH weapon.
 function SWEP:GetActivityEnabled()
+    return false
+end
+
+function SWEP:GetStatL(name, default)
+    return default
+end
+
+function SWEP:IsTFAWeapon()
     return false
 end
 
@@ -1201,4 +1210,32 @@ function SWEP:EndMelee()
     self._meleeHitDone = nil
     self._meleeEndTime = nil
     self:ClearAnimSounds()
+end
+
+-- ============================================================
+-- THINK — melee state machine
+-- ============================================================
+-- The parent's Think() doesn't know about melee. We need to:
+-- 1. Fire the hit trace at _meleeHitTime
+-- 2. End the melee at _meleeEndTime
+-- Without this, _meleeActive stays true forever and the weapon locks up.
+function SWEP:Think()
+    BaseClass.Think(self)
+    if not IsValid(self.Owner) then return end
+    local ct = CurTime()
+
+    -- Melee state machine
+    if self._meleeActive then
+        -- Do the hit trace at the scheduled time
+        if not self._meleeHitDone and ct >= (self._meleeHitTime or 0) then
+            self._meleeHitDone = true
+            if SERVER or IsFirstTimePredicted() then
+                self:DoMeleeTrace()
+            end
+        end
+        -- End the melee when the animation finishes
+        if ct >= (self._meleeEndTime or 0) then
+            self:EndMelee()
+        end
+    end
 end
