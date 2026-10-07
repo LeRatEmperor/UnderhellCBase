@@ -154,12 +154,15 @@ SWEP.AnimSounds = {
     },
     ["inspect"] = {
         { time = 0.0333, sound = "TFA_CODWW2_MOSIN.Inspect1" },
+        { time = 1.6667, sound = "TFA_CODWW2_MOSIN.Inspect2" },
     },
     ["inspect_empty"] = {
         { time = 0.0333, sound = "TFA_CODWW2_MOSIN.Inspect1" },
+        { time = 1.6667, sound = "TFA_CODWW2_MOSIN.Inspect2" },
     },
     ["inspect_epic"] = {
         { time = 0.0333, sound = "TFA_CODWW2_MOSIN.InspectEpic1" },
+        { time = 1.6667, sound = "TFA_CODWW2_MOSIN.InspectEpic2" },
     },
     ["rechamber"] = {
         { time = 0.0333, sound = "TFA_CODWW2_MOSIN.Cycle" },
@@ -169,18 +172,47 @@ SWEP.AnimSounds = {
     },
     ["reload"] = {
         { time = 0.2333, sound = "TFA_CODWW2_MOSIN.Open" },
+        { time = 1.0000, sound = "TFA_CODWW2_MOSIN.Roundin1" },
+        { time = 1.8333, sound = "TFA_CODWW2_MOSIN.Close" },
+    },
+    ["reload2"] = {
+        { time = 0.2333, sound = "TFA_CODWW2_MOSIN.Open" },
+        { time = 1.0000, sound = "TFA_CODWW2_MOSIN.Roundin" },
+        { time = 1.4333, sound = "TFA_CODWW2_MOSIN.Roundin1" },
+        { time = 2.1667, sound = "TFA_CODWW2_MOSIN.Roundin" },
+        { time = 3.5000, sound = "TFA_CODWW2_MOSIN.Close" },
     },
     ["reload_deployed"] = {
         { time = 0.2333, sound = "TFA_CODWW2_MOSIN.Open" },
+        { time = 1.0000, sound = "TFA_CODWW2_MOSIN.Roundin" },
+        { time = 1.4333, sound = "TFA_CODWW2_MOSIN.Roundin1" },
+        { time = 2.1667, sound = "TFA_CODWW2_MOSIN.Close" },
     },
     ["reload_empty"] = {
         { time = 0.2333, sound = "TFA_CODWW2_MOSIN.Open" },
+        { time = 1.0000, sound = "TFA_CODWW2_MOSIN.Roundin" },
+        { time = 1.4333, sound = "TFA_CODWW2_MOSIN.Roundin1" },
+        { time = 2.3333, sound = "TFA_CODWW2_MOSIN.Roundin" },
+        { time = 2.7667, sound = "TFA_CODWW2_MOSIN.Roundin1" },
+        { time = 3.8333, sound = "TFA_CODWW2_MOSIN.Roundin1" },
+        { time = 4.6667, sound = "TFA_CODWW2_MOSIN.Close" },
     },
     ["reload_end"] = {
         { time = 0.2333, sound = "TFA_CODWW2_MOSIN.Open" },
+        { time = 1.0000, sound = "TFA_CODWW2_MOSIN.Roundin" },
+        { time = 2.0000, sound = "TFA_CODWW2_MOSIN.Close" },
+    },
+    ["reload_low"] = {
+        { time = 0.2333, sound = "TFA_CODWW2_MOSIN.Open" },
+        { time = 1.0000, sound = "TFA_CODWW2_MOSIN.Roundin" },
+        { time = 2.0000, sound = "TFA_CODWW2_MOSIN.Roundin" },
+        { time = 3.1667, sound = "TFA_CODWW2_MOSIN.Close" },
     },
     ["reload_silenced"] = {
         { time = 0.2333, sound = "TFA_CODWW2_MOSIN.Open" },
+        { time = 1.0000, sound = "TFA_CODWW2_MOSIN.Roundin" },
+        { time = 2.3333, sound = "TFA_CODWW2_MOSIN.Roundin" },
+        { time = 3.6667, sound = "TFA_CODWW2_MOSIN.Close" },
     },
 }
 

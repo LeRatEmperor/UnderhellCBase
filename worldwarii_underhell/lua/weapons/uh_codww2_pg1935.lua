@@ -170,6 +170,7 @@ SWEP.AnimSounds = {
     },
     ["grenade_in"] = {
         { time = 0.0333, sound = "TFA_CODWW2_RFLGRND.Foley" },
+        { time = 0.8333, sound = "TFA_CODWW2_RFLGRND.On" },
     },
     ["grenade_in_empty"] = {
         { time = 0.0333, sound = "TFA_CODWW2_SML.Raise" },
@@ -191,27 +192,37 @@ SWEP.AnimSounds = {
     },
     ["inspect"] = {
         { time = 0.0333, sound = "TFA_CODWW2_M1935.Inspect1" },
+        { time = 1.8333, sound = "TFA_CODWW2_M1935.Inspect2" },
     },
     ["inspect_epic"] = {
         { time = 0.0333, sound = "TFA_CODWW2_M1935.EpicInspect1" },
+        { time = 3.0000, sound = "TFA_CODWW2_M1935.EpicInspect2" },
     },
     ["inspect_grenade"] = {
         { time = 0.0333, sound = "TFA_CODWW2_STG44.Inspect1" },
+        { time = 1.6667, sound = "TFA_CODWW2_STG44.Inspect1b" },
+        { time = 3.8333, sound = "TFA_CODWW2_STG44.Inspect2" },
     },
     ["inspect_grenade_empty"] = {
         { time = 0.0333, sound = "TFA_CODWW2_STG44.Inspect1" },
+        { time = 1.6667, sound = "TFA_CODWW2_STG44.Inspect1b" },
+        { time = 3.8333, sound = "TFA_CODWW2_STG44.Inspect2" },
     },
     ["reload"] = {
         { time = 0.1667, sound = "TFA_CODWW2_M1935.TacMagOut" },
+        { time = 1.5000, sound = "TFA_CODWW2_M1935.TacMagIn" },
     },
     ["reload_empty"] = {
         { time = 0.1667, sound = "TFA_CODWW2_M1935.MagOut" },
+        { time = 1.5000, sound = "TFA_CODWW2_M1935.MagIn" },
     },
     ["reload_ext_empty"] = {
         { time = 0.1667, sound = "TFA_CODWW2_M1935.MagOut" },
+        { time = 1.5000, sound = "TFA_CODWW2_M1935.MagIn" },
     },
     ["reload_grenade"] = {
         { time = 0.0333, sound = "TFA_CODWW2_RFLGRND.Foley" },
+        { time = 0.8333, sound = "TFA_CODWW2_RFLGRND.On" },
     },
 }
 

@@ -156,12 +156,15 @@ SWEP.AnimSounds = {
     },
     ["inspect"] = {
         { time = 0.0333, sound = "TFA_CODWW2_SDK.Inspect1" },
+        { time = 1.5000, sound = "TFA_CODWW2_SDK.Inspect2" },
     },
     ["inspect_empty"] = {
         { time = 0.0333, sound = "TFA_CODWW2_SDK.Inspect1" },
+        { time = 1.5000, sound = "TFA_CODWW2_SDK.Inspect2" },
     },
     ["inspect_epic"] = {
         { time = 0.0333, sound = "TFA_CODWW2_SDK.EpicInspect1" },
+        { time = 2.5000, sound = "TFA_CODWW2_SDK.EpicInspect2" },
     },
     ["rechamber"] = {
         { time = 0.1667, sound = "TFA_CODWW2_SDK.Cycle" },
@@ -171,15 +174,23 @@ SWEP.AnimSounds = {
     },
     ["reload"] = {
         { time = 0.6667, sound = "TFA_CODWW2_SDK.TacMagOut" },
+        { time = 2.5000, sound = "TFA_CODWW2_SDK.TacMagIn" },
     },
     ["reload_empty"] = {
         { time = 0.1667, sound = "TFA_CODWW2_SDK.Open" },
+        { time = 0.8333, sound = "TFA_CODWW2_SDK.MagOut" },
+        { time = 2.0000, sound = "TFA_CODWW2_SDK.MagIn" },
+        { time = 2.8333, sound = "TFA_CODWW2_SDK.Close" },
     },
     ["reload_ext"] = {
         { time = 0.6667, sound = "TFA_CODWW2_SDK.TacMagOut" },
+        { time = 2.5000, sound = "TFA_CODWW2_SDK.TacMagIn" },
     },
     ["reload_ext_empty"] = {
         { time = 0.1667, sound = "TFA_CODWW2_SDK.Open" },
+        { time = 0.8333, sound = "TFA_CODWW2_SDK.MagOut" },
+        { time = 2.0000, sound = "TFA_CODWW2_SDK.MagIn" },
+        { time = 2.8333, sound = "TFA_CODWW2_SDK.Close" },
     },
 }
 

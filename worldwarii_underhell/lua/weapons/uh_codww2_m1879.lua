@@ -185,6 +185,13 @@ SWEP.AnimSounds = {
     ["reload_out_knife"] = {
         { time = 0.0000, sound = "TFA_CODWW2_M1879.Close" },
     },
+    ["shotgun_reload_finish"] = {
+        { time = 0.0000, sound = "TFA_CODWW2_M1879.Close" },
+    },
+    ["shotgun_reload_start"] = {
+        { time = 0.1667, sound = "TFA_CODWW2_M1879.Open" },
+        { time = 0.5000, sound = "TFA_CODWW2_M1879.Insert" },
+    },
 }
 
 function SWEP:ShootAnimation()

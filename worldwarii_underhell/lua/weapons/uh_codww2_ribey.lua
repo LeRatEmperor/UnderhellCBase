@@ -167,21 +167,37 @@ SWEP.AnimSounds = {
     },
     ["inspect"] = {
         { time = 0.0333, sound = "TFA_CODWW2_RIBEY.Inspect1" },
+        { time = 1.6667, sound = "TFA_CODWW2_RIBEY.Inspect2" },
     },
     ["inspect_empty"] = {
         { time = 0.0333, sound = "TFA_CODWW2_RIBEY.Inspect1" },
+        { time = 1.6667, sound = "TFA_CODWW2_RIBEY.Inspect2" },
     },
     ["inspect_knife"] = {
         { time = 0.0333, sound = "TFA_CODWW2_RIBEY.Inspect1" },
+        { time = 1.6667, sound = "TFA_CODWW2_RIBEY.Inspect2" },
     },
     ["inspect_knife_empty"] = {
         { time = 0.0333, sound = "TFA_CODWW2_RIBEY.Inspect1" },
+        { time = 1.6667, sound = "TFA_CODWW2_RIBEY.Inspect2" },
     },
     ["reload"] = {
         { time = 0.0333, sound = "TFA_CODWW2_RIBEY.TacMagOut" },
+        { time = 0.8333, sound = "TFA_CODWW2_RIBEY.TacMagIn" },
     },
     ["reload_empty"] = {
         { time = 0.0333, sound = "TFA_CODWW2_RIBEY.MagOut" },
+        { time = 0.8333, sound = "TFA_CODWW2_RIBEY.MagIn" },
+        { time = 2.3333, sound = "TFA_CODWW2_RIBEY.Charge" },
+    },
+    ["reload_knife"] = {
+        { time = 0.1667, sound = "TFA_CODWW2_RIBEY.ExtTacMagOut" },
+        { time = 0.8333, sound = "TFA_CODWW2_RIBEY.ExtTacMagIn" },
+    },
+    ["reload_knife_empty"] = {
+        { time = 0.1667, sound = "TFA_CODWW2_RIBEY.ExtMagOut" },
+        { time = 0.8333, sound = "TFA_CODWW2_RIBEY.ExtMagIn" },
+        { time = 2.1667, sound = "TFA_CODWW2_RIBEY.ExtCharge" },
     },
     ["suppressor_attach"] = {
         { time = 0.0333, sound = "TFA_CODWW2_MP40.SuppOn" },

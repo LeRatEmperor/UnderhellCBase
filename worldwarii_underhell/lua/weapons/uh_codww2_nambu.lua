@@ -153,18 +153,24 @@ SWEP.AnimSounds = {
     },
     ["inspect"] = {
         { time = 0.0333, sound = "TFA_CODWW2_NAMBU.Inspect1" },
+        { time = 1.6667, sound = "TFA_CODWW2_NAMBU.Inspect2" },
     },
     ["inspect_empty"] = {
         { time = 0.0333, sound = "TFA_CODWW2_NAMBU.Inspect1" },
+        { time = 1.6667, sound = "TFA_CODWW2_NAMBU.Inspect2" },
     },
     ["inspect_epic"] = {
         { time = 0.0333, sound = "TFA_CODWW2_NAMBU.Inspect1" },
+        { time = 1.6667, sound = "TFA_CODWW2_NAMBU.Inspect2" },
     },
     ["reload"] = {
         { time = 0.1667, sound = "TFA_CODWW2_NAMBU.TacMagOut" },
+        { time = 1.3333, sound = "TFA_CODWW2_NAMBU.TacMagIn" },
     },
     ["reload_empty"] = {
         { time = 0.1667, sound = "TFA_CODWW2_NAMBU.MagOut" },
+        { time = 1.1667, sound = "TFA_CODWW2_NAMBU.MagIn" },
+        { time = 2.3333, sound = "TFA_CODWW2_NAMBU.Charge" },
     },
     ["suppressor_attach"] = {
         { time = 0.0333, sound = "TFA_CODWW2_PPSH.SuppOn" },

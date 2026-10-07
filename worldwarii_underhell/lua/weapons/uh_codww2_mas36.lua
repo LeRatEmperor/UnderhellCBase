@@ -157,12 +157,16 @@ SWEP.AnimSounds = {
     },
     ["inspect"] = {
         { time = 0.0333, sound = "TFA_CODWW2_MAS36.Inspect1" },
+        { time = 1.8333, sound = "TFA_CODWW2_MAS36.Inspect2" },
     },
     ["inspect_empty"] = {
         { time = 0.0333, sound = "TFA_CODWW2_MAS36.Inspect1" },
+        { time = 1.8333, sound = "TFA_CODWW2_MAS36.Inspect2" },
     },
     ["inspect_epic"] = {
         { time = 0.0333, sound = "TFA_CODWW2_MAS36.InspectEpic1" },
+        { time = 2.3333, sound = "TFA_CODWW2_MAS36.InspectEpic2" },
+        { time = 5.5000, sound = "TFA_CODWW2_MAS36.InspectEpic3" },
     },
     ["rechamber"] = {
         { time = 0.1667, sound = "TFA_CODWW2_MAS36.Cycle" },
@@ -172,6 +176,13 @@ SWEP.AnimSounds = {
     },
     ["reload"] = {
         { time = 0.0333, sound = "TFA_CODWW2_MAS36.Insert" },
+    },
+    ["shotgun_reload_finish"] = {
+        { time = 0.0333, sound = "TFA_CODWW2_MAS36.Close" },
+    },
+    ["shotgun_reload_start"] = {
+        { time = 0.0333, sound = "TFA_CODWW2_MAS36.Open" },
+        { time = 1.0000, sound = "TFA_CODWW2_MAS36.Insert" },
     },
 }
 

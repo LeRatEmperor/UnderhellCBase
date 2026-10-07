@@ -150,27 +150,39 @@ SWEP.AnimSounds = {
     },
     ["inspect"] = {
         { time = 0.0333, sound = "TFA_CODWW2_M1903.Inspect1" },
+        { time = 1.6667, sound = "TFA_CODWW2_M1903.Inspect2" },
     },
     ["inspect_empty"] = {
         { time = 0.0333, sound = "TFA_CODWW2_M1903.Inspect1" },
+        { time = 1.6667, sound = "TFA_CODWW2_M1903.Inspect2" },
     },
     ["rechamber"] = {
         { time = 0.1667, sound = "TFA_CODWW2_M1903.CycleOpen" },
+        { time = 0.5000, sound = "TFA_CODWW2_M1903.CycleClose" },
     },
     ["rechamber_ads"] = {
         { time = 0.1667, sound = "TFA_CODWW2_M1903.CycleAdsOpen" },
+        { time = 0.5000, sound = "TFA_CODWW2_M1903.CycleAdsClose" },
     },
     ["reload"] = {
         { time = 0.1667, sound = "TFA_CODWW2_M1903.TacOpen" },
+        { time = 1.6667, sound = "TFA_CODWW2_M1903.TacClipin" },
+        { time = 2.3333, sound = "TFA_CODWW2_M1903.TacClose" },
     },
     ["reload_empty"] = {
         { time = 0.1667, sound = "TFA_CODWW2_M1903.EmptyOpen" },
+        { time = 1.6667, sound = "TFA_CODWW2_M1903.EmptyClipin" },
+        { time = 2.5000, sound = "TFA_CODWW2_M1903.EmptyClose" },
     },
     ["reload_ext"] = {
         { time = 0.1667, sound = "TFA_CODWW2_M1903.TacExtMagout" },
+        { time = 2.0000, sound = "TFA_CODWW2_M1903.TacExtMagin" },
     },
     ["reload_ext_empty"] = {
         { time = 0.1667, sound = "TFA_CODWW2_M1903.EmptyExtMagout" },
+        { time = 1.8333, sound = "TFA_CODWW2_M1903.EmptyExtMagin" },
+        { time = 2.8333, sound = "TFA_CODWW2_M1903.EmptyExtOpen" },
+        { time = 3.1667, sound = "TFA_CODWW2_M1903.EmptyExtClose" },
     },
 }
 

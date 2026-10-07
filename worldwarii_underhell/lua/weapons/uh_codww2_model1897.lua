@@ -153,6 +153,8 @@ SWEP.AnimSounds = {
     },
     ["draw_first"] = {
         { time = 0.0333, sound = "TFA_CODWW2_M1897.FPOFoley" },
+        { time = 0.3333, sound = "TFA_CODWW2_M1897.FPOGrab" },
+        { time = 0.8333, sound = "TFA_CODWW2_M1897.FPOCharge" },
     },
     ["holster"] = {
         { time = 0.0667, sound = "TFA_CODWW2_MED.Holster" },
@@ -162,9 +164,11 @@ SWEP.AnimSounds = {
     },
     ["inspect"] = {
         { time = 0.0333, sound = "TFA_CODWW2_M1897.Inspect1" },
+        { time = 1.6667, sound = "TFA_CODWW2_M1897.Inspect2" },
     },
     ["inspect_empty"] = {
         { time = 0.0333, sound = "TFA_CODWW2_M1897.Inspect1" },
+        { time = 1.6667, sound = "TFA_CODWW2_M1897.Inspect2" },
     },
     ["rechamber"] = {
         { time = 0.0333, sound = "TFA_CODWW2_M1897.Rack" },
@@ -174,12 +178,20 @@ SWEP.AnimSounds = {
     },
     ["rechamber_dragon"] = {
         { time = 0.0333, sound = "TFA_CODWW2_M1897.Rack" },
+        { time = 0.4000, sound = "TFA_CODWW2_M1897.Rack" },
+        { time = 0.8000, sound = "TFA_CODWW2_M1897.Rack" },
+        { time = 1.2000, sound = "TFA_CODWW2_M1897.Rack" },
+        { time = 1.6333, sound = "TFA_CODWW2_M1897.Rack" },
+        { time = 2.0667, sound = "TFA_CODWW2_M1897.Rack" },
+        { time = 2.4667, sound = "TFA_CODWW2_M1897.Rack" },
     },
     ["reload"] = {
         { time = 0.1667, sound = "TFA_CODWW2_M1897.ShellIn" },
     },
     ["reload_empty"] = {
         { time = 0.0333, sound = "TFA_CODWW2_M1897.ADSFoley" },
+        { time = 0.0333, sound = "TFA_CODWW2_M1897.ShellStart" },
+        { time = 1.0000, sound = "TFA_CODWW2_M1897.ShellIn" },
     },
     ["reload_end_dragon"] = {
         { time = 0.0333, sound = "TFA_CODWW2_M1897.ADSFoley" },
@@ -192,6 +204,16 @@ SWEP.AnimSounds = {
     },
     ["reload_start_dragon_empty"] = {
         { time = 0.0333, sound = "TFA_CODWW2_M1897.DRGStart" },
+        { time = 1.0000, sound = "TFA_CODWW2_M1897.DRGClose" },
+    },
+    ["shotgun_reload_finish"] = {
+        { time = 0.0333, sound = "TFA_CODWW2_M1897.EndStart" },
+        { time = 0.3333, sound = "TFA_CODWW2_M1897.EndPump" },
+    },
+    ["shotgun_reload_start"] = {
+        { time = 0.0333, sound = "TFA_CODWW2_M1897.ADSFoley" },
+        { time = 0.0333, sound = "TFA_CODWW2_M1897.ShellStart" },
+        { time = 1.0000, sound = "TFA_CODWW2_M1897.ShellIn" },
     },
 }
 

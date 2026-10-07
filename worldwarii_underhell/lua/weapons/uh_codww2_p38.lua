@@ -164,39 +164,55 @@ SWEP.AnimSounds = {
     },
     ["inspect"] = {
         { time = 0.0333, sound = "TFA_CODWW2_P38.Inspect1" },
+        { time = 1.8333, sound = "TFA_CODWW2_P38.Inspect2" },
     },
     ["inspect_empty"] = {
         { time = 0.0333, sound = "TFA_CODWW2_P38.Inspect1" },
+        { time = 1.8333, sound = "TFA_CODWW2_P38.Inspect2" },
     },
     ["inspect_knife"] = {
         { time = 0.0333, sound = "TFA_CODWW2_P38.Inspect1" },
+        { time = 1.8333, sound = "TFA_CODWW2_P38.Inspect2" },
     },
     ["inspect_knife_empty"] = {
         { time = 0.0333, sound = "TFA_CODWW2_P38.Inspect1" },
+        { time = 1.8333, sound = "TFA_CODWW2_P38.Inspect2" },
     },
     ["reload"] = {
         { time = 0.1667, sound = "TFA_CODWW2_P38.TacMagOut" },
+        { time = 0.8333, sound = "TFA_CODWW2_P38.TacMagIn" },
     },
     ["reload_empty"] = {
         { time = 0.1667, sound = "TFA_CODWW2_P38.MagOut" },
+        { time = 0.8333, sound = "TFA_CODWW2_P38.MagIn" },
+        { time = 1.6667, sound = "TFA_CODWW2_P38.Charge" },
     },
     ["reload_ext"] = {
         { time = 0.1667, sound = "TFA_CODWW2_P38.MagOut" },
+        { time = 0.8333, sound = "TFA_CODWW2_P38.MagIn" },
     },
     ["reload_ext_empty"] = {
         { time = 0.1667, sound = "TFA_CODWW2_P38.MagOut" },
+        { time = 0.8333, sound = "TFA_CODWW2_P38.MagIn" },
+        { time = 1.6667, sound = "TFA_CODWW2_P38.Charge" },
     },
     ["reload_ext_knife"] = {
         { time = 0.1667, sound = "TFA_CODWW2_P38.MagOut" },
+        { time = 0.8333, sound = "TFA_CODWW2_P38.MagIn" },
     },
     ["reload_ext_knife_empty"] = {
         { time = 0.1667, sound = "TFA_CODWW2_P38.MagOut" },
+        { time = 0.8333, sound = "TFA_CODWW2_P38.MagIn" },
+        { time = 1.6667, sound = "TFA_CODWW2_P38.Charge" },
     },
     ["reload_knife"] = {
         { time = 0.1667, sound = "TFA_CODWW2_P38.MagOut" },
+        { time = 0.8333, sound = "TFA_CODWW2_P38.MagIn" },
     },
     ["reload_knife_empty"] = {
         { time = 0.1667, sound = "TFA_CODWW2_P38.MagOut" },
+        { time = 0.8333, sound = "TFA_CODWW2_P38.MagIn" },
+        { time = 1.6667, sound = "TFA_CODWW2_P38.Charge" },
     },
 }
 

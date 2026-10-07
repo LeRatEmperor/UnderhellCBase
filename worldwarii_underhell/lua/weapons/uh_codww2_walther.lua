@@ -151,18 +151,29 @@ SWEP.AnimSounds = {
     },
     ["inspect"] = {
         { time = 0.0333, sound = "TFA_CODWW2_WALTHER.Inspect1" },
+        { time = 1.6667, sound = "TFA_CODWW2_WALTHER.Inspect2" },
     },
     ["reload"] = {
         { time = 0.0333, sound = "TFA_CODWW2_WALTHER.TacFoley" },
+        { time = 0.8333, sound = "TFA_CODWW2_WALTHER.TacMagOut" },
+        { time = 1.3333, sound = "TFA_CODWW2_WALTHER.TacMagIn" },
     },
     ["reload_empty"] = {
         { time = 0.3333, sound = "TFA_CODWW2_WALTHER.Open" },
+        { time = 1.3333, sound = "TFA_CODWW2_WALTHER.MagOut" },
+        { time = 2.0000, sound = "TFA_CODWW2_WALTHER.MagIn" },
+        { time = 2.5000, sound = "TFA_CODWW2_WALTHER.Charge" },
     },
     ["reload_ext"] = {
         { time = 0.0333, sound = "TFA_CODWW2_WALTHER.TacFoley" },
+        { time = 0.1667, sound = "TFA_CODWW2_WALTHER.TacMagOut" },
+        { time = 1.1667, sound = "TFA_CODWW2_WALTHER.TacMagIn" },
     },
     ["reload_ext_empty"] = {
         { time = 0.1667, sound = "TFA_CODWW2_WALTHER.Open" },
+        { time = 1.1667, sound = "TFA_CODWW2_WALTHER.MagOut" },
+        { time = 2.0000, sound = "TFA_CODWW2_WALTHER.MagIn" },
+        { time = 2.5000, sound = "TFA_CODWW2_WALTHER.Charge" },
     },
 }
 

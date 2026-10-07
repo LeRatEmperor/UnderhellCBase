@@ -153,6 +153,7 @@ SWEP.AnimSounds = {
     },
     ["grenade_in"] = {
         { time = 0.0333, sound = "TFA_CODWW2_RFLGRND.Foley" },
+        { time = 0.8333, sound = "TFA_CODWW2_RFLGRND.On" },
     },
     ["grenade_in_empty"] = {
         { time = 0.0333, sound = "TFA_CODWW2_SML.Raise" },
@@ -174,33 +175,47 @@ SWEP.AnimSounds = {
     },
     ["inspect"] = {
         { time = 0.0333, sound = "TFA_CODWW2_VOLK.Inspect1" },
+        { time = 1.6667, sound = "TFA_CODWW2_VOLK.Inspect2" },
     },
     ["inspect_empty"] = {
         { time = 0.0333, sound = "TFA_CODWW2_VOLK.Inspect1" },
+        { time = 1.6667, sound = "TFA_CODWW2_VOLK.Inspect2" },
     },
     ["inspect_epic"] = {
         { time = 0.0333, sound = "TFA_CODWW2_VOLK.EpicInspect1" },
+        { time = 3.5000, sound = "TFA_CODWW2_VOLK.EpicInspect2" },
     },
     ["inspect_grenade"] = {
         { time = 0.0333, sound = "TFA_CODWW2_STG44.Inspect1" },
+        { time = 1.6667, sound = "TFA_CODWW2_STG44.Inspect1b" },
+        { time = 3.8333, sound = "TFA_CODWW2_STG44.Inspect2" },
     },
     ["inspect_grenade_empty"] = {
         { time = 0.0333, sound = "TFA_CODWW2_STG44.Inspect1" },
+        { time = 1.6667, sound = "TFA_CODWW2_STG44.Inspect1b" },
+        { time = 3.8333, sound = "TFA_CODWW2_STG44.Inspect2" },
     },
     ["reload"] = {
         { time = 0.1667, sound = "TFA_CODWW2_VOLK.TacMagOut" },
+        { time = 1.0000, sound = "TFA_CODWW2_VOLK.TacMagIn" },
     },
     ["reload_empty"] = {
         { time = 0.1667, sound = "TFA_CODWW2_VOLK.MagOut" },
+        { time = 1.0000, sound = "TFA_CODWW2_VOLK.MagIn" },
+        { time = 2.1667, sound = "TFA_CODWW2_VOLK.Charge" },
     },
     ["reload_ext"] = {
         { time = 0.3333, sound = "TFA_CODWW2_VOLK.TacMagOut" },
+        { time = 1.1667, sound = "TFA_CODWW2_VOLK.TacMagIn" },
     },
     ["reload_ext_empty"] = {
         { time = 0.3333, sound = "TFA_CODWW2_VOLK.MagOut" },
+        { time = 1.1667, sound = "TFA_CODWW2_VOLK.MagIn" },
+        { time = 2.1667, sound = "TFA_CODWW2_VOLK.Charge" },
     },
     ["reload_grenade"] = {
         { time = 0.0333, sound = "TFA_CODWW2_RFLGRND.Foley" },
+        { time = 0.8333, sound = "TFA_CODWW2_RFLGRND.On" },
     },
 }
 

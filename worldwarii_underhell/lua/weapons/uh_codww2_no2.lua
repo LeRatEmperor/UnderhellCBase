@@ -148,21 +148,31 @@ SWEP.AnimSounds = {
     },
     ["inspect"] = {
         { time = 0.0333, sound = "TFA_CODWW2_NO2.Inspect1" },
+        { time = 1.5000, sound = "TFA_CODWW2_NO2.Inspect2" },
     },
     ["inspect_knife"] = {
         { time = 0.0333, sound = "TFA_CODWW2_1911.Inspect1" },
+        { time = 1.8333, sound = "TFA_CODWW2_1911.Inspect2" },
     },
     ["reload"] = {
         { time = 0.3333, sound = "TFA_CODWW2_NO2.Open" },
+        { time = 1.1667, sound = "TFA_CODWW2_NO2.Insert" },
+        { time = 1.5000, sound = "TFA_CODWW2_NO2.Close" },
     },
     ["reload_empty"] = {
         { time = 0.3333, sound = "TFA_CODWW2_NO2.Open" },
+        { time = 1.1667, sound = "TFA_CODWW2_NO2.Insert" },
+        { time = 1.5000, sound = "TFA_CODWW2_NO2.Close" },
     },
     ["reload_knife"] = {
         { time = 0.3333, sound = "TFA_CODWW2_NO2.Open" },
+        { time = 1.1667, sound = "TFA_CODWW2_NO2.Insert" },
+        { time = 1.5000, sound = "TFA_CODWW2_NO2.Close" },
     },
     ["reload_knife_empty"] = {
         { time = 0.3333, sound = "TFA_CODWW2_NO2.Open" },
+        { time = 1.1667, sound = "TFA_CODWW2_NO2.Insert" },
+        { time = 1.5000, sound = "TFA_CODWW2_NO2.Close" },
     },
 }
 

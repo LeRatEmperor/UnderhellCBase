@@ -155,15 +155,20 @@ SWEP.AnimSounds = {
     },
     ["inspect"] = {
         { time = 0.0333, sound = "TFA_CODWW2_MP28.Inspect1" },
+        { time = 1.6667, sound = "TFA_CODWW2_MP28.Inspect2" },
     },
     ["inspect_empty"] = {
         { time = 0.0333, sound = "TFA_CODWW2_MP28.Inspect1" },
+        { time = 1.6667, sound = "TFA_CODWW2_MP28.Inspect2" },
     },
     ["reload"] = {
         { time = 0.1667, sound = "TFA_CODWW2_MP28.TacMagOut" },
+        { time = 1.0000, sound = "TFA_CODWW2_MP28.TacMagIn" },
     },
     ["reload_empty"] = {
         { time = 0.1667, sound = "TFA_CODWW2_MP28.MagOut" },
+        { time = 0.8333, sound = "TFA_CODWW2_MP28.MagIn" },
+        { time = 1.8333, sound = "TFA_CODWW2_MP28.Charge" },
     },
     ["suppressor_attach"] = {
         { time = 0.0333, sound = "TFA_CODWW2_MP40.SuppOn" },

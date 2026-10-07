@@ -155,21 +155,34 @@ SWEP.AnimSounds = {
     },
     ["inspect"] = {
         { time = 0.0333, sound = "TFA_CODWW2_LEVER.Inspect1" },
+        { time = 3.0000, sound = "TFA_CODWW2_LEVER.Inspect2" },
     },
     ["inspect_empty"] = {
         { time = 0.0333, sound = "TFA_CODWW2_LEVER.Inspect1" },
+        { time = 3.0000, sound = "TFA_CODWW2_LEVER.Inspect2" },
     },
     ["inspect_epic"] = {
         { time = 0.0333, sound = "TFA_CODWW2_LEVER.InspectEpic1" },
+        { time = 3.0000, sound = "TFA_CODWW2_LEVER.InspectEpic2" },
     },
     ["rechamber"] = {
         { time = 0.1667, sound = "TFA_CODWW2_LEVER.CycleOpen" },
+        { time = 0.3333, sound = "TFA_CODWW2_LEVER.Brass" },
+        { time = 0.5000, sound = "TFA_CODWW2_LEVER.CycleClose" },
     },
     ["reload"] = {
         { time = 0.0333, sound = "TFA_CODWW2_LEVER.Insert" },
     },
     ["shoot_last"] = {
         { time = 0.3333, sound = "TFA_CODWW2_LEVER.CycleOpen" },
+        { time = 0.5000, sound = "TFA_CODWW2_LEVER.Brass" },
+        { time = 0.6667, sound = "TFA_CODWW2_LEVER.CycleClose" },
+    },
+    ["shotgun_reload_finish"] = {
+        { time = 0.1667, sound = "TFA_CODWW2_LEVER.Charge" },
+    },
+    ["shotgun_reload_start"] = {
+        { time = 0.0333, sound = "TFA_CODWW2_LEVER.Start" },
     },
 }
 
