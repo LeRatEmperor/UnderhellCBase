@@ -6,7 +6,7 @@ sound.Add({
     level = 140,
     pitch = {100},
     sound = {"weapons/tfa_codww2/1911/wpn_1911_tail_01.wav", "weapons/tfa_codww2/1911/wpn_1911_tail_02.wav", "weapons/tfa_codww2/1911/wpn_1911_tail_03.wav"}
-})")
+})
 sound.Add({
     name = "TFA_CODWW2_1911.Main",
     channel = CHAN_WEAPON,
@@ -14,7 +14,7 @@ sound.Add({
     level = 140,
     pitch = {100},
     sound = {"weapons/tfa_codww2/1911/wpn_1911_main_01.wav", "weapons/tfa_codww2/1911/wpn_1911_main_02.wav", "weapons/tfa_codww2/1911/wpn_1911_main_03.wav", "weapons/tfa_codww2/1911/wpn_1911_main_04.wav"}
-})")
+})
 sound.Add({
     name = "TFA_CODWW2_1911.Trans",
     channel = CHAN_WEAPON,
@@ -22,7 +22,7 @@ sound.Add({
     level = 140,
     pitch = {100},
     sound = {"weapons/tfa_codww2/1911/wpn_1911_trans_01.wav", "weapons/tfa_codww2/1911/wpn_1911_trans_02.wav", "weapons/tfa_codww2/1911/wpn_1911_trans_03.wav"}
-})")
+})
 sound.Add({
     name = "TFA_CODWW2_1911.Sub",
     channel = CHAN_WEAPON,
@@ -30,7 +30,7 @@ sound.Add({
     level = 140,
     pitch = {100},
     sound = {"weapons/tfa_codww2/1911/wpn_1911_sub_01.wav"}
-})")
+})
 sound.Add({
     name = "TFA_CODWW2_1911.PapFlux",
     channel = CHAN_WEAPON,
@@ -38,7 +38,7 @@ sound.Add({
     level = 140,
     pitch = {100},
     sound = {"weapons/tfa_codww2/1911/wpn_pap_flux2.wav"}
-})")
+})
 
 sound.Add({
     name = "TFA_CODWW2_1911.MechEmpty",
@@ -219,7 +219,7 @@ sound.Add({
     level = 140,
     pitch = {100},
     sound = {"weapons/tfa_codww2/luger/wpn_luger_tail_01.wav", "weapons/tfa_codww2/luger/wpn_luger_tail_02.wav", "weapons/tfa_codww2/luger/wpn_luger_tail_03.wav"}
-})")
+})
 sound.Add({
     name = "TFA_CODWW2_LUGER.Mid",
     channel = CHAN_WEAPON,
@@ -227,7 +227,7 @@ sound.Add({
     level = 140,
     pitch = {100},
     sound = {"weapons/tfa_codww2/luger/wpn_luger_mid_01.wav", "weapons/tfa_codww2/luger/wpn_luger_mid_02.wav", "weapons/tfa_codww2/luger/wpn_luger_mid_03.wav", "weapons/tfa_codww2/luger/wpn_luger_mid_04.wav"}
-})")
+})
 sound.Add({
     name = "TFA_CODWW2_LUGER.Low",
     channel = CHAN_WEAPON,
@@ -235,7 +235,7 @@ sound.Add({
     level = 140,
     pitch = {100},
     sound = {"weapons/tfa_codww2/luger/wpn_luger_low_01.wav"}
-})")
+})
 
 sound.Add({
     name = "TFA_CODWW2_LUGER.TacMagOut",
@@ -294,7 +294,7 @@ sound.Add({
     level = 140,
     pitch = {100},
     sound = {"weapons/tfa_codww2/m712/wpn_m712_shot_01.wav", "weapons/tfa_codww2/m712/wpn_m712_shot_02.wav", "weapons/tfa_codww2/m712/wpn_m712_shot_03.wav"}
-})")
+})
 
 sound.Add( {
 	name = "TFA_CODWW2_M712.Ext",
@@ -356,7 +356,7 @@ sound.Add({
     level = 140,
     pitch = {100},
     sound = {"weapons/tfa_codww2/m1879/wpn_reich_shot_01.wav"}
-})")
+})
 sound.Add({
     name = "TFA_CODWW2_M1879.Mid",
     channel = CHAN_WEAPON,
@@ -364,7 +364,7 @@ sound.Add({
     level = 140,
     pitch = {100},
     sound = {"weapons/tfa_codww2/m1879/wpn_reich_mid_01.wav", "weapons/tfa_codww2/m1879/wpn_reich_mid_02.wav", "weapons/tfa_codww2/m1879/wpn_reich_mid_03.wav"}
-})")
+})
 sound.Add({
     name = "TFA_CODWW2_M1879.Snap",
     channel = CHAN_WEAPON,
@@ -372,7 +372,7 @@ sound.Add({
     level = 140,
     pitch = {100},
     sound = {"weapons/tfa_codww2/m1879/wpn_reich_snap_01.wav"}
-})")
+})
 sound.Add({
     name = "TFA_CODWW2_M1879.Thump",
     channel = CHAN_WEAPON,
@@ -380,7 +380,7 @@ sound.Add({
     level = 140,
     pitch = {100},
     sound = {"weapons/tfa_codww2/m1879/wpn_reich_thump_01.wav"}
-})")
+})
 
 sound.Add({
     name = "TFA_CODWW2_M1879.Open",
@@ -417,7 +417,7 @@ sound.Add({
     level = 140,
     pitch = {100},
     sound = {"weapons/tfa_codww2/no2/wpn_no2_tail_01.wav", "weapons/tfa_codww2/no2/wpn_no2_tail_02.wav", "weapons/tfa_codww2/no2/wpn_no2_tail_03.wav"}
-})")
+})
 
 sound.Add({
     name = "TFA_CODWW2_NO2.High",
@@ -426,7 +426,7 @@ sound.Add({
     level = 140,
     pitch = {100},
     sound = {"weapons/tfa_codww2/no2/wpn_enfield_high_01.wav", "weapons/tfa_codww2/no2/wpn_enfield_high_02.wav", "weapons/tfa_codww2/no2/wpn_enfield_high_03.wav", "weapons/tfa_codww2/no2/wpn_enfield_high_04.wav"}
-})")
+})
 sound.Add({
     name = "TFA_CODWW2_NO2.Mid",
     channel = CHAN_WEAPON,
@@ -434,7 +434,7 @@ sound.Add({
     level = 140,
     pitch = {100},
     sound = {"weapons/tfa_codww2/no2/wpn_enfield_mid_01.wav", "weapons/tfa_codww2/no2/wpn_enfield_mid_02.wav", "weapons/tfa_codww2/no2/wpn_enfield_mid_03.wav", "weapons/tfa_codww2/no2/wpn_enfield_mid_04.wav"}
-})")
+})
 sound.Add({
     name = "TFA_CODWW2_NO2.Low",
     channel = CHAN_WEAPON,
@@ -442,7 +442,7 @@ sound.Add({
     level = 140,
     pitch = {100},
     sound = {"weapons/tfa_codww2/no2/wpn_enfield_low_01.wav", "weapons/tfa_codww2/no2/wpn_enfield_low_02.wav", "weapons/tfa_codww2/no2/wpn_enfield_low_03.wav"}
-})")
+})
 sound.Add({
     name = "TFA_CODWW2_NO2.Thump",
     channel = CHAN_WEAPON,
@@ -450,7 +450,7 @@ sound.Add({
     level = 140,
     pitch = {100},
     sound = {"weapons/tfa_codww2/no2/wpn_enfield_thump_01.wav", "weapons/tfa_codww2/no2/wpn_enfield_thump_02.wav", "weapons/tfa_codww2/no2/wpn_enfield_thump_03.wav", "weapons/tfa_codww2/no2/wpn_enfield_thump_04.wav"}
-})")
+})
 sound.Add({
     name = "TFA_CODWW2_NO2.Mech",
     channel = CHAN_WEAPON,
@@ -458,7 +458,7 @@ sound.Add({
     level = 140,
     pitch = {100},
     sound = {"weapons/tfa_codww2/no2/wpn_enfield_click_02.wav"}
-})")
+})
 
 sound.Add({
     name = "TFA_CODWW2_NO2.Open",
@@ -499,7 +499,7 @@ sound.Add({
     level = 140,
     pitch = {100},
     sound = {"weapons/tfa_codww2/p38/wpn_p38_mid_01.wav", "weapons/tfa_codww2/p38/wpn_p38_mid_02.wav", "weapons/tfa_codww2/p38/wpn_p38_mid_03.wav"}
-})")
+})
 sound.Add({
     name = "TFA_CODWW2_P38.Ext",
     channel = CHAN_WEAPON,
@@ -507,7 +507,7 @@ sound.Add({
     level = 140,
     pitch = {100},
     sound = {"weapons/tfa_codww2/p38/wpn_p38_tail_01.wav", "weapons/tfa_codww2/p38/wpn_p38_tail_02.wav", "weapons/tfa_codww2/p38/wpn_p38_tail_03.wav"}
-})")
+})
 sound.Add({
     name = "TFA_CODWW2_P38.Snap",
     channel = CHAN_WEAPON,
@@ -515,7 +515,7 @@ sound.Add({
     level = 140,
     pitch = {100},
     sound = {"weapons/tfa_codww2/p38/wpn_p38_snap_01.wav", "weapons/tfa_codww2/p38/wpn_p38_snap_02.wav", "weapons/tfa_codww2/p38/wpn_p38_snap_03.wav"}
-})")
+})
 
 sound.Add({
     name = "TFA_CODWW2_P38.TacMagOut",
@@ -645,7 +645,7 @@ sound.Add({
     level = 140,
     pitch = {100},
     sound = {"weapons/tfa_codww2/bren/wpn_bren_trigger_pull.wav"}
-})")
+})
 sound.Add({
     name = "TFA_CODWW2_BREN.Plr",
     channel = CHAN_WEAPON,
@@ -653,7 +653,7 @@ sound.Add({
     level = 140,
     pitch = {100},
     sound = {"weapons/tfa_codww2/bren/wpn_bren_lyr_2_01.wav", "weapons/tfa_codww2/bren/wpn_bren_lyr_2_02.wav", "weapons/tfa_codww2/bren/wpn_bren_lyr_2_03.wav", "weapons/tfa_codww2/bren/wpn_bren_lyr_2_04.wav", "weapons/tfa_codww2/bren/wpn_bren_lyr_2_05.wav"}
-})")
+})
 sound.Add({
     name = "TFA_CODWW2_BREN.Ext",
     channel = CHAN_WEAPON,
@@ -661,7 +661,7 @@ sound.Add({
     level = 140,
     pitch = {100},
     sound = {"weapons/tfa_codww2/bren/wpn_bren_tail_lyr_01.wav", "weapons/tfa_codww2/bren/wpn_bren_tail_lyr_02.wav", "weapons/tfa_codww2/bren/wpn_bren_tail_lyr_03.wav"}
-})")
+})
 
 sound.Add(
 {
@@ -927,7 +927,7 @@ sound.Add({
     level = 140,
     pitch = {100},
     sound = {"weapons/tfa_codww2/lewis/wpn_lewis_lyr_1_01.wav", "weapons/tfa_codww2/lewis/wpn_lewis_lyr_1_02.wav", "weapons/tfa_codww2/lewis/wpn_lewis_lyr_1_03.wav", "weapons/tfa_codww2/lewis/wpn_lewis_lyr_1_04.wav"}
-})")
+})
 sound.Add({
     name = "TFA_CODWW2_LEWIS.Mech",
     channel = CHAN_WEAPON,
@@ -935,7 +935,7 @@ sound.Add({
     level = 140,
     pitch = {100},
     sound = {"weapons/tfa_codww2/lewis/wpn_lewis_mech_lyr_01.wav", "weapons/tfa_codww2/lewis/wpn_lewis_mech_lyr_02.wav", "weapons/tfa_codww2/lewis/wpn_lewis_mech_lyr_03.wav", "weapons/tfa_codww2/lewis/wpn_lewis_mech_lyr_04.wav", "weapons/tfa_codww2/lewis/wpn_lewis_mech_lyr_05.wav", "weapons/tfa_codww2/lewis/wpn_lewis_mech_lyr_06.wav", "weapons/tfa_codww2/lewis/wpn_lewis_mech_lyr_07.wav", "weapons/tfa_codww2/lewis/wpn_lewis_mech_lyr_08.wav", "weapons/tfa_codww2/lewis/wpn_lewis_mech_lyr_09.wav", "weapons/tfa_codww2/lewis/wpn_lewis_mech_lyr_10.wav"}
-})")
+})
 sound.Add({
     name = "TFA_CODWW2_LEWIS.Ext",
     channel = CHAN_WEAPON,
@@ -943,7 +943,7 @@ sound.Add({
     level = 140,
     pitch = {100},
     sound = {"weapons/tfa_codww2/lewis/wpn_lewis_tail_lyr_01.wav", "weapons/tfa_codww2/lewis/wpn_lewis_tail_lyr_02.wav", "weapons/tfa_codww2/lewis/wpn_lewis_tail_lyr_03.wav"}
-})")
+})
 sound.Add({
     name = "TFA_CODWW2_LEWIS.NPC_shot_01",
     channel = CHAN_WEAPON,
@@ -951,7 +951,7 @@ sound.Add({
     level = 140,
     pitch = {100},
     sound = {"weapons/tfa_codww2/lewis/wpn_npc_lewis_shot_01.wav", "weapons/tfa_codww2/lewis/wpn_npc_lewis_shot_02.wav", "weapons/tfa_codww2/lewis/wpn_npc_lewis_shot_03.wav"}
-})")
+})
 
 sound.Add(
 {
@@ -1109,7 +1109,7 @@ sound.Add({
     level = 140,
     pitch = {100},
     sound = {"weapons/tfa_codww2/m1919/wpn_1919_lyr_1_01.wav", "weapons/tfa_codww2/m1919/wpn_1919_lyr_1_02.wav", "weapons/tfa_codww2/m1919/wpn_1919_lyr_1_03.wav"}
-})")
+})
 sound.Add({
     name = "TFA_CODWW2_M1919.MP_Shot",
     channel = CHAN_WEAPON,
@@ -1117,7 +1117,7 @@ sound.Add({
     level = 140,
     pitch = {100},
     sound = {"weapons/tfa_codww2/m1919/wpn_1919_mp_shot_01.wav", "weapons/tfa_codww2/m1919/wpn_1919_mp_shot_02.wav", "weapons/tfa_codww2/m1919/wpn_1919_mp_shot_03.wav", "weapons/tfa_codww2/m1919/wpn_1919_mp_shot_04.wav", "weapons/tfa_codww2/m1919/wpn_1919_mp_shot_05.wav", "weapons/tfa_codww2/m1919/wpn_1919_mp_shot_06.wav", "weapons/tfa_codww2/m1919/wpn_1919_mp_shot_07.wav"}
-})")
+})
 sound.Add({
     name = "TFA_CODWW2_M1919.Low",
     channel = CHAN_WEAPON,
@@ -1125,7 +1125,7 @@ sound.Add({
     level = 140,
     pitch = {100},
     sound = {"weapons/tfa_codww2/m1919/wpn_brown_1919_low_01.wav"}
-})")
+})
 sound.Add({
     name = "TFA_CODWW2_M1919.Ext",
     channel = CHAN_WEAPON,
@@ -1133,7 +1133,7 @@ sound.Add({
     level = 140,
     pitch = {100},
     sound = {"weapons/tfa_codww2/m1919/wpn_1919_tail_lyr_01.wav", "weapons/tfa_codww2/m1919/wpn_1919_tail_lyr_02.wav", "weapons/tfa_codww2/m1919/wpn_1919_tail_lyr_03.wav", "weapons/tfa_codww2/m1919/wpn_1919_tail_lyr_04.wav"}
-})")
+})
 sound.Add({
     name = "TFA_CODWW2_M1919.Sub",
     channel = CHAN_WEAPON,
@@ -1141,7 +1141,7 @@ sound.Add({
     level = 140,
     pitch = {100},
     sound = {"weapons/tfa_codww2/m1919/wpn_brown_1919_sub.wav"}
-})")
+})
 sound.Add({
     name = "TFA_CODWW2_M1919.Lyr4",
     channel = CHAN_WEAPON,
@@ -1149,7 +1149,7 @@ sound.Add({
     level = 140,
     pitch = {100},
     sound = {"weapons/tfa_codww2/m1919/wpn_1919_mp_lyr_4_01.wav", "weapons/tfa_codww2/m1919/wpn_1919_mp_lyr_4_02.wav", "weapons/tfa_codww2/m1919/wpn_1919_mp_lyr_4_03.wav", "weapons/tfa_codww2/m1919/wpn_1919_mp_lyr_4_04.wav", "weapons/tfa_codww2/m1919/wpn_1919_mp_lyr_4_05.wav", "weapons/tfa_codww2/m1919/wpn_1919_mp_lyr_4_06.wav", "weapons/tfa_codww2/m1919/wpn_1919_mp_lyr_4_07.wav"}
-})")
+})
 
 sound.Add({
     name = "TFA_CODWW2_M1919.FPO",
@@ -1272,7 +1272,7 @@ sound.Add({
     level = 140,
     pitch = {100},
     sound = {"weapons/tfa_codww2/mg15/wpn_mg15_lyr_1_01.wav", "weapons/tfa_codww2/mg15/wpn_mg15_lyr_1_02.wav", "weapons/tfa_codww2/mg15/wpn_mg15_lyr_1_03.wav"}
-})")
+})
 sound.Add({
     name = "TFA_CODWW2_MG15.Sub",
     channel = CHAN_WEAPON,
@@ -1280,7 +1280,7 @@ sound.Add({
     level = 140,
     pitch = {100},
     sound = {"weapons/tfa_codww2/mg15/wpn_mg15_sub.wav"}
-})")
+})
 sound.Add({
     name = "TFA_CODWW2_MG15.Thump",
     channel = CHAN_WEAPON,
@@ -1288,7 +1288,7 @@ sound.Add({
     level = 140,
     pitch = {100},
     sound = {"weapons/tfa_codww2/mg15/wpn_mg15_thump_01.wav"}
-})")
+})
 sound.Add({
     name = "TFA_CODWW2_MG15.Ext",
     channel = CHAN_WEAPON,
@@ -1296,7 +1296,7 @@ sound.Add({
     level = 140,
     pitch = {100},
     sound = {"weapons/tfa_codww2/mg15/wpn_mg15_tail_lyr_01.wav", "weapons/tfa_codww2/mg15/wpn_mg15_tail_lyr_02.wav", "weapons/tfa_codww2/mg15/wpn_mg15_tail_lyr_03.wav"}
-})")
+})
 
 sound.Add(
 {
@@ -1436,7 +1436,7 @@ sound.Add({
     level = 140,
     pitch = {100},
     sound = {"weapons/tfa_codww2/mg42/wpn_mg42_rear_lyr.wav"}
-})")
+})
 sound.Add({
     name = "TFA_CODWW2_MG42.Click",
     channel = CHAN_WEAPON,
@@ -1444,7 +1444,7 @@ sound.Add({
     level = 140,
     pitch = {100},
     sound = {"weapons/tfa_codww2/mg42/wpn_mg42_plr_shot_click_01.wav"}
-})")
+})
 sound.Add({
     name = "TFA_CODWW2_MG42.High",
     channel = CHAN_WEAPON,
@@ -1452,7 +1452,7 @@ sound.Add({
     level = 140,
     pitch = {100},
     sound = {"weapons/tfa_codww2/mg42/mg42_high_lyr_01.wav", "weapons/tfa_codww2/mg42/mg42_high_lyr_02.wav", "weapons/tfa_codww2/mg42/mg42_high_lyr_03.wav", "weapons/tfa_codww2/mg42/mg42_high_lyr_04.wav", "weapons/tfa_codww2/mg42/mg42_high_lyr_05.wav", "weapons/tfa_codww2/mg42/mg42_high_lyr_06.wav", "weapons/tfa_codww2/mg42/mg42_high_lyr_07.wav"}
-})")
+})
 sound.Add({
     name = "TFA_CODWW2_MG42.Mech",
     channel = CHAN_WEAPON,
@@ -1460,7 +1460,7 @@ sound.Add({
     level = 140,
     pitch = {100},
     sound = {"weapons/tfa_codww2/mg42/wpn_mg42_delay_mech_01.wav", "weapons/tfa_codww2/mg42/wpn_mg42_delay_mech_02.wav", "weapons/tfa_codww2/mg42/wpn_mg42_delay_mech_03.wav", "weapons/tfa_codww2/mg42/wpn_mg42_delay_mech_04.wav", "weapons/tfa_codww2/mg42/wpn_mg42_delay_mech_05.wav"}
-})")
+})
 sound.Add({
     name = "TFA_CODWW2_MG42.Ext",
     channel = CHAN_WEAPON,
@@ -1468,7 +1468,7 @@ sound.Add({
     level = 140,
     pitch = {100},
     sound = {"weapons/tfa_codww2/mg42/wpn_mg42_npc_ndy_dist_01.wav", "weapons/tfa_codww2/mg42/wpn_mg42_npc_ndy_dist_02.wav", "weapons/tfa_codww2/mg42/wpn_mg42_npc_ndy_dist_03.wav", "weapons/tfa_codww2/mg42/wpn_mg42_npc_ndy_dist_04.wav", "weapons/tfa_codww2/mg42/wpn_mg42_npc_ndy_dist_05.wav"}
-})")
+})
 sound.Add({
     name = "TFA_CODWW2_MG42.Low",
     channel = CHAN_WEAPON,
@@ -1476,7 +1476,7 @@ sound.Add({
     level = 140,
     pitch = {100},
     sound = {"weapons/tfa_codww2/mg42/mg42_low_lyr.wav"}
-})")
+})
 
 sound.Add(
 {
@@ -1802,7 +1802,7 @@ sound.Add({
     level = 140,
     pitch = {100},
     sound = {"weapons/tfa_codww2/vmg27/wpn_vmg27_center_low_01.wav", "weapons/tfa_codww2/vmg27/wpn_vmg27_center_low_02.wav", "weapons/tfa_codww2/vmg27/wpn_vmg27_center_low_03.wav", "weapons/tfa_codww2/vmg27/wpn_vmg27_center_low_04.wav", "weapons/tfa_codww2/vmg27/wpn_vmg27_center_low_05.wav", "weapons/tfa_codww2/vmg27/wpn_vmg27_center_low_06.wav", "weapons/tfa_codww2/vmg27/wpn_vmg27_center_low_07.wav"}
-})")
+})
 sound.Add({
     name = "TFA_CODWW2_VMG27.High",
     channel = CHAN_WEAPON,
@@ -1810,7 +1810,7 @@ sound.Add({
     level = 140,
     pitch = {100},
     sound = {"weapons/tfa_codww2/vmg27/wpn_vmg27_center_high_01.wav", "weapons/tfa_codww2/vmg27/wpn_vmg27_center_high_02.wav", "weapons/tfa_codww2/vmg27/wpn_vmg27_center_high_03.wav", "weapons/tfa_codww2/vmg27/wpn_vmg27_center_high_04.wav", "weapons/tfa_codww2/vmg27/wpn_vmg27_center_high_05.wav", "weapons/tfa_codww2/vmg27/wpn_vmg27_center_high_06.wav", "weapons/tfa_codww2/vmg27/wpn_vmg27_center_high_07.wav"}
-})")
+})
 sound.Add({
     name = "TFA_CODWW2_VMG27.Lfe",
     channel = CHAN_WEAPON,
@@ -1818,7 +1818,7 @@ sound.Add({
     level = 140,
     pitch = {100},
     sound = {"weapons/tfa_codww2/vmg27/wpn_vmg27_lfe_lyr.wav"}
-})")
+})
 sound.Add({
     name = "TFA_CODWW2_VMG27.Lyr3",
     channel = CHAN_WEAPON,
@@ -1826,7 +1826,7 @@ sound.Add({
     level = 140,
     pitch = {100},
     sound = {"weapons/tfa_codww2/vmg27/wpn_vmg27_lyr_3_01.wav", "weapons/tfa_codww2/vmg27/wpn_vmg27_lyr_3_02.wav", "weapons/tfa_codww2/vmg27/wpn_vmg27_lyr_3_03.wav", "weapons/tfa_codww2/vmg27/wpn_vmg27_lyr_3_04.wav", "weapons/tfa_codww2/vmg27/wpn_vmg27_lyr_3_07.wav", "weapons/tfa_codww2/vmg27/wpn_vmg27_lyr_3_08.wav", "weapons/tfa_codww2/vmg27/wpn_vmg27_lyr_3_09.wav"}
-})")
+})
 
 sound.Add({
     name = "TFA_CODWW2_VMG27.FPO",
@@ -2147,7 +2147,7 @@ sound.Add({
     level = 140,
     pitch = {100},
     sound = {"weapons/tfa_codww2/ak47/wpn_ak47_thump_01.wav", "weapons/tfa_codww2/ak47/wpn_ak47_thump_02.wav", "weapons/tfa_codww2/ak47/wpn_ak47_thump_03.wav", "weapons/tfa_codww2/ak47/wpn_ak47_thump_04.wav", "weapons/tfa_codww2/ak47/wpn_ak47_thump_05.wav", "weapons/tfa_codww2/ak47/wpn_ak47_thump_06.wav"}
-})")
+})
 sound.Add({
     name = "TFA_CODWW2_AK47.High",
     channel = CHAN_WEAPON,
@@ -2155,7 +2155,7 @@ sound.Add({
     level = 140,
     pitch = {100},
     sound = {"weapons/tfa_codww2/ak47/wpn_ak47_high_01.wav", "weapons/tfa_codww2/ak47/wpn_ak47_high_02.wav", "weapons/tfa_codww2/ak47/wpn_ak47_high_03.wav", "weapons/tfa_codww2/ak47/wpn_ak47_high_04.wav", "weapons/tfa_codww2/ak47/wpn_ak47_high_05.wav", "weapons/tfa_codww2/ak47/wpn_ak47_high_06.wav"}
-})")
+})
 sound.Add({
     name = "TFA_CODWW2_AK47.Crack",
     channel = CHAN_WEAPON,
@@ -2163,7 +2163,7 @@ sound.Add({
     level = 140,
     pitch = {100},
     sound = {"weapons/tfa_codww2/ak47/wpn_ak47_crack_01.wav", "weapons/tfa_codww2/ak47/wpn_ak47_crack_02.wav", "weapons/tfa_codww2/ak47/wpn_ak47_crack_03.wav", "weapons/tfa_codww2/ak47/wpn_ak47_crack_04.wav", "weapons/tfa_codww2/ak47/wpn_ak47_crack_05.wav"}
-})")
+})
 sound.Add({
     name = "TFA_CODWW2_AK47.Trans",
     channel = CHAN_WEAPON,
@@ -2171,7 +2171,7 @@ sound.Add({
     level = 140,
     pitch = {100},
     sound = {"weapons/tfa_codww2/ak47/wpn_ak47_trans_lyr_2.wav"}
-})")
+})
 sound.Add({
     name = "TFA_CODWW2_AK47.Sub",
     channel = CHAN_WEAPON,
@@ -2179,7 +2179,7 @@ sound.Add({
     level = 140,
     pitch = {100},
     sound = {"weapons/tfa_codww2/ak47/wpn_ak47_sub_lyr.wav"}
-})")
+})
 sound.Add({
     name = "TFA_CODWW2_AK47.Ext",
     channel = CHAN_WEAPON,
@@ -2187,7 +2187,7 @@ sound.Add({
     level = 140,
     pitch = {100},
     sound = {"weapons/tfa_codww2/ak47/wpn_ak47_tail_01.wav", "weapons/tfa_codww2/ak47/wpn_ak47_tail_02.wav", "weapons/tfa_codww2/ak47/wpn_ak47_tail_03.wav"}
-})")
+})
 
 sound.Add({
     name = "TFA_CODWW2_AS44.FPO",
@@ -2261,7 +2261,7 @@ sound.Add({
     level = 140,
     pitch = {100},
     sound = {"weapons/tfa_codww2/avs36/wpn_avs36_plr_lyr_2_01.wav", "weapons/tfa_codww2/avs36/wpn_avs36_plr_lyr_2_02.wav", "weapons/tfa_codww2/avs36/wpn_avs36_plr_lyr_2_03.wav"}
-})")
+})
 sound.Add({
     name = "TFA_CODWW2_AVS.Trans",
     channel = CHAN_WEAPON,
@@ -2269,7 +2269,7 @@ sound.Add({
     level = 140,
     pitch = {100},
     sound = {"weapons/tfa_codww2/avs36/wpn_avs36_plr_trans_01.wav", "weapons/tfa_codww2/avs36/wpn_avs36_plr_trans_02.wav", "weapons/tfa_codww2/avs36/wpn_avs36_plr_trans_03.wav", "weapons/tfa_codww2/avs36/wpn_avs36_plr_trans_04.wav"}
-})")
+})
 
 sound.Add({
     name = "TFA_CODWW2_AVS.FPO",
@@ -2343,7 +2343,7 @@ sound.Add({
     level = 140,
     pitch = {100},
     sound = {"weapons/tfa_codww2/bar/wpn_bar_tail_2.wav"}
-})")
+})
 sound.Add({
     name = "TFA_CODWW2_BAR.Lyr1",
     channel = CHAN_WEAPON,
@@ -2351,7 +2351,7 @@ sound.Add({
     level = 140,
     pitch = {100},
     sound = {"weapons/tfa_codww2/bar/wpn_bar_lyr_1_01.wav", "weapons/tfa_codww2/bar/wpn_bar_lyr_1_02.wav", "weapons/tfa_codww2/bar/wpn_bar_lyr_1_03.wav", "weapons/tfa_codww2/bar/wpn_bar_lyr_1_04.wav"}
-})")
+})
 sound.Add({
     name = "TFA_CODWW2_BAR.Lyr2",
     channel = CHAN_WEAPON,
@@ -2359,7 +2359,7 @@ sound.Add({
     level = 140,
     pitch = {100},
     sound = {"weapons/tfa_codww2/bar/wpn_bar_lyr_2_01.wav"}
-})")
+})
 sound.Add({
     name = "TFA_CODWW2_BAR.Ext.Mp",
     channel = CHAN_WEAPON,
@@ -2367,7 +2367,7 @@ sound.Add({
     level = 140,
     pitch = {100},
     sound = {"weapons/tfa_codww2/bar/wpn_bar_tail_mp_01.wav", "weapons/tfa_codww2/bar/wpn_bar_tail_mp_02.wav", "weapons/tfa_codww2/bar/wpn_bar_tail_mp_03.wav"}
-})")
+})
 
 sound.Add(
 {
@@ -2480,7 +2480,7 @@ sound.Add({
     level = 140,
     pitch = {100},
     sound = {"weapons/tfa_codww2/charlton/wpn_charlton_center_lyr_1_01.wav", "weapons/tfa_codww2/charlton/wpn_charlton_center_lyr_1_02.wav", "weapons/tfa_codww2/charlton/wpn_charlton_center_lyr_1_03.wav", "weapons/tfa_codww2/charlton/wpn_charlton_center_lyr_1_04.wav", "weapons/tfa_codww2/charlton/wpn_charlton_center_lyr_1_05.wav", "weapons/tfa_codww2/charlton/wpn_charlton_center_lyr_1_06.wav"}
-})")
+})
 sound.Add({
     name = "TFA_CODWW2_NZ41.Center2",
     channel = CHAN_WEAPON,
@@ -2488,7 +2488,7 @@ sound.Add({
     level = 140,
     pitch = {100},
     sound = {"weapons/tfa_codww2/charlton/wpn_charlton_center_lyr_2_01.wav", "weapons/tfa_codww2/charlton/wpn_charlton_center_lyr_2_02.wav", "weapons/tfa_codww2/charlton/wpn_charlton_center_lyr_2_03.wav", "weapons/tfa_codww2/charlton/wpn_charlton_center_lyr_2_04.wav", "weapons/tfa_codww2/charlton/wpn_charlton_center_lyr_2_05.wav", "weapons/tfa_codww2/charlton/wpn_charlton_center_lyr_2_06.wav"}
-})")
+})
 sound.Add({
     name = "TFA_CODWW2_NZ41.Wide",
     channel = CHAN_WEAPON,
@@ -2496,7 +2496,7 @@ sound.Add({
     level = 140,
     pitch = {100},
     sound = {"weapons/tfa_codww2/charlton/wpn_charlton_wide_lyr_1_01.wav", "weapons/tfa_codww2/charlton/wpn_charlton_wide_lyr_1_02.wav", "weapons/tfa_codww2/charlton/wpn_charlton_wide_lyr_1_03.wav", "weapons/tfa_codww2/charlton/wpn_charlton_wide_lyr_1_04.wav", "weapons/tfa_codww2/charlton/wpn_charlton_wide_lyr_1_05.wav", "weapons/tfa_codww2/charlton/wpn_charlton_wide_lyr_1_06.wav"}
-})")
+})
 sound.Add({
     name = "TFA_CODWW2_NZ41.Ext",
     channel = CHAN_WEAPON,
@@ -2504,7 +2504,7 @@ sound.Add({
     level = 140,
     pitch = {100},
     sound = {"weapons/tfa_codww2/charlton/wpn_charlton_tail_01.wav", "weapons/tfa_codww2/charlton/wpn_charlton_tail_02.wav", "weapons/tfa_codww2/charlton/wpn_charlton_tail_03.wav"}
-})")
+})
 
 sound.Add({
     name = "TFA_CODWW2_NZ41.FPO",
@@ -2610,7 +2610,7 @@ sound.Add({
     level = 140,
     pitch = {100},
     sound = {"weapons/tfa_codww2/federov/wpn_federov_center_01.wav", "weapons/tfa_codww2/federov/wpn_federov_center_02.wav", "weapons/tfa_codww2/federov/wpn_federov_center_03.wav", "weapons/tfa_codww2/federov/wpn_federov_center_04.wav", "weapons/tfa_codww2/federov/wpn_federov_center_05.wav", "weapons/tfa_codww2/federov/wpn_federov_center_06.wav"}
-})")
+})
 sound.Add({
     name = "TFA_CODWW2_FDRV.Stereo",
     channel = CHAN_WEAPON,
@@ -2618,7 +2618,7 @@ sound.Add({
     level = 140,
     pitch = {100},
     sound = {"weapons/tfa_codww2/federov/wpn_federov_stereo_01.wav", "weapons/tfa_codww2/federov/wpn_federov_stereo_02.wav", "weapons/tfa_codww2/federov/wpn_federov_stereo_03.wav", "weapons/tfa_codww2/federov/wpn_federov_stereo_04.wav", "weapons/tfa_codww2/federov/wpn_federov_stereo_05.wav", "weapons/tfa_codww2/federov/wpn_federov_stereo_06.wav"}
-})")
+})
 sound.Add({
     name = "TFA_CODWW2_FDRV.High",
     channel = CHAN_WEAPON,
@@ -2626,7 +2626,7 @@ sound.Add({
     level = 140,
     pitch = {100},
     sound = {"weapons/tfa_codww2/federov/wpn_federov_high_01.wav", "weapons/tfa_codww2/federov/wpn_federov_high_02.wav", "weapons/tfa_codww2/federov/wpn_federov_high_03.wav", "weapons/tfa_codww2/federov/wpn_federov_high_04.wav", "weapons/tfa_codww2/federov/wpn_federov_high_05.wav", "weapons/tfa_codww2/federov/wpn_federov_high_06.wav"}
-})")
+})
 sound.Add({
     name = "TFA_CODWW2_FDRV.Ext",
     channel = CHAN_WEAPON,
@@ -2634,7 +2634,7 @@ sound.Add({
     level = 140,
     pitch = {100},
     sound = {"weapons/tfa_codww2/federov/wpn_federov_stereo_tail_01.wav", "weapons/tfa_codww2/federov/wpn_federov_stereo_tail_02.wav", "weapons/tfa_codww2/federov/wpn_federov_stereo_tail_03.wav", "weapons/tfa_codww2/federov/wpn_federov_stereo_tail_04.wav"}
-})")
+})
 
 sound.Add({
     name = "TFA_CODWW2_FDRV.FPO",
@@ -2708,7 +2708,7 @@ sound.Add({
     level = 140,
     pitch = {100},
     sound = {"weapons/tfa_codww2/fg42/wpn_fg42_snap_01.wav", "weapons/tfa_codww2/fg42/wpn_fg42_snap_02.wav"}
-})")
+})
 sound.Add({
     name = "TFA_CODWW2_FG42.Ext",
     channel = CHAN_WEAPON,
@@ -2716,7 +2716,7 @@ sound.Add({
     level = 140,
     pitch = {100},
     sound = {"weapons/tfa_codww2/fg42/wpn_fg42_tail_01.wav", "weapons/tfa_codww2/fg42/wpn_fg42_tail_03.wav"}
-})")
+})
 sound.Add({
     name = "TFA_CODWW2_FG42.Lyr1",
     channel = CHAN_WEAPON,
@@ -2724,7 +2724,7 @@ sound.Add({
     level = 140,
     pitch = {100},
     sound = {"weapons/tfa_codww2/fg42/wpn_fg42_lyr_1_01.wav"}
-})")
+})
 sound.Add({
     name = "TFA_CODWW2_FG42.Lyr2",
     channel = CHAN_WEAPON,
@@ -2732,7 +2732,7 @@ sound.Add({
     level = 140,
     pitch = {100},
     sound = {"weapons/tfa_codww2/fg42/wpn_fg42_lyr_2_01.wav", "weapons/tfa_codww2/fg42/wpn_fg42_lyr_2_02.wav", "weapons/tfa_codww2/fg42/wpn_fg42_lyr_2_03.wav"}
-})")
+})
 sound.Add({
     name = "TFA_CODWW2_FG42.Lyr3",
     channel = CHAN_WEAPON,
@@ -2740,7 +2740,7 @@ sound.Add({
     level = 140,
     pitch = {100},
     sound = {"weapons/tfa_codww2/fg42/wpn_fg42_lyr_3_01.wav"}
-})")
+})
 sound.Add({
     name = "TFA_CODWW2_FG42.Ext.Mp",
     channel = CHAN_WEAPON,
@@ -2748,7 +2748,7 @@ sound.Add({
     level = 140,
     pitch = {100},
     sound = {"weapons/tfa_codww2/fg42/wpn_fg42_tail_lyr_01.wav", "weapons/tfa_codww2/fg42/wpn_fg42_tail_lyr_02.wav", "weapons/tfa_codww2/fg42/wpn_fg42_tail_lyr_03.wav"}
-})")
+})
 
 sound.Add(
 {
@@ -2891,7 +2891,7 @@ sound.Add({
     level = 140,
     pitch = {100},
     sound = {"weapons/tfa_codww2/gewehr43/wpn_gewehr_tail.wav"}
-})")
+})
 sound.Add({
     name = "TFA_CODWW2_GEWEHR.Shot",
     channel = CHAN_WEAPON,
@@ -2899,7 +2899,7 @@ sound.Add({
     level = 140,
     pitch = {100},
     sound = {"weapons/tfa_codww2/gewehr43/wpn_gewehr43_plr_shot.wav"}
-})")
+})
 sound.Add({
     name = "TFA_CODWW2_GEWEHR.Sub",
     channel = CHAN_WEAPON,
@@ -2907,7 +2907,7 @@ sound.Add({
     level = 140,
     pitch = {100},
     sound = {"weapons/tfa_codww2/gewehr43/wpn_gewehr43_plr_sub.wav"}
-})")
+})
 sound.Add({
     name = "TFA_CODWW2_GEWEHR.Mech",
     channel = CHAN_WEAPON,
@@ -2915,7 +2915,7 @@ sound.Add({
     level = 140,
     pitch = {100},
     sound = {"weapons/tfa_codww2/gewehr43/wpn_gewehr43_mech_01.wav"}
-})")
+})
 sound.Add({
     name = "TFA_CODWW2_GEWEHR.Body",
     channel = CHAN_WEAPON,
@@ -2923,7 +2923,7 @@ sound.Add({
     level = 140,
     pitch = {100},
     sound = {"weapons/tfa_codww2/gewehr43/wpn_gewehr43_body_01.wav", "weapons/tfa_codww2/gewehr43/wpn_gewehr43_body_02.wav", "weapons/tfa_codww2/gewehr43/wpn_gewehr43_body_03.wav", "weapons/tfa_codww2/gewehr43/wpn_gewehr43_body_04.wav"}
-})")
+})
 sound.Add({
     name = "TFA_CODWW2_GEWEHR.High",
     channel = CHAN_WEAPON,
@@ -2931,7 +2931,7 @@ sound.Add({
     level = 140,
     pitch = {100},
     sound = {"weapons/tfa_codww2/gewehr43/wpn_gewehr_high_01.wav", "weapons/tfa_codww2/gewehr43/wpn_gewehr_high_02.wav", "weapons/tfa_codww2/gewehr43/wpn_gewehr_high_03.wav"}
-})")
+})
 sound.Add({
     name = "TFA_CODWW2_GEWEHR.Ext",
     channel = CHAN_WEAPON,
@@ -2939,7 +2939,7 @@ sound.Add({
     level = 140,
     pitch = {100},
     sound = {"weapons/tfa_codww2/gewehr43/wpn_gewehr_tail_mp_01.wav"}
-})")
+})
 
 sound.Add({
     name = "TFA_CODWW2_GEWEHR.FPO",
@@ -3013,7 +3013,7 @@ sound.Add({
     level = 140,
     pitch = {100},
     sound = {"weapons/tfa_codww2/grossfuss/wpn_grossfuss_fire_plr.wav"}
-})")
+})
 sound.Add({
     name = "TFA_CODWW2_GFSTG.Ext",
     channel = CHAN_WEAPON,
@@ -3021,7 +3021,7 @@ sound.Add({
     level = 140,
     pitch = {100},
     sound = {"weapons/tfa_codww2/grossfuss/wpn_grossfuss_tail_plr.wav"}
-})")
+})
 
 sound.Add({
     name = "TFA_CODWW2_GFSTG.Inspect1",
@@ -3044,7 +3044,7 @@ sound.Add({
     level = 140,
     pitch = {100},
     sound = {"weapons/tfa_codww2/m1carabine/wpn_m1_carbine_ping.wav"}
-})")
+})
 sound.Add({
     name = "TFA_CODWW2_M1CARB.Ext",
     channel = CHAN_WEAPON,
@@ -3052,7 +3052,7 @@ sound.Add({
     level = 140,
     pitch = {100},
     sound = {"weapons/tfa_codww2/m1carabine/wpn_m1_carbine_tail_01.wav", "weapons/tfa_codww2/m1carabine/wpn_m1_carbine_tail_02.wav", "weapons/tfa_codww2/m1carabine/wpn_m1_carbine_tail_03.wav"}
-})")
+})
 sound.Add({
     name = "TFA_CODWW2_M1CARB.Tail05",
     channel = CHAN_WEAPON,
@@ -3060,7 +3060,7 @@ sound.Add({
     level = 140,
     pitch = {100},
     sound = {"weapons/tfa_codww2/m1carabine/wpn_m1_carbine_tail_05.wav"}
-})")
+})
 sound.Add({
     name = "TFA_CODWW2_M1CARB.Shot",
     channel = CHAN_WEAPON,
@@ -3068,7 +3068,7 @@ sound.Add({
     level = 140,
     pitch = {100},
     sound = {"weapons/tfa_codww2/m1carabine/wpn_m1_carbine_shot_01.wav", "weapons/tfa_codww2/m1carabine/wpn_m1_carbine_shot_02.wav", "weapons/tfa_codww2/m1carabine/wpn_m1_carbine_shot_03.wav"}
-})")
+})
 sound.Add({
     name = "TFA_CODWW2_M1CARB.Low",
     channel = CHAN_WEAPON,
@@ -3076,7 +3076,7 @@ sound.Add({
     level = 140,
     pitch = {100},
     sound = {"weapons/tfa_codww2/m1carabine/wpn_m1_carbine_low_01.wav"}
-})")
+})
 sound.Add({
     name = "TFA_CODWW2_M1CARB.Ext.Mp",
     channel = CHAN_WEAPON,
@@ -3084,7 +3084,7 @@ sound.Add({
     level = 140,
     pitch = {100},
     sound = {"weapons/tfa_codww2/m1carabine/wpn_m1_carbine_tail_mp_01.wav", "weapons/tfa_codww2/m1carabine/wpn_m1_carbine_tail_mp_02.wav", "weapons/tfa_codww2/m1carabine/wpn_m1_carbine_tail_mp_03.wav"}
-})")
+})
 sound.Add({
     name = "TFA_CODWW2_M1CARB.Trans",
     channel = CHAN_WEAPON,
@@ -3092,7 +3092,7 @@ sound.Add({
     level = 140,
     pitch = {100},
     sound = {"weapons/tfa_codww2/m1carabine/wpn_m1_carbine_trans_05.wav"}
-})")
+})
 
 sound.Add({
     name = "TFA_CODWW2_M1CARB.FPO",
@@ -3197,7 +3197,7 @@ sound.Add({
     level = 140,
     pitch = {100},
     sound = {"weapons/tfa_codww2/m1garand/wpn_m1garand_npc_shot_04.wav"}
-})")
+})
 sound.Add({
     name = "TFA_CODWW2_M1GRND.NPC.Ext",
     channel = CHAN_WEAPON,
@@ -3205,7 +3205,7 @@ sound.Add({
     level = 140,
     pitch = {100},
     sound = {"weapons/tfa_codww2/m1garand/wpn_m1garand_npc_tail_01.wav", "weapons/tfa_codww2/m1garand/wpn_m1garand_npc_tail_02.wav", "weapons/tfa_codww2/m1garand/wpn_m1garand_npc_tail_03.wav"}
-})")
+})
 sound.Add({
     name = "TFA_CODWW2_M1GRND.Snap",
     channel = CHAN_WEAPON,
@@ -3213,7 +3213,7 @@ sound.Add({
     level = 140,
     pitch = {100},
     sound = {"weapons/tfa_codww2/m1garand/wpn_garand_snap_01.wav", "weapons/tfa_codww2/m1garand/wpn_garand_snap_02.wav", "weapons/tfa_codww2/m1garand/wpn_garand_snap_03.wav", "weapons/tfa_codww2/m1garand/wpn_garand_snap_04.wav", "weapons/tfa_codww2/m1garand/wpn_garand_snap_05.wav"}
-})")
+})
 sound.Add({
     name = "TFA_CODWW2_M1GRND.Mid",
     channel = CHAN_WEAPON,
@@ -3221,7 +3221,7 @@ sound.Add({
     level = 140,
     pitch = {100},
     sound = {"weapons/tfa_codww2/m1garand/wpn_m1garand_mid_01.wav", "weapons/tfa_codww2/m1garand/wpn_m1garand_mid_02.wav", "weapons/tfa_codww2/m1garand/wpn_m1garand_mid_03.wav"}
-})")
+})
 --sound.Add({
     name = "TFA_CODWW2_M1GRND.Low.Lyr",
     channel = CHAN_WEAPON,
@@ -3229,7 +3229,7 @@ sound.Add({
     level = 140,
     pitch = {100},
     sound = {"weapons/tfa_codww2/m1garand/wpn_m1garand_low_lyr_01.wav"}
-})")
+})
 sound.Add({
     name = "TFA_CODWW2_M1GRND.Sub",
     channel = CHAN_WEAPON,
@@ -3237,7 +3237,7 @@ sound.Add({
     level = 140,
     pitch = {100},
     sound = {"weapons/tfa_codww2/m1garand/wpn_garand_sub_01.wav"}
-})")
+})
 sound.Add({
     name = "TFA_CODWW2_M1GRND.Ext",
     channel = CHAN_WEAPON,
@@ -3245,7 +3245,7 @@ sound.Add({
     level = 140,
     pitch = {100},
     sound = {"weapons/tfa_codww2/m1garand/wpn_m1garand_tail_01.wav", "weapons/tfa_codww2/m1garand/wpn_m1garand_tail_02.wav", "weapons/tfa_codww2/m1garand/wpn_m1garand_tail_03.wav", "weapons/tfa_codww2/m1garand/wpn_m1garand_tail_04.wav"}
-})")
+})
 sound.Add({
     name = "TFA_CODWW2_M1GRND.Low",
     channel = CHAN_WEAPON,
@@ -3253,7 +3253,7 @@ sound.Add({
     level = 140,
     pitch = {100},
     sound = {"weapons/tfa_codww2/m1garand/wpn_m1garand_low_01.wav"}
-})")
+})
 
 sound.Add(
 {
@@ -3351,7 +3351,7 @@ sound.Add({
     level = 140,
     pitch = {100},
     sound = {"weapons/tfa_codww2/m1941/wpn_1941_plr_thump_01.wav", "weapons/tfa_codww2/m1941/wpn_1941_plr_thump_02.wav"}
-})")
+})
 sound.Add({
     name = "TFA_CODWW2_M1941.Trans",
     channel = CHAN_WEAPON,
@@ -3359,7 +3359,7 @@ sound.Add({
     level = 140,
     pitch = {100},
     sound = {"weapons/tfa_codww2/m1941/wpn_1941_plr_trans_01.wav", "weapons/tfa_codww2/m1941/wpn_1941_plr_trans_02.wav"}
-})")
+})
 sound.Add({
     name = "TFA_CODWW2_M1941.NPC.Main",
     channel = CHAN_WEAPON,
@@ -3367,7 +3367,7 @@ sound.Add({
     level = 140,
     pitch = {100},
     sound = {"weapons/tfa_codww2/m1941/wpn_1941_npc_main_01.wav", "weapons/tfa_codww2/m1941/wpn_1941_npc_main_02.wav"}
-})")
+})
 
 sound.Add({
     name = "TFA_CODWW2_M1941.FPO",
@@ -3497,7 +3497,7 @@ sound.Add({
     level = 140,
     pitch = {100},
     sound = {"weapons/tfa_codww2/stg44/wpn_stg44_blast.wav"}
-})")
+})
 sound.Add({
     name = "TFA_CODWW2_STG44.Clicky",
     channel = CHAN_WEAPON,
@@ -3505,7 +3505,7 @@ sound.Add({
     level = 140,
     pitch = {100},
     sound = {"weapons/tfa_codww2/stg44/wpn_stg44_clicky_01.wav", "weapons/tfa_codww2/stg44/wpn_stg44_clicky_02.wav", "weapons/tfa_codww2/stg44/wpn_stg44_clicky_03.wav", "weapons/tfa_codww2/stg44/wpn_stg44_clicky_04.wav"}
-})")
+})
 sound.Add({
     name = "TFA_CODWW2_STG44.Punch",
     channel = CHAN_WEAPON,
@@ -3513,7 +3513,7 @@ sound.Add({
     level = 140,
     pitch = {100},
     sound = {"weapons/tfa_codww2/stg44/wpn_stg44_punch.wav"}
-})")
+})
 sound.Add({
     name = "TFA_CODWW2_STG44.Lyr1",
     channel = CHAN_WEAPON,
@@ -3521,7 +3521,7 @@ sound.Add({
     level = 140,
     pitch = {100},
     sound = {"weapons/tfa_codww2/stg44/wpn_stg44_lyr_1_01.wav", "weapons/tfa_codww2/stg44/wpn_stg44_lyr_1_02.wav", "weapons/tfa_codww2/stg44/wpn_stg44_lyr_1_03.wav", "weapons/tfa_codww2/stg44/wpn_stg44_lyr_1_04.wav", "weapons/tfa_codww2/stg44/wpn_stg44_lyr_1_05.wav"}
-})")
+})
 sound.Add({
     name = "TFA_CODWW2_STG44.Lyr2",
     channel = CHAN_WEAPON,
@@ -3529,7 +3529,7 @@ sound.Add({
     level = 140,
     pitch = {100},
     sound = {"weapons/tfa_codww2/stg44/wpn_stg44_lyr_2_01.wav", "weapons/tfa_codww2/stg44/wpn_stg44_lyr_2_02.wav", "weapons/tfa_codww2/stg44/wpn_stg44_lyr_2_03.wav"}
-})")
+})
 --sound.Add({
     name = "TFA_CODWW2_STG44.Sub",
     channel = CHAN_WEAPON,
@@ -3537,7 +3537,7 @@ sound.Add({
     level = 140,
     pitch = {100},
     sound = {"weapons/tfa_codww2/stg44/wpn_stg44_sub.wav"}
-})")
+})
 sound.Add({
     name = "TFA_CODWW2_STG44.Ext.Mp",
     channel = CHAN_WEAPON,
@@ -3545,7 +3545,7 @@ sound.Add({
     level = 140,
     pitch = {100},
     sound = {"weapons/tfa_codww2/stg44/wpn_stg44_tail_mp_01.wav", "weapons/tfa_codww2/stg44/wpn_stg44_tail_mp_02.wav", "weapons/tfa_codww2/stg44/wpn_stg44_tail_mp_03.wav"}
-})")
+})
 
 sound.Add(
 {
@@ -3627,7 +3627,7 @@ sound.Add({
     level = 140,
     pitch = {100},
     sound = {"weapons/tfa_codww2/svt40/wpn_svt_lfe_01.wav"}
-})")
+})
 sound.Add({
     name = "TFA_CODWW2_SVT.Mechy",
     channel = CHAN_WEAPON,
@@ -3635,7 +3635,7 @@ sound.Add({
     level = 140,
     pitch = {100},
     sound = {"weapons/tfa_codww2/svt40/wpn_svt_high_mechy_01.wav", "weapons/tfa_codww2/svt40/wpn_svt_high_mechy_02.wav", "weapons/tfa_codww2/svt40/wpn_svt_high_mechy_03.wav", "weapons/tfa_codww2/svt40/wpn_svt_high_mechy_04.wav"}
-})")
+})
 sound.Add({
     name = "TFA_CODWW2_SVT.Thump",
     channel = CHAN_WEAPON,
@@ -3643,7 +3643,7 @@ sound.Add({
     level = 140,
     pitch = {100},
     sound = {"weapons/tfa_codww2/svt40/wpn_svt_thump_01.wav", "weapons/tfa_codww2/svt40/wpn_svt_thump_02.wav", "weapons/tfa_codww2/svt40/wpn_svt_thump_03.wav", "weapons/tfa_codww2/svt40/wpn_svt_thump_04.wav"}
-})")
+})
 sound.Add({
     name = "TFA_CODWW2_SVT.Trans",
     channel = CHAN_WEAPON,
@@ -3651,7 +3651,7 @@ sound.Add({
     level = 140,
     pitch = {100},
     sound = {"weapons/tfa_codww2/svt40/wpn_svt_trans_01.wav"}
-})")
+})
 sound.Add({
     name = "TFA_CODWW2_SVT.Ext",
     channel = CHAN_WEAPON,
@@ -3659,7 +3659,7 @@ sound.Add({
     level = 140,
     pitch = {100},
     sound = {"weapons/tfa_codww2/svt40/wpn_tail_rifle_02.wav"}
-})")
+})
 
 sound.Add({
     name = "TFA_CODWW2_SVT.FPO",
@@ -3739,7 +3739,7 @@ sound.Add({
     level = 140,
     pitch = {100},
     sound = {"weapons/tfa_codww2/type5/wpn_type5_ping.wav"}
-})")
+})
 sound.Add({
     name = "TFA_CODWW2_TYPE5.Ext",
     channel = CHAN_WEAPON,
@@ -3747,7 +3747,7 @@ sound.Add({
     level = 140,
     pitch = {100},
     sound = {"weapons/tfa_codww2/type5/wpn_type5_tail_01.wav"}
-})")
+})
 
 sound.Add({
     name = "TFA_CODWW2_TYPE5.FPO",
@@ -3853,7 +3853,7 @@ sound.Add({
     level = 140,
     pitch = {100},
     sound = {"weapons/tfa_codww2/volk/wpn_volk_tail_lyr_01.wav", "weapons/tfa_codww2/volk/wpn_volk_tail_lyr_02.wav", "weapons/tfa_codww2/volk/wpn_volk_tail_lyr_03.wav"}
-})")
+})
 sound.Add({
     name = "TFA_CODWW2_VOLK.Lyr1",
     channel = CHAN_WEAPON,
@@ -3861,7 +3861,7 @@ sound.Add({
     level = 140,
     pitch = {100},
     sound = {"weapons/tfa_codww2/volk/wpn_volk_lyr_1_01.wav"}
-})")
+})
 sound.Add({
     name = "TFA_CODWW2_VOLK.Main",
     channel = CHAN_WEAPON,
@@ -3869,7 +3869,7 @@ sound.Add({
     level = 140,
     pitch = {100},
     sound = {"weapons/tfa_codww2/volk/wpn_volk_main_lyr_01.wav", "weapons/tfa_codww2/volk/wpn_volk_main_lyr_02.wav", "weapons/tfa_codww2/volk/wpn_volk_main_lyr_03.wav", "weapons/tfa_codww2/volk/wpn_volk_main_lyr_04.wav"}
-})")
+})
 
 sound.Add({
     name = "TFA_CODWW2_VOLK.FPO",
@@ -3943,7 +3943,7 @@ sound.Add({
     level = 140,
     pitch = {100},
     sound = {"weapons/tfa_codww2/shotgun/wpn_shtgn_gen_tail_01.wav"}
-})")
+})
 sound.Add({
     name = "TFA_CODWW2_SHGN.DeepBlast",
     channel = CHAN_WEAPON,
@@ -3951,7 +3951,7 @@ sound.Add({
     level = 140,
     pitch = {100},
     sound = {"weapons/tfa_codww2/shotgun/wpn_shotgun_deep_blast_01.wav"}
-})")
+})
 sound.Add({
     name = "TFA_CODWW2_SHGN.BigBlast",
     channel = CHAN_WEAPON,
@@ -3959,7 +3959,7 @@ sound.Add({
     level = 140,
     pitch = {100},
     sound = {"weapons/tfa_codww2/shotgun/wpn_shtgn_big_blast_01.wav"}
-})")
+})
 sound.Add({
     name = "TFA_CODWW2_SHGN.GenBlast",
     channel = CHAN_WEAPON,
@@ -3967,7 +3967,7 @@ sound.Add({
     level = 140,
     pitch = {100},
     sound = {"weapons/tfa_codww2/shotgun/wpn_shtgn_gen_blast_01.wav"}
-})")
+})
 sound.Add({
     name = "TFA_CODWW2_SHGN.GenBoom",
     channel = CHAN_WEAPON,
@@ -3975,7 +3975,7 @@ sound.Add({
     level = 140,
     pitch = {100},
     sound = {"weapons/tfa_codww2/shotgun/wpn_shtgn_gen_boom_01.wav"}
-})")
+})
 sound.Add({
     name = "TFA_CODWW2_SHGN.GenHigh",
     channel = CHAN_WEAPON,
@@ -3983,7 +3983,7 @@ sound.Add({
     level = 140,
     pitch = {100},
     sound = {"weapons/tfa_codww2/shotgun/wpn_shtgn_gen_high_01.wav"}
-})")
+})
 sound.Add({
     name = "TFA_CODWW2_SHGN.HighSnap",
     channel = CHAN_WEAPON,
@@ -3991,7 +3991,7 @@ sound.Add({
     level = 140,
     pitch = {100},
     sound = {"weapons/tfa_codww2/shotgun/wpn_shtgn_high_snap_01.wav"}
-})")
+})
 sound.Add({
     name = "TFA_CODWW2_SHGN.MidBlast",
     channel = CHAN_WEAPON,
@@ -3999,7 +3999,7 @@ sound.Add({
     level = 140,
     pitch = {100},
     sound = {"weapons/tfa_codww2/shotgun/wpn_shtgn_mid_blast_01.wav"}
-})")
+})
 sound.Add({
     name = "TFA_CODWW2_SHGN.Trans",
     channel = CHAN_WEAPON,
@@ -4007,7 +4007,7 @@ sound.Add({
     level = 140,
     pitch = {100},
     sound = {"weapons/tfa_codww2/shotgun/wpn_shtgn_trans.wav"}
-})")
+})
 sound.Add({
     name = "TFA_CODWW2_SHGN.Lfe",
     channel = CHAN_WEAPON,
@@ -4015,7 +4015,7 @@ sound.Add({
     level = 140,
     pitch = {100},
     sound = {"weapons/tfa_codww2/shotgun/wpn_shtgn_gen_lfe_01.wav"}
-})")
+})
 sound.Add({
     name = "TFA_CODWW2_SHGN.Fire",
     channel = CHAN_WEAPON,
@@ -4023,7 +4023,7 @@ sound.Add({
     level = 140,
     pitch = {100},
     sound = {"weapons/tfa_codww2/shotgun/wpn_shotgun_fire_lyr_01.wav", "weapons/tfa_codww2/shotgun/wpn_shotgun_fire_lyr_02.wav", "weapons/tfa_codww2/shotgun/wpn_shotgun_fire_lyr_04.wav"}
-})")
+})
 sound.Add({
     name = "TFA_CODWW2_WALTHER.High",
     channel = CHAN_WEAPON,
@@ -4031,7 +4031,7 @@ sound.Add({
     level = 140,
     pitch = {100},
     sound = {"weapons/tfa_codww2/shotgun/wpn_walther_high_01.wav"}
-})")
+})
 sound.Add({
     name = "TFA_CODWW2_WALTHER.Low",
     channel = CHAN_WEAPON,
@@ -4039,7 +4039,7 @@ sound.Add({
     level = 140,
     pitch = {100},
     sound = {"weapons/tfa_codww2/shotgun/wpn_walther_low_01.wav"}
-})")
+})
 sound.Add({
     name = "TFA_CODWW2_WALTHER.Trans",
     channel = CHAN_WEAPON,
@@ -4047,7 +4047,7 @@ sound.Add({
     level = 140,
     pitch = {100},
     sound = {"weapons/tfa_codww2/shotgun/wpn_walther_mid_trans.wav"}
-})")
+})
 sound.Add({
     name = "TFA_CODWW2_SHGN.Rifle",
     channel = CHAN_WEAPON,
@@ -4055,7 +4055,7 @@ sound.Add({
     level = 140,
     pitch = {100},
     sound = {"weapons/tfa_codww2/shotgun/wpn_shtgn_big_blast_rifle.wav"}
-})")
+})
 sound.Add({
     name = "TFA_CODWW2_M97.ThickTrans",
     channel = CHAN_WEAPON,
@@ -4063,7 +4063,7 @@ sound.Add({
     level = 140,
     pitch = {100},
     sound = {"weapons/tfa_codww2/shotgun/wpn_m97_thick_trans_01.wav", "weapons/tfa_codww2/shotgun/wpn_m97_thick_trans_02.wav", "weapons/tfa_codww2/shotgun/wpn_m97_thick_trans_03.wav", "weapons/tfa_codww2/shotgun/wpn_m97_thick_trans_04.wav"}
-})")
+})
 
 -- blunderbuss ------------------------------------------------------------------------------------------------------------
 game.AddParticles("particles/bb_blackpowder.pcf")
@@ -4076,7 +4076,7 @@ sound.Add({
     level = 140,
     pitch = {100},
     sound = {"weapons/tfa_codww2/blunderbuss/wpn_blunder_plr_lyr_1.wav"}
-})")
+})
 sound.Add({
     name = "TFA_CODWW2_BLUNDER.Lyr2",
     channel = CHAN_WEAPON,
@@ -4084,7 +4084,7 @@ sound.Add({
     level = 140,
     pitch = {100},
     sound = {"weapons/tfa_codww2/blunderbuss/wpn_blunder_plr_lyr_2.wav"}
-})")
+})
 sound.Add({
     name = "TFA_CODWW2_BLUNDER.Lyr3",
     channel = CHAN_WEAPON,
@@ -4092,7 +4092,7 @@ sound.Add({
     level = 140,
     pitch = {100},
     sound = {"weapons/tfa_codww2/blunderbuss/wpn_blunder_plr_lyr_3.wav"}
-})")
+})
 sound.Add({
     name = "TFA_CODWW2_BLUNDER.Ext",
     channel = CHAN_WEAPON,
@@ -4100,7 +4100,7 @@ sound.Add({
     level = 140,
     pitch = {100},
     sound = {"weapons/tfa_codww2/blunderbuss/wpn_blunder_tail_01.wav"}
-})")
+})
 
 sound.Add( {
 	name = "TFA_CODWW2_BLUNDER.Mech",
@@ -4180,7 +4180,7 @@ sound.Add({
     level = 140,
     pitch = {100},
     sound = {"weapons/tfa_codww2/m30/wpn_m30_tail_01.wav", "weapons/tfa_codww2/m30/wpn_m30_tail_02.wav"}
-})")
+})
 
 sound.Add({
     name = "TFA_CODWW2_M30.FPO",
@@ -4282,7 +4282,7 @@ sound.Add({
     level = 140,
     pitch = {100},
     sound = {"weapons/tfa_codww2/model21/wpn_m21_shot_01.wav"}
-})")
+})
 sound.Add({
     name = "TFA_CODWW2_MODEL21.Ext",
     channel = CHAN_WEAPON,
@@ -4290,7 +4290,7 @@ sound.Add({
     level = 140,
     pitch = {100},
     sound = {"weapons/tfa_codww2/model21/wpn_m21_tail_01.wav", "weapons/tfa_codww2/model21/wpn_m21_tail_02.wav"}
-})")
+})
 
 sound.Add({
     name = "TFA_CODWW2_MODEL21.FPO",
@@ -4363,7 +4363,7 @@ sound.Add({
     level = 140,
     pitch = {100},
     sound = {"weapons/tfa_codww2/model1897/wpn_win1987_shot_01.wav", "weapons/tfa_codww2/model1897/wpn_win1987_shot_02.wav"}
-})")
+})
 sound.Add({
     name = "TFA_CODWW2_M1897.Ext",
     channel = CHAN_WEAPON,
@@ -4371,7 +4371,7 @@ sound.Add({
     level = 140,
     pitch = {100},
     sound = {"weapons/tfa_codww2/model1897/wpn_win1987_tail_01.wav"}
-})")
+})
 
 sound.Add({
     name = "TFA_CODWW2_M1897.ADSFoley",
@@ -4470,7 +4470,7 @@ sound.Add({
     level = 140,
     pitch = {100},
     sound = {"weapons/tfa_codww2/walther/wpn_wta_tail_01.wav"}
-})")
+})
 
 sound.Add({
     name = "TFA_CODWW2_WALTHER.FPO",
@@ -4541,7 +4541,7 @@ sound.Add({
     level = 140,
     pitch = {100},
     sound = {"weapons/tfa_codww2/arsenal/wpn_tokyo_tail_01.wav", "weapons/tfa_codww2/arsenal/wpn_tokyo_tail_02.wav", "weapons/tfa_codww2/arsenal/wpn_tokyo_tail_03.wav", "weapons/tfa_codww2/arsenal/wpn_tokyo_tail_04.wav"}
-})")
+})
 sound.Add({
     name = "TFA_CODWW2_TOKYO.Center",
     channel = CHAN_WEAPON,
@@ -4549,7 +4549,7 @@ sound.Add({
     level = 140,
     pitch = {100},
     sound = {"weapons/tfa_codww2/arsenal/wpn_tokyo_plr_center_01.wav", "weapons/tfa_codww2/arsenal/wpn_tokyo_plr_center_02.wav", "weapons/tfa_codww2/arsenal/wpn_tokyo_plr_center_03.wav", "weapons/tfa_codww2/arsenal/wpn_tokyo_plr_center_04.wav", "weapons/tfa_codww2/arsenal/wpn_tokyo_plr_center_05.wav", "weapons/tfa_codww2/arsenal/wpn_tokyo_plr_center_06.wav"}
-})")
+})
 sound.Add({
     name = "TFA_CODWW2_TOKYO.High",
     channel = CHAN_WEAPON,
@@ -4557,7 +4557,7 @@ sound.Add({
     level = 140,
     pitch = {100},
     sound = {"weapons/tfa_codww2/arsenal/wpn_tokyo_plr_high_01.wav", "weapons/tfa_codww2/arsenal/wpn_tokyo_plr_high_02.wav", "weapons/tfa_codww2/arsenal/wpn_tokyo_plr_high_03.wav", "weapons/tfa_codww2/arsenal/wpn_tokyo_plr_high_04.wav", "weapons/tfa_codww2/arsenal/wpn_tokyo_plr_high_05.wav", "weapons/tfa_codww2/arsenal/wpn_tokyo_plr_high_06.wav"}
-})")
+})
 sound.Add({
     name = "TFA_CODWW2_TOKYO.Stereo",
     channel = CHAN_WEAPON,
@@ -4565,7 +4565,7 @@ sound.Add({
     level = 140,
     pitch = {100},
     sound = {"weapons/tfa_codww2/arsenal/wpn_tokyo_plr_stereo_01.wav", "weapons/tfa_codww2/arsenal/wpn_tokyo_plr_stereo_02.wav", "weapons/tfa_codww2/arsenal/wpn_tokyo_plr_stereo_03.wav", "weapons/tfa_codww2/arsenal/wpn_tokyo_plr_stereo_04.wav", "weapons/tfa_codww2/arsenal/wpn_tokyo_plr_stereo_05.wav", "weapons/tfa_codww2/arsenal/wpn_tokyo_plr_stereo_06.wav"}
-})")
+})
 
 sound.Add( {
 	name = "TFA_CODWW2_TOKYO.Mech",
@@ -4632,7 +4632,7 @@ sound.Add({
     level = 140,
     pitch = {100},
     sound = {"weapons/tfa_codww2/sten/wpn_sten_clicky.wav"}
-})")
+})
 
 sound.Add({
     name = "TFA_CODWW2_AUausten.FPOCharge",
@@ -4691,7 +4691,7 @@ sound.Add({
     level = 140,
     pitch = {100},
     sound = {"weapons/tfa_codww2/beretta38/wpn_baretta38_tail_01.wav", "weapons/tfa_codww2/beretta38/wpn_baretta38_tail_02.wav", "weapons/tfa_codww2/beretta38/wpn_baretta38_tail_03.wav"}
-})")
+})
 sound.Add({
     name = "TFA_CODWW2_BM38.Snap",
     channel = CHAN_WEAPON,
@@ -4699,7 +4699,7 @@ sound.Add({
     level = 140,
     pitch = {100},
     sound = {"weapons/tfa_codww2/beretta38/wpn_baretta38_snap_01.wav", "weapons/tfa_codww2/beretta38/wpn_baretta38_snap_02.wav", "weapons/tfa_codww2/beretta38/wpn_baretta38_snap_03.wav", "weapons/tfa_codww2/beretta38/wpn_baretta38_snap_04.wav"}
-})")
+})
 sound.Add({
     name = "TFA_CODWW2_BM38.Sub",
     channel = CHAN_WEAPON,
@@ -4707,7 +4707,7 @@ sound.Add({
     level = 140,
     pitch = {100},
     sound = {"weapons/tfa_codww2/beretta38/wpn_baretta38_sub.wav"}
-})")
+})
 sound.Add({
     name = "TFA_CODWW2_BM38.Thump",
     channel = CHAN_WEAPON,
@@ -4715,7 +4715,7 @@ sound.Add({
     level = 140,
     pitch = {100},
     sound = {"weapons/tfa_codww2/beretta38/wpn_baretta38_thump_01.wav", "weapons/tfa_codww2/beretta38/wpn_baretta38_thump_02.wav", "weapons/tfa_codww2/beretta38/wpn_baretta38_thump_03.wav"}
-})")
+})
 
 sound.Add({
     name = "TFA_CODWW2_BM38.FPOCharge",
@@ -4848,7 +4848,7 @@ sound.Add({
     level = 140,
     pitch = {100},
     sound = {"weapons/tfa_codww2/emp44/wpn_emp44_tail_01.wav", "weapons/tfa_codww2/emp44/wpn_emp44_tail_02.wav", "weapons/tfa_codww2/emp44/wpn_emp44_tail_03.wav"}
-})")
+})
 sound.Add({
     name = "TFA_CODWW2_EMP44.Center",
     channel = CHAN_WEAPON,
@@ -4856,7 +4856,7 @@ sound.Add({
     level = 140,
     pitch = {100},
     sound = {"weapons/tfa_codww2/emp44/wpn_bechowiec_center_01.wav", "weapons/tfa_codww2/emp44/wpn_bechowiec_center_02.wav", "weapons/tfa_codww2/emp44/wpn_bechowiec_center_03.wav", "weapons/tfa_codww2/emp44/wpn_bechowiec_center_04.wav", "weapons/tfa_codww2/emp44/wpn_bechowiec_center_05.wav", "weapons/tfa_codww2/emp44/wpn_bechowiec_center_06.wav"}
-})")
+})
 sound.Add({
     name = "TFA_CODWW2_EMP44.Wide",
     channel = CHAN_WEAPON,
@@ -4864,7 +4864,7 @@ sound.Add({
     level = 140,
     pitch = {100},
     sound = {"weapons/tfa_codww2/emp44/wpn_bechowiec_wide_01.wav", "weapons/tfa_codww2/emp44/wpn_bechowiec_wide_02.wav", "weapons/tfa_codww2/emp44/wpn_bechowiec_wide_03.wav", "weapons/tfa_codww2/emp44/wpn_bechowiec_wide_04.wav", "weapons/tfa_codww2/emp44/wpn_bechowiec_wide_05.wav", "weapons/tfa_codww2/emp44/wpn_bechowiec_wide_06.wav"}
-})")
+})
 
 sound.Add({
     name = "TFA_CODWW2_EMP44.FPOCharge",
@@ -4985,7 +4985,7 @@ sound.Add({
     level = 140,
     pitch = {100},
     sound = {"weapons/tfa_codww2/greasegun/wpn_grease_tail_lyr_01.wav", "weapons/tfa_codww2/greasegun/wpn_grease_tail_lyr_02.wav", "weapons/tfa_codww2/greasegun/wpn_grease_tail_lyr_03.wav", "weapons/tfa_codww2/greasegun/wpn_grease_tail_lyr_04.wav"}
-})")
+})
 sound.Add({
     name = "TFA_CODWW2_GG.Lyr1",
     channel = CHAN_WEAPON,
@@ -4993,7 +4993,7 @@ sound.Add({
     level = 140,
     pitch = {100},
     sound = {"weapons/tfa_codww2/greasegun/wpn_grease_lyr_1_01.wav", "weapons/tfa_codww2/greasegun/wpn_grease_lyr_1_02.wav", "weapons/tfa_codww2/greasegun/wpn_grease_lyr_1_03.wav"}
-})")
+})
 sound.Add({
     name = "TFA_CODWW2_GG.Lyr2",
     channel = CHAN_WEAPON,
@@ -5001,7 +5001,7 @@ sound.Add({
     level = 140,
     pitch = {100},
     sound = {"weapons/tfa_codww2/greasegun/wpn_grease_lyr_2_01.wav"}
-})")
+})
 sound.Add({
     name = "TFA_CODWW2_GG.NPC.Close",
     channel = CHAN_WEAPON,
@@ -5009,7 +5009,7 @@ sound.Add({
     level = 140,
     pitch = {100},
     sound = {"weapons/tfa_codww2/greasegun/wpn_grease_npc_close_03.wav"}
-})")
+})
 
 sound.Add({
     name = "TFA_CODWW2_GG.TacMagOut",
@@ -5137,7 +5137,7 @@ sound.Add({
     level = 140,
     pitch = {100},
     sound = {"weapons/tfa_codww2/mas38/wpn_mas38_shot_01.wav", "weapons/tfa_codww2/mas38/wpn_mas38_shot_02.wav", "weapons/tfa_codww2/mas38/wpn_mas38_shot_03.wav"}
-})")
+})
 
 sound.Add( {
 	name = "TFA_CODWW2_MAS38.Ext",
@@ -5205,7 +5205,7 @@ sound.Add({
     level = 140,
     pitch = {100},
     sound = {"weapons/tfa_codww2/mp28/wpn_mp28_tail_lyr_01.wav", "weapons/tfa_codww2/mp28/wpn_mp28_tail_lyr_02.wav", "weapons/tfa_codww2/mp28/wpn_mp28_tail_lyr_03.wav", "weapons/tfa_codww2/mp28/wpn_mp28_tail_lyr_04.wav"}
-})")
+})
 sound.Add({
     name = "TFA_CODWW2_MP28.Snap",
     channel = CHAN_WEAPON,
@@ -5213,7 +5213,7 @@ sound.Add({
     level = 140,
     pitch = {100},
     sound = {"weapons/tfa_codww2/mp28/wpn_mp28_snap_lyr_01.wav", "weapons/tfa_codww2/mp28/wpn_mp28_snap_lyr_02.wav", "weapons/tfa_codww2/mp28/wpn_mp28_snap_lyr_03.wav", "weapons/tfa_codww2/mp28/wpn_mp28_snap_lyr_04.wav", "weapons/tfa_codww2/mp28/wpn_mp28_snap_lyr_05.wav", "weapons/tfa_codww2/mp28/wpn_mp28_snap_lyr_06.wav"}
-})")
+})
 sound.Add({
     name = "TFA_CODWW2_MP28.Thump",
     channel = CHAN_WEAPON,
@@ -5221,7 +5221,7 @@ sound.Add({
     level = 140,
     pitch = {100},
     sound = {"weapons/tfa_codww2/mp28/wpn_mp28_thump_lyr_01.wav", "weapons/tfa_codww2/mp28/wpn_mp28_thump_lyr_02.wav", "weapons/tfa_codww2/mp28/wpn_mp28_thump_lyr_03.wav", "weapons/tfa_codww2/mp28/wpn_mp28_thump_lyr_04.wav", "weapons/tfa_codww2/mp28/wpn_mp28_thump_lyr_05.wav", "weapons/tfa_codww2/mp28/wpn_mp28_thump_lyr_06.wav"}
-})")
+})
 sound.Add({
     name = "TFA_CODWW2_MP28.NPC.Mech",
     channel = CHAN_WEAPON,
@@ -5229,7 +5229,7 @@ sound.Add({
     level = 140,
     pitch = {100},
     sound = {"weapons/tfa_codww2/mp28/wpn_mp28_npc_mech.wav"}
-})")
+})
 sound.Add({
     name = "TFA_CODWW2_MP28.NPC.Shot",
     channel = CHAN_WEAPON,
@@ -5237,7 +5237,7 @@ sound.Add({
     level = 140,
     pitch = {100},
     sound = {"weapons/tfa_codww2/mp28/wpn_mp28_npc_shot_01.wav", "weapons/tfa_codww2/mp28/wpn_mp28_npc_shot_02.wav", "weapons/tfa_codww2/mp28/wpn_mp28_npc_shot_03.wav"}
-})")
+})
 
 sound.Add({
     name = "TFA_CODWW2_MP28.TacMagOut",
@@ -5309,7 +5309,7 @@ sound.Add({
     level = 140,
     pitch = {100},
     sound = {"weapons/tfa_codww2/mp40/mp40_lyr_1_01.wav", "weapons/tfa_codww2/mp40/mp40_lyr_1_02.wav"}
-})")
+})
 sound.Add({
     name = "TFA_CODWW2_MP40.Mech",
     channel = CHAN_WEAPON,
@@ -5317,7 +5317,7 @@ sound.Add({
     level = 140,
     pitch = {100},
     sound = {"weapons/tfa_codww2/mp40/mp40_lyr_2_01.wav", "weapons/tfa_codww2/mp40/mp40_lyr_2_02.wav"}
-})")
+})
 sound.Add({
     name = "TFA_CODWW2_MP40.Ext",
     channel = CHAN_WEAPON,
@@ -5325,7 +5325,7 @@ sound.Add({
     level = 140,
     pitch = {100},
     sound = {"weapons/tfa_codww2/mp40/mp40_tail_01.wav", "weapons/tfa_codww2/mp40/mp40_tail_02.wav", "weapons/tfa_codww2/mp40/mp40_tail_03.wav", "weapons/tfa_codww2/mp40/mp40_tail_04.wav", "weapons/tfa_codww2/mp40/mp40_tail_05.wav", "weapons/tfa_codww2/mp40/mp40_tail_06.wav"}
-})")
+})
 sound.Add({
     name = "TFA_CODWW2_MP40.Sub",
     channel = CHAN_WEAPON,
@@ -5333,7 +5333,7 @@ sound.Add({
     level = 140,
     pitch = {100},
     sound = {"weapons/tfa_codww2/mp40/mp40_lyr_3_01.wav"}
-})")
+})
 
 sound.Add({
     name = "TFA_CODWW2_MP40.TacMagOut",
@@ -5459,7 +5459,7 @@ sound.Add({
     level = 140,
     pitch = {100},
     sound = {"weapons/tfa_codww2/ppsh41/wpn_ppsh_tail_lyr_01.wav", "weapons/tfa_codww2/ppsh41/wpn_ppsh_tail_lyr_02.wav", "weapons/tfa_codww2/ppsh41/wpn_ppsh_tail_lyr_03.wav"}
-})")
+})
 sound.Add({
     name = "TFA_CODWW2_PPSH.Thump",
     channel = CHAN_WEAPON,
@@ -5467,7 +5467,7 @@ sound.Add({
     level = 140,
     pitch = {100},
     sound = {"weapons/tfa_codww2/ppsh41/wpn_ppsh_thump_01.wav"}
-})")
+})
 sound.Add({
     name = "TFA_CODWW2_PPSH.NPC.Med",
     channel = CHAN_WEAPON,
@@ -5475,7 +5475,7 @@ sound.Add({
     level = 140,
     pitch = {100},
     sound = {"weapons/tfa_codww2/ppsh41/wpn_ppsh_npc_med_01.wav", "weapons/tfa_codww2/ppsh41/wpn_ppsh_npc_med_02.wav", "weapons/tfa_codww2/ppsh41/wpn_ppsh_npc_med_03.wav"}
-})")
+})
 sound.Add({
     name = "TFA_CODWW2_PPSH.Plr.Ext",
     channel = CHAN_WEAPON,
@@ -5483,7 +5483,7 @@ sound.Add({
     level = 140,
     pitch = {100},
     sound = {"weapons/tfa_codww2/ppsh41/wpn_ppsh_plr_tail_01.wav", "weapons/tfa_codww2/ppsh41/wpn_ppsh_plr_tail_02.wav", "weapons/tfa_codww2/ppsh41/wpn_ppsh_plr_tail_03.wav"}
-})")
+})
 
 sound.Add({
     name = "TFA_CODWW2_PPSH.FPOCharge",
@@ -5597,7 +5597,7 @@ sound.Add({
     level = 140,
     pitch = {100},
     sound = {"weapons/tfa_codww2/ribey/wpn_ribey_tail_01.wav", "weapons/tfa_codww2/ribey/wpn_ribey_tail_02.wav", "weapons/tfa_codww2/ribey/wpn_ribey_tail_03.wav"}
-})")
+})
 sound.Add({
     name = "TFA_CODWW2_RIBEY.Sub",
     channel = CHAN_WEAPON,
@@ -5605,7 +5605,7 @@ sound.Add({
     level = 140,
     pitch = {100},
     sound = {"weapons/tfa_codww2/ribey/wpn_ribey_sub_lyr.wav"}
-})")
+})
 sound.Add({
     name = "TFA_CODWW2_RIBEY.Trans",
     channel = CHAN_WEAPON,
@@ -5613,7 +5613,7 @@ sound.Add({
     level = 140,
     pitch = {100},
     sound = {"weapons/tfa_codww2/ribey/wpn_ribey_trans_lyr.wav"}
-})")
+})
 sound.Add({
     name = "TFA_CODWW2_RIBEY.Blast",
     channel = CHAN_WEAPON,
@@ -5621,7 +5621,7 @@ sound.Add({
     level = 140,
     pitch = {100},
     sound = {"weapons/tfa_codww2/ribey/wpn_ribey_blast_01.wav", "weapons/tfa_codww2/ribey/wpn_ribey_blast_02.wav", "weapons/tfa_codww2/ribey/wpn_ribey_blast_03.wav", "weapons/tfa_codww2/ribey/wpn_ribey_blast_04.wav", "weapons/tfa_codww2/ribey/wpn_ribey_blast_05.wav"}
-})")
+})
 sound.Add({
     name = "TFA_CODWW2_RIBEY.Lyr1",
     channel = CHAN_WEAPON,
@@ -5629,7 +5629,7 @@ sound.Add({
     level = 140,
     pitch = {100},
     sound = {"weapons/tfa_codww2/ribey/wpn_ribey_lyr_1_01.wav", "weapons/tfa_codww2/ribey/wpn_ribey_lyr_1_02.wav", "weapons/tfa_codww2/ribey/wpn_ribey_lyr_1_03.wav", "weapons/tfa_codww2/ribey/wpn_ribey_lyr_1_04.wav", "weapons/tfa_codww2/ribey/wpn_ribey_lyr_1_05.wav"}
-})")
+})
 
 sound.Add({
     name = "TFA_CODWW2_RIBEY.FPOCharge",
@@ -5718,7 +5718,7 @@ sound.Add({
     level = 140,
     pitch = {100},
     sound = {"weapons/tfa_codww2/ppsh41/wpn_ppsh_plr_tail_01.wav", "weapons/tfa_codww2/ppsh41/wpn_ppsh_plr_tail_02.wav", "weapons/tfa_codww2/ppsh41/wpn_ppsh_plr_tail_03.wav"}
-})")
+})
 sound.Add({
     name = "TFA_CODWW2_STEN.High",
     channel = CHAN_WEAPON,
@@ -5726,7 +5726,7 @@ sound.Add({
     level = 140,
     pitch = {100},
     sound = {"weapons/tfa_codww2/sten/wpn_sten_high_01.wav", "weapons/tfa_codww2/sten/wpn_sten_high_02.wav", "weapons/tfa_codww2/sten/wpn_sten_high_03.wav"}
-})")
+})
 sound.Add({
     name = "TFA_CODWW2_STEN.Shot",
     channel = CHAN_WEAPON,
@@ -5734,7 +5734,7 @@ sound.Add({
     level = 140,
     pitch = {100},
     sound = {"weapons/tfa_codww2/sten/wpn_sten_plr_shot_01.wav", "weapons/tfa_codww2/sten/wpn_sten_plr_shot_02.wav", "weapons/tfa_codww2/sten/wpn_sten_plr_shot_03.wav"}
-})")
+})
 sound.Add({
     name = "TFA_CODWW2_STEN.Low",
     channel = CHAN_WEAPON,
@@ -5742,7 +5742,7 @@ sound.Add({
     level = 140,
     pitch = {100},
     sound = {"weapons/tfa_codww2/sten/wpn_sten_low_01.wav"}
-})")
+})
 sound.Add({
     name = "TFA_CODWW2_STEN.Mechy",
     channel = CHAN_WEAPON,
@@ -5750,7 +5750,7 @@ sound.Add({
     level = 140,
     pitch = {100},
     sound = {"weapons/tfa_codww2/sten/wpn_sten_mechy_shot_01.wav"}
-})")
+})
 sound.Add({
     name = "TFA_CODWW2_STEN.Plr.Mech",
     channel = CHAN_WEAPON,
@@ -5758,7 +5758,7 @@ sound.Add({
     level = 140,
     pitch = {100},
     sound = {"weapons/tfa_codww2/sten/wpn_sten_plr_mech_01.wav"}
-})")
+})
 sound.Add({
     name = "TFA_CODWW2_STEN.Thump",
     channel = CHAN_WEAPON,
@@ -5766,7 +5766,7 @@ sound.Add({
     level = 140,
     pitch = {100},
     sound = {"weapons/tfa_codww2/sten/wpn_sten_thump_01.wav"}
-})")
+})
 sound.Add({
     name = "TFA_CODWW2_STEN.Clicky",
     channel = CHAN_WEAPON,
@@ -5774,7 +5774,7 @@ sound.Add({
     level = 140,
     pitch = {100},
     sound = {"weapons/tfa_codww2/sten/wpn_sten_clicky.wav"}
-})")
+})
 
 sound.Add({
     name = "TFA_CODWW2_STEN.FPOCharge",
@@ -5883,7 +5883,7 @@ sound.Add({
     level = 140,
     pitch = {100},
     sound = {"weapons/tfa_codww2/thompson/wpn_tho_shot_01.wav", "weapons/tfa_codww2/thompson/wpn_tho_shot_02.wav", "weapons/tfa_codww2/thompson/wpn_tho_shot_03.wav"}
-})")
+})
 sound.Add({
     name = "TFA_CODWW2_M1928.Ext",
     channel = CHAN_WEAPON,
@@ -5891,7 +5891,7 @@ sound.Add({
     level = 140,
     pitch = {100},
     sound = {"weapons/tfa_codww2/thompson/wpn_thom_short_tail_01.wav"}
-})")
+})
 sound.Add({
     name = "TFA_CODWW2_M1928.Short.Shot",
     channel = CHAN_WEAPON,
@@ -5899,7 +5899,7 @@ sound.Add({
     level = 140,
     pitch = {100},
     sound = {"weapons/tfa_codww2/thompson/wpn_thom_short_shot_01.wav", "weapons/tfa_codww2/thompson/wpn_thom_short_shot_02.wav", "weapons/tfa_codww2/thompson/wpn_thom_short_shot_03.wav", "weapons/tfa_codww2/thompson/wpn_thom_short_shot_04.wav", "weapons/tfa_codww2/thompson/wpn_thom_short_shot_05.wav"}
-})")
+})
 sound.Add({
     name = "TFA_CODWW2_M1928.Short.Snap",
     channel = CHAN_WEAPON,
@@ -5907,7 +5907,7 @@ sound.Add({
     level = 140,
     pitch = {100},
     sound = {"weapons/tfa_codww2/thompson/wpn_thom_short_snap_01.wav", "weapons/tfa_codww2/thompson/wpn_thom_short_snap_02.wav", "weapons/tfa_codww2/thompson/wpn_thom_short_snap_03.wav", "weapons/tfa_codww2/thompson/wpn_thom_short_snap_04.wav", "weapons/tfa_codww2/thompson/wpn_thom_short_snap_05.wav"}
-})")
+})
 sound.Add({
     name = "TFA_CODWW2_M1928.Short.Low",
     channel = CHAN_WEAPON,
@@ -5915,7 +5915,7 @@ sound.Add({
     level = 140,
     pitch = {100},
     sound = {"weapons/tfa_codww2/thompson/wpn_thom_short_low_01.wav"}
-})")
+})
 
 sound.Add({
     name = "TFA_CODWW2_M1928.Plr.Blast",
@@ -5924,7 +5924,7 @@ sound.Add({
     level = 140,
     pitch = {100},
     sound = {"weapons/tfa_codww2/thompson/wpn_tho_plr_blast_01.wav", "weapons/tfa_codww2/thompson/wpn_tho_plr_blast_02.wav", "weapons/tfa_codww2/thompson/wpn_tho_plr_blast_03.wav", "weapons/tfa_codww2/thompson/wpn_tho_plr_blast_04.wav"}
-})")
+})
 sound.Add({
     name = "TFA_CODWW2_M1928.Plr.Low",
     channel = CHAN_WEAPON,
@@ -5932,7 +5932,7 @@ sound.Add({
     level = 140,
     pitch = {100},
     sound = {"weapons/tfa_codww2/thompson/wpn_tho_plr_low_01.wav"}
-})")
+})
 
 sound.Add({
     name = "TFA_CODWW2_M1928.FPOCharge",
@@ -6016,7 +6016,7 @@ sound.Add({
     level = 140,
     pitch = {100},
     sound = {"weapons/tfa_codww2/type100/wpn_type100_lyr_1_01.wav", "weapons/tfa_codww2/type100/wpn_type100_lyr_1_02.wav", "weapons/tfa_codww2/type100/wpn_type100_lyr_1_03.wav"}
-})")
+})
 sound.Add({
     name = "TFA_CODWW2_TYPE100.Mech",
     channel = CHAN_WEAPON,
@@ -6024,7 +6024,7 @@ sound.Add({
     level = 140,
     pitch = {100},
     sound = {"weapons/tfa_codww2/type100/wpn_type100_lyr_2_01.wav", "weapons/tfa_codww2/type100/wpn_type100_lyr_2_02.wav", "weapons/tfa_codww2/type100/wpn_type100_lyr_2_03.wav"}
-})")
+})
 sound.Add({
     name = "TFA_CODWW2_TYPE100.Ext",
     channel = CHAN_WEAPON,
@@ -6032,7 +6032,7 @@ sound.Add({
     level = 140,
     pitch = {100},
     sound = {"weapons/tfa_codww2/type100/wpn_type100_tail_lyr_01.wav", "weapons/tfa_codww2/type100/wpn_type100_tail_lyr_02.wav", "weapons/tfa_codww2/type100/wpn_type100_tail_lyr_03.wav", "weapons/tfa_codww2/type100/wpn_type100_tail_lyr_04.wav"}
-})")
+})
 sound.Add({
     name = "TFA_CODWW2_TYPE100.Sub",
     channel = CHAN_WEAPON,
@@ -6040,7 +6040,7 @@ sound.Add({
     level = 140,
     pitch = {100},
     sound = {"weapons/tfa_codww2/type100/wpn_type100_sub_01.wav"}
-})")
+})
 sound.Add({
     name = "TFA_CODWW2_TYPE100.Punch",
     channel = CHAN_WEAPON,
@@ -6048,7 +6048,7 @@ sound.Add({
     level = 140,
     pitch = {100},
     sound = {"weapons/tfa_codww2/type100/wpn_type100_punch.wav"}
-})")
+})
 
 sound.Add({
     name = "TFA_CODWW2_TYPE100.FPOCharge",
@@ -6107,7 +6107,7 @@ sound.Add({
     level = 140,
     pitch = {100},
     sound = {"weapons/tfa_codww2/zk383/wpn_zk383_lyr_1_01.wav"}
-})")
+})
 
 sound.Add(
 {
@@ -6175,7 +6175,7 @@ sound.Add({
     level = 140,
     pitch = {100},
     sound = {"weapons/tfa_codww2/arisaka/wpn_aris_shot_01.wav", "weapons/tfa_codww2/arisaka/wpn_aris_shot_02.wav", "weapons/tfa_codww2/arisaka/wpn_aris_shot_03.wav", "weapons/tfa_codww2/arisaka/wpn_aris_shot_04.wav"}
-})")
+})
 
 sound.Add({
     name = "TFA_CODWW2_ARISAKA.Inspect1",
@@ -6210,7 +6210,7 @@ sound.Add({
     level = 140,
     pitch = {100},
     sound = {"weapons/tfa_codww2/delisle/wpn_de_lisle_click_lyr_01.wav", "weapons/tfa_codww2/delisle/wpn_de_lisle_click_lyr_02.wav"}
-})")
+})
 sound.Add({
     name = "TFA_CODWW2_DELISLE.Snap",
     channel = CHAN_WEAPON,
@@ -6218,7 +6218,7 @@ sound.Add({
     level = 140,
     pitch = {100},
     sound = {"weapons/tfa_codww2/delisle/wpn_de_lisle_snap_lyr_01.wav", "weapons/tfa_codww2/delisle/wpn_de_lisle_snap_lyr_02.wav", "weapons/tfa_codww2/delisle/wpn_de_lisle_snap_lyr_03.wav", "weapons/tfa_codww2/delisle/wpn_de_lisle_snap_lyr_04.wav"}
-})")
+})
 sound.Add({
     name = "TFA_CODWW2_DELISLE.Low",
     channel = CHAN_WEAPON,
@@ -6226,7 +6226,7 @@ sound.Add({
     level = 140,
     pitch = {100},
     sound = {"weapons/tfa_codww2/delisle/wpn_de_lisle_low_lyr_01.wav", "weapons/tfa_codww2/delisle/wpn_de_lisle_low_lyr_02.wav", "weapons/tfa_codww2/delisle/wpn_de_lisle_low_lyr_03.wav", "weapons/tfa_codww2/delisle/wpn_de_lisle_low_lyr_04.wav"}
-})")
+})
 sound.Add({
     name = "TFA_CODWW2_DELISLE.Lfe",
     channel = CHAN_WEAPON,
@@ -6234,7 +6234,7 @@ sound.Add({
     level = 140,
     pitch = {100},
     sound = {"weapons/tfa_codww2/delisle/wpn_de_lisle_lfe_lyr.wav"}
-})")
+})
 
 sound.Add({
     name = "TFA_CODWW2_DELISLE.FPO",
@@ -6327,7 +6327,7 @@ sound.Add({
     level = 140,
     pitch = {100},
     sound = {"weapons/tfa_codww2/enfield/wpn_lee_tail_01.wav", "weapons/tfa_codww2/enfield/wpn_lee_tail_02.wav", "weapons/tfa_codww2/enfield/wpn_lee_tail_03.wav"}
-})")
+})
 sound.Add({
     name = "TFA_CODWW2_ENFIELD.CrackTrans",
     channel = CHAN_WEAPON,
@@ -6335,7 +6335,7 @@ sound.Add({
     level = 140,
     pitch = {100},
     sound = {"weapons/tfa_codww2/enfield/wpn_lee_crack_trans.wav"}
-})")
+})
 sound.Add({
     name = "TFA_CODWW2_ENFIELD.Crack",
     channel = CHAN_WEAPON,
@@ -6343,7 +6343,7 @@ sound.Add({
     level = 140,
     pitch = {100},
     sound = {"weapons/tfa_codww2/enfield/wpn_lee_crack_01.wav", "weapons/tfa_codww2/enfield/wpn_lee_crack_02.wav", "weapons/tfa_codww2/enfield/wpn_lee_crack_03.wav"}
-})")
+})
 sound.Add({
     name = "TFA_CODWW2_ENFIELD.Shoot",
     channel = CHAN_WEAPON,
@@ -6351,7 +6351,7 @@ sound.Add({
     level = 140,
     pitch = {100},
     sound = {"weapons/tfa_codww2/enfield/wpn_lee_main_shot.wav"}
-})")
+})
 
 sound.Add({
     name = "TFA_CODWW2_ENFIELD.FPO",
@@ -6504,7 +6504,7 @@ sound.Add({
     level = 140,
     pitch = {100},
     sound = {"weapons/tfa_codww2/kar98k/wpn_kar98_tail_01.wav", "weapons/tfa_codww2/kar98k/wpn_kar98_tail_02.wav"}
-})")
+})
 sound.Add({
     name = "TFA_CODWW2_KAR98K.LowCrack",
     channel = CHAN_WEAPON,
@@ -6512,7 +6512,7 @@ sound.Add({
     level = 140,
     pitch = {100},
     sound = {"weapons/tfa_codww2/kar98k/wpn_kar98_plr_low_crack_01.wav"}
-})")
+})
 sound.Add({
     name = "TFA_CODWW2_KAR98K.Punch.Delay",
     channel = CHAN_WEAPON,
@@ -6520,7 +6520,7 @@ sound.Add({
     level = 140,
     pitch = {100},
     sound = {"weapons/tfa_codww2/kar98k/wpn_kar98_plr_punch_delay_02.wav"}
-})")
+})
 sound.Add({
     name = "TFA_CODWW2_KAR98K.PlrMech",
     channel = CHAN_WEAPON,
@@ -6528,7 +6528,7 @@ sound.Add({
     level = 140,
     pitch = {100},
     sound = {"weapons/tfa_codww2/kar98k/wpn_kar98_plr_mech_01.wav"}
-})")
+})
 sound.Add({
     name = "TFA_CODWW2_KAR98K.Punch",
     channel = CHAN_WEAPON,
@@ -6536,7 +6536,7 @@ sound.Add({
     level = 140,
     pitch = {100},
     sound = {"weapons/tfa_codww2/kar98k/wpn_kar98_plr_punch_01.wav"}
-})")
+})
 sound.Add({
     name = "TFA_CODWW2_KAR98K.Boom.Delay",
     channel = CHAN_WEAPON,
@@ -6544,7 +6544,7 @@ sound.Add({
     level = 140,
     pitch = {100},
     sound = {"weapons/tfa_codww2/kar98k/wpn_kar98_plr_boom_delay_01.wav"}
-})")
+})
 sound.Add({
     name = "TFA_CODWW2_KAR98K.Trans",
     channel = CHAN_WEAPON,
@@ -6552,7 +6552,7 @@ sound.Add({
     level = 140,
     pitch = {100},
     sound = {"weapons/tfa_codww2/kar98k/wpn_kar98_plr_trans_01.wav"}
-})")
+})
 sound.Add({
     name = "TFA_CODWW2_KAR98K.Trans.Delay",
     channel = CHAN_WEAPON,
@@ -6560,7 +6560,7 @@ sound.Add({
     level = 140,
     pitch = {100},
     sound = {"weapons/tfa_codww2/kar98k/wpn_kar98_plr_trans_delay_01.wav"}
-})")
+})
 sound.Add({
     name = "TFA_CODWW2_KAR98K.Sub",
     channel = CHAN_WEAPON,
@@ -6568,7 +6568,7 @@ sound.Add({
     level = 140,
     pitch = {100},
     sound = {"weapons/tfa_codww2/kar98k/wpn_kar98_plr_sub_01.wav"}
-})")
+})
 sound.Add({
     name = "TFA_CODWW2_KAR98K.Smack",
     channel = CHAN_WEAPON,
@@ -6576,7 +6576,7 @@ sound.Add({
     level = 140,
     pitch = {100},
     sound = {"weapons/tfa_codww2/kar98k/wpn_kar98_plr_smack_01.wav"}
-})")
+})
 sound.Add({
     name = "TFA_CODWW2_KAR98K.NPC.Shot",
     channel = CHAN_WEAPON,
@@ -6584,7 +6584,7 @@ sound.Add({
     level = 140,
     pitch = {100},
     sound = {"weapons/tfa_codww2/kar98k/wpn_kar98_npc_shot_01.wav"}
-})")
+})
 sound.Add({
     name = "TFA_CODWW2_KAR98K.Boom",
     channel = CHAN_WEAPON,
@@ -6592,7 +6592,7 @@ sound.Add({
     level = 140,
     pitch = {100},
     sound = {"weapons/tfa_codww2/kar98k/wpn_kar98_plr_boom_01.wav"}
-})")
+})
 sound.Add({
     name = "TFA_CODWW2_KAR98K.Int.Delay",
     channel = CHAN_WEAPON,
@@ -6600,7 +6600,7 @@ sound.Add({
     level = 140,
     pitch = {100},
     sound = {"weapons/tfa_codww2/kar98k/wpn_kar98_int_delay_01.wav"}
-})")
+})
 sound.Add({
     name = "TFA_CODWW2_KAR98K.Punch03",
     channel = CHAN_WEAPON,
@@ -6608,7 +6608,7 @@ sound.Add({
     level = 140,
     pitch = {100},
     sound = {"weapons/tfa_codww2/kar98k/wpn_kar98_plr_punch_03.wav"}
-})")
+})
 sound.Add({
     name = "TFA_CODWW2_KAR98K.Ducker",
     channel = CHAN_WEAPON,
@@ -6616,7 +6616,7 @@ sound.Add({
     level = 140,
     pitch = {100},
     sound = {"weapons/tfa_codww2/kar98k/wpn_kar98_ducker.wav"}
-})")
+})
 
 sound.Add({
     name = "TFA_CODWW2_KAR98K.FPO",
@@ -6751,7 +6751,7 @@ sound.Add({
     level = 140,
     pitch = {100},
     sound = {"weapons/tfa_codww2/kbsp1938/wpn_karabin_shot_01.wav", "weapons/tfa_codww2/kbsp1938/wpn_karabin_shot_02.wav", "weapons/tfa_codww2/kbsp1938/wpn_karabin_shot_03.wav", "weapons/tfa_codww2/kbsp1938/wpn_karabin_shot_04.wav"}
-})")
+})
 --sound.Add({
     name = "TFA_CODWW2_KBSP.Ext",
     channel = CHAN_WEAPON,
@@ -6759,7 +6759,7 @@ sound.Add({
     level = 140,
     pitch = {100},
     sound = {"weapons/tfa_codww2/kbsp1938/wpn_karabin_tail_01.wav", "weapons/tfa_codww2/kbsp1938/wpn_karabin_tail_02.wav"}
-})")
+})
 sound.Add({
     name = "TFA_CODWW2_KBSP.ShootLast",
     channel = CHAN_WEAPON,
@@ -6767,7 +6767,7 @@ sound.Add({
     level = 140,
     pitch = {100},
     sound = {"weapons/tfa_codww2/kbsp1938/wpn_karabin_shot_last_01.wav"}
-})")
+})
 
 sound.Add( {
 	name = "TFA_CODWW2_KBSP.Ext",
@@ -6901,7 +6901,7 @@ sound.Add({
     level = 140,
     pitch = {100},
     sound = {"weapons/tfa_codww2/mosin/wpn_mosin_tail_01.wav", "weapons/tfa_codww2/mosin/wpn_mosin_tail_02.wav"}
-})")
+})
 sound.Add({
     name = "TFA_CODWW2_MOSIN.Bright",
     channel = CHAN_WEAPON,
@@ -6909,7 +6909,7 @@ sound.Add({
     level = 140,
     pitch = {100},
     sound = {"weapons/tfa_codww2/mosin/wpn_mosin_bright_lyr_01.wav", "weapons/tfa_codww2/mosin/wpn_mosin_bright_lyr_02.wav", "weapons/tfa_codww2/mosin/wpn_mosin_bright_lyr_03.wav", "weapons/tfa_codww2/mosin/wpn_mosin_bright_lyr_04.wav", "weapons/tfa_codww2/mosin/wpn_mosin_bright_lyr_05.wav", "weapons/tfa_codww2/mosin/wpn_mosin_bright_lyr_06.wav"}
-})")
+})
 sound.Add({
     name = "TFA_CODWW2_MOSIN.Thick",
     channel = CHAN_WEAPON,
@@ -6917,7 +6917,7 @@ sound.Add({
     level = 140,
     pitch = {100},
     sound = {"weapons/tfa_codww2/mosin/wpn_mosin_thick_lyr_01.wav", "weapons/tfa_codww2/mosin/wpn_mosin_thick_lyr_02.wav", "weapons/tfa_codww2/mosin/wpn_mosin_thick_lyr_03.wav", "weapons/tfa_codww2/mosin/wpn_mosin_thick_lyr_04.wav"}
-})")
+})
 sound.Add({
     name = "TFA_CODWW2_MOSIN.Sub",
     channel = CHAN_WEAPON,
@@ -6925,7 +6925,7 @@ sound.Add({
     level = 140,
     pitch = {100},
     sound = {"weapons/tfa_codww2/mosin/wpn_mosin_sub_lyr.wav"}
-})")
+})
 sound.Add({
     name = "TFA_CODWW2_MOSIN.Trans",
     channel = CHAN_WEAPON,
@@ -6933,7 +6933,7 @@ sound.Add({
     level = 140,
     pitch = {100},
     sound = {"weapons/tfa_codww2/mosin/wpn_mosin_trans_lyr_01.wav", "weapons/tfa_codww2/mosin/wpn_mosin_trans_lyr_02.wav", "weapons/tfa_codww2/mosin/wpn_mosin_trans_lyr_03.wav"}
-})")
+})
 
 sound.Add({
     name = "TFA_CODWW2_MOSIN.FPO",
@@ -7026,7 +7026,7 @@ sound.Add({
     level = 140,
     pitch = {100},
     sound = {"weapons/tfa_codww2/ptrs/wpn_ptrs_plr_tail_01.wav", "weapons/tfa_codww2/ptrs/wpn_ptrs_plr_tail_02.wav", "weapons/tfa_codww2/ptrs/wpn_ptrs_plr_tail_03.wav", "weapons/tfa_codww2/ptrs/wpn_ptrs_plr_tail_04.wav"}
-})")
+})
 sound.Add({
     name = "TFA_CODWW2_PTRS.Bright",
     channel = CHAN_WEAPON,
@@ -7034,7 +7034,7 @@ sound.Add({
     level = 140,
     pitch = {100},
     sound = {"weapons/tfa_codww2/ptrs/wpn_ptrs_plr_bright_01.wav"}
-})")
+})
 sound.Add({
     name = "TFA_CODWW2_PTRS.Thump",
     channel = CHAN_WEAPON,
@@ -7042,7 +7042,7 @@ sound.Add({
     level = 140,
     pitch = {100},
     sound = {"weapons/tfa_codww2/ptrs/wpn_ptrs_plr_thump_01.wav"}
-})")
+})
 sound.Add({
     name = "TFA_CODWW2_PTRS.Mid",
     channel = CHAN_WEAPON,
@@ -7050,7 +7050,7 @@ sound.Add({
     level = 140,
     pitch = {100},
     sound = {"weapons/tfa_codww2/ptrs/wpn_ptrs_plr_mid_01.wav"}
-})")
+})
 
 sound.Add({
     name = "TFA_CODWW2_PTRS.Last",
@@ -7151,7 +7151,7 @@ sound.Add({
     level = 140,
     pitch = {100},
     sound = {"weapons/tfa_codww2/sdk/wpn_sdk_plr_center_01.wav", "weapons/tfa_codww2/sdk/wpn_sdk_plr_center_02.wav", "weapons/tfa_codww2/sdk/wpn_sdk_plr_center_03.wav", "weapons/tfa_codww2/sdk/wpn_sdk_plr_center_04.wav"}
-})")
+})
 sound.Add({
     name = "TFA_CODWW2_SDK.Wide",
     channel = CHAN_WEAPON,
@@ -7159,7 +7159,7 @@ sound.Add({
     level = 140,
     pitch = {100},
     sound = {"weapons/tfa_codww2/sdk/wpn_sdk_plr_wide_01.wav", "weapons/tfa_codww2/sdk/wpn_sdk_plr_wide_02.wav", "weapons/tfa_codww2/sdk/wpn_sdk_plr_wide_03.wav"}
-})")
+})
 
 sound.Add({
     name = "TFA_CODWW2_SDK.FPO",
@@ -7246,7 +7246,7 @@ sound.Add({
     level = 140,
     pitch = {100},
     sound = {"weapons/tfa_codww2/springfield/wpn_spring_tail_01.wav", "weapons/tfa_codww2/springfield/wpn_spring_tail_02.wav", "weapons/tfa_codww2/springfield/wpn_spring_tail_03.wav"}
-})")
+})
 sound.Add({
     name = "TFA_CODWW2_M1903.Shoot",
     channel = CHAN_WEAPON,
@@ -7254,7 +7254,7 @@ sound.Add({
     level = 140,
     pitch = {100},
     sound = {"weapons/tfa_codww2/springfield/wpn_spring_shot_02.wav", "weapons/tfa_codww2/springfield/wpn_spring_shot_03.wav"}
-})")
+})
 sound.Add({
     name = "TFA_CODWW2_M1903.Thud",
     channel = CHAN_WEAPON,
@@ -7262,7 +7262,7 @@ sound.Add({
     level = 140,
     pitch = {100},
     sound = {"weapons/tfa_codww2/springfield/wpn_spring_thud_03.wav"}
-})")
+})
 sound.Add({
     name = "TFA_CODWW2_M1903.Blast",
     channel = CHAN_WEAPON,
@@ -7270,7 +7270,7 @@ sound.Add({
     level = 140,
     pitch = {100},
     sound = {"weapons/tfa_codww2/springfield/wpn_spring_blast_01.wav", "weapons/tfa_codww2/springfield/wpn_spring_blast_02.wav", "weapons/tfa_codww2/springfield/wpn_spring_blast_03.wav"}
-})")
+})
 sound.Add({
     name = "TFA_CODWW2_M1903.Low",
     channel = CHAN_WEAPON,
@@ -7278,7 +7278,7 @@ sound.Add({
     level = 140,
     pitch = {100},
     sound = {"weapons/tfa_codww2/springfield/wpn_spring_low_lyr_01.wav", "weapons/tfa_codww2/springfield/wpn_spring_low_lyr_02.wav", "weapons/tfa_codww2/springfield/wpn_spring_low_lyr_03.wav"}
-})")
+})
 sound.Add({
     name = "TFA_CODWW2_M1903.Shot01",
     channel = CHAN_WEAPON,
@@ -7286,7 +7286,7 @@ sound.Add({
     level = 140,
     pitch = {100},
     sound = {"weapons/tfa_codww2/springfield/wpn_spring_shot_01.wav"}
-})")
+})
 sound.Add({
     name = "TFA_CODWW2_M1903.Blast.Trans",
     channel = CHAN_WEAPON,
@@ -7294,7 +7294,7 @@ sound.Add({
     level = 140,
     pitch = {100},
     sound = {"weapons/tfa_codww2/springfield/wpn_spring_blast_trans.wav"}
-})")
+})
 sound.Add({
     name = "TFA_CODWW2_M1903.NPC.Close",
     channel = CHAN_WEAPON,
@@ -7302,7 +7302,7 @@ sound.Add({
     level = 140,
     pitch = {100},
     sound = {"weapons/tfa_codww2/springfield/wpn_spring_npc_close_01.wav", "weapons/tfa_codww2/springfield/wpn_spring_npc_close_02.wav", "weapons/tfa_codww2/springfield/wpn_spring_npc_close_03.wav"}
-})")
+})
 
 sound.Add({
     name = "TFA_CODWW2_M1903.FPO",
@@ -7449,7 +7449,7 @@ sound.Add({
     level = 140,
     pitch = {100},
     sound = {"weapons/tfa_codww2/kar98k/wpn_kar98_npc_shot_01.wav", "weapons/tfa_codww2/kar98k/wpn_kar98_int_delay_01.wav"}
-})")
+})
 sound.Add({
     name = "TFA_CODWW2_LEVER.Ext",
     channel = CHAN_WEAPON,
@@ -7457,7 +7457,7 @@ sound.Add({
     level = 140,
     pitch = {100},
     sound = {"weapons/tfa_codww2/winchester94/wpn_lev_trail_01.wav", "weapons/tfa_codww2/winchester94/wpn_lev_trail_02.wav"}
-})")
+})
 
 sound.Add({
     name = "TFA_CODWW2_LEVER.FPO",
@@ -7610,7 +7610,7 @@ sound.Add({
     level = 140,
     pitch = {100},
     sound = {"weapons/tfa_codww2/bazooka/wpn_bzka_tail_01.wav", "weapons/tfa_codww2/bazooka/wpn_bzka_tail_02.wav"}
-})")
+})
 sound.Add({
     name = "TFA_CODWW2_BZKA.Shoot",
     channel = CHAN_WEAPON,
@@ -7618,7 +7618,7 @@ sound.Add({
     level = 140,
     pitch = {100},
     sound = {"weapons/tfa_codww2/bazooka/wpn_bzka_shot_01.wav", "weapons/tfa_codww2/bazooka/wpn_bzka_shot_02.wav"}
-})")
+})
 sound.Add({
     name = "TFA_CODWW2_BZKA.Body",
     channel = CHAN_WEAPON,
@@ -7626,7 +7626,7 @@ sound.Add({
     level = 140,
     pitch = {100},
     sound = {"weapons/tfa_codww2/bazooka/wpn_bzka_body_01.wav"}
-})")
+})
 sound.Add({
     name = "TFA_CODWW2_BZKA.Low",
     channel = CHAN_WEAPON,
@@ -7634,7 +7634,7 @@ sound.Add({
     level = 140,
     pitch = {100},
     sound = {"weapons/tfa_codww2/bazooka/wpn_bzka_low_01.wav"}
-})")
+})
 sound.Add({
     name = "TFA_CODWW2_BZKA.Metal",
     channel = CHAN_WEAPON,
@@ -7642,7 +7642,7 @@ sound.Add({
     level = 140,
     pitch = {100},
     sound = {"weapons/tfa_codww2/bazooka/wpn_bzka_metal_01.wav", "weapons/tfa_codww2/bazooka/wpn_bzka_metal_02.wav"}
-})")
+})
 sound.Add({
     name = "TFA_CODWW2_BZKA.Snap",
     channel = CHAN_WEAPON,
@@ -7650,7 +7650,7 @@ sound.Add({
     level = 140,
     pitch = {100},
     sound = {"weapons/tfa_codww2/bazooka/wpn_bzka_snap_01.wav"}
-})")
+})
 
 sound.Add({
     name = "TFA_CODWW2_BZKA.Rattle",
@@ -7698,7 +7698,7 @@ sound.Add({
     level = 140,
     pitch = {100},
     sound = {"weapons/tfa_codww2/smi44_betty/wpn_betty_boom_lyr_01.wav", "weapons/tfa_codww2/smi44_betty/wpn_betty_boom_lyr_02.wav", "weapons/tfa_codww2/smi44_betty/wpn_betty_boom_lyr_03.wav"}
-})")
+})
 sound.Add({
     name = "TFA_CODWW2_BETTY.Exp",
     channel = CHAN_WEAPON,
@@ -7706,7 +7706,7 @@ sound.Add({
     level = 140,
     pitch = {100},
     sound = {"weapons/tfa_codww2/smi44_betty/wpn_betty_exp_01.wav", "weapons/tfa_codww2/smi44_betty/wpn_betty_exp_02.wav", "weapons/tfa_codww2/smi44_betty/wpn_betty_exp_03.wav", "weapons/tfa_codww2/smi44_betty/wpn_betty_exp_04.wav", "weapons/tfa_codww2/smi44_betty/wpn_betty_exp_05.wav"}
-})")
+})
 sound.Add({
     name = "TFA_CODWW2_BETTY.Low",
     channel = CHAN_WEAPON,
@@ -7714,7 +7714,7 @@ sound.Add({
     level = 140,
     pitch = {100},
     sound = {"weapons/tfa_codww2/smi44_betty/wpn_betty_low_lyr.wav"}
-})")
+})
 sound.Add({
     name = "TFA_CODWW2_BETTY.UrFucked",
     channel = CHAN_WEAPON,
@@ -7722,7 +7722,7 @@ sound.Add({
     level = 140,
     pitch = {100},
     sound = {"weapons/tfa_codww2/smi44_betty/wpn_betty_activate_01.wav", "weapons/tfa_codww2/smi44_betty/wpn_betty_activate_02.wav", "weapons/tfa_codww2/smi44_betty/wpn_betty_activate_03.wav"}
-})")
+})
 
 -- AddWeaponSound("TFA_CODWW2_BETTY.Land", {"weapons/tfa_codww2/smi44_betty/wpn_bouncing_betty_land_default_01.wav", "weapons/tfa_codww2/smi44_betty/wpn_bouncing_betty_land_default_02.wav", "weapons/tfa_codww2/smi44_betty/wpn_bouncing_betty_land_default_03.wav"})
 -- AddWeaponSound("TFA_CODWW2_BETTY.PullPin", {"weapons/tfa_codww2/smi44_betty/wpn_bouncing_betty_pull_out_01.wav", "weapons/tfa_codww2/smi44_betty/wpn_bouncing_betty_pull_out_02.wav", "weapons/tfa_codww2/smi44_betty/wpn_bouncing_betty_pull_out_03.wav"})
@@ -7744,7 +7744,7 @@ sound.Add({
     level = 140,
     pitch = {100},
     sound = {"weapons/tfa_codww2/flashbang/wpn_conc_grenade_01.wav", "weapons/tfa_codww2/flashbang/wpn_conc_grenade_02.wav", "weapons/tfa_codww2/flashbang/wpn_conc_grenade_03.wav", "weapons/tfa_codww2/flashbang/wpn_conc_grenade_04.wav"}
-})")
+})
 sound.Add({
     name = "TFA_CODWW2_FLASHBANG.Dist",
     channel = CHAN_WEAPON,
@@ -7752,7 +7752,7 @@ sound.Add({
     level = 140,
     pitch = {100},
     sound = {"weapons/tfa_codww2/flashbang/wpn_conc_grenade_dist_01.wav", "weapons/tfa_codww2/flashbang/wpn_conc_grenade_dist_02.wav"}
-})")
+})
 sound.Add({
     name = "TFA_CODWW2_FLASHBANG.Lyr2",
     channel = CHAN_WEAPON,
@@ -7760,7 +7760,7 @@ sound.Add({
     level = 140,
     pitch = {100},
     sound = {"weapons/tfa_codww2/flashbang/wpn_conc_grenade_lyr2_01.wav", "weapons/tfa_codww2/flashbang/wpn_conc_grenade_lyr2_02.wav", "weapons/tfa_codww2/flashbang/wpn_conc_grenade_lyr2_03.wav", "weapons/tfa_codww2/flashbang/wpn_conc_grenade_lyr2_04.wav"}
-})")
+})
 sound.Add({
     name = "TFA_CODWW2_FLASHBANG.Lyr3",
     channel = CHAN_WEAPON,
@@ -7768,7 +7768,7 @@ sound.Add({
     level = 140,
     pitch = {100},
     sound = {"weapons/tfa_codww2/flashbang/wpn_conc_grenade_lyr3_01.wav", "weapons/tfa_codww2/flashbang/wpn_conc_grenade_lyr3_02.wav", "weapons/tfa_codww2/flashbang/wpn_conc_grenade_lyr3_03.wav", "weapons/tfa_codww2/flashbang/wpn_conc_grenade_lyr3_04.wav"}
-})")
+})
 
 -- crossbow ------------------------------------------------------------------------------------------------------------
 sound.Add({
@@ -7778,7 +7778,7 @@ sound.Add({
     level = 140,
     pitch = {100},
     sound = {"weapons/tfa_codww2/crossbow/wpn_crossbow_shot_01.wav", "weapons/tfa_codww2/crossbow/wpn_crossbow_shot_02.wav", "weapons/tfa_codww2/crossbow/wpn_crossbow_shot_03.wav"}
-})")
+})
 
 sound.Add({
     name = "TFA_CODWW2_CROSSBOW.FPO",
@@ -7838,7 +7838,7 @@ sound.Add({
     level = 140,
     pitch = {100},
     sound = {"weapons/tfa_codww2/dynamite/mp_s2_obj_timer_tick_1s.wav"}
-})")
+})
 
 -- flamethrower ------------------------------------------------------------------------------------------------------------
 sound.Add({
@@ -7848,7 +7848,7 @@ sound.Add({
     level = 140,
     pitch = {100},
     sound = {"weapons/tfa_codww2/flamethrower/wpn_flamethrower_loop.wav"}
-})")
+})
 sound.Add({
     name = "TFA_CODWW2_M2FT.Start",
     channel = CHAN_WEAPON,
@@ -7856,7 +7856,7 @@ sound.Add({
     level = 140,
     pitch = {100},
     sound = {"weapons/tfa_codww2/flamethrower/wpn_flamethrower_start_01.wav"}
-})")
+})
 sound.Add({
     name = "TFA_CODWW2_M2FT.Stop",
     channel = CHAN_WEAPON,
@@ -7864,7 +7864,7 @@ sound.Add({
     level = 140,
     pitch = {100},
     sound = {"weapons/tfa_codww2/flamethrower/wpn_flamethrower_stop_01.wav"}
-})")
+})
 
 -- flare ------------------------------------------------------------------------------------------------------------
 sound.Add({
@@ -7874,7 +7874,7 @@ sound.Add({
     level = 140,
     pitch = {100},
     sound = {"weapons/tfa_codww2/flare/wpn_flare_exp.wav"}
-})")
+})
 
 -- AddWeaponSound("TFA_CODWW2_FLARE.Pullpin", {"weapons/tfa_codww2/flare/wpn_flare_equip.wav"})
 -- AddWeaponSound("TFA_CODWW2_FLARE.Throw", {"weapons/tfa_codww2/flare/wpn_gen_equipment_throw.wav"})
@@ -7914,7 +7914,7 @@ sound.Add({
     level = 140,
     pitch = {100},
     sound = {"weapons/tfa_codww2/tabun_gas/wpn_gas_grenade_thump.wav"}
-})")
+})
 sound.Add({
     name = "TFA_CODWW2_TABUNGAS.Boom",
     channel = CHAN_WEAPON,
@@ -7922,7 +7922,7 @@ sound.Add({
     level = 140,
     pitch = {100},
     sound = {"weapons/tfa_codww2/tabun_gas/wpn_gas_grenade_boom.wav"}
-})")
+})
 sound.Add({
     name = "TFA_CODWW2_TABUNGAS.Low",
     channel = CHAN_WEAPON,
@@ -7930,7 +7930,7 @@ sound.Add({
     level = 140,
     pitch = {100},
     sound = {"weapons/tfa_codww2/tabun_gas/wpn_gas_grenade_low.wav"}
-})")
+})
 
 -- AddWeaponSound("TFA_CODWW2_TABUNGAS.Hiss", {"weapons/tfa_codww2/tabun_gas/wpn_gas_grenade_hiss.wav"})
 
@@ -7942,7 +7942,7 @@ sound.Add({
     level = 140,
     pitch = {100},
     sound = {"weapons/tfa_codww2/grenade/grenade_accent_01.wav", "weapons/tfa_codww2/grenade/grenade_accent_02.wav", "weapons/tfa_codww2/grenade/grenade_accent_03.wav", "weapons/tfa_codww2/grenade/grenade_accent_04.wav", "weapons/tfa_codww2/grenade/grenade_accent_05.wav", "weapons/tfa_codww2/grenade/grenade_accent_06.wav", "weapons/tfa_codww2/grenade/grenade_accent_07.wav"}
-})")
+})
 sound.Add({
     name = "TFA_CODWW2_GRENADE.Low",
     channel = CHAN_WEAPON,
@@ -7950,7 +7950,7 @@ sound.Add({
     level = 140,
     pitch = {100},
     sound = {"weapons/tfa_codww2/grenade/grenade_low_01.wav", "weapons/tfa_codww2/grenade/grenade_low_02.wav", "weapons/tfa_codww2/grenade/grenade_low_03.wav", "weapons/tfa_codww2/grenade/grenade_low_04.wav", "weapons/tfa_codww2/grenade/grenade_low_05.wav", "weapons/tfa_codww2/grenade/grenade_low_06.wav", "weapons/tfa_codww2/grenade/grenade_low_07.wav", "weapons/tfa_codww2/grenade/grenade_low_08.wav"}
-})")
+})
 sound.Add({
     name = "TFA_CODWW2_GRENADE.Dist",
     channel = CHAN_WEAPON,
@@ -7958,7 +7958,7 @@ sound.Add({
     level = 140,
     pitch = {100},
     sound = {"weapons/tfa_codww2/grenade/wpn_grenade_dist_01.wav", "weapons/tfa_codww2/grenade/wpn_grenade_dist_02.wav", "weapons/tfa_codww2/grenade/wpn_grenade_dist_03.wav", "weapons/tfa_codww2/grenade/wpn_grenade_dist_04.wav", "weapons/tfa_codww2/grenade/wpn_grenade_dist_05.wav", "weapons/tfa_codww2/grenade/wpn_grenade_dist_06.wav"}
-})")
+})
 sound.Add({
     name = "TFA_CODWW2_GRENADE.Trans",
     channel = CHAN_WEAPON,
@@ -7966,7 +7966,7 @@ sound.Add({
     level = 140,
     pitch = {100},
     sound = {"weapons/tfa_codww2/grenade/wpn_frag_trans_01.wav"}
-})")
+})
 sound.Add({
     name = "TFA_CODWW2_GRENADE.Sub",
     channel = CHAN_WEAPON,
@@ -7974,7 +7974,7 @@ sound.Add({
     level = 140,
     pitch = {100},
     sound = {"weapons/tfa_codww2/grenade/wpn_frag_sub_01.wav"}
-})")
+})
 
 -- AddWeaponSound("TFA_CODWW2_GRENADE.PullPin", {"weapons/tfa_codww2/grenade/wpn_grenade_pull_out_02.wav"})
 -- AddWeaponSound("TFA_CODWW2_GRENADE.Throw", {"weapons/tfa_codww2/grenade/wpn_grenade_throw_01.wav", "weapons/tfa_codww2/grenade/wpn_grenade_throw_02.wav", "weapons/tfa_codww2/grenade/wpn_grenade_throw_03.wav"})
@@ -8035,7 +8035,7 @@ sound.Add({
     level = 140,
     pitch = {100},
     sound = {"weapons/tfa_codww2/molotov/mp_ks_molotov_exp_shatter_01.wav", "weapons/tfa_codww2/molotov/mp_ks_molotov_exp_shatter_02.wav", "weapons/tfa_codww2/molotov/mp_ks_molotov_exp_shatter_03.wav"}
-})")
+})
 sound.Add({
     name = "TFA_CODWW2_MOLOTOV.Explode",
     channel = CHAN_WEAPON,
@@ -8043,7 +8043,7 @@ sound.Add({
     level = 140,
     pitch = {100},
     sound = {"weapons/tfa_codww2/molotov/mp_ks_molotov_exp_fire_01.wav", "weapons/tfa_codww2/molotov/mp_ks_molotov_exp_fire_02.wav", "weapons/tfa_codww2/molotov/mp_ks_molotov_exp_fire_03.wav"}
-})")
+})
 
 sound.Add(
 {
@@ -8136,7 +8136,7 @@ sound.Add({
     level = 140,
     pitch = {100},
     sound = {"weapons/tfa_codww2/rocket/wpn_rocket_thump_01.wav", "weapons/tfa_codww2/rocket/wpn_rocket_thump_02.wav", "weapons/tfa_codww2/rocket/wpn_rocket_thump_04.wav", "weapons/tfa_codww2/rocket/wpn_rocket_thump_05.wav", "weapons/tfa_codww2/rocket/wpn_rocket_thump_06.wav", "weapons/tfa_codww2/rocket/wpn_rocket_thump_07.wav", "weapons/tfa_codww2/rocket/wpn_rocket_thump_08.wav", "weapons/tfa_codww2/rocket/wpn_rocket_thump_09.wav", "weapons/tfa_codww2/rocket/wpn_rocket_thump_10.wav"}
-})")
+})
 sound.Add({
     name = "TFA_CODWW2_ROCKET.Trans",
     channel = CHAN_WEAPON,
@@ -8144,7 +8144,7 @@ sound.Add({
     level = 140,
     pitch = {100},
     sound = {"weapons/tfa_codww2/rocket/wpn_rocket_trans_01.wav", "weapons/tfa_codww2/rocket/wpn_rocket_trans_02.wav"}
-})")
+})
 sound.Add({
     name = "TFA_CODWW2_ROCKET.Lfe",
     channel = CHAN_WEAPON,
@@ -8152,7 +8152,7 @@ sound.Add({
     level = 140,
     pitch = {100},
     sound = {"weapons/tfa_codww2/rocket/wpn_rocket_lfe_01.wav", "weapons/tfa_codww2/rocket/wpn_rocket_lfe_02.wav", "weapons/tfa_codww2/rocket/wpn_rocket_lfe_04.wav", "weapons/tfa_codww2/rocket/wpn_rocket_lfe_05.wav", "weapons/tfa_codww2/rocket/wpn_rocket_lfe_07.wav"}
-})")
+})
 
 sound.Add(
 {
@@ -8180,7 +8180,7 @@ sound.Add({
     level = 140,
     pitch = {100},
     sound = {"weapons/tfa_codww2/smokegrenade/wpn_smk_gren_thump_01.wav"}
-})")
+})
 sound.Add({
     name = "TFA_CODWW2_SMOKE.Blast",
     channel = CHAN_WEAPON,
@@ -8188,7 +8188,7 @@ sound.Add({
     level = 140,
     pitch = {100},
     sound = {"weapons/tfa_codww2/smokegrenade/wpn_smk_gren_blast.wav"}
-})")
+})
 sound.Add({
     name = "TFA_CODWW2_SMOKE.Explode",
     channel = CHAN_WEAPON,
@@ -8196,7 +8196,7 @@ sound.Add({
     level = 140,
     pitch = {100},
     sound = {"weapons/tfa_codww2/smokegrenade/morale_smoke_exp.wav"}
-})")
+})
 sound.Add({
     name = "TFA_CODWW2_SMOKE.Hiss",
     channel = CHAN_WEAPON,
@@ -8204,7 +8204,7 @@ sound.Add({
     level = 140,
     pitch = {100},
     sound = {"weapons/tfa_codww2/smokegrenade/morale_smoke_throw_hiss.wav"}
-})")
+})
 
 -- AddWeaponSound("TFA_CODWW2_SMOKE.PullPin", {"weapons/tfa_codww2/smokegrenade/wpn_smoke_pull_out_01.wav"})
 -- AddWeaponSound("TFA_CODWW2_SMOKE.Gas", {"weapons/tfa_codww2/smokegrenade/wpn_smk_gren_gas_rls.wav"})

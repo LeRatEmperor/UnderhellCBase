@@ -25,11 +25,6 @@ ATTACHMENT.WeaponTable = {
 
 function ATTACHMENT:Attach(wep)
 end
-end
 
 function ATTACHMENT:Detach(wep)
 end
-end
-
-
--- TFA attachment registration removed (CUH base handles this)

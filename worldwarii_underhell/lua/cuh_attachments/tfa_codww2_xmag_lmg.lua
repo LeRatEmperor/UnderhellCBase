@@ -156,17 +156,6 @@ ATTACHMENT.WeaponTable = {
 
 function ATTACHMENT:Attach(wep)
 end
-	end
-	wep:SetNextIdleAnim(-1)
-	wep:Unload()
-end
 
 function ATTACHMENT:Detach(wep)
 end
-	end
-	wep:SetNextIdleAnim(-1)
-	wep:Unload()
-end
-
-
--- TFA attachment registration removed (CUH base handles this)

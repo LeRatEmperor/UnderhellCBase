@@ -191,43 +191,5 @@ ATTACHMENT.Ammo = "pistol"
 function ATTACHMENT:Attach(wep)
 end
 
-	wep:Unload()
-	
-	wep.ViewModelKitOld = wep.ViewModelKitOld or wep.ViewModel
-	wep.WorldModelKitOld = wep.WorldModelKitOld or wep.WorldModel
-	wep.ViewModel = wep:GetStat("ViewModel_DW") or wep.ViewModel
-	wep.WorldModel = wep:GetStat("WorldModel_DW") or wep.WorldModel
-	if IsValid(wep.OwnerViewModel) then
-		wep.OwnerViewModel:SetModel(wep.ViewModel)
-	end
-	wep:SetModel(wep.WorldModel)
-	
-	if -- Enum.ReadyStatus[wep:GetStatus()] then
-		wep:ChooseIdleAnim()
-		if game.SinglePlayer() then
-			wep:CallOnClient("ChooseIdleAnim","")
-		end
-	end
-	wep:SetNextIdleAnim(-1)
-end
-
 function ATTACHMENT:Detach(wep)
 end
-		wep.ViewModelKitOld = nil
-	end
-	if wep.WorldModelKitOld then
-		wep.WorldModel = wep.WorldModelKitOld
-		wep:SetModel(wep.WorldModel)
-		wep.ViewModelKitOld = nil
-	end
-	
-	if -- Enum.ReadyStatus[wep:GetStatus()] then
-		wep:ChooseIdleAnim()
-		if game.SinglePlayer() then
-			wep:CallOnClient("ChooseIdleAnim","")
-		end
-	end
-	wep:SetNextIdleAnim(-1)
-end
-
--- TFA attachment registration removed (CUH base handles this)
