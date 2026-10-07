@@ -66,7 +66,7 @@ SWEP.CUHInspectOnMenu       = true
 
 SWEP.IronSightsPos = Vector(-4.4, -4, 1.4)
 SWEP.IronSightsAng = Vector(0, 0, 0)
-SWEP.IronSightTime = 0.4
+SWEP.IronSightTime = 0.3
 SWEP.SwayPosition = 2.0
 SWEP.AlternativePos = Vector(0, 0, 0)
 SWEP.AlternativeAng = Angle(0, 0, 0)
@@ -76,9 +76,9 @@ SWEP.RunSightsPos = Vector(0, 0, 0)
 SWEP.RunSightsAng = Vector(0, 0, 0)
 
 -- TFA-style curved ironsight dip
-SWEP.IronSightsDipPos   = Vector(0, -1.5, -2.0)
-SWEP.IronSightsDipAng   = Angle(3, 0, 0)
-SWEP.IronSightsDipScale = 1.0
+SWEP.IronSightsDipPos   = Vector(0, 0, 0)
+SWEP.IronSightsDipAng   = Angle(0, 0, 0)
+SWEP.IronSightsDipScale = 0
 
 -- Camera bone system
 SWEP.CameraAttachment = "Camera"
