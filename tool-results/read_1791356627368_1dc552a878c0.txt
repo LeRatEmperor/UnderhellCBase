@@ -1,0 +1,752 @@
+     1→AddCSLuaFile()
+     2→
+     3→DEFINE_BASECLASS("weapon_bo3_base_shotty")
+     4→SWEP.Base = "weapon_bo3_base_shotty"
+     5→
+     6→SWEP.PrintName = "KRM-262"
+     7→SWEP.Category = "Black Ops III"
+     8→SWEP.SubCategory = ""
+     9→SWEP.IconLetter = "u"
+    10→
+    11→SWEP.Slot = 3 -- The slot the weapon will appear in when switching weapons, add 1 to get the actual slot (e.g. a value of 1 translates to weapon slot 2, the pistol slots)
+    12→
+    13→SWEP.Spawnable = true -- Set this to true to make your weapon appear in the spawnmenu, set to false to hide the template
+    14→
+    15→-- Appearance
+    16→
+    17→SWEP.UseHands = false
+    18→SWEP.ViewModelFlip = false
+    19→SWEP.ViewModelFOV = 65
+    20→SWEP.ViewModel          = "models/loyalists/blackops3/spartan/v_shot_spartan.mdl"
+    21→SWEP.WorldModel         = "models/loyalists/blackops3/spartan/w_shot_spartan.mdl"
+    22→SWEP.LoweredPos = Vector(2.95, -3.057, -4.119)
+    23→SWEP.LoweredAng = Vector(-13.131, 33.537, -29.906)
+    24→
+    25→SWEP.UseQCReloadEvents = false
+    26→SWEP.UseReloadTable    = true
+    27→
+    28→SWEP.HoldType = "shotgun"
+    29→SWEP.PassiveAnim = "passive"
+    30→SWEP.ZoomFov = 20
+    31→
+    32→SWEP.FireModes = {
+    33→        {
+    34→                name = "Pump-Action"
+    35→        }
+    36→}
+    37→
+    38→SWEP.Primary.Sound          = Sound("CW_BLACKOPS3_SPARTAN_FIRE")
+    39→SWEP.Primary.ShellSound         = Sound("Weapon_BLACKOPS3_SPARTAN.Shell_In")
+    40→SWEP.Primary.ClipSize       = 8
+    41→SWEP.Primary.Ammo           = "12 Gauge"
+    42→SWEP.Primary.DefaultClip    = 120
+    43→SWEP.Primary.MinDamage      = 15
+    44→SWEP.Primary.MaxDamage      = 15
+    45→SWEP.Primary.Automatic      = false
+    46→SWEP.Primary.TakeAmmo       = 1
+    47→SWEP.Primary.Force          = 6
+    48→SWEP.Primary.Spread         = 0.5
+    49→SWEP.Primary.Delay          = 0.7
+    50→SWEP.Primary.NumberofShots  = 8
+    51→SWEP.Primary.MinRecoil      = -1.0
+    52→SWEP.Primary.MaxRecoil      = -1.5
+    53→SWEP.TwoHanded                          = true
+    54→SWEP.ReloadSpeed = 1
+    55→SWEP.Chambering                         = false
+    56→SWEP.NoShell                            = true
+    57→SWEP.AnimatedSprint                     = false
+    58→SWEP.PumpDelay = 0.2
+    59→SWEP.Primary.ReloadTime         = 0.4
+    60→
+    61→-- Custom configurators
+    62→
+    63→SWEP.MuzzleFlashType = "particle"
+    64→SWEP.MuzzleFlashParticle = "muzzleflash_m3"
+    65→SWEP.MuzzleFlashLightColor = Vector(0, 200, 255)
+    66→SWEP.MuzzleFlashLightSize = 128
+    67→
+    68→SWEP.MeleeDamage    = 50      -- Damage dealt by melee attack
+    69→SWEP.MeleeRange     = 64      -- Range of melee trace (Source units)
+    70→SWEP.MeleeDelay     = 0.6     -- Minimum time between melee attacks
+    71→SWEP.MeleeForce     = 300     -- Knockback force on hit
+    72→SWEP.MeleeHitDelay  = 0.15    -- Seconds after melee start to perform hit trace
+    73→SWEP.MeleeViewPunch = Angle(-5, 0, 0)  -- Camera punch on melee
+    74→
+    75→SWEP.MeleeSound     = "weapons/blackops3/cloth/riot_shield_swing_cloth_00.wav"      -- Swing sound (leave empty for none)
+    76→SWEP.MeleeHitSound  = {"weapons/blackops3/rifle_butt/rifle_hit_00.wav", "weapons/blackops3/rifle_butt/rifle_hit_00.wav"}      -- Sound on hit
+    77→SWEP.MeleeMissSound = "nil"      -- Sound on miss
+    78→
+    79→SWEP.MeleeInterruptReload = true
+    80→
+    81→SWEP.IronSightsPos = Vector(-8.62, 1.0289, 2.1)
+    82→SWEP.IronSightsAng = Vector(0, 0, 0)
+    83→SWEP.SwayPosition = 2.0
+    84→
+    85→SWEP.AlternativePos = Vector(0, 0, 0) -- Shifts gun right, back, and down
+    86→SWEP.AlternativeAng = Angle(0, 0, 0)   -- Tilts it
+    87→
+    88→SWEP.Animations = {
+    89→        ["shoot"] = "base_fire",
+    90→        ["reload_loop"] = "base_reload_loop",
+    91→    ["start_reload"] = "base_reload_in",
+    92→    ["after_reload"] = "base_reload_out",
+    93→        ["sprint_idle"] = "base_sprint_loop",
+    94→        ["sprint_in"] = "base_sprint_in",
+    95→        ["sprint_out"] = "base_sprint_out",
+    96→        ["iron_fire"] = "base_fire_ads",
+    97→        ["idle"] = "base_idle",
+    98→        ["deploy"] = "base_draw",
+    99→        ["melee"] = "base_melee",
+   100→        ["inspect"] = "base_inspect",
+   101→        ["rechamber"] = "base_rechamber",
+   102→        ["rechamber_ads"] = "base_rechamber_ads",
+   103→        ["mantle"] = "base_mantle_over",
+   104→}
+   105→
+   106→SWEP.AnimSounds = {
+   107→    ["start_reload"] = {
+   108→        {time = 0.0, sound = "Weapon_BLACKOPS3_Cloth.Med"},
+   109→        {time = 0.3, sound = "Weapon_BLACKOPS3_ARGUS.Lever_Open"},
+   110→        {time = 0.9, sound = "Weapon_BLACKOPS3_SPARTAN.Shell_In"},
+   111→    },
+   112→    ["reload_loop"] = {
+   113→        {time = 0.35, sound = "Weapon_BLACKOPS3_SPARTAN.Shell_In"},
+   114→    },
+   115→    ["after_reload"] = {
+   116→        {time = 0.3, sound = "Weapon_BLACKOPS3_ARGUS.Lever_Close"},
+   117→        {time = 0.6, sound = "Weapon_BLACKOPS3_SPARTAN.Pump_Back"},
+   118→        {time = 0.7, sound = "Weapon_BLACKOPS3_SPARTAN.Pump_Forward"},
+   119→    },
+   120→    ["fire_last"] = {
+   121→        {time = 0.1, sound = "Weapon_BLACKOPS3_SPARTAN.Pump_Back"},
+   122→        {time = 0.3, sound = "Weapon_BLACKOPS3_SPARTAN.Pump_Forward"},
+   123→    },
+   124→    ["rechamber"] = {
+   125→        {time = 0.1, sound = "Weapon_BLACKOPS3_SPARTAN.Pump_Back"},
+   126→        {time = 0.3, sound = "Weapon_BLACKOPS3_SPARTAN.Pump_Forward"},
+   127→    },
+   128→    ["rechamber_ads"] = {
+   129→        {time = 0.1, sound = "Weapon_BLACKOPS3_SPARTAN.Pump_Back"},
+   130→        {time = 0.3, sound = "Weapon_BLACKOPS3_SPARTAN.Pump_Forward"},
+   131→    },
+   132→    ["draw_first"] = {
+   133→        {time = 0.0, sound = "Weapon_BLACKOPS3_Cloth.Med"},
+   134→        {time = 0.5, sound = "Weapon_BLACKOPS3_SPARTAN.Pump_Back"},
+   135→        {time = 0.7, sound = "Weapon_BLACKOPS3_SPARTAN.Pump_Forward"},
+   136→    },
+   137→}
+   138→
+   139→function SWEP:PostShoot()
+   140→    local ct = CurTime()
+   141→    local pumpDelay = self.PumpDelay or 0.4
+   142→
+   143→    -- Ensure fire+sprint block lasts AT LEAST pumpDelay long
+   144→    -- but don't shorten a longer Primary.Delay
+   145→    self:SetNextPrimaryFire(math.max(self:GetNextPrimaryFire(), ct + pumpDelay))
+   146→    self:SetNextSecondaryFire(math.max(self:GetNextSecondaryFire(), ct + pumpDelay))
+   147→
+   148→    timer.Simple(pumpDelay, function()
+   149→        if !IsValid(self) or !IsValid(self.Owner) or !IsValid(self.Owner:GetActiveWeapon()) or self.Owner:GetActiveWeapon() != self then return end
+   150→
+   151→        local animKey = self:GetUHBool("Zooming") and "rechamber_ads" or "rechamber"
+   152→        self:EasySendWeaponAnim(animKey, ACT_SHOTGUN_PUMP)
+   153→    end)
+   154→end
+   155→
+   156→function SWEP:Initialize()
+   157→    BaseClass.Initialize(self)
+   158→end
+   159→
+   160→function SWEP:ShootAnimation()
+   161→    -- If zoomed and "iron_fire" exists in Animations, return the key
+   162→    if self:GetUHBool("Zooming") and self.Animations and self.Animations["iron_fire"] then
+   163→        return "iron_fire"
+   164→    end
+   165→    -- If not zoomed and "shoot" exists in Animations, return the key
+   166→    if self.Animations and self.Animations["shoot"] then
+   167→        return "shoot"
+   168→    end
+   169→    return ACT_VM_PRIMARYATTACK
+   170→end
+   171→
+   172→function SWEP:PrimaryAttack()
+   173→    -- Block during melee or mantle animation
+   174→    if self._meleeActive then return end
+   175→    if self._mantleActive then return end
+   176→
+   177→    -- E + M1 = melee
+   178→    if self.Owner:KeyDown(IN_USE) then
+   179→        local ct = CurTime()
+   180→        if ct < (self._nextMelee or 0) then return end
+   181→        if self:GetUHBool("Reloading") then return end
+   182→        if self:GetNWFloat("DeployTime") > ct then return end
+   183→        if self:GetNWInt("FireMode") == 0 then return end
+   184→
+   185→        if SERVER or IsFirstTimePredicted() then
+   186→            self:MeleeAttack()
+   187→        end
+   188→        return
+   189→    end
+   190→
+   191→    -- Normal shooting — delegate to base
+   192→    return BaseClass.PrimaryAttack(self)
+   193→end
+   194→
+   195→
+   196→-- ==========================================
+   197→-- MELEE ATTACK
+   198→-- ==========================================
+   199→-- Plays ["melee"] animation, schedules a hit trace at MeleeHitDelay,
+   200→-- and locks controls for the animation duration.
+   201→
+   202→function SWEP:MeleeAttack()
+   203→    local ct = CurTime()
+   204→    local sp = game.SinglePlayer()
+   205→    local iftp = IsFirstTimePredicted()
+   206→
+   207→    if not (sp or iftp) then return end
+   208→
+   209→    -- Cancel conflicting states
+   210→    self:SetUHBool("Zooming", false)
+   211→
+   212→    if self:GetUHBool("Running") then
+   213→        self:SetUHBool("Running", false)
+   214→    end
+   215→
+   216→    -- Optionally cancel reload
+   217→    if self.MeleeInterruptReload ~= false and self:GetUHBool("Reloading") then
+   218→        self:SetUHBool("Reloading", false)
+   219→        self:SetNWFloat("ReloadTime", 0)
+   220→        self:SetNWFloat("ReloadEndTime", 0)
+   221→        if timer.Exists("UHReload_"..self.Owner:SteamID()) then
+   222→            timer.Remove("UHReload_"..self.Owner:SteamID())
+   223→        end
+   224→    end
+   225→
+   226→    -- Set melee state
+   227→    self._meleeActive = true
+   228→    self._engineWantsIdle = nil
+   229→    self._customIdleActive = false
+   230→    self:ClearAnimSounds()
+   231→
+   232→    -- Play ["melee"] animation via EasySendWeaponAnim
+   233→    -- Falls back to ACT_VM_MELEE if the key doesn't exist.
+   234→    self:EasySendWeaponAnim("melee", ACT_VM_MELEE)
+   235→
+   236→    local vm = self.Owner:GetViewModel()
+   237→    local animDuration = IsValid(vm) and vm:SequenceDuration() or 0.5
+   238→
+   239→    -- Timing
+   240→    self._meleeHitTime = ct + (self.MeleeHitDelay or 0.15)
+   241→    self._meleeHitDone = false
+   242→    self._meleeEndTime = ct + animDuration
+   243→    self._nextMelee = ct + (self.MeleeDelay or 0.6)
+   244→
+   245→    -- Lock controls
+   246→    self:SetNextPrimaryFire(ct + animDuration)
+   247→    self:SetNextSecondaryFire(ct + animDuration)
+   248→    self.NextReload = ct + animDuration
+   249→
+   250→    -- Play swing sound
+   251→    self:PlayMeleeSound(self.MeleeSound, 75, 100)
+   252→end
+   253→
+   254→function SWEP:PlayMeleeSound(soundEntry, vol, pitch)
+   255→    -- Supports both single strings and tables of strings (random pick)
+   256→    if not soundEntry then return end
+   257→    local snd = soundEntry
+   258→    if istable(soundEntry) then
+   259→        snd = soundEntry[math.random(1, #soundEntry)]
+   260→    end
+   261→    if snd and snd ~= "" then
+   262→        self:EmitSound(snd, vol or 75, pitch or 100, 1, CHAN_USER_BASE)
+   263→    end
+   264→end
+   265→
+   266→-- ==========================================
+   267→-- MELEE HIT TRACE
+   268→-- ==========================================
+   269→-- Hull trace forward. Applies damage to valid targets.
+   270→-- Called from Think() at MeleeHitDelay seconds after melee start.
+   271→
+   272→function SWEP:DoMeleeTrace()
+   273→    local ply = self.Owner
+   274→    if not IsValid(ply) then return end
+   275→
+   276→    local pos = ply:GetShootPos()
+   277→    local aim = ply:GetAimVector()
+   278→    local range = self.MeleeRange or 64
+   279→
+   280→    local tr = util.TraceHull({
+   281→        start = pos,
+   282→        endpos = pos + aim * range,
+   283→        filter = ply,
+   284→        mins = Vector(-10, -10, -10),
+   285→        maxs = Vector(10, 10, 10),
+   286→        mask = MASK_SHOT_HULL,
+   287→    })
+   288→
+   289→    if tr.Hit then
+   290→        local target = tr.Entity
+   291→
+   292→        if IsValid(target) and SERVER then
+   293→            local dmg = DamageInfo()
+   294→            dmg:SetDamage(self.MeleeDamage or 50)
+   295→            dmg:SetAttacker(ply)
+   296→            dmg:SetInflictor(self)
+   297→            dmg:SetDamageForce(aim * (self.MeleeForce or 300))
+   298→            dmg:SetDamagePosition(tr.HitPos)
+   299→            dmg:SetDamageType(DMG_CLUB)
+   300→
+   301→            target:TakeDamageInfo(dmg)
+   302→        end
+   303→
+   304→        if SERVER then
+   305→            util.ScreenShake(tr.HitPos, 3, 0.1, 0.3, 32)
+   306→        end
+   307→
+   308→        self:PlayMeleeSound(self.MeleeHitSound, 75, 100)
+   309→    else
+   310→        self:PlayMeleeSound(self.MeleeMissSound, 65, 100)
+   311→    end
+   312→
+   313→    ply:ViewPunch(self.MeleeViewPunch or Angle(-3, 0, 0))
+   314→end
+   315→
+   316→
+   317→-- ==========================================
+   318→-- MELEE END
+   319→-- ==========================================
+   320→-- Resets state and lets idle take over.
+   321→
+   322→function SWEP:EndMelee()
+   323→    self._meleeActive = false
+   324→    self._meleeHitTime = nil
+   325→    self._meleeHitDone = nil
+   326→    self._meleeEndTime = nil
+   327→    self:ClearAnimSounds()
+   328→    self._engineWantsIdle = true
+   329→end
+   330→
+   331→
+   332→-- ==========================================
+   333→-- SECONDARY ATTACK GUARD
+   334→-- ==========================================
+   335→-- Blocks zoom during melee so ADS doesn't fight the animation.
+   336→
+   337→function SWEP:SecondaryAttack()
+   338→    if self._meleeActive then return end
+   339→    if self._mantleActive then return end
+   340→    return BaseClass.SecondaryAttack(self)
+   341→end
+   342→
+   343→
+   344→-- ==========================================
+   345→-- RELOAD GUARD
+   346→-- ==========================================
+   347→-- Blocks reload during melee.
+   348→
+   349→function SWEP:Reload()
+   350→    if self._meleeActive then return end
+   351→    if self._mantleActive then return end
+   352→    return BaseClass.Reload(self)
+   353→end
+   354→
+   355→
+   356→-- ==========================================
+   357→-- THINK OVERRIDE
+   358→-- ==========================================
+   359→-- Handles melee timing (hit trace + animation end),
+   360→-- holster finish, and delegates to base Think.
+   361→
+   362→-- ==========================================
+   363→-- START MANTLE
+   364→-- ==========================================
+   365→-- Called when the BO3 parkour addon starts a vault or mantle.
+   366→-- Plays the ["mantle"] viewmodel animation and blocks weapon actions.
+   367→
+   368→function SWEP:StartMantle()
+   369→    local ct = CurTime()
+   370→    local sp = game.SinglePlayer()
+   371→    local iftp = IsFirstTimePredicted()
+   372→
+   373→    if not (sp or iftp) then return end
+   374→
+   375→    -- Cancel conflicting states
+   376→    self:SetUHBool("Zooming", false)
+   377→    if self:GetUHBool("Running") then
+   378→        self:SetUHBool("Running", false)
+   379→    end
+   380→    if self._meleeActive then
+   381→        self:EndMelee()
+   382→    end
+   383→
+   384→    -- Cancel reload
+   385→    if self:GetUHBool("Reloading") then
+   386→        self:SetUHBool("Reloading", false)
+   387→        self:SetNWFloat("ReloadTime", 0)
+   388→        self:SetNWFloat("ReloadEndTime", 0)
+   389→        if timer.Exists("UHReload_"..self.Owner:SteamID()) then
+   390→            timer.Remove("UHReload_"..self.Owner:SteamID())
+   391→        end
+   392→    end
+   393→
+   394→    -- Set mantle state
+   395→    self._mantleActive = true
+   396→    self._engineWantsIdle = nil
+   397→    self._customIdleActive = false
+   398→    self:ClearAnimSounds()
+   399→
+   400→    -- Play ["mantle"] animation
+   401→    self:EasySendWeaponAnim("mantle", ACT_VM_MELEE_SHOVE)
+   402→
+   403→    local vm = self.Owner:GetViewModel()
+   404→    local animDuration = IsValid(vm) and vm:SequenceDuration() or (self.MantleDuration or 0.6)
+   405→
+   406→    -- Use whichever is longer: animation duration or addon traversal duration
+   407→    local mantleDur = math.max(animDuration, self.MantleDuration or 0.6)
+   408→    self._mantleEndTime = ct + mantleDur
+   409→
+   410→    -- Lock controls
+   411→    self:SetNextPrimaryFire(ct + mantleDur)
+   412→    self:SetNextSecondaryFire(ct + mantleDur)
+   413→    self.NextReload = ct + mantleDur
+   414→end
+   415→
+   416→
+   417→-- ==========================================
+   418→-- END MANTLE
+   419→-- ==========================================
+   420→
+   421→function SWEP:EndMantle()
+   422→    self._mantleActive = false
+   423→    self._mantleEndTime = nil
+   424→    self:ClearAnimSounds()
+   425→    self._engineWantsIdle = true
+   426→end
+   427→
+   428→
+   429→function SWEP:Think()
+   430→    local ct = CurTime()
+   431→
+   432→    -- ==========================================
+   433→    -- PARKOUR TRAVERSAL DETECTION
+   434→    -- ==========================================
+   435→    -- Detects when the BO3 parkour addon sets BO3_IsVaulting / BO3_IsMantling.
+   436→    local ply = self.Owner
+   437→    if IsValid(ply) then
+   438→        local isVaulting = ply:GetNW2Bool("BO3_IsVaulting", false)
+   439→        local isMantling = ply:GetNW2Bool("BO3_IsMantling", false)
+   440→        local isInTraversal = isVaulting or isMantling
+   441→
+   442→        if isInTraversal and not self._mantleActive then
+   443→            if SERVER or IsFirstTimePredicted() then
+   444→                self:StartMantle()
+   445→            end
+   446→        end
+   447→
+   448→        if not isInTraversal and self._mantleActive then
+   449→            self:EndMantle()
+   450→        end
+   451→
+   452→        self._lastBO3IsVaulting = isVaulting
+   453→        self._lastBO3IsMantling = isMantling
+   454→    end
+   455→
+   456→    -- Mantle timeout safety
+   457→    if self._mantleActive and self._mantleEndTime and ct >= self._mantleEndTime then
+   458→        self:EndMantle()
+   459→    end
+   460→
+   461→    -- Melee hit timing
+   462→    if self._meleeActive and not self._meleeHitDone and self._meleeHitTime and ct >= self._meleeHitTime then
+   463→        self._meleeHitDone = true
+   464→        if SERVER or IsFirstTimePredicted() then
+   465→            self:DoMeleeTrace()
+   466→        end
+   467→    end
+   468→
+   469→    -- Melee end timing
+   470→    if self._meleeActive and self._meleeEndTime and ct >= self._meleeEndTime then
+   471→        self:EndMelee()
+   472→    end
+   473→
+   474→    -- Holster finish
+   475→    if self._holstering and self._holsterFinish and ct >= self._holsterFinish then
+   476→        self._holstering = nil
+   477→        self._holsterFinish = nil
+   478→        if SERVER or IsFirstTimePredicted() then
+   479→            local target = self._holsterTarget
+   480→            self._holsterTarget = nil
+   481→            if IsValid(target) then
+   482→                self.Owner:SelectWeapon(target:GetClass())
+   483→            end
+   484→        end
+   485→    end
+   486→
+   487→    BaseClass.Think(self)
+   488→    self:HandleSprintingAnimations()
+   489→end
+   490→
+   491→function SWEP:Holster()
+   492→    if self._meleeActive then
+   493→        self._meleeActive = false
+   494→        self._meleeHitTime = nil
+   495→        self._meleeHitDone = nil
+   496→        self._meleeEndTime = nil
+   497→        self:ClearAnimSounds()
+   498→    end
+   499→    if self._mantleActive then
+   500→        self._mantleActive = false
+   501→        self._mantleEndTime = nil
+   502→        self:ClearAnimSounds()
+   503→    end
+   504→    -- Cancel any in-flight burst
+   505→    self._burstRemaining = nil
+   506→    self._burstNextFire = nil
+   507→    -- Cancel rechamber
+   508→    self._isRechambering = false
+   509→    -- Reset animation transition trackers
+   510→    self.wasZooming = false
+   511→    self.wasRunning = false
+   512→    -- Note: timer.Simple closures will still fire but the above
+   513→    -- state resets make their checks self-correcting
+   514→    return BaseClass.Holster(self)
+   515→end
+   516→
+   517→function SWEP:Deploy()
+   518→    BaseClass.Deploy(self)
+   519→        
+   520→        self:SetHoldType( self.HoldType )
+   521→
+   522→    if self.Animations and self.Animations["deploy"] then
+   523→        local vm = self.Owner:GetViewModel()
+   524→        if IsValid(vm) then
+   525→            self:EasySendWeaponAnim("deploy", ACT_VM_DRAW)
+   526→            local dur = vm:SequenceDuration()
+   527→            self:SetNextPrimaryFire(CurTime() + dur)
+   528→            self:SetNextSecondaryFire(CurTime() + dur)
+   529→            self.NextReload = CurTime() + dur
+   530→            self._nextIdlePlay = nil
+   531→            self._deployEndTime = CurTime() + dur
+   532→            self:SetNWFloat("DeployTime", 0)
+   533→        end
+   534→    end
+   535→
+   536→    -- Reset melee state
+   537→    self._meleeActive = nil
+   538→    self._meleeHitTime = nil
+   539→    self._meleeHitDone = nil
+   540→    self._meleeEndTime = nil
+   541→    self._nextMelee = nil
+   542→
+   543→    -- Reset mantle state
+   544→    self._mantleActive = nil
+   545→    self._mantleEndTime = nil
+   546→    self._lastBO3IsVaulting = false
+   547→    self._lastBO3IsMantling = false
+   548→
+   549→    return false
+   550→end
+   551→
+   552→function SWEP:HandleRunning( ct )
+   553→    if self:GetUHBool("Reloading") then
+   554→        return
+   555→    end
+   556→        
+   557→        local vm = self.Owner:GetViewModel()
+   558→    if IsValid(vm) then
+   559→        local fireDelay = self:GetNextPrimaryFire() - ct
+   560→        if fireDelay > 0.3 then return end
+   561→    end
+   562→        
+   563→        if self:GetNWFloat("DeployTime", 10) then
+   564→
+   565→
+   566→    local dist = self.Owner:GetVelocity():LengthSqr()
+   567→    local isSprinting = self.Owner:KeyDown( IN_SPEED ) and dist > self.Owner:GetWalkSpeed()^2
+   568→    local isSafeMode = self:GetNWInt("FireMode") == 0
+   569→
+   570→    -- 1. SPRINTING (Takes Priority)
+   571→    if isSprinting then
+   572→        self:SetHoldType( self.PassiveAnim )
+   573→        self:SetUHBool("Running", true) -- Set to TRUE so animations play
+   574→        self:SetUHBool("Zooming", false)
+   575→        
+   576→        if self:GetUHBool("Reloading") then
+   577→            self:SetUHBool("Reloading", false)
+   578→            self.NextReload = ct + 0.5
+   579→            if timer.Exists("UHReload_"..self.Owner:SteamID()) then
+   580→                timer.Remove( "UHReload_"..self.Owner:SteamID() )
+   581→            end
+   582→        end
+   583→
+   584→    -- 2. NOT SPRINTING
+   585→                else
+   586→                        self:SetHoldType( self.HoldType )
+   587→        
+   588→                        -- If we are in Safe Mode (and not sprinting), ensure we are flagged as NOT running.
+   589→                        -- This allows the procedural lowering to take effect.
+   590→                        if isSafeMode then
+   591→                                self:SetUHBool("Running", false) 
+   592→                        else
+   593→                                self:SetUHBool("Running", false)
+   594→                        end
+   595→                end
+   596→        end
+   597→end
+   598→
+   599→function SWEP:GetViewModelPosition(pos, ang)
+   600→    local ft = FrameTime()
+   601→
+   602→    -- Pass through BaseClass logic (Sway, Inspect, etc.)
+   603→    if BaseClass and BaseClass.GetViewModelPosition then
+   604→        pos, ang = BaseClass.GetViewModelPosition(self, pos, ang)
+   605→    end
+   606→
+   607→    -- ==========================================
+   608→    -- HYBRID LOWERING LOGIC (Safe Mode)
+   609→    -- ==========================================
+   610→    
+   611→    -- We only use procedural LoweredPos/Ang if we are in SAFE MODE
+   612→    -- AND we are NOT Sprinting.
+   613→    local target = 0
+   614→    if self:GetNWInt("FireMode") == 0 and not self:GetUHBool("Running") then
+   615→        target = 1
+   616→    end
+   617→
+   618→    self._uhLower = Lerp(ft * 8, self._uhLower or 0, target)
+   619→
+   620→    -- Apply Safe Mode Lowering (Procedural)
+   621→    if self._uhLower > 0.001 then
+   622→        local lp = self.LoweredPos or vector_origin
+   623→        local la = self.LoweredAng or angle_zero
+   624→
+   625→        local ap, ay, ar = 0, 0, 0
+   626→        if isangle(la) then
+   627→            ap, ay, ar = la.p, la.y, la.r
+   628→        elseif isvector(la) then
+   629→            ap, ay, ar = la.x, la.y, la.z
+   630→        end
+   631→
+   632→        ang:RotateAroundAxis(ang:Right(),   ap * self._uhLower)
+   633→        ang:RotateAroundAxis(ang:Up(),      ay * self._uhLower)
+   634→        ang:RotateAroundAxis(ang:Forward(), ar * self._uhLower)
+   635→
+   636→        pos = pos
+   637→            + ang:Right()   * lp.x * self._uhLower
+   638→            + ang:Forward() * lp.y * self._uhLower
+   639→            + ang:Up()      * lp.z * self._uhLower
+   640→    end
+   641→
+   642→    -- ==========================================
+   643→    -- ALTERNATIVE POS/ANG LOGIC (Ultra Guns Style)
+   644→    -- ==========================================
+   645→    
+   646→    -- Determine if we should show the offset
+   647→    -- We hide it if: Sprinting, Zooming, or in Safe Mode
+   648→    local targetAlt = 1
+   649→    if self:GetUHBool("Running") or self:GetUHBool("Zooming") or self:GetNWInt("FireMode") == 0 then
+   650→        targetAlt = 0
+   651→    end
+   652→
+   653→    -- Smoothly interpolate the factor
+   654→    self._altFactor = Lerp(ft * 10, self._altFactor or 0, targetAlt)
+   655→
+   656→    -- Apply the offset if it exists
+   657→    if (self.AlternativePos or self.AlternativeAng) and self._altFactor > 0.01 then
+   658→        local ap = self.AlternativePos or vector_origin
+   659→        local aa = self.AlternativeAng or angle_zero
+   660→
+   661→        -- Apply Position Offset
+   662→        pos = pos
+   663→            + ang:Right()   * ap.x * self._altFactor
+   664→            + ang:Forward() * ap.y * self._altFactor
+   665→            + ang:Up()      * ap.z * self._altFactor
+   666→
+   667→        -- Apply Angle Offset
+   668→        local ap_p, ap_y, ap_r = 0, 0, 0
+   669→        if isangle(aa) then
+   670→            ap_p, ap_y, ap_r = aa.p, aa.y, aa.r
+   671→        elseif isvector(aa) then
+   672→            ap_p, ap_y, ap_r = aa.x, aa.y, aa.z
+   673→        end
+   674→
+   675→        ang:RotateAroundAxis(ang:Right(),   ap_p * self._altFactor)
+   676→        ang:RotateAroundAxis(ang:Up(),      ap_y * self._altFactor)
+   677→        ang:RotateAroundAxis(ang:Forward(), ap_r * self._altFactor)
+   678→    end
+   679→
+   680→    -- ==========================================
+   681→    -- SPRINT Z-AXIS OFFSET (Smoothed)
+   682→    -- ==========================================
+   683→    local targetZ = self:GetUHBool("Running") and 0 or 0
+   684→    self._sprintZOffset = Lerp(ft * 10, self._sprintZOffset or 0, targetZ)
+   685→    pos = pos + ang:Up() * self._sprintZOffset
+   686→
+   687→    return pos, ang
+   688→end
+   689→
+   690→function SWEP:HandleSprintingAnimations()
+   691→    local ply = self:GetOwner()
+   692→    
+   693→    if not IsValid(ply) or not ply:IsPlayer() then return end
+   694→
+   695→    -- Use UH variable for running state
+   696→    local isRunning = self:GetUHBool("Running")
+   697→    local isReloading = self:GetUHBool("Reloading")
+   698→
+   699→    -- Initialize tracking variable
+   700→    if self.wasRunning == nil then self.wasRunning = false end
+   701→
+   702→    local vm = ply:GetViewModel()
+   703→    if not IsValid(vm) then return end
+   704→
+   705→    -- TRANSITION: Enter Sprint
+   706→    if isRunning and not self.wasRunning then
+   707→        if not isReloading then
+   708→            self:EasySendWeaponAnim("sprint_in", ACT_VM_SPRINT_ENTER)
+   709→        end
+   710→    
+   711→    -- TRANSITION: Exit Sprint
+   712→    elseif not isRunning and self.wasRunning then
+   713→        if not isReloading then
+   714→            self:EasySendWeaponAnim("sprint_out", ACT_VM_SPRINT_LEAVE)
+   715→        end
+   716→    
+   717→    -- LOOPING: While Sprinting (and not reloading)
+   718→    elseif isRunning and not isReloading then
+   719→        -- If the current sprint animation finished (cycle >= 1), restart it
+   720→        if vm:GetCycle() >= 1 then
+   721→            self:EasySendWeaponAnim("sprint_idle", ACT_VM_SPRINT_IDLE)
+   722→        end
+   723→    end
+   724→
+   725→    self.wasRunning = isRunning
+   726→end
+   727→
+   728→if CLIENT then
+   729→        local WorldModel = ClientsideModel(SWEP.WorldModel)
+   730→        WorldModel:SetSkin(1)
+   731→        WorldModel:SetNoDraw(true)
+   732→
+   733→        function SWEP:DrawWorldModel()
+   734→                local _Owner = self:GetOwner()
+   735→                if IsValid(_Owner) then
+   736→                        local offsetVec = Vector(0, -2, -1)
+   737→                        local offsetAng = Angle(180, 90, 0)
+   738→                        local boneid = _Owner:LookupBone("ValveBiped.Bip01_R_Hand")
+   739→                        if not boneid then return end
+   740→                        local matrix = _Owner:GetBoneMatrix(boneid)
+   741→                        if not matrix then return end
+   742→                        local newPos, newAng = LocalToWorld(offsetVec, offsetAng, matrix:GetTranslation(), matrix:GetAngles())
+   743→                        WorldModel:SetPos(newPos)
+   744→                        WorldModel:SetAngles(newAng)
+   745→                        WorldModel:SetupBones()
+   746→                else
+   747→                        WorldModel:SetPos(self:GetPos())
+   748→                        WorldModel:SetAngles(self:GetAngles())
+   749→                end
+   750→                WorldModel:DrawModel()
+   751→        end
+   752→end
