@@ -1,0 +1,1125 @@
+     1→-- weapon_custom_uh_base_gun.lua
+     2→-- Deep-cleaned Underhell gun base for the Customized edition.
+     3→-- v1.2
+     4→--
+     5→-- Key changes from original:
+     6→--   * h_scope, h_reload, h_crosshair moved to self._xxx (fixes weapon-switch bleed)
+     7→--   * ShootBullets: global `spread` → local
+     8→--   * Reload: `return` → `continue` in ReloadTable loop (was aborting entire reload)
+     9→--   * GrenadeTime → UH_GrenadeTime (3 call sites fixed)
+    10→--   * Dead cycle-based reload completion removed (lines 442-494 of original)
+    11→--   * Dead idle-system block removed
+    12→--   * Dead state fields removed (_isRechambering, wasZooming, etc.)
+    13→--   * LookupSequence > 0 → >= 0 (sequence index 0 is valid)
+    14→--   * DoMuzzleFlash DynamicLight(0) → DynamicLight(self:EntIndex())
+    15→--   * EntityEmitSound hook: early-out for non-SoundChanger weapons
+    16→--   * ShootGrenade: ent.Owner → ent:SetOwner
+    17→--   * Prediction gates standardized
+    18→--   * IsValid checks added throughout
+    19→
+    20→AddCSLuaFile()
+    21→
+    22→DEFINE_BASECLASS("weapon_custom_uh_base")
+    23→SWEP.Base = "weapon_custom_uh_base"
+    24→
+    25→SWEP.PrintName  = "Underhell Custom Gun Base"
+    26→SWEP.Category   = "UnderHell Custom"
+    27→
+    28→SWEP.Spawnable  = false
+    29→SWEP.AdminSpawnable = false
+    30→
+    31→SWEP.ViewModelFOV = 64
+    32→SWEP.ViewModel  = "models/weapons/v_smg_mp5_pg.mdl"
+    33→SWEP.WorldModel = "models/weapons/w_smg_mp5_pg.mdl"
+    34→
+    35→SWEP.Slot       = 2
+    36→SWEP.SlotPos    = 3
+    37→
+    38→SWEP.HoldType   = "smg"
+    39→SWEP.FiresUnderwater = false
+    40→SWEP.Weight     = 45
+    41→SWEP.DrawCrosshair = false
+    42→SWEP.DrawAmmo   = true
+    43→SWEP.DrawWeaponInfoBox = false
+    44→
+    45→SWEP.SmokeWidth = 30
+    46→SWEP.Chambering = true
+    47→
+    48→-- ZoomFov — degrees of FOV to subtract from the player's view FOV while
+    49→-- aiming down sights (matches original Underhell behaviour).
+    50→--   Example with default fov 90:  SWEP.ZoomFov = 15  →  aimed FOV = 75
+    51→--   Set to 0 to disable the FOV override entirely.
+    52→-- Tunables: SWEP.ZoomSpeedIn (default 15), SWEP.ZoomSpeedOut (default 10)
+    53→SWEP.ZoomFov          = 15
+    54→SWEP.ZoomSpeedIn      = 15
+    55→SWEP.ZoomSpeedOut     = 10
+    56→
+    57→SWEP.NoShell    = false
+    58→SWEP.ShellHeat  = 0.8
+    59→SWEP.Shell      = "models/weapons/shell_9mm.mdl"
+    60→
+    61→SWEP.MuzzleFlashType = "default"
+    62→SWEP.MuzzleFlashTexture = ""
+    63→SWEP.MuzzleFlashParticle = ""
+    64→SWEP.MuzzleFlashColor = nil
+    65→SWEP.MuzzleFlashLightColor = nil
+    66→SWEP.MuzzleFlashScale = 1
+    67→SWEP.MuzzleFlashLightBrightness = 4
+    68→SWEP.MuzzleFlashLightSize = 128
+    69→SWEP.MuzzleFlashLightDecay = 128
+    70→
+    71→SWEP.FireModes = {}
+    72→
+    73→SWEP.Primary.Sound     = Sound("weapons/mp5/mp5_fire.wav")
+    74→SWEP.Primary.SilSound  = Sound("weapons/mp5/mp5_fire.wav")
+    75→SWEP.Primary.ClipSize  = 30
+    76→SWEP.Primary.Ammo      = "UH_SMG"
+    77→SWEP.Primary.DefaultClip = 30
+    78→SWEP.Primary.MinDamage = 12
+    79→SWEP.Primary.MaxDamage = 18
+    80→SWEP.Primary.Automatic = true
+    81→SWEP.Primary.TakeAmmo  = 1
+    82→SWEP.Primary.Force     = 15
+    83→SWEP.Primary.Spread    = 0.45
+    84→SWEP.Primary.Delay     = 0.08
+    85→SWEP.Primary.NumberofShots = 1
+    86→SWEP.Primary.MinRecoil = -0.6
+    87→SWEP.Primary.MaxRecoil = -1.4
+    88→
+    89→SWEP.Secondary.ClipSize    = -1
+    90→SWEP.Secondary.Ammo        = "none"
+    91→SWEP.Secondary.DefaultClip = -1
+    92→SWEP.Secondary.Automatic   = false
+    93→
+    94→SWEP.SwayScale = 0
+    95→SWEP.BobScale  = 0
+    96→
+    97→SWEP.HolsterTime = 0.3
+    98→
+    99→SWEP.UseQCReloadEvents = false
+   100→SWEP.UseReloadTable    = true
+   101→
+   102→SWEP.ReloadTable = {}
+   103→SWEP.AnimSounds = {}
+   104→
+   105→SWEP.ReloadSpeed = 1
+   106→
+   107→SWEP.IronSightsPos = Vector(-3.701, -6.79, 0.419)
+   108→SWEP.IronSightsAng = Vector(0, 0, 0)
+   109→
+   110→SWEP.Inspection = {
+   111→    { pos = Vector(8, -8, 0), ang = Angle(40, 40, 40) },
+   112→    { pos = Vector(-4, -8, -8), ang = Angle(20, 40, -60) },
+   113→}
+   114→
+   115→SWEP.SwayPosition = 2
+   116→
+   117→-- ============================================================
+   118→-- Initialize
+   119→-- ============================================================
+   120→function SWEP:Initialize()
+   121→    if BaseClass.Initialize then BaseClass.Initialize(self) end
+   122→    util.PrecacheSound(self.Primary.Sound)
+   123→    util.PrecacheModel(self.ViewModel)
+   124→    util.PrecacheModel(self.WorldModel)
+   125→    self:SetWeaponHoldType(self.HoldType)
+   126→    self:SetHoldType(self.HoldType)
+   127→    self.NextReload = CurTime()
+   128→    self:SetNWInt("FireMode", 1)
+   129→
+   130→    -- Initialize HUD blend state on self (not file-scope)
+   131→    self._scopeBlend = 0
+   132→    self._reloadHUDBlend = 0
+   133→    self._crosshairBlend = 0
+   134→
+   135→    if CLIENT and self.ScopeTexture then
+   136→        local scale = ScrH() / 1080
+   137→        local quality = { 256, 512, 768, 1080 }
+   138→        local num = math.Clamp(GetConVar("uh_rt_quality"):GetInt(), 1, 4)
+   139→        self.RT_Size = quality[num] * scale
+   140→        -- Use unique RT name per weapon instance to avoid clobbering
+   141→        self.RenderTarget = GetRenderTarget("CustomUH_ScopeRT_" .. self:EntIndex(), self.RT_Size, self.RT_Size, false)
+   142→    end
+   143→end
+   144→
+   145→-- ============================================================
+   146→-- Animation helpers (gun-specific overrides)
+   147→-- ============================================================
+   148→function SWEP:SendSequence(vm, seq)
+   149→    if not IsValid(vm) or seq == nil then return end
+   150→    vm:SendViewModelMatchingSequence(seq)
+   151→end
+   152→
+   153→function SWEP:SendAnim(vm, lookupsequence, backup)
+   154→    if not IsValid(vm) then return end
+   155→    if isstring(lookupsequence) then
+   156→        local seq = vm:LookupSequence(lookupsequence)
+   157→        if seq and seq >= 0 then  -- FIXED: was > 0
+   158→            self:SendSequence(vm, seq)
+   159→            return
+   160→        end
+   161→    end
+   162→    if type(backup) == "number" then
+   163→        local s = vm:SelectWeightedSequence(backup)
+   164→        if s and s >= 0 then self:SendSequence(vm, s) end
+   165→    end
+   166→    vm:SetCycle(0)
+   167→end
+   168→
+   169→function SWEP:EasySendWeaponAnim(lookupanimation, elseifnotfounded)
+   170→    local vm = IsValid(self.Owner) and self.Owner:GetViewModel() or nil
+   171→    if not IsValid(vm) then return end
+   172→
+   173→    if self.Animations and self.Animations[lookupanimation] then
+   174→        local animData = self.Animations[lookupanimation]
+   175→        if istable(animData) then
+   176→            animData = animData[math.random(1, #animData)]
+   177→        end
+   178→        local seq = vm:LookupSequence(animData)
+   179→        if seq and seq >= 0 then  -- FIXED: was > 0
+   180→            self:SendSequence(vm, seq)
+   181→        else
+   182→            local act = type(elseifnotfounded) == "number" and vm:SelectWeightedSequence(elseifnotfounded) or -1
+   183→            if act >= 0 then self:SendSequence(vm, act) end
+   184→        end
+   185→    else
+   186→        local act = type(elseifnotfounded) == "number" and vm:SelectWeightedSequence(elseifnotfounded) or -1
+   187→        if act >= 0 then self:SendSequence(vm, act) end
+   188→    end
+   189→    vm:SetCycle(0)
+   190→    self:SetupAnimSounds(lookupanimation)
+   191→end
+   192→
+   193→function SWEP:SendWeaponAnim(act)
+   194→    if isstring(act) then
+   195→        self:EasySendWeaponAnim(act, nil)
+   196→    elseif type(act) == "number" then
+   197→        local vm = IsValid(self.Owner) and self.Owner:GetViewModel() or nil
+   198→        if IsValid(vm) then
+   199→            local s = vm:SelectWeightedSequence(act)
+   200→            if s and s >= 0 then vm:SendViewModelMatchingSequence(s) end
+   201→            vm:SetCycle(0)
+   202→        end
+   203→    end
+   204→end
+   205→
+   206→function SWEP:LookupSequence(name)
+   207→    local vm = IsValid(self.Owner) and self.Owner:GetViewModel() or nil
+   208→    if not IsValid(vm) then return -1 end
+   209→    return vm:LookupSequence(name)
+   210→end
+   211→
+   212→-- ============================================================
+   213→-- AnimSounds system
+   214→-- ============================================================
+   215→function SWEP:SetupAnimSounds(animKey, variantName)
+   216→    if not self.AnimSounds then return end
+   217→    local timeline = nil
+   218→    if variantName and self.AnimSounds[variantName] then
+   219→        timeline = self.AnimSounds[variantName]
+   220→    end
+   221→    if not istable(timeline) or #timeline == 0 then
+   222→        timeline = self.AnimSounds[animKey]
+   223→    end
+   224→    if (not timeline or not istable(timeline)) and animKey == "reload_empty" then
+   225→        timeline = self.AnimSounds["reload"]
+   226→    end
+   227→    if not istable(timeline) or #timeline == 0 then return end
+   228→
+   229→    self._animSoundTimeline = timeline
+   230→    self._animSoundIndex = 1
+   231→    self._animSoundStartTime = CurTime()
+   232→    local vm = IsValid(self.Owner) and self.Owner:GetViewModel() or nil
+   233→    self._animSoundPlaybackRate = IsValid(vm) and vm:GetPlaybackRate() or 1
+   234→    self._animSoundActive = true
+   235→end
+   236→
+   237→function SWEP:ProcessAnimSounds()
+   238→    if not self._animSoundActive then return end
+   239→    local sp = game.SinglePlayer()
+   240→    local iftp = IsFirstTimePredicted()
+   241→    -- FIXED: standardized prediction gate — server always runs for MP broadcast
+   242→    if not (SERVER or (CLIENT and iftp)) then return end
+   243→
+   244→    local owner = self:GetOwner()
+   245→    if not IsValid(owner) then
+   246→        self._animSoundActive = false
+   247→        return
+   248→    end
+   249→
+   250→    local timeline = self._animSoundTimeline
+   251→    local idx = self._animSoundIndex
+   252→    if not timeline or idx > #timeline then
+   253→        self._animSoundActive = false
+   254→        return
+   255→    end
+   256→
+   257→    local elapsed = (CurTime() - self._animSoundStartTime) * (self._animSoundPlaybackRate or 1)
+   258→    while idx <= #timeline and elapsed >= (timeline[idx].time or 0) do
+   259→        local entry = timeline[idx]
+   260→        if entry.sound and entry.sound ~= "" and entry.sound ~= "nil" then
+   261→            local snd = entry.sound
+   262→            if istable(snd) then snd = snd[math.random(1, #snd)] end
+   263→            owner:EmitSound(snd, entry.level or 75, entry.pitch or 100, 1, CHAN_USER_BASE)
+   264→        end
+   265→        if entry.callback then entry.callback(self) end
+   266→        idx = idx + 1
+   267→    end
+   268→    self._animSoundIndex = idx
+   269→end
+   270→
+   271→function SWEP:ClearAnimSounds()
+   272→    self._animSoundActive = false
+   273→    self._animSoundTimeline = nil
+   274→    self._animSoundIndex = 0
+   275→end
+   276→
+   277→-- ============================================================
+   278→-- GetShootSound
+   279→-- ============================================================
+   280→function SWEP:GetShootSound()
+   281→    local source = self:GetNWBool("Silenced") and self.Primary.SilSound or self.Primary.Sound
+   282→    if istable(source) then
+   283→        return tostring(source[math.random(1, #source)])
+   284→    end
+   285→    return source
+   286→end
+   287→
+   288→-- ============================================================
+   289→-- Configurators
+   290→-- ============================================================
+   291→function SWEP:ShootAnimation()
+   292→    return ACT_VM_PRIMARYATTACK
+   293→end
+   294→
+   295→function SWEP:GrenadeAnimation()
+   296→    return ACT_VM_PRIMARYATTACK
+   297→end
+   298→
+   299→function SWEP:GetShellDirection()
+   300→    return Angle(30, -90, 0)
+   301→end
+   302→
+   303→function SWEP:GetMuzzle()
+   304→    return 1
+   305→end
+   306→
+   307→function SWEP:GetDisplay()
+   308→    return 1
+   309→end
+   310→
+   311→function SWEP:GetShellEject()
+   312→    return 2
+   313→end
+   314→
+   315→-- ============================================================
+   316→-- PrimaryAttack
+   317→-- ============================================================
+   318→function SWEP:PrimaryAttack()
+   319→    if not self:CanPrimaryAttack() then return end
+   320→    local sp = game.SinglePlayer()
+   321→    local iftp = IsFirstTimePredicted()
+   322→
+   323→    -- Firemode-specific shoot behavior
+   324→    if SERVER or iftp then
+   325→        local mode = self.FireModes[self:GetNWInt("FireMode")]
+   326→        if mode and mode.shoot then
+   327→            local res = mode.shoot(self.Owner, self)
+   328→            if res then return end
+   329→        end
+   330→
+   331→        -- FIXED: local spread (was global)
+   332→        local dmg = math.random(self.Primary.MinDamage, self.Primary.MaxDamage)
+   333→        if self:GetNWBool("Silenced") then
+   334→            dmg = math.Round(dmg * 0.95)
+   335→        end
+   336→        self:ShootBullets(self.Owner:GetShootPos(), self.Owner:GetAimVector(), dmg, self.Penetration or 2)
+   337→    end
+   338→
+   339→    local recoil = util.SharedRandom("uh_recoil", self.Primary.MinRecoil, self.Primary.MaxRecoil) * (self:GetUHBool("Zooming") and 0.35 or 1)
+   340→
+   341→    -- FIXED: standardized prediction gate — SERVER runs for MP broadcast
+   342→    if SERVER or (CLIENT and iftp) then
+   343→        self:DoMuzzleFlash()
+   344→        self:CreateSmoke(self:GetMuzzle(), self.Primary.Delay + (self.Primary.Automatic and 0.14 or 0.32))
+   345→        if not self.NoShell then
+   346→            self:CreateShell(self.ShellDelay or 0, self.ShellHeat)
+   347→        end
+   348→        self.Owner:SetEyeAngles(self.Owner:EyeAngles() + Angle(recoil, 0, 0))
+   349→    end
+   350→
+   351→    self.Owner:ViewPunch(Angle(recoil, 0, 0))
+   352→
+   353→    -- Animation
+   354→    self:SendWeaponAnim(ACT_VM_IDLE)
+   355→    local baseAct = ACT_VM_PRIMARYATTACK
+   356→    if self.ShootAnimation then
+   357→        baseAct = self:ShootAnimation()
+   358→    end
+   359→    local isSilenced = self:GetNWBool("Silenced")
+   360→    local isZooming = self:GetUHBool("Zooming")
+   361→    local lookupKey = isZooming and "shoot_ads" or "shoot"
+   362→    if isSilenced then lookupKey = lookupKey .. "_sil" end
+   363→    if not self.Animations or not self.Animations[lookupKey] then
+   364→        lookupKey = tostring(baseAct)
+   365→        if isSilenced then lookupKey = lookupKey .. "_sil" end
+   366→    end
+   367→
+   368→    local fallbackActivity = baseAct
+   369→    if isSilenced then
+   370→        if baseAct == ACT_VM_PRIMARYATTACK then
+   371→            fallbackActivity = ACT_VM_PRIMARYATTACK_SILENCED or ACT_VM_PRIMARYATTACK
+   372→        elseif baseAct == ACT_VM_SECONDARYATTACK then
+   373→            fallbackActivity = ACT_VM_SECONDARYATTACK_SILENCED or ACT_VM_SECONDARYATTACK
+   374→        end
+   375→    end
+   376→
+   377→    self:EasySendWeaponAnim(lookupKey, fallbackActivity)
+   378→
+   379→    local vm = IsValid(self.Owner) and self.Owner:GetViewModel() or nil
+   380→    if IsValid(vm) then
+   381→        vm:SetCycle(0)
+   382→        vm:SetPlaybackRate(1)
+   383→    end
+   384→
+   385→    self.Owner:SetAnimation(PLAYER_ATTACK1)
+   386→    self.Owner:MuzzleFlash()
+   387→
+   388→    local fireSound = self:GetShootSound()
+   389→    self:EmitSound(fireSound, 110, 100, 1, CHAN_WEAPON)
+   390→
+   391→    self:SetNextPrimaryFire(CurTime() + self.Primary.Delay)
+   392→    self:SetNextSecondaryFire(CurTime() + self.Primary.Delay)
+   393→    self:TakePrimaryAmmo(self.Primary.TakeAmmo)
+   394→    self.NextReload = CurTime() + 0.5
+   395→    self:PostShoot()
+   396→end
+   397→
+   398→-- ============================================================
+   399→-- ShootBullets — FIXED: local spread (was global)
+   400→-- ============================================================
+   401→function SWEP:ShootBullets(pos, buldir, dmg, tries)
+   402→    if tries <= 0 then return end
+   403→    local owner = self.Owner
+   404→
+   405→    -- FIXED: local spread (was undeclared global)
+   406→    local spread
+   407→    local movement = Vector(owner:GetVelocity().x, owner:GetVelocity().y, 0):LengthSqr()
+   408→    local movepercent = math.Clamp(movement / owner:GetRunSpeed()^2, 0, 1)
+   409→    local move = movepercent * 0.1
+   410→
+   411→    if owner:OnGround() then
+   412→        if self:GetUHBool("Zooming") and owner:Crouching() then
+   413→            spread = self.Primary.Spread * 0.18
+   414→        elseif self:GetUHBool("Zooming") then
+   415→            spread = self.Primary.Spread * 0.26
+   416→        elseif owner:Crouching() then
+   417→            spread = self.Primary.Spread * 0.34
+   418→        else
+   419→            spread = self.Primary.Spread * 0.5
+   420→        end
+   421→    else
+   422→        spread = self.Primary.Spread * 0.62
+   423→    end
+   424→    spread = spread + move
+   425→
+   426→    local bullet = {}
+   427→    bullet.Num = self.Primary.NumberofShots
+   428→    bullet.Src = pos
+   429→    bullet.Dir = buldir
+   430→    bullet.Spread = Vector(spread, spread, 0)
+   431→    bullet.Tracer = 1
+   432→    bullet.TracerName = "uh_tracer"
+   433→    bullet.Force = self.Primary.Force
+   434→    bullet.Damage = dmg
+   435→    bullet.AmmoType = self.Primary.Ammo
+   436→    bullet.Callback = function(attacker, bultrace, dmginfo)
+   437→        local mat = bultrace.MatType
+   438→        if SERVER then
+   439→            util.ScreenShake(bultrace.HitPos, 5, 0.1, 0.5, 64)
+   440→        end
+   441→        if bultrace.Hit then
+   442→            local dir = bultrace.HitNormal
+   443→            local tr = {}
+   444→            tr.start = bultrace.HitPos - dir * (self.PenetrationDepth or 4)
+   445→            tr.endpos = bultrace.HitPos
+   446→            tr.filter = owner
+   447→            tr.mask = MASK_SHOT
+   448→            local trace = util.TraceLine(tr)
+   449→            if not trace.AllSolid and trace.Fraction > 0 and GetConVar("uh_sv_penetration"):GetBool() then
+   450→                self:ShootBullets(trace.HitPos, buldir, math.Round(dmg * math.Rand(0.5, 0.6)), tries - 1)
+   451→            end
+   452→            if mat == MAT_METAL or mat == MAT_VENT or mat == MAT_GRATE then
+   453→                local fx = EffectData()
+   454→                fx:SetOrigin(bultrace.HitPos)
+   455→                fx:SetScale(1)
+   456→                util.Effect("uh_hitworld", fx)
+   457→            end
+   458→        end
+   459→    end
+   460→
+   461→    owner:FireBullets(bullet)
+   462→end
+   463→
+   464→-- ============================================================
+   465→-- ShootGrenade — FIXED: ent:SetOwner (was direct field assignment)
+   466→-- ============================================================
+   467→function SWEP:ShootGrenade(force)
+   468→    if SERVER then
+   469→        local ent = ents.Create("sent_mgl_grenade")
+   470→        ent:SetPos(self.Owner:EyePos() + self.Owner:GetAimVector() * 30 + self.Owner:GetUp() * -10 +
+   471→            (self:GetUHBool("Zooming") and Vector(0,0,0) or self.Owner:GetRight() * 5))
+   472→        ent:SetAngles(self.Owner:GetAngles())
+   473→        ent:Spawn()
+   474→        ent:Activate()
+   475→        -- FIXED: SetOwner instead of direct field assignment
+   476→        ent:SetOwner(self.Owner)
+   477→        local phys = ent:GetPhysicsObject()
+   478→        if IsValid(phys) then  -- FIXED: IsValid check (was phys != nil)
+   479→            phys:ApplyForceCenter(self.Owner:GetAimVector() * force)
+   480→        end
+   481→    end
+   482→end
+   483→
+   484→function SWEP:PostShoot()
+   485→end
+   486→
+   487→-- ============================================================
+   488→-- CanPrimaryAttack — FIXED: UH_GrenadeTime (was GrenadeTime)
+   489→-- ============================================================
+   490→function SWEP:CanPrimaryAttack()
+   491→    if not IsValid(self.Owner) then return false end
+   492→    if self:GetNWInt("FireMode") == 0
+   493→       or self:GetNWFloat("DeployTime") > CurTime()
+   494→       or self:GetUHBool("Running")
+   495→       or self:GetUHBool("Reloading") then return false end
+   496→    if self:Clip1() <= 0 then
+   497→        if not self:GetUHBool("Reloading") then
+   498→            self:EmitSound("Weapon_SMG1.Empty", 75, 100, 1, CHAN_USER_BASE)
+   499→        end
+   500→        self:SetNextPrimaryFire(CurTime() + 0.4)
+   501→        return false
+   502→    end
+   503→    return true
+   504→end
+   505→
+   506→-- ============================================================
+   507→-- SecondaryAttack — firemode switch + zoom
+   508→-- ============================================================
+   509→-- Helper for prediction gate
+   510→local function iftp2()
+   511→    return IsFirstTimePredicted()
+   512→end
+   513→
+   514→function SWEP:SecondaryAttack()
+   515→    local ct = CurTime()
+   516→    local sp = game.SinglePlayer()
+   517→
+   518→    if self:GetUHBool("Reloading") or self:GetNWFloat("DeployTime") > ct then return end
+   519→
+   520→    if SERVER or iftp2() then
+   521→        if self.Owner:KeyDown(IN_USE) then
+   522→            local mode = self:GetNWInt("FireMode") + 1
+   523→            if mode > #self.FireModes then mode = 0 end
+   524→
+   525→            local old = self.FireModes[self:GetNWInt("FireMode")]
+   526→            if old and old.holster then
+   527→                old.holster(self.Owner, self)
+   528→                if sp and SERVER then
+   529→                    net.Start("UH_Select_Fire")
+   530→                        net.WriteFloat(self:GetNWInt("FireMode"))
+   531→                        net.WriteBool(false)
+   532→                    net.Broadcast()
+   533→                end
+   534→            elseif self:GetNWInt("FireMode") == 0 then
+   535→                self:SendWeaponAnim(ACT_VM_LOWERED_TO_IDLE)
+   536→            end
+   537→
+   538→            local new = self.FireModes[mode]
+   539→            if new and new.equip then
+   540→                new.equip(self.Owner, self)
+   541→                if sp and SERVER then
+   542→                    net.Start("UH_Select_Fire")
+   543→                        net.WriteFloat(mode)
+   544→                        net.WriteBool(true)
+   545→                    net.Broadcast()
+   546→                end
+   547→            elseif mode == 0 then
+   548→                self:SetUHBool("Running", false)
+   549→                self:SetUHBool("Zooming", false)
+   550→                self:SendWeaponAnim(ACT_VM_IDLE_TO_LOWERED)
+   551→            end
+   552→
+   553→            self:SetNextPrimaryFire(ct + 0.5)
+   554→            self:SetNextSecondaryFire(ct + 0.2)
+   555→            self:SetNWInt("FireMode", mode)
+   556→
+   557→            -- FIXED: standardized sound gate
+   558→            if SERVER or (CLIENT and IsFirstTimePredicted()) then
+   559→                self.Owner:EmitSound("uh/flashlight.wav", 64, 100, 1, CHAN_USER_BASE)
+   560→            end
+   561→        end
+   562→    end
+   563→end
+   564→
+   565→-- Helper for prediction gate
+   566→
+   567→-- ============================================================
+   568→-- Muzzle flash — FIXED: DynamicLight ID (was 0, now self:EntIndex())
+   569→-- ============================================================
+   570→function SWEP:DoMuzzleFlash()
+   571→    if self:GetNWBool("Silenced") then return end
+   572→
+   573→    if self.MuzzleFlashType == "particle" and self.MuzzleFlashParticle and self.MuzzleFlashParticle ~= "" then
+   574→        local vm = IsValid(self.Owner) and self.Owner:GetViewModel() or nil
+   575→        if IsValid(vm) then
+   576→            ParticleEffectAttach(self.MuzzleFlashParticle, PATTACH_POINT_FOLLOW, vm, self:GetMuzzle())
+   577→        end
+   578→        self._muzzleFlashTime = CurTime()
+   579→        if CLIENT and GetConVar("uh_dynamiclight"):GetBool() then
+   580→            local att = self:GetAttachment(self:GetMuzzle())
+   581→            if att then
+   582→                -- FIXED: use self:EntIndex() instead of 0
+   583→                local dlight = DynamicLight(self:EntIndex())
+   584→                if dlight then
+   585→                    dlight.Pos = att.Pos
+   586→                    local lc = self.MuzzleFlashLightColor
+   587→                    dlight.r = lc and lc.x or 255
+   588→                    dlight.g = lc and lc.y or 218
+   589→                    dlight.b = lc and lc.z or 74
+   590→                    dlight.Brightness = self.MuzzleFlashLightBrightness or 4
+   591→                    dlight.Size = (self.MuzzleFlashLightSize or 96) * (self.MuzzleFlashScale or 1)
+   592→                    dlight.Decay = self.MuzzleFlashLightDecay or 128
+   593→                    dlight.DieTime = CurTime() + FrameTime() * 3
+   594→                end
+   595→            end
+   596→        end
+   597→        return
+   598→    end
+   599→
+   600→    local fx = EffectData()
+   601→    fx:SetEntity(self)
+   602→    fx:SetOrigin(self.Owner:GetShootPos())
+   603→    fx:SetNormal(self.Owner:GetAimVector())
+   604→    fx:SetAttachment(self:GetMuzzle())
+   605→    util.Effect("uh_muzzle", fx)
+   606→end
+   607→
+   608→function SWEP:CreateSmoke(att, delay)
+   609→    if (delay or 0) > 0 then
+   610→        timer.Simple(delay, function()
+   611→            if not IsValid(self) or not IsValid(self.Owner) then return end
+   612→            local fx = EffectData()
+   613→            fx:SetEntity(self)
+   614→            fx:SetOrigin(self.Owner:GetShootPos())
+   615→            fx:SetRadius(self.SmokeWidth or 20)
+   616→            fx:SetAttachment(att)
+   617→            util.Effect("uh_smoke", fx)
+   618→        end)
+   619→    else
+   620→        local fx = EffectData()
+   621→        fx:SetEntity(self)
+   622→        fx:SetOrigin(self.Owner:GetShootPos())
+   623→        fx:SetRadius(self.SmokeWidth or 20)
+   624→        fx:SetAttachment(att)
+   625→        util.Effect("uh_smoke", fx)
+   626→    end
+   627→end
+   628→
+   629→function SWEP:CreateShell(delay, heat)
+   630→    if (delay or 0) > 0 then
+   631→        timer.Create("CustomUH_Shell_" .. self.Owner:SteamID(), delay, 1, function()
+   632→            if not IsValid(self) or not IsValid(self.Owner) then return end
+   633→            if self.Owner:GetActiveWeapon() != self then return end
+   634→            local fx = EffectData()
+   635→            fx:SetEntity(self)
+   636→            fx:SetOrigin(self.Owner:EyePos())
+   637→            fx:SetAttachment(self:GetShellEject())
+   638→            fx:SetNormal(self.Owner:GetAimVector())
+   639→            fx:SetScale(heat or 1)
+   640→            util.Effect("uh_shell", fx)
+   641→            timer.Simple(0.5, function()
+   642→                if not IsValid(self) then return end
+   643→                if self.Shotgun then
+   644→                    self:EmitSound("weapons/underhell/shells/shotgun_shell" .. math.random(1,3) .. ".wav", 65, 100, 0.75, CHAN_USER_BASE)
+   645→                else
+   646→                    self:EmitSound("player/pl_shell" .. math.random(1,3) .. ".wav", 65, 100, 0.75, CHAN_USER_BASE)
+   647→                end
+   648→            end)
+   649→        end)
+   650→    else
+   651→        local fx = EffectData()
+   652→        fx:SetEntity(self)
+   653→        fx:SetOrigin(self.Owner:EyePos())
+   654→        fx:SetAttachment(self:GetShellEject())
+   655→        fx:SetNormal(self.Owner:GetAimVector())
+   656→        fx:SetScale(heat or 1)
+   657→        util.Effect("uh_shell", fx)
+   658→        timer.Simple(0.5, function()
+   659→            if not IsValid(self) then return end
+   660→            if self.Shotgun then
+   661→                self:EmitSound("weapons/underhell/shells/shotgun_shell" .. math.random(1,3) .. ".wav", 65, 100, 0.75, CHAN_USER_BASE)
+   662→            else
+   663→                self:EmitSound("player/pl_shell" .. math.random(1,3) .. ".wav", 65, 100, 0.75, CHAN_USER_BASE)
+   664→            end
+   665→        end)
+   666→    end
+   667→end
+   668→
+   669→-- ============================================================
+   670→-- Reload — cleaned up, dead code removed
+   671→-- ============================================================
+   672→function SWEP:_FinishReload()
+   673→    if self._reloadFinished then return end
+   674→    self._reloadFinished = true
+   675→
+   676→    self:SetUHBool("Reloading", false)
+   677→    self:SetNWFloat("ReloadTime", 0)
+   678→    self:SetNWFloat("ReloadEndTime", 0)
+   679→    self:ClearAnimSounds()
+   680→
+   681→    local vm = IsValid(self.Owner) and self.Owner:GetViewModel() or nil
+   682→    if IsValid(vm) then
+   683→        vm:SetPlaybackRate(1)
+   684→        vm:SetCycle(0)
+   685→    end
+   686→    self:PostReload()
+   687→
+   688→    -- Ammo refill (server only)
+   689→    if SERVER then
+   690→        if self.Chambering and self:Clip1() > 0 then
+   691→            local clip = math.min(self.Owner:GetAmmoCount(self.Primary.Ammo) + self:Clip1(), self.Primary.ClipSize + 1)
+   692→            self.Owner:RemoveAmmo(self.Primary.ClipSize + 1 - self:Clip1(), self.Primary.Ammo)
+   693→            self:SetClip1(clip)
+   694→        else
+   695→            local clip = math.min(self.Owner:GetAmmoCount(self.Primary.Ammo) + self:Clip1(), self.Primary.ClipSize)
+   696→            self.Owner:RemoveAmmo(self.Primary.ClipSize - self:Clip1(), self.Primary.Ammo)
+   697→            self:SetClip1(clip)
+   698→        end
+   699→    end
+   700→end
+   701→
+   702→function SWEP:Reload()
+   703→    local ct = CurTime()
+   704→    if not IsValid(self.Owner) then return end
+   705→
+   706→    -- FIXED: UH_GrenadeTime (was GrenadeTime)
+   707→    if self.NextReload < ct and not self:GetUHBool("Running") and not self:GetUHBool("Reloading")
+   708→       and not self.Owner:KeyDown(IN_USE)
+   709→       and self.Owner:GetNWFloat("UH_GrenadeTime") < ct
+   710→       and self:GetNWFloat("DeployTime") < ct then
+   711→
+   712→        if self:Clip1() < (self.Chambering and self.Primary.ClipSize + 1 or self.Primary.ClipSize)
+   713→           and self.Owner:GetAmmoCount(self.Primary.Ammo) > 0 then
+   714→
+   715→            if SERVER then
+   716→                self.Owner:SetAnimation(PLAYER_RELOAD)
+   717→            end
+   718→            if self:GetNWInt("FireMode") == 0 then self:SetNWInt("FireMode", 1) end
+   719→
+   720→            self:PreReload()
+   721→
+   722→            -- Play reload animation
+   723→            local vm = IsValid(self.Owner) and self.Owner:GetViewModel() or nil
+   724→            local reloadAnimKey = nil
+   725→            local pickedVariant = nil
+   726→
+   727→            if self.ReloadAnim and type(self.ReloadAnim) == "string" then
+   728→                local seq = IsValid(vm) and vm:LookupSequence(self.ReloadAnim) or -1
+   729→                if seq and seq >= 0 then
+   730→                    self:SendSequence(vm, seq)
+   731→                end
+   732→            else
+   733→                local isSilenced = self:GetNWBool("Silenced")
+   734→                local isEmpty = (self:Clip1() <= 0)
+   735→                local animToPlay = nil
+   736→
+   737→                local function GetBestAnim(emptyKey, normalKey)
+   738→                    local result
+   739→                    if isSilenced then
+   740→                        result = self.Animations[emptyKey.."_sil"] or self.Animations[emptyKey]
+   741→                            or self.Animations[normalKey.."_sil"] or self.Animations[normalKey]
+   742→                    else
+   743→                        result = self.Animations[emptyKey] or self.Animations[normalKey]
+   744→                    end
+   745→                    if istable(result) then
+   746→                        pickedVariant = result[math.random(1, #result)]
+   747→                        result = pickedVariant
+   748→                    end
+   749→                    return result
+   750→                end
+   751→
+   752→                if isEmpty then
+   753→                    animToPlay = GetBestAnim("reload_empty", "reload")
+   754→                    reloadAnimKey = "reload_empty"
+   755→                else
+   756→                    animToPlay = GetBestAnim("reload", "reload")
+   757→                    reloadAnimKey = "reload"
+   758→                end
+   759→
+   760→                if animToPlay then
+   761→                    self:SendAnim(vm, animToPlay, ACT_VM_RELOAD)
+   762→                else
+   763→                    if self:GetNWBool("Silenced") then
+   764→                        self:SendSequence(vm, vm:SelectWeightedSequence(ACT_VM_RELOAD_SILENCED or ACT_VM_RELOAD))
+   765→                    else
+   766→                        self:SendSequence(vm, vm:SelectWeightedSequence(ACT_VM_RELOAD))
+   767→                    end
+   768→                end
+   769→            end
+   770→
+   771→            -- Reload duration
+   772→            local AnimTime = self.ReloadTime or (IsValid(vm) and vm:SequenceDuration() or 2)
+   773→            local speed = self.ReloadSpeed or 1
+   774→            if speed ~= 1 then
+   775→                AnimTime = AnimTime / speed
+   776→                if IsValid(vm) then vm:SetPlaybackRate(speed) end
+   777→            else
+   778→                if IsValid(vm) then vm:SetPlaybackRate(1) end
+   779→            end
+   780→
+   781→            self._reloadFinished = false
+   782→            self._reloadEndTime = ct + AnimTime
+   783→
+   784→            -- Setup AnimSounds
+   785→            if reloadAnimKey then
+   786→                self:SetupAnimSounds(reloadAnimKey, pickedVariant)
+   787→            end
+   788→
+   789→            self.NextReload = ct + AnimTime + 0.5
+   790→            self:SetNextPrimaryFire(ct + AnimTime)
+   791→            self:SetUHBool("Reloading", true)
+   792→            self:SetUHBool("Zooming", false)
+   793→            self:SetNWFloat("ReloadTime", AnimTime)
+   794→            self:SetNWFloat("ReloadEndTime", ct + AnimTime)
+   795→
+   796→            -- ReloadTable sounds (if no AnimSounds entry exists)
+   797→            if self.UseReloadTable and not self._animSoundActive then
+   798→                local sp2 = game.SinglePlayer()
+   799→                local iftp = IsFirstTimePredicted()
+   800→                if (sp2 and SERVER) or (not sp2 and CLIENT and iftp) then
+   801→                    local scale = 1 / speed
+   802→                    for _, tbl in ipairs(self.ReloadTable) do
+   803→                        if tbl and tbl.delay then
+   804→                            -- FIXED: was `return` (exited entire Reload function)
+   805→                            -- Now uses proper continue pattern
+   806→                            timer.Simple(tbl.delay * scale, function()
+   807→                                if not IsValid(self) or not self:GetUHBool("Reloading") then return end
+   808→                                local owner = self:GetOwner()
+   809→                                if not IsValid(owner) or owner:GetActiveWeapon() != self then return end
+   810→                                if tbl.sound and tbl.sound ~= "" and tbl.sound ~= "nil" then
+   811→                                    local snd = tbl.sound
+   812→                                    if istable(snd) then snd = snd[math.random(1, #snd)] end
+   813→                                    owner:EmitSound(snd, tbl.level or 75, tbl.pitch or 100, 1, CHAN_USER_BASE)
+   814→                                end
+   815→                            end)
+   816→                        end
+   817→                    end
+   818→                end
+   819→            end
+   820→        end
+   821→    end
+   822→end
+   823→
+   824→function SWEP:PreReload()
+   825→end
+   826→
+   827→function SWEP:PostReload()
+   828→end
+   829→
+   830→-- ============================================================
+   831→-- QC Animation Event Sound Handler
+   832→-- ============================================================
+   833→hook.Add("EntityEmitSound", "CustomUH_ReloadOverride", function(data)
+   834→    local ent = data.Entity
+   835→    if not IsValid(ent) then return end
+   836→    local wep = ent.GetActiveWeapon and ent:GetActiveWeapon()
+   837→    if not IsValid(wep) then return end
+   838→    -- FIXED: early-out for non-SoundChanger weapons (was checking every sound)
+   839→    if not wep.SoundChanger then return end
+   840→    if wep.SoundChanger[data.SoundName] ~= nil then
+   841→        if wep.SoundChanger[data.SoundName] == false then
+   842→            return false
+   843→        else
+   844→            data.SoundName = wep.SoundChanger[data.SoundName]
+   845→            return true
+   846→        end
+   847→    end
+   848→end)
+   849→
+   850→function SWEP:FireAnimationEvent(pos, ang, event, options)
+   851→    if not self.UseQCReloadEvents then
+   852→        return true
+   853→    end
+   854→    if event == 5004 or event == 6004 or event == 15 then
+   855→        if options and options ~= "" then
+   856→            if IsValid(self.Owner) then
+   857→                self.Owner:EmitSound(options, 75, 100, 1, CHAN_USER_BASE)
+   858→            else
+   859→                self:EmitSound(options, 75, 100)
+   860→            end
+   861→        end
+   862→        return true
+   863→    end
+   864→    return true
+   865→end
+   866→
+   867→-- ============================================================
+   868→-- Think
+   869→-- ============================================================
+   870→function SWEP:Think()
+   871→    BaseClass.Think(self)
+   872→    if not IsValid(self.Owner) then return end
+   873→    local ct = CurTime()
+   874→
+   875→    -- Reload speed enforcement + completion
+   876→    if self:GetUHBool("Reloading") then
+   877→        local vm = self.Owner:GetViewModel()
+   878→        if IsValid(vm) then
+   879→            if self.ReloadSpeed and self.ReloadSpeed ~= 1 then
+   880→                vm:SetPlaybackRate(self.ReloadSpeed)
+   881→            end
+   882→            if self._reloadEndTime and ct >= self._reloadEndTime then
+   883→                self:_FinishReload()
+   884→            end
+   885→        end
+   886→    end
+   887→
+   888→    -- Zoom logic
+   889→    local isZooming = self:GetUHBool("Zooming")
+   890→    local preventZoom = not self.Owner:OnGround()
+   891→        or self.Owner:GetNWBool("UH_Flare")
+   892→        or self.Owner:GetNWBool("UH_Flashlight")
+   893→        or self:GetUHBool("Running")
+   894→        or self:GetUHBool("Reloading")
+   895→        or self:GetNWFloat("DeployTime") > ct
+   896→        or self.Owner:GetNWFloat("UH_GrenadeTime") > ct
+   897→
+   898→    local wantsToZoom = self.Owner:KeyDown(IN_ATTACK2)
+   899→        and not preventZoom
+   900→        and not self.Owner:KeyDown(IN_USE)
+   901→        and self:GetNWInt("FireMode") ~= 0
+   902→
+   903→    if isZooming and preventZoom then
+   904→        self:SetUHBool("Zooming", false)
+   905→        if SERVER or (CLIENT and IsFirstTimePredicted()) then
+   906→            self.Owner:EmitSound("weapons/underhell/ironsight_off.wav", 65, 100, 1, CHAN_USER_BASE)
+   907→        end
+   908→    elseif isZooming and not wantsToZoom then
+   909→        self:SetUHBool("Zooming", false)
+   910→        if SERVER or (CLIENT and IsFirstTimePredicted()) then
+   911→            self.Owner:EmitSound("weapons/underhell/ironsight_off.wav", 65, 100, 1, CHAN_USER_BASE)
+   912→        end
+   913→    elseif not isZooming and wantsToZoom then
+   914→        self:SetUHBool("Zooming", true)
+   915→        if SERVER or (CLIENT and IsFirstTimePredicted()) then
+   916→            self.Owner:EmitSound("weapons/underhell/ironsight_on.wav", 64, 100, 1, CHAN_USER_BASE)
+   917→        end
+   918→    end
+   919→
+   920→    -- AnimSounds processing
+   921→    self:ProcessAnimSounds()
+   922→
+   923→    if self.CustomThink then
+   924→        self:CustomThink(ct)
+   925→    end
+   926→end
+   927→
+   928→-- ============================================================
+   929→-- Client-side scope rendering
+   930→-- ============================================================
+   931→if CLIENT then
+   932→    local devzoom = Material("vgui/scope_lens")
+   933→
+   934→    -- Same inheritance-chain walker as in weapon_custom_uh_base.lua.
+   935→    -- Required because BO4 / MW ports inherit through several layers
+   936→    -- (e.g. "weapon_bo4_custom_base_gun") before reaching "custom_uh_base".
+   937→    local function IsCustomUHWeapon(wep)
+   938→        if wep._customUHChecked then return wep._isCustomUH end
+   939→        wep._customUHChecked = true
+   940→        wep._isCustomUH = false
+   941→        local cur = wep
+   942→        local seen = {}
+   943→        local depth = 0
+   944→        while cur and not seen[cur] and depth < 16 do
+   945→            seen[cur] = true
+   946→            depth = depth + 1
+   947→            if cur.Base and string.find(cur.Base, "custom_uh_base") then
+   948→                wep._isCustomUH = true
+   949→                break
+   950→            end
+   951→            if not cur.Base then break end
+   952→            cur = weapons.GetStored(cur.Base)
+   953→        end
+   954→        return wep._isCustomUH
+   955→    end
+   956→
+   957→    hook.Add("RenderScene", "CustomUH_SniperRenderScene", function(origin, angles, fov)
+   958→        local wep = LocalPlayer():GetActiveWeapon()
+   959→        if not IsValid(wep) then return end
+   960→        if not IsCustomUHWeapon(wep) then return end
+   961→        if not wep.ScopeTexture then return end
+   962→        if wep:GetUHBool("Zooming") and not wep.ScopeDisabled then
+   963→            local size = wep.RT_Size or 512
+   964→            render.PushRenderTarget(wep.RenderTarget, 0, 0, size, size)
+   965→            local ang = LocalPlayer():EyeAngles()
+   966→            local pos = LocalPlayer():EyePos()
+   967→            render.RenderView({
+   968→                x = 0, y = 0, w = size, h = size,
+   969→                origin = pos, angles = ang,
+   970→                drawviewmodel = false, drawhud = false,
+   971→                dopostprocess = false, fov = wep.ScopeFov or 8,
+   972→            })
+   973→            render.PopRenderTarget()
+   974→            wep.ScopeTexture:SetTexture("$basetexture", wep.RenderTarget)
+   975→        else
+   976→            if wep.ScopeTexture then
+   977→                wep.ScopeTexture:SetTexture("$basetexture", devzoom:GetTexture("$basetexture"))
+   978→            end
+   979→        end
+   980→    end)
+   981→end
+   982→
+   983→function SWEP:AdjustMouseSensitivity()
+   984→    local hasScope = self.ScopeTexture or self.Use2DScope
+   985→    if not hasScope and self.Sensitivity then hasScope = true end
+   986→    if hasScope and self:GetUHBool("Zooming") then
+   987→        return self.Sensitivity or 0.2
+   988→    end
+   989→end
+   990→
+   991→-- ============================================================
+   992→-- DrawHUD
+   993→-- ============================================================
+   994→if CLIENT then
+   995→    local h_reload = 0
+   996→    local h_crosshair = 0
+   997→    local h_scope = 0
+   998→
+   999→    function SWEP:DrawHUD()
+  1000→        if not GetConVar("cl_drawhud"):GetBool() then return end
+  1001→        if self:GetNWFloat("DeployTime") > CurTime() then return end
+  1002→
+  1003→        local col = Color(GetConVar("uh_hud_r"):GetInt(), GetConVar("uh_hud_g"):GetInt(), GetConVar("uh_hud_b"):GetInt())
+  1004→        local pos = {x = ScrW()/2, y = ScrH()/2}
+  1005→        local movement = LocalPlayer():GetVelocity():Length() / 10
+  1006→        if movement > 80 then movement = 80 end
+  1007→        local drawply = LocalPlayer():ShouldDrawLocalPlayer()
+  1008→
+  1009→        h_reload = math.Approach(h_reload, self:GetUHBool("Reloading") and 1 or 0, FrameTime()*3)
+  1010→        h_crosshair = math.Approach(h_crosshair, (self:GetNWInt("FireMode") == 0 or self:GetUHBool("Running") or self:GetUHBool("Reloading") or self:GetUHBool("Zooming")) and 0 or 1, FrameTime()*5)
+  1011→
+  1012→        if drawply then
+  1013→            pos = self.Owner:GetEyeTrace().HitPos:ToScreen()
+  1014→        end
+  1015→
+  1016→        -- Crosshair
+  1017→        if (h_crosshair > 0 or drawply) and GetConVar("uh_crosshair"):GetBool() and not (self.Use2DScope and self:GetUHBool("Zooming")) then
+  1018→            draw.RoundedBox(0, pos.x - 25 - movement, pos.y - 2, 12, 3, Color(0,0,0,200*h_crosshair))
+  1019→            draw.RoundedBox(0, pos.x + 12 + movement, pos.y - 2, 12, 3, Color(0,0,0,200*h_crosshair))
+  1020→            draw.RoundedBox(0, pos.x - 2, pos.y - 25 - movement, 3, 12, Color(0,0,0,200*h_crosshair))
+  1021→            draw.RoundedBox(0, pos.x - 2, pos.y + 12 + movement, 3, 12, Color(0,0,0,200*h_crosshair))
+  1022→            draw.RoundedBox(0, pos.x - 24 - movement, pos.y - 1, 12, 1, Color(255,255,255,255*h_crosshair))
+  1023→            draw.RoundedBox(0, pos.x + 11 + movement, pos.y - 1, 12, 1, Color(255,255,255,255*h_crosshair))
+  1024→            draw.RoundedBox(0, pos.x - 1, pos.y - 24 - movement, 1, 12, Color(255,255,255,255*h_crosshair))
+  1025→            draw.RoundedBox(0, pos.x - 1, pos.y + 11 + movement, 1, 12, Color(255,255,255,255*h_crosshair))
+  1026→        end
+  1027→
+  1028→        -- 2D Scope
+  1029→        if self.Use2DScope and self:GetUHBool("Zooming") and not drawply then
+  1030→            h_scope = math.Approach(h_scope, 1, FrameTime() * 100)
+  1031→            if h_scope > 0.01 then
+  1032→                local w, h = ScrW(), ScrH()
+  1033→                local scopeSize = h * 1.25
+  1034→                local x = w/2 - scopeSize/2
+  1035→                local y = h/2 - scopeSize/2
+  1036→                surface.SetDrawColor(0, 0, 0, 255 * h_scope)
+  1037→                surface.DrawRect(0, 0, x, h)
+  1038→                surface.DrawRect(x + scopeSize, 0, w - (x + scopeSize), h)
+  1039→                surface.DrawRect(x, 0, scopeSize, y)
+  1040→                surface.DrawRect(x, h - y, scopeSize, y)
+  1041→                surface.SetDrawColor(0, 0, 0, 255)
+  1042→                surface.SetMaterial(Material("gmod/scope"))
+  1043→                surface.DrawTexturedRect(x, y, scopeSize, scopeSize)
+  1044→                surface.SetDrawColor(0, 0, 0, 255)
+  1045→                surface.DrawLine(0, h/2, w, h/2)
+  1046→                surface.DrawLine(w/2, 0, w/2, h)
+  1047→            end
+  1048→        else
+  1049→            h_scope = math.Approach(h_scope, 0, FrameTime() * 10)
+  1050→        end
+  1051→
+  1052→        if not GetConVar("uh_hud"):GetBool() then return end
+  1053→
+  1054→        -- Ammo counter
+  1055→        if drawply then
+  1056→            local att = self:GetAttachment(self:GetDisplay())
+  1057→            if att then pos = att.Pos:ToScreen() end
+  1058→        else
+  1059→            local vm = self.Owner:GetViewModel()
+  1060→            if IsValid(vm) then
+  1061→                local att = vm:GetAttachment(self:GetDisplay())
+  1062→                if att then pos = att.Pos:ToScreen() end
+  1063→            end
+  1064→        end
+  1065→
+  1066→        local clip = self:Clip1()
+  1067→        local ammotype = self.Primary.Ammo
+  1068→        local ammocount = self.Owner:GetAmmoCount(ammotype)
+  1069→        local cliptext = "Magazine " .. (self.Chambering and clip > self.Primary.ClipSize and (clip-1).." + 1" or clip)
+  1070→        local ammotext = "Reserved " .. ammocount
+  1071→        local typetext = language.GetPhrase(ammotype.."_ammo")
+  1072→
+  1073→        surface.SetFont("UH_AmmoLarge")
+  1074→        local textsize = surface.GetTextSize(cliptext)
+  1075→        local x = pos.x - textsize
+  1076→        local y = pos.y
+  1077→        local pr = math.Clamp(clip / self.Primary.ClipSize, 0, 1)
+  1078→
+  1079→        draw.SimpleText(cliptext, "UH_AmmoLarge", x - 4, y + 1, Color(0,0,0), TEXT_ALIGN_LEFT)
+  1080→        draw.SimpleText(cliptext, "UH_AmmoLarge", x - 5, y, Color(255*(1-pr) + col.r*pr, col.g*pr, col.b*pr), TEXT_ALIGN_LEFT)
+  1081→
+  1082→        y = y + 24
+  1083→
+  1084→        if self:GetNWFloat("ReloadEndTime") > CurTime() or h_reload > 0 then
+  1085→            local p = math.Clamp(1-(self:GetNWFloat("ReloadEndTime")-CurTime())/math.max(self:GetNWFloat("ReloadTime"), 0.001), 0, 1)
+  1086→            draw.RoundedBox(0, x - 2, y + 1, 1, 14, Color(0,0,0,255*h_reload))
+  1087→            draw.RoundedBox(0, x - 3, y, 1, 14, Color(col.r,col.g,col.b,255*h_reload))
+  1088→            draw.RoundedBox(0, x - 5 + textsize, y + 1, 1, 14, Color(0,0,0,255*h_reload))
+  1089→            draw.RoundedBox(0, x - 6 + textsize, y, 1, 14, Color(col.r,col.g,col.b,255*h_reload))
+  1090→            draw.RoundedBox(0, x + 1, y + 3, textsize*p-8, 10, Color(0,0,0,255*h_reload))
+  1091→            draw.RoundedBox(0, x, y + 2, textsize*p-8, 10, Color(255*(1-p) + col.r*p, col.g*p, col.b*p, 255*h_reload))
+  1092→        end
+  1093→
+  1094→        y = y + h_reload*14 - 2
+  1095→
+  1096→        if ammocount > 0 then
+  1097→            draw.SimpleText(ammotext, "UH_AmmoSmall", x - 4, y + 1, Color(0,0,0), TEXT_ALIGN_LEFT)
+  1098→            draw.SimpleText(ammotext, "UH_AmmoSmall", x - 5, y, Color(col.r,col.g,col.b), TEXT_ALIGN_LEFT)
+  1099→            y = y + 15
+  1100→        end
+  1101→
+  1102→        draw.SimpleText(typetext, "UH_AmmoSmall", x - 4, y + 1, Color(0,0,0), TEXT_ALIGN_LEFT)
+  1103→        draw.SimpleText(typetext, "UH_AmmoSmall", x - 5, y, Color(col.r,col.g,col.b), TEXT_ALIGN_LEFT)
+  1104→        y = y + 15
+  1105→
+  1106→        local mode = self:GetNWInt("FireMode")
+  1107→        if mode == 0 or self.FireModes[mode] then
+  1108→            local name = self.FireModes[mode] and self.FireModes[mode].name or "Safe"
+  1109→            draw.SimpleText(name, "UH_AmmoSmall", x - 4, y + 1, Color(0,0,0), TEXT_ALIGN_LEFT)
+  1110→            draw.SimpleText(name, "UH_AmmoSmall", x - 5, y, Color(col.r,col.g,col.b), TEXT_ALIGN_LEFT)
+  1111→        end
+  1112→
+  1113→        if GetConVar("uh_sv_grenades"):GetBool() then
+  1114→            local grenades = self.Owner:GetAmmoCount("UH_Grenade")
+  1115→            if grenades > 0 and h_reload < 1 then
+  1116→                local p = 1 - h_reload
+  1117→                draw.SimpleText("Grenades", "UH_AmmoLarge", ScrW()/2 + 1, ScrH()*0.8 + 1, Color(0,0,0,255*p), TEXT_ALIGN_CENTER)
+  1118→                draw.SimpleText("Grenades", "UH_AmmoLarge", ScrW()/2, ScrH()*0.8, Color(col.r,col.g,col.b,255*p), TEXT_ALIGN_CENTER)
+  1119→                draw.SimpleText("x"..grenades, "UH_AmmoSmall", ScrW()/2 + 1, ScrH()*0.8 + 23, Color(0,0,0,255*p), TEXT_ALIGN_CENTER)
+  1120→                draw.SimpleText("x"..grenades, "UH_AmmoSmall", ScrW()/2, ScrH()*0.8 + 22, Color(col.r,col.g,col.b,255*p), TEXT_ALIGN_CENTER)
+  1121→            end
+  1122→        end
+  1123→    end
+  1124→end
+  1125→

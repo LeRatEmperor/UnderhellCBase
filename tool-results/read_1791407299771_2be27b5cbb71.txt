@@ -1,0 +1,1077 @@
+     1→-- weapon_custom_uh_base.lua
+     2→-- Deep-cleaned Underhell SWEP base for the Customized edition.
+     3→-- v1.2 — CalcView/PreDrawVM now check wep.Base for "custom_uh_base" instead of class name
+     4→--
+     5→-- Key changes from original:
+     6→--   * All file-scope lerp upvalues moved to self._xxx (fixes weapon-switch state bleed)
+     7→--   * Prediction gates standardized
+     8→--   * Dead code removed
+     9→--   * Bugs fixed (Deploy return, HandleRunning cancel, DrawWeaponSelection precedence, etc.)
+    10→--   * ConVar lookups cached
+    11→--   * IsValid checks added throughout
+    12→--   * Ease-in ironsight interpolation (snappier feel)
+    13→--   * Configurable ironsight/zoom speeds via SWEP fields
+    14→
+    15→AddCSLuaFile()
+    16→SWEP.Base = "weapon_base"
+    17→
+    18→-- ============================================================
+    19→-- getUHCacheMat — cached Material() lookup
+    20→-- ============================================================
+    21→-- Returns a cached IMaterial for the given material path, creating
+    22→-- it on first access and reusing on subsequent calls. This avoids
+    23→-- creating new IMaterial objects every frame in HandleHands().
+    24→-- ============================================================
+    25→local UH_MaterialCache = UH_MaterialCache or {}
+    26→function getUHCacheMat(matPath)
+    27→    if not matPath then return nil end
+    28→    if UH_MaterialCache[matPath] then return UH_MaterialCache[matPath] end
+    29→    local mat = Material(matPath)
+    30→    if not mat then return nil end
+    31→    if mat:GetName() == "___error" then return nil end
+    32→    UH_MaterialCache[matPath] = mat
+    33→    return mat
+    34→end
+    35→
+    36→SWEP.PrintName        = "Underhell Custom Base"
+    37→SWEP.Category         = "UnderHell Custom"
+    38→SWEP.UseHands         = false
+    39→
+    40→SWEP.Spawnable        = false
+    41→SWEP.AdminSpawnable   = false
+    42→
+    43→-- ============================================================
+    44→-- Initialize — sets up view state, can be overridden
+    45→-- ============================================================
+    46→function SWEP:Initialize()
+    47→    self:ResetViewState()
+    48→end
+    49→
+    50→SWEP.ViewModelFOV     = 64
+    51→SWEP.ViewModel        = "models/weapons/v_smg_mp5_pg.mdl"
+    52→SWEP.WorldModel       = "models/weapons/w_smg_mp5_pg.mdl"
+    53→
+    54→SWEP.AutoSwitchTo     = true
+    55→SWEP.AutoSwitchFrom   = true
+    56→
+    57→SWEP.Slot             = 2
+    58→SWEP.SlotPos          = 3
+    59→
+    60→SWEP.HoldType         = "smg"
+    61→SWEP.PassiveAnim      = "passive"
+    62→SWEP.FiresUnderwater  = false
+    63→SWEP.Weight           = 45
+    64→SWEP.DrawCrosshair    = false
+    65→SWEP.DrawAmmo         = true
+    66→SWEP.DrawWeaponInfoBox = false
+    67→
+    68→SWEP.Primary.ClipSize   = 30
+    69→SWEP.Primary.Ammo       = "smg1"
+    70→SWEP.Primary.DefaultClip = 30
+    71→SWEP.Primary.Automatic  = true
+    72→
+    73→SWEP.Secondary.ClipSize    = -1
+    74→SWEP.Secondary.Ammo        = "none"
+    75→SWEP.Secondary.DefaultClip = -1
+    76→SWEP.Secondary.Automatic   = false
+    77→
+    78→SWEP.SwayScale = 0
+    79→SWEP.BobScale  = 0
+    80→
+    81→SWEP.SwayPosition = 2
+    82→SWEP.LoweredPos   = Vector(0, 0, 0)
+    83→SWEP.LoweredAng   = Angle(0, 0, 0)
+    84→
+    85→SWEP.AnimatedFirstDraw = false
+    86→SWEP.AnimatedSprint = false
+    87→
+    88→-- Configurable ironsight/zoom speeds
+    89→SWEP.IronsightSpeed  = 10
+    90→SWEP.IronsightEaseIn = 1.5
+    91→SWEP.ZoomSpeedIn     = 15
+    92→SWEP.ZoomSpeedOut    = 10
+    93→
+    94→-- ============================================================
+    95→-- TFA-style curved ironsight transition
+    96→-- ============================================================
+    97→-- Instead of a straight-line lerp from hip to ironsight, the gun dips
+    98→-- down/back through a sine bump, then recovers to the iron position.
+    99→-- This mimics the natural wrist motion of shouldering a rifle.
+   100→--
+   101→-- The dip is a sine wave (0 at start, peaks at midpoint, 0 at end) so
+   102→-- the start and end positions are NEVER changed — only the middle of
+   103→-- the transition is displaced.
+   104→--
+   105→-- Per-weapon tuning (override in any weapon file):
+   106→--   SWEP.IronSightsDipPos   = Vector(right, forward, up)  — dip direction
+   107→--   SWEP.IronSightsDipAng   = Angle(pitch, yaw, roll)     — dip angle
+   108→--   SWEP.IronSightsDipScale = 1.0                          — 0 disables curve
+   109→--
+   110→-- Defaults:
+   111→SWEP.IronSightsDipPos   = Vector(0, -1.5, -2.0)   -- back & down at midpoint
+   112→SWEP.IronSightsDipAng   = Angle(3, 0, 0)           -- muzzle tilts down ~3deg
+   113→SWEP.IronSightsDipScale = 1.0                       -- set 0 to disable
+   114→
+   115→SWEP.IronSightsPos = Vector(-6, -8, -10)
+   116→SWEP.IronSightsAng = Vector(20, 40, -60)
+   117→SWEP.Inspection = {}
+   118→SWEP.HideMaterials = {}
+   119→SWEP.VM3D2D = {}
+   120→SWEP.LeftBones = { ["Left_U_Arm"] = Angle(-50, 50, -50) }
+   121→
+   122→-- ============================================================
+   123→-- STATE INITIALIZATION
+   124→-- ============================================================
+   125→function SWEP:ResetViewState()
+   126→    self._ironBlend    = 0
+   127→    self._ironBlendLat = 0
+   128→    self._ironBlendFwd = 0
+   129→    self._swayAng      = Angle(0, 0, 0)
+   130→    self._oldEyeAng    = Angle(0, 0, 0)
+   131→    self._viewBobP     = 0
+   132→    self._viewBobY     = 0
+   133→    self._zoomBlend    = 0
+   134→    self._blurAmount   = 0
+   135→    self._inspectAng   = Angle(0, 0, 0)
+   136→    self._inspectPos   = Vector(0, 0, 0)
+   137→    self._grenadeLerp = 0
+   138→    self._jumpBlend    = 0
+   139→    self._lookBlend    = 0
+   140→    self._sightMult    = 0
+   141→    self._bobLerp      = 0
+   142→    self._bobSmooth    = 0
+   143→    self._bobAbs       = 0
+   144→    self._runDir       = 0
+   145→    self._breathP      = 0
+   146→    self._breathY      = 0
+   147→    self._breathR      = 0
+   148→    self._velOffset    = Vector(0, 0, 0)
+   149→    self._erp          = 0
+   150→    self._erpDecay     = {}
+   151→    self._bobTime      = 0
+   152→    self._bobNextThink = 0
+   153→    self._oldHandTex   = nil
+   154→    self._grenLerp     = 0
+   155→    self._handSkin     = nil
+   156→end
+   157→
+   158→-- ============================================================
+   159→-- CONVAR CACHE
+   160→-- ============================================================
+   161→local cv_sway, cv_bob, cv_idle, cv_deploy, cv_blur, cv_blur_amount, cv_viewbob, cv_hands
+   162→
+   163→local function cache_convars()
+   164→    cv_sway        = cv_sway        or GetConVar("uh_vmsway")
+   165→    cv_bob         = cv_bob         or GetConVar("uh_vmbob")
+   166→    cv_idle        = cv_idle        or GetConVar("uh_vmidle")
+   167→    cv_deploy      = cv_deploy      or GetConVar("uh_sv_deploy")
+   168→    cv_blur        = cv_blur        or GetConVar("uh_blur")
+   169→    cv_blur_amount = cv_blur_amount or GetConVar("uh_blur_amount")
+   170→    cv_viewbob     = cv_viewbob     or GetConVar("uh_viewbob")
+   171→    cv_hands       = cv_hands       or GetConVar("uh_hands")
+   172→end
+   173→
+   174→-- ============================================================
+   175→-- GetViewModelPosition
+   176→-- ============================================================
+   177→function SWEP:GetViewModelPosition(pos, ang)
+   178→    if not IsValid(self.Owner) then return pos, ang end
+   179→    local sp = game.SinglePlayer()
+   180→    local ct = CurTime()
+   181→    local ft = FrameTime()
+   182→    local iftp = IsFirstTimePredicted()
+   183→    if sp then iftp = true end
+   184→    if CLIENT then iftp = true end
+   185→
+   186→    if not self._ironBlendLat then self:ResetViewState() end
+   187→
+   188→    pos, ang = self:Inspect(pos, ang, ct)
+   189→    pos, ang = self:Grenade(pos, ang, ct, ft, iftp)
+   190→    pos, ang = self:Sway(pos, ang, ft, iftp)
+   191→    pos, ang = self:Movement(pos, ang, ct, ft, iftp)
+   192→    if self.IronSightsPos and self.IronSightsAng then
+   193→        pos, ang = self:Sights(pos, ang, ft, iftp)
+   194→    end
+   195→    return pos, ang
+   196→end
+   197→
+   198→-- ============================================================
+   199→-- Inspect
+   200→-- ============================================================
+   201→function SWEP:Inspect(pos, ang, ct)
+   202→    if not cv_deploy or not cv_deploy:GetBool() then return pos, ang end
+   203→    local t = self:GetNWFloat("DeployTime") - ct
+   204→    if t <= 0 then return pos, ang end
+   205→    if not self.Inspection or not self.Inspection[1] then return pos, ang end
+   206→
+   207→    if t > 2 then
+   208→        local p = math.Clamp((1-(t-2))*2, 0, 1)
+   209→        local stage = self.Inspection[1]
+   210→        self._inspectAng = LerpAngle(p, Angle(0,0,0), stage.ang)
+   211→        self._inspectPos = LerpVector(p, Vector(0,0,0), stage.pos)
+   212→    elseif t > 1 then
+   213→        local p = math.Clamp((1-(t-1))*2, 0, 1)
+   214→        local oldstage = self.Inspection[1]
+   215→        local stage = self.Inspection[2] or oldstage
+   216→        self._inspectAng = LerpAngle(p, oldstage.ang, stage.ang)
+   217→        self._inspectPos = LerpVector(p, oldstage.pos, stage.pos)
+   218→    else
+   219→        local p = 1-t
+   220→        local stage = self.Inspection[2] or self.Inspection[1]
+   221→        self._inspectAng = LerpAngle(p, stage.ang, Angle(0,0,0))
+   222→        self._inspectPos = LerpVector(p, stage.pos, Vector(0,0,0))
+   223→    end
+   224→
+   225→    ang:RotateAroundAxis(ang:Right(),    self._inspectAng.p)
+   226→    ang:RotateAroundAxis(ang:Up(),       self._inspectAng.y)
+   227→    ang:RotateAroundAxis(ang:Forward(),  self._inspectAng.r)
+   228→    pos = pos + ang:Right()*self._inspectPos.x + ang:Forward()*self._inspectPos.y + ang:Up()*self._inspectPos.z
+   229→    return pos, ang
+   230→end
+   231→
+   232→-- ============================================================
+   233→-- Grenade
+   234→-- ============================================================
+   235→function SWEP:Grenade(pos, ang, ct, ft, iftp)
+   236→    if not IsValid(self.Owner) then return pos, ang end
+   237→    if iftp then
+   238→        local grenTime = self.Owner:GetNWFloat("UH_GrenadeTime")
+   239→        if grenTime > ct then
+   240→            local t = grenTime - ct
+   241→            if t > 0.5 then
+   242→                self._grenadeLerp = Lerp(math.Clamp(ft*6,0,1), self._grenadeLerp or 0, 1)
+   243→            else
+   244→                self._grenadeLerp = Lerp(math.Clamp(ft*6,0,1), self._grenadeLerp or 0, 0)
+   245→            end
+   246→        else
+   247→            self._grenadeLerp = Lerp(math.Clamp(ft*6,0,1), self._grenadeLerp or 0, 0)
+   248→        end
+   249→    end
+   250→    ang:RotateAroundAxis(ang:Up(),      -self._grenadeLerp*12)
+   251→    ang:RotateAroundAxis(ang:Forward(),  self._grenadeLerp*5)
+   252→    return pos, ang
+   253→end
+   254→
+   255→-- ============================================================
+   256→-- Sights — staged ironsight blend (X/Y first, then Z)
+   257→-- ============================================================
+   258→-- Two-phase ADS movement matching good FPS game feel:
+   259→--   Phase 1: Gun snaps to the correct screen position (IronSightsPos.x/y)
+   260→--            quickly — the lateral/vertical alignment.
+   261→--   Phase 2: Gun eases forward into the eye (IronSightsPos.z) AFTER
+   262→--            the screen position is established.
+   263→--
+   264→-- This produces a "present then push" motion that feels more natural
+   265→-- than a single linear lerp moving all 3 axes at once.
+   266→--
+   267→-- Tunables per-weapon:
+   268→--   SWEP.IronsightSpeed       — base lerp speed (default 10)
+   269→--   SWEP.IronsightEaseIn      — ease-in factor (default 1.5)
+   270→--   SWEP.IronsightLateralSpeed — multiplier for X/Y phase (default 1.8x faster)
+   271→--   SWEP.IronsightForwardDelay — how long to wait before Z starts (default 0.0 = immediate, but slower speed handles it)
+   272→--   SWEP.IronsightForwardSpeed — multiplier for Z phase (default 0.6x slower)
+   273→-- ============================================================
+   274→function SWEP:Sights(pos, ang, ft, iftp)
+   275→    if not IsValid(self.Owner) then return pos, ang end
+   276→    if iftp then
+   277→        local target = self:GetUHBool("Zooming") and self.Owner:OnGround() and 1 or 0
+   278→
+   279→        -- Phase 1: Lateral blend (X/Z screen position) — moves FASTER
+   280→        local currentLat = self._ironBlendLat or 0
+   281→        local remainingLat = math.abs(target - currentLat)
+   282→        local baseSpeed = self.IronsightSpeed or 10
+   283→        local easeIn = self.IronsightEaseIn or 1.5
+   284→        local latSpeedMult = self.IronsightLateralSpeed or 1.8
+   285→        local speedLat = math.min(ft * baseSpeed * latSpeedMult * (1 + (1 - remainingLat) * easeIn), 1)
+   286→        self._ironBlendLat = Lerp(speedLat, currentLat, target)
+   287→
+   288→        -- Phase 2: Forward blend (Y depth) — moves SLOWER
+   289→        -- No hold/threshold logic — just a slower speed multiplier.
+   290→        -- The lateral arrives at the target first because it's 3x faster,
+   291→        -- creating the "present then push" effect naturally without
+   292→        -- any oscillation from threshold checks.
+   293→        local currentFwd = self._ironBlendFwd or 0
+   294→        local remainingFwd = math.abs(target - currentFwd)
+   295→        local fwdSpeedMult = self.IronsightForwardSpeed or 0.6
+   296→        local speedFwd = math.min(ft * baseSpeed * fwdSpeedMult * (1 + (1 - remainingFwd) * easeIn), 1)
+   297→        self._ironBlendFwd = Lerp(speedFwd, currentFwd, target)
+   298→    end
+   299→
+   300→    local pLat = self._ironBlendLat or 0  -- lateral blend (X/Y)
+   301→    local pFwd = self._ironBlendFwd or 0  -- forward blend (Z)
+   302→    local p = pLat  -- for dip calculation, use lateral progress
+   303→
+   304→    -- ============================================================
+   305→    -- TFA-STYLE CURVED IRONSIGHT TRANSITION
+   306→    -- ============================================================
+   307→    -- Sine bump: 0 at p=0, peaks at 1 when p=0.5, 0 at p=1.
+   308→    -- Added on top of the linear lerp so the gun dips below the
+   309→    -- straight-line path at the midpoint, then recovers to the
+   310→    -- iron position. Endpoints are NEVER changed.
+   311→    -- ============================================================
+   312→    local dipScale = self.IronSightsDipScale or 1.0
+   313→    if dipScale ~= 0 and p > 0 and p < 1 then
+   314→        local swoop = math.sin(p * math.pi) * dipScale
+   315→        local dipPos = self.IronSightsDipPos or vector_origin
+   316→        local dipAng = self.IronSightsDipAng or angle_zero
+   317→        pos = pos + ang:Right()   * (dipPos.x * swoop)
+   318→        pos = pos + ang:Forward() * (dipPos.y * swoop)
+   319→        pos = pos + ang:Up()      * (dipPos.z * swoop)
+   320→        ang:RotateAroundAxis(ang:Right(),   dipAng.p * swoop)
+   321→        ang:RotateAroundAxis(ang:Up(),       dipAng.y * swoop)
+   322→        ang:RotateAroundAxis(ang:Forward(),  dipAng.r * swoop)
+   323→    end
+   324→
+   325→    -- Staged ironsight lerp:
+   326→    --   X/Z (horizontal + vertical) uses pLat — moves together to screen position
+   327→    --   Y (forward/depth) uses pFwd — eases forward after X/Z is in place
+   328→    -- GMod viewmodel coordinate system:
+   329→    --   offset.x = right (horizontal)
+   330→    --   offset.y = forward (depth, toward eye) — DELAYED
+   331→    --   offset.z = up (vertical)
+   332→    local offset = self.IronSightsPos
+   333→    if self.IronSightsAng then
+   334→        ang:RotateAroundAxis(ang:Right(),   self.IronSightsAng.x * pLat)
+   335→        ang:RotateAroundAxis(ang:Up(),       self.IronSightsAng.y * pFwd)
+   336→        ang:RotateAroundAxis(ang:Forward(),  self.IronSightsAng.z * pLat)
+   337→    end
+   338→    pos = pos + offset.x * pLat * ang:Right()
+   339→            + offset.y * pFwd * ang:Forward()
+   340→            + offset.z * pLat * ang:Up()
+   341→    return pos, ang
+   342→end
+   343→
+   344→-- ============================================================
+   345→-- Sway
+   346→-- ============================================================
+   347→function SWEP:Sway(pos, ang, ft, iftp)
+   348→    if not IsValid(self.Owner) then return pos, ang end
+   349→    local sway = (cv_sway and cv_sway:GetFloat()) or 1.2
+   350→    if sway == 0 then return pos, ang end
+   351→
+   352→    local eyeAng = self.Owner:EyeAngles()
+   353→    local angdelta = eyeAng - (self._oldEyeAng or eyeAng)
+   354→    if angdelta.y >= 180 then angdelta.y = angdelta.y - 360
+   355→    elseif angdelta.y <= -180 then angdelta.y = angdelta.y + 360 end
+   356→    angdelta.p = math.Clamp(angdelta.p, -5, 5)
+   357→    angdelta.y = math.Clamp(angdelta.y, -5, 5)
+   358→    angdelta.r = math.Clamp(angdelta.r, -5, 5)
+   359→    if self:GetUHBool("Zooming") then angdelta = angdelta * 0.05 end
+   360→
+   361→    if iftp then
+   362→        self._swayAng = LerpAngle(math.Clamp(ft*10,0,1), self._swayAng or Angle(0,0,0), angdelta)
+   363→    end
+   364→    self._oldEyeAng = eyeAng
+   365→
+   366→    local psway = sway / (self.SwayPosition or 2)
+   367→    local sa = self._swayAng or Angle(0,0,0)
+   368→    ang:RotateAroundAxis(ang:Right(),   -sa.p*sway)
+   369→    ang:RotateAroundAxis(ang:Up(),        sa.y*sway)
+   370→    ang:RotateAroundAxis(ang:Forward(),  sa.y*sway)
+   371→    pos = pos + ang:Right()*sa.y*psway + ang:Up()*sa.p*psway
+   372→    return pos, ang
+   373→end
+   374→
+   375→-- ============================================================
+   376→-- Movement — bob, breathing, jump, look lean
+   377→-- ============================================================
+   378→function SWEP:Movement(pos, ang, ct, ft, iftp)
+   379→    if not IsValid(self.Owner) then return pos, ang end
+   380→    -- Per-weapon toggle: set SWEP.UseViewBob = false to disable ALL
+   381→    -- viewmodel bobbing/breathing for this weapon. Used by pose-parameter-
+   382→    -- driven weapons (TRM/MW ports) where the model handles walk/sprint/
+   383→    -- ironsights via pose parameters — the parent base's position-based
+   384→    -- bobbing fights with the pose parameter system.
+   385→    if self.UseViewBob == false then return pos, ang end
+   386→    local bob = (cv_bob and cv_bob:GetFloat()) or 0
+   387→    local idle = (cv_idle and cv_idle:GetFloat()) or 0
+   388→    if bob == 0 and idle == 0 then return pos, ang end
+   389→
+   390→    local owner = self.Owner
+   391→    local vel = owner:GetVelocity()
+   392→    local moveSpeed = math.sqrt(vel.x*vel.x + vel.y*vel.y)
+   393→    local maxSpeed = owner:GetRunSpeed()
+   394→    local maxWalk = owner:GetWalkSpeed()
+   395→    local onGround = owner:OnGround()
+   396→    local isRunning = self:GetUHBool("Running")
+   397→    local isZooming = self:GetUHBool("Zooming")
+   398→    local ft8 = math.Clamp(ft*8, 0, 1)
+   399→
+   400→    if iftp then
+   401→        if isRunning and onGround then
+   402→            self._erpDecay = {}
+   403→            self._bobTime = ct * (3.7 + math.Clamp(maxSpeed/150, 0, 3)) * 2
+   404→            self._erp = math.cos(self._bobTime) * 2
+   405→        elseif moveSpeed > 0 and onGround then
+   406→            self._erpDecay = {}
+   407→            self._bobTime = ct * (2.75 + math.Clamp(maxWalk/120, 0, 2)) * 2
+   408→            self._erp = math.cos(self._bobTime) * 0.5
+   409→        elseif not onGround then
+   410→            if not self._erpDecay[1] then self._erpDecay = {self._erp, ct + 0.1} end
+   411→            self._erp = self._erpDecay[1] * math.Clamp((self._erpDecay[2]-ct)*2, 0, 1)
+   412→            self._bobNextThink = ct
+   413→        else
+   414→            if not self._erpDecay[1] then self._erpDecay = {self._erp, ct + 0.33} end
+   415→            self._erp = self._erpDecay[1] * math.Clamp((self._erpDecay[2]-ct)*3, 0, 1)
+   416→        end
+   417→
+   418→        self._sightMult = Lerp(ft8, self._sightMult or 0, isZooming and 0.125 or 1)
+   419→        local walkRemapped = math.Clamp(moveSpeed/maxWalk, 0, 1)
+   420→        self._bobLerp = Lerp(ft*12, self._bobLerp or 0, (self._erp*walkRemapped*self._sightMult)*1.1)
+   421→        self._bobSmooth = Lerp(ft*4, self._bobSmooth or 0, self._bobLerp)
+   422→        self._bobAbs = Lerp(ft*10, self._bobAbs or 0, math.abs(self._bobLerp))
+   423→        self._runDir = Lerp(ft*14, self._runDir or 0, isRunning and -1 or 1)
+   424→        self._jumpBlend = Lerp(ft8, self._jumpBlend or 0, owner:GetMoveType()==MOVETYPE_NOCLIP and 0 or math.Clamp(vel.z/120, -1.5, 1))
+   425→
+   426→        local velNorm = Vector(vel.x, vel.y, 0)
+   427→        velNorm:Normalize()
+   428→        local rd = owner:GetRight():Dot(velNorm)
+   429→        local mp = math.Clamp(moveSpeed/maxSpeed, 0, 1)
+   430→        if rd > 0.5 then
+   431→            self._lookBlend = Lerp(ft*5, self._lookBlend or 0, 5*mp)
+   432→        elseif rd < -0.5 then
+   433→            self._lookBlend = Lerp(ft*5, self._lookBlend or 0, -5*mp)
+   434→        else
+   435→            self._lookBlend = Lerp(ft*5, self._lookBlend or 0, 0)
+   436→        end
+   437→        self._velOffset = Lerp(ft*4, self._velOffset or Vector(0,0,0), -(velNorm/3)*walkRemapped)
+   438→    end
+   439→
+   440→    pos = pos + ang:Up()*(self._jumpBlend or 0)
+   441→    ang.p = ang.p + (self._jumpBlend or 0)*2
+   442→    ang.r = ang.r + (self._lookBlend or 0)
+   443→
+   444→    pos = pos + ang:Up()*(self._viewBobP or 0)
+   445→    pos = pos + ang:Right()*(self._viewBobY or 0)
+   446→
+   447→    if bob ~= 0 and not (self.AnimatedSprint and isRunning) then
+   448→        pos = pos + ang:Right()*(self._bobLerp or 0)*(isRunning and 1 or 0.6)*bob
+   449→        pos = pos + ang:Up()*(self._bobAbs or 0)*2*(isZooming and -0.45 or 0.65)*(isRunning and 1 or 0.8)*bob
+   450→        pos.z = pos.z + (self._velOffset or Vector(0,0,0)).z*bob
+   451→        ang:RotateAroundAxis(ang:Up(),      -(self._bobSmooth or 0)*(self._runDir or 0)*10*bob)
+   452→        ang:RotateAroundAxis(ang:Right(),   -(self._bobSmooth or 0)*(self._runDir or 0)*1.2*bob)
+   453→        ang:RotateAroundAxis(ang:Forward(),  (self._bobSmooth or 0)*3*bob)
+   454→    end
+   455→
+   456→    if idle ~= 0 then
+   457→        if not isRunning and not isZooming and moveSpeed < 1 then
+   458→            self._breathP = Lerp(ft*10, self._breathP or 0, math.sin(ct*0.5)*idle)
+   459→            self._breathY = Lerp(ft*10, self._breathY or 0, math.sin(ct*1)*0.5*idle)
+   460→            self._breathR = Lerp(ft*10, self._breathR or 0, math.sin(ct*2)*0.25*idle)
+   461→        else
+   462→            self._breathP = Lerp(ft*10, self._breathP or 0, 0)
+   463→            self._breathY = Lerp(ft*10, self._breathY or 0, 0)
+   464→            self._breathR = Lerp(ft*10, self._breathR or 0, 0)
+   465→        end
+   466→        ang.p = ang.p + (self._breathP or 0)*(self._sightMult or 1)
+   467→        ang.y = ang.y + (self._breathY or 0)*(self._sightMult or 1)
+   468→        ang.r = ang.r + (self._breathR or 0)*(self._sightMult or 1)
+   469→    end
+   470→    return pos, ang
+   471→end
+   472→
+   473→-- ============================================================
+   474→-- FireAnimationEvent
+   475→-- ============================================================
+   476→function SWEP:FireAnimationEvent(pos, ang, event, options)
+   477→    return true
+   478→end
+   479→
+   480→-- ============================================================
+   481→-- Animation helpers
+   482→-- ============================================================
+   483→function SWEP:EasySendWeaponAnim(lookupkey, fallbackact)
+   484→    local vm = IsValid(self.Owner) and self.Owner:GetViewModel() or nil
+   485→    if not IsValid(vm) then return end
+   486→    if self.Animations and self.Animations[lookupkey] then
+   487→        local animData = self.Animations[lookupkey]
+   488→        if istable(animData) then animData = animData[math.random(1, #animData)] end
+   489→        local seq = vm:LookupSequence(animData)
+   490→        if seq and seq >= 0 then
+   491→            vm:SendViewModelMatchingSequence(seq)
+   492→            vm:SetCycle(0)
+   493→            return
+   494→        end
+   495→    end
+   496→    if type(fallbackact) == "number" then
+   497→        local s = vm:SelectWeightedSequence(fallbackact)
+   498→        if s and s >= 0 then vm:SendViewModelMatchingSequence(s) end
+   499→        vm:SetCycle(0)
+   500→    end
+   501→end
+   502→
+   503→function SWEP:SendSequence(vm, seq)
+   504→    if not IsValid(vm) or seq == nil then return end
+   505→    vm:SendViewModelMatchingSequence(seq)
+   506→end
+   507→
+   508→function SWEP:SendAnim(vm, lookupsequence, backup)
+   509→    if not IsValid(vm) then return end
+   510→    if isstring(lookupsequence) then
+   511→        local seq = vm:LookupSequence(lookupsequence)
+   512→        if seq and seq >= 0 then self:SendSequence(vm, seq) return end
+   513→    end
+   514→    if type(backup) == "number" then
+   515→        local s = vm:SelectWeightedSequence(backup)
+   516→        if s and s >= 0 then self:SendSequence(vm, s) end
+   517→    end
+   518→    vm:SetCycle(0)
+   519→end
+   520→
+   521→function SWEP:SendWeaponAnim(act)
+   522→    if isstring(act) then self:EasySendWeaponAnim(act, nil)
+   523→    elseif type(act) == "number" then
+   524→        local vm = IsValid(self.Owner) and self.Owner:GetViewModel() or nil
+   525→        if IsValid(vm) then
+   526→            local s = vm:SelectWeightedSequence(act)
+   527→            if s and s >= 0 then vm:SendViewModelMatchingSequence(s) end
+   528→            vm:SetCycle(0)
+   529→        end
+   530→    end
+   531→end
+   532→
+   533→function SWEP:LookupSequence(name)
+   534→    local vm = IsValid(self.Owner) and self.Owner:GetViewModel() or nil
+   535→    if not IsValid(vm) then return -1 end
+   536→    return vm:LookupSequence(name)
+   537→end
+   538→
+   539→-- ============================================================
+   540→-- ClearAnimSounds
+   541→-- ============================================================
+   542→function SWEP:ClearAnimSounds()
+   543→    self._animSoundActive = false
+   544→    self._animSoundTimeline = nil
+   545→    self._animSoundIndex = 0
+   546→end
+   547→
+   548→-- ============================================================
+   549→-- HandleRunning
+   550→-- ============================================================
+   551→function SWEP:HandleRunning(ct)
+   552→    if not IsValid(self.Owner) then return end
+   553→    local vm = self.Owner:GetViewModel()
+   554→    if IsValid(vm) then
+   555→        local fireDelay = self:GetNextPrimaryFire() - ct
+   556→        if fireDelay > 0.3 then return end
+   557→    end
+   558→    if self:GetNWBool("FirstDrawPlaying") then return end
+   559→
+   560→    if self:GetUHBool("Running") or self:GetNWInt("FireMode") == 0 then
+   561→        self:SetHoldType(self.PassiveAnim)
+   562→    else
+   563→        self:SetHoldType(self.HoldType)
+   564→    end
+   565→
+   566→    if not GetConVar("uh_sv_running"):GetBool() then return end
+   567→    if self:GetNWInt("FireMode") == 0 then return end
+   568→
+   569→    local dist = self.Owner:GetVelocity():LengthSqr()
+   570→    if self.Owner:KeyDown(IN_SPEED) and dist > self.Owner:GetWalkSpeed()^2 then
+   571→        if not self:GetUHBool("Running") then
+   572→            local act = ACT_VM_IDLE_TO_LOWERED
+   573→            if self.HasSilencer and self:GetNWBool("Silenced") then
+   574→                act = ACT_VM_IDLE_SILENCED
+   575→            elseif self.Animations and self.Animations["idle_empty"] and self:Clip1() <= 0 then
+   576→                local vm2 = self.Owner:GetViewModel()
+   577→                if IsValid(vm2) then
+   578→                    local seq = vm2:LookupSequence(self.Animations["idle_empty"])
+   579→                    if seq and seq >= 0 then act = seq end
+   580→                end
+   581→            end
+   582→            self:SendWeaponAnim(ACT_VM_IDLE)
+   583→            self:SendWeaponAnim(act)
+   584→            if IsValid(vm) then vm:SetBodygroup(1, self:GetNWBool("Silenced") and 1 or 0) end
+   585→        end
+   586→        self:SetUHBool("Running", true)
+   587→        self:SetUHBool("Zooming", false)
+   588→        -- FIXED: cancel reload properly
+   589→        if self:GetUHBool("Reloading") then
+   590→            self:SetUHBool("Reloading", false)
+   591→            self:SetNWFloat("ReloadTime", 0)
+   592→            self:SetNWFloat("ReloadEndTime", 0)
+   593→            if timer.Exists("UHReload_"..self.Owner:SteamID()) then
+   594→                timer.Remove("UHReload_"..self.Owner:SteamID())
+   595→            end
+   596→        end
+   597→    elseif self:GetUHBool("Running") then
+   598→        if self:GetNextPrimaryFire() < ct + 0.5 then
+   599→            self:SetNextPrimaryFire(ct + 0.5)
+   600→            self:SetNextSecondaryFire(ct + 0.5)
+   601→        end
+   602→        local act = ACT_VM_LOWERED_TO_IDLE
+   603→        if self.HasSilencer and self:GetNWBool("Silenced") then
+   604→            act = ACT_VM_IDLE_SILENCED
+   605→        elseif self.Animations and self.Animations["idle_empty"] and self:Clip1() <= 0 then
+   606→            local vm2 = self.Owner:GetViewModel()
+   607→            if IsValid(vm2) then
+   608→                local seq = vm2:LookupSequence(self.Animations["idle_empty"])
+   609→                if seq and seq >= 0 then act = seq end
+   610→            end
+   611→        end
+   612→        self:SendWeaponAnim(act)
+   613→        if IsValid(vm) then vm:SetBodygroup(1, self:GetNWBool("Silenced") and 1 or 0) end
+   614→        self:SetUHBool("Running", false)
+   615→    end
+   616→end
+   617→
+   618→-- ============================================================
+   619→-- HandleBones
+   620→-- ============================================================
+   621→function SWEP:HandleBones(vm, ct)
+   622→    if not IsValid(self.Owner) then return end
+   623→    if game.SinglePlayer() or IsFirstTimePredicted() then
+   624→        self._grenLerp = Lerp(FrameTime()*5, self._grenLerp or 0,
+   625→            (self.Owner:GetNWFloat("UH_ArmTime") > ct or self.Owner:GetNWBool("UH_ArmGone")) and 1 or 0)
+   626→    end
+   627→    for bone, ang in pairs(self.LeftBones) do
+   628→        local bone_id = vm:LookupBone(bone)
+   629→        if not bone_id then continue end
+   630→        vm:ManipulateBoneAngles(bone_id, ang * (self._grenLerp or 0))
+   631→    end
+   632→    if self:GetNWBool("Silenced") or self:GetNWFloat("SilenceTime") > ct then
+   633→        vm:SetBodygroup(1, 1)
+   634→    else
+   635→        vm:SetBodygroup(1, 0)
+   636→    end
+   637→end
+   638→
+   639→-- ============================================================
+   640→-- HandleHands
+   641→-- ============================================================
+   642→function SWEP:HandleHands(vm)
+   643→    if not IsValid(self.Owner) then return end
+   644→    local skin = math.Clamp(self.Owner:GetInfoNum("uh_hands", 0), -1, 3)
+   645→    if skin ~= -1 then
+   646→        vm:SetSkin(skin)
+   647→        if CLIENT and self._handSkin ~= skin then
+   648→            self._handSkin = skin
+   649→            local handmat = getUHCacheMat("models/weapons/v_models/hands/v_hands")
+   650→            local newmat = getUHCacheMat("models/weapons/v_models/hands/v_hands_casual")
+   651→            if handmat and newmat then
+   652→                local oldtex = handmat:GetTexture("$basetexture")
+   653→                local newtex = newmat:GetTexture("$basetexture")
+   654→                if not self._oldHandTex and oldtex ~= newtex and oldtex:GetName() ~= newtex:GetName() then
+   655→                    self._oldHandTex = {
+   656→                        tex = oldtex, detail = handmat:GetTexture("$detail"),
+   657→                        blendfactor = handmat:GetFloat("$detailblendfactor") or 0,
+   658→                        blendmode = handmat:GetInt("$detailblendmode") or 0,
+   659→                        scale = handmat:GetFloat("$detailscale") or 1,
+   660→                    }
+   661→                end
+   662→                handmat:SetTexture("$basetexture", newtex)
+   663→                handmat:SetTexture("$detail", newmat:GetTexture("$detail"))
+   664→                handmat:SetFloat("$detailblendfactor", newmat:GetFloat("$detailblendfactor"))
+   665→                handmat:SetInt("$detailblendmode", newmat:GetInt("$detailblendmode"))
+   666→                handmat:SetFloat("$detailscale", newmat:GetFloat("$detailscale"))
+   667→            end
+   668→        end
+   669→    else
+   670→        local handmat = getUHCacheMat("models/weapons/v_models/hands/v_hands")
+   671→        if handmat and self._oldHandTex then
+   672→            local detail = self._oldHandTex.detail
+   673→            handmat:SetTexture("$basetexture", self._oldHandTex.tex)
+   674→            handmat:SetTexture("$detail", detail and not string.find(detail:GetName(),"error") and detail or Material("color"):GetTexture("$basetexture"))
+   675→            handmat:SetFloat("$detailblendfactor", self._oldHandTex.blendfactor or 0)
+   676→            handmat:SetInt("$detailblendmode", self._oldHandTex.blendmode or 0)
+   677→            handmat:SetFloat("$detailscale", self._oldHandTex.scale or 1)
+   678→        end
+   679→    end
+   680→end
+   681→
+   682→-- ============================================================
+   683→-- Deploy
+   684→-- ============================================================
+   685→function SWEP:Deploy()
+   686→    if SERVER then
+   687→        if not self.b_ammogiven then
+   688→            self.b_ammogiven = true
+   689→            if GetConVar("uh_sv_ammo"):GetBool() and self.Primary.ClipSize > 0 then
+   690→                self.Owner:GiveAmmo(self.Primary.ClipSize * 5, self.Primary.Ammo, true)
+   691→            end
+   692→        end
+   693→    end
+   694→    if self.CustomDeploy then self:CustomDeploy() end
+   695→
+   696→    self:ResetViewState()
+   697→    self:ClearAnimSounds()
+   698→
+   699→    self:SetUHBool("Reloading", false)
+   700→    self:SetUHBool("Zooming", false)
+   701→    self:SetUHBool("Running", false)
+   702→    self:SetNWFloat("ReloadTime", 0)
+   703→    self:SetNWFloat("ReloadEndTime", 0)
+   704→    self.NextReload = CurTime() + 0.5
+   705→    self:SetNextPrimaryFire(CurTime() + 1)
+   706→    self:SetNextSecondaryFire(CurTime() + 1)
+   707→
+   708→    if not self:GetNWBool("FirstTimeDeployed") and GetConVar("uh_sv_deploy"):GetBool() then
+   709→        self:SetNWBool("FirstTimeDeployed", true)
+   710→        if self.AnimatedFirstDraw then
+   711→            local vm = IsValid(self.Owner) and self.Owner:GetViewModel() or nil
+   712→            self:EasySendWeaponAnim("first_draw", ACT_VM_DRAW)
+   713→            local animDuration = IsValid(vm) and vm:SequenceDuration() or 3
+   714→            animDuration = math.max(3, animDuration)
+   715→            self:SetNextPrimaryFire(CurTime() + animDuration)
+   716→            self:SetNextSecondaryFire(CurTime() + animDuration)
+   717→            self.NextReload = CurTime() + animDuration
+   718→            self:SetNWBool("FirstDrawPlaying", true)
+   719→            timer.Simple(animDuration, function()
+   720→                if IsValid(self) then self:SetNWBool("FirstDrawPlaying", false) end
+   721→            end)
+   722→        else
+   723→            self:EasySendWeaponAnim("draw", ACT_VM_DRAW)
+   724→            local vm = IsValid(self.Owner) and self.Owner:GetViewModel() or nil
+   725→            local animtime = math.max(3, IsValid(vm) and vm:SequenceDuration() or 3)
+   726→            self:SetNWFloat("DeployTime", CurTime() + animtime)
+   727→            if self.PreCock then
+   728→                timer.Simple(animtime - 1.5, function()
+   729→                    if not IsValid(self) or not IsValid(self.Owner) then return end
+   730→                    if not IsValid(self.Owner:GetActiveWeapon()) or self.Owner:GetActiveWeapon() != self then return end
+   731→                    self.Owner:EmitSound(self.Primary.PumpSound)
+   732→                    self:SendWeaponAnim(ACT_SHOTGUN_PUMP)
+   733→                end)
+   734→            end
+   735→        end
+   736→    else
+   737→        self:EasySendWeaponAnim("draw", ACT_VM_DRAW)
+   738→    end
+   739→    return true  -- FIXED: was false
+   740→end
+   741→
+   742→-- ============================================================
+   743→-- Holster
+   744→-- ============================================================
+   745→function SWEP:Holster(wep)
+   746→    -- Defensive: some derived weapons used to call BaseClass.Holster(wep)
+   747→    -- without passing `self`, which made `self` be the (sometimes NULL)
+   748→    -- `wep` argument and threw "Tried to use a NULL entity!" on
+   749→    -- self.Owner. Guard against NULL self here too so the error can never
+   750→    -- recur even if a future caller makes the same mistake.
+   751→    if not IsValid(self) then return true end
+   752→    if not IsValid(self.Owner) then return true end
+   753→    if not game.SinglePlayer() and not IsFirstTimePredicted() then return true end
+   754→    local vm = self.Owner:GetViewModel()
+   755→    if IsValid(vm) then
+   756→        -- Guard against NULL entity when entering vehicles
+   757→        local wepBase = nil
+   758→        if IsValid(wep) then
+   759→            wepBase = wep.Base
+   760→        end
+   761→        if wepBase and string.find(wepBase, "custom_uh_base") then
+   762→            vm:SetSkin(0)
+   763→            if CLIENT and GetConVar("uh_hands"):GetInt() == 0 then
+   764→                local handmat = getUHCacheMat("models/weapons/v_models/hands/v_hands")
+   765→                if handmat and self._oldHandTex then
+   766→                    local detail = self._oldHandTex.detail
+   767→                    handmat:SetTexture("$basetexture", self._oldHandTex.tex)
+   768→                    handmat:SetTexture("$detail", detail and not string.find(detail:GetName(),"error") and detail or Material("color"):GetTexture("$basetexture"))
+   769→                    handmat:SetFloat("$detailblendfactor", self._oldHandTex.blendfactor or 0)
+   770→                    handmat:SetInt("$detailblendmode", self._oldHandTex.blendmode or 0)
+   771→                    handmat:SetFloat("$detailscale", self._oldHandTex.scale or 1)
+   772→                end
+   773→            end
+   774→        end
+   775→        for bone_id = 0, vm:GetBoneCount() - 1 do
+   776→            if not string.find(vm:GetBoneName(bone_id), "INVALIDBONE") then
+   777→                vm:ManipulateBonePosition(bone_id, Vector(0,0,0))
+   778→                vm:ManipulateBoneAngles(bone_id, Angle(0,0,0))
+   779→                vm:ManipulateBoneScale(bone_id, Vector(1,1,1))
+   780→            end
+   781→        end
+   782→    end
+   783→    self:SetUHBool("Reloading", false)
+   784→    self:SetUHBool("Zooming", false)
+   785→    self:SetUHBool("Running", false)
+   786→    -- Reset ZoomFov lerp so the next weapon doesn't inherit a zoomed view
+   787→    self._zoomBlend = nil
+   788→    self._customUHChecked = nil  -- force re-check on next equip
+   789→    self:SetNWBool("FirstDrawPlaying", false)
+   790→    self:SetNWFloat("ReloadTime", 0)
+   791→    self:SetNWFloat("ReloadEndTime", 0)
+   792→    -- Nil guard: ClearAnimSounds is defined in this base (line ~494) AND in
+   793→    -- weapon_custom_uh_base_gun.lua (line ~271). However, when switching
+   794→    -- FROM a CUH-derived weapon (e.g. M8A1) to a non-CUH weapon, the
+   795→    -- engine can call Holster on a weapon instance whose metatable lookup
+   796→    -- for ClearAnimSounds returns nil (e.g. if a child base failed to
+   797→    -- inherit properly, or during partial-state edge cases like entering
+   798→    -- a vehicle). Guard against the nil case so holster never errors.
+   799→    if self.ClearAnimSounds then self:ClearAnimSounds() end
+   800→    if self:GetNWInt("FireMode") == 0 then self:SetNWInt("FireMode", 1) end
+   801→    if timer.Exists("UHReload_"..self.Owner:SteamID()) then
+   802→        timer.Remove("UHReload_"..self.Owner:SteamID())
+   803→    end
+   804→    self.NextReload = CurTime() + 0.5
+   805→    if self.CustomHolster then self:CustomHolster(wep) end
+   806→    return true
+   807→end
+   808→
+   809→function SWEP:ClientHolster()
+   810→    if game.SinglePlayer() then self:CallOnClient("ClientHolster") end
+   811→    if SERVER then return end
+   812→    local vm = IsValid(self.Owner) and self.Owner:GetViewModel() or nil
+   813→    if IsValid(vm) then
+   814→        vm:SetSubMaterial()
+   815→        vm:SetMaterial()
+   816→        vm:StopParticles()
+   817→    end
+   818→end
+   819→
+   820→-- ============================================================
+   821→-- Think
+   822→-- ============================================================
+   823→function SWEP:Think()
+   824→    cache_convars()
+   825→    if not IsValid(self.Owner) then return end
+   826→    local ct = CurTime()
+   827→    local vm = self.Owner:GetViewModel()
+   828→    if IsValid(vm) then
+   829→        self:HandleBones(vm, ct)
+   830→        self:HandleHands(vm)
+   831→    end
+   832→    self:HandleRunning(ct)
+   833→end
+   834→
+   835→-- ============================================================
+   836→-- CalcView — SWEP method (client-only)
+   837→-- ============================================================
+   838→-- This is the primary view-modification hook. The engine calls
+   839→-- SWEP:CalcView on the active weapon every frame. No class-name
+   840→-- check or inheritance walker is needed — if you inherit from this
+   841→-- base, you get the FOV zoom and view bob automatically.
+   842→--
+   843→-- Child weapons that override CalcView should call BaseClass.CalcView
+   844→-- first to preserve the FOV zoom / view bob behaviour:
+   845→--   function SWEP:CalcView(ply, pos, ang, fov)
+   846→--       pos, ang, fov = BaseClass.CalcView(self, ply, pos, ang, fov)
+   847→--       -- custom camera logic here
+   848→--       return pos, ang, fov
+   849→--   end
+   850→-- ============================================================
+   851→if CLIENT then
+   852→    -- Walks the SWEP inheritance chain looking for a Base named
+   853→    -- "custom_uh_base". Used by the PreDrawViewModel cleanup hook below.
+   854→    local function IsCustomUHWeapon(wep)
+   855→        if wep._customUHChecked then return wep._isCustomUH end
+   856→        wep._customUHChecked = true
+   857→        wep._isCustomUH = false
+   858→        local cur = wep
+   859→        local seen = {}
+   860→        local depth = 0
+   861→        while cur and not seen[cur] and depth < 16 do
+   862→            seen[cur] = true
+   863→            depth = depth + 1
+   864→            if cur.Base and string.find(cur.Base, "custom_uh_base") then
+   865→                wep._isCustomUH = true
+   866→                break
+   867→            end
+   868→            if not cur.Base then break end
+   869→            cur = weapons.GetStored(cur.Base)
+   870→        end
+   871→        return wep._isCustomUH
+   872→    end
+   873→
+   874→    function SWEP:CalcView(ply, pos, ang, fov)
+   875→        if not IsValid(ply) then return end
+   876→        if ply:ShouldDrawLocalPlayer() then return end
+   877→        if not IsValid(self.Owner) or self.Owner ~= ply then return end
+   878→
+   879→        local ft = FrameTime()
+   880→        local intensity = (cv_viewbob and cv_viewbob:GetFloat()) or 1
+   881→        local vel = ply:GetVelocity()
+   882→        local velLen = vel:Length()
+   883→        local onGround = ply:OnGround()
+   884→        local isZooming = self.GetUHBool and self:GetUHBool("Zooming")
+   885→
+   886→        -- ============================================================
+   887→        -- VIEW BOB — position offset based on movement speed
+   888→        -- ============================================================
+   889→        if intensity > 0 and onGround and velLen > ply:GetWalkSpeed() * 0.3 then
+   890→            local zoomFactor = isZooming and 0.15 or 1
+   891→            if velLen < ply:GetWalkSpeed() * 1.2 then
+   892→                self._viewBobP = math.cos(CurTime()*15) * 1 * zoomFactor * intensity
+   893→                self._viewBobY = math.cos(CurTime()*12) * 0.5 * zoomFactor * intensity
+   894→            else
+   895→                self._viewBobP = math.cos(CurTime()*20) * 1.2 * zoomFactor * intensity
+   896→                self._viewBobY = math.cos(CurTime()*15) * 0.6 * zoomFactor * intensity
+   897→            end
+   898→        else
+   899→            self._viewBobP = Lerp(ft*10, self._viewBobP or 0, 0)
+   900→            self._viewBobY = Lerp(ft*10, self._viewBobY or 0, 0)
+   901→        end
+   902→
+   903→        pos = pos + ang:Up() * (self._viewBobP or 0)
+   904→        pos = pos + ang:Right() * (self._viewBobY or 0)
+   905→
+   906→        -- ============================================================
+   907→        -- SWEP.ZoomFov — FOV zoom while aiming down sights.
+   908→        -- ------------------------------------------------------------
+   909→        -- The player's view FOV is reduced by `ZoomFov` degrees while
+   910→        -- aiming. With the default SWEP.ZoomFov = 15 and a base FOV of
+   911→        -- 90, the aimed FOV is 75. Increase ZoomFov for more zoom:
+   912→        --   SWEP.ZoomFov = 30  →  aimed FOV = 60 (mild sniper)
+   913→        --   SWEP.ZoomFov = 60  →  aimed FOV = 30 (heavy sniper)
+   914→        --
+   915→        -- Tunables per-weapon:
+   916→        --   SWEP.ZoomFov       — FOV degrees to subtract while aiming (default 15)
+   917→        --   SWEP.ZoomSpeedIn   — lerp speed while aiming in  (default 15)
+   918→        --   SWEP.ZoomSpeedOut  — lerp speed while aiming out (default 10)
+   919→        -- ============================================================
+   920→        local zoomFov = self.ZoomFov or 0
+   921→        if zoomFov > 0 then
+   922→            local zoomSpeedIn  = self.ZoomSpeedIn  or 15
+   923→            local zoomSpeedOut = self.ZoomSpeedOut or 10
+   924→            local zoomSpeed    = isZooming and ft*zoomSpeedIn or ft*zoomSpeedOut
+   925→            local zoomTarget   = isZooming and zoomFov or 0
+   926→            local zoomCurrent  = self._zoomBlend or 0
+   927→            -- Ease-out: snap accelerates as it approaches the target
+   928→            local zoomRemaining = math.abs(zoomTarget - zoomCurrent) / math.max(zoomFov, 1)
+   929→            local zoomEaseSpeed = math.min(zoomSpeed * (1 + (1 - zoomRemaining) * 1.5), 1)
+   930→            self._zoomBlend = Lerp(zoomEaseSpeed, zoomCurrent, zoomTarget)
+   931→            fov = fov - (self._zoomBlend or 0)
+   932→        else
+   933→            self._zoomBlend = nil
+   934→        end
+   935→
+   936→        return pos, ang, fov
+   937→    end
+   938→
+   939→    -- PreDrawViewModel cleanup hook — this stays as a hook because it needs
+   940→    -- to run for ALL viewmodels (not just the active weapon's) to clear
+   941→    -- stale sub-materials from previous frames.
+   942→    hook.Add("PreDrawViewModel", "CustomUH_CleanupSubMaterials", function(vm, ply, wep)
+   943→        if not IsValid(wep) or not wep.GetClass then return end
+   944→        if not IsCustomUHWeapon(wep) then return end
+   945→        local materials = vm:GetMaterials()
+   946→        for i = 0, #materials - 1 do
+   947→            vm:SetSubMaterial(i, "")
+   948→        end
+   949→    end)
+   950→end
+   951→
+   952→-- ============================================================
+   953→-- PreDrawViewModel
+   954→-- ============================================================
+   955→function SWEP:PreDrawViewModel()
+   956→    if self.Use2DScope and self:GetUHBool("Zooming") then
+   957→        render.SetBlend(0)
+   958→        return
+   959→    end
+   960→    local vm = IsValid(self.Owner) and self.Owner:GetViewModel() or nil
+   961→    if IsValid(vm) then
+   962→        local materials = vm:GetMaterials()
+   963→        for i = 0, #materials - 1 do vm:SetSubMaterial(i, "") end
+   964→        if self.HideMaterials then
+   965→            for index = 1, #materials do
+   966→                local material = materials[index]
+   967→                if self.HideMaterials[material] then
+   968→                    vm:SetSubMaterial(index - 1, "engine/occlusionproxy")
+   969→                end
+   970→            end
+   971→        end
+   972→    end
+   973→    if not (cv_blur and cv_blur:GetBool()) then return end
+   974→    if (self.ScopeBlur and self:GetUHBool("Zooming")) or self:GetUHBool("Reloading") or self:GetNWFloat("DeployTime") > CurTime() then
+   975→        self._blurAmount = math.Approach(self._blurAmount or 0, 1, FrameTime()*1.25)
+   976→    else
+   977→        self._blurAmount = math.Approach(self._blurAmount or 0, 0, FrameTime())
+   978→    end
+   979→    if (self._blurAmount or 0) > 0 then
+   980→        cam.Start2D()
+   981→            surface.SetDrawColor(255, 255, 255)
+   982→            surface.SetMaterial(Material("pp/blurscreen"))
+   983→            local b = (cv_blur_amount and cv_blur_amount:GetInt()) or 5
+   984→            local w, h = ScrW(), ScrH()
+   985→            for i = 1, b do
+   986→                Material("pp/blurscreen"):SetFloat("$blur", i * (self._blurAmount or 0))
+   987→                Material("pp/blurscreen"):Recompute()
+   988→                render.UpdateScreenEffectTexture()
+   989→                surface.DrawTexturedRect(0, 0, w, h)
+   990→            end
+   991→        cam.End2D()
+   992→    end
+   993→end
+   994→
+   995→-- ============================================================
+   996→-- PostDrawViewModel — VM3D2D + VElements
+   997→-- ============================================================
+   998→function SWEP:PostDrawViewModel(vm)
+   999→    -- VElements (attachment models on viewmodel bones)
+  1000→    if self.ViewModelElements then
+  1001→        if not self._vElementsInit then self:InitVElements() end
+  1002→        self:DrawVElements(vm)
+  1003→    end
+  1004→
+  1005→    -- VM3D2D (2D surfaces on bones)
+  1006→    if self.VM3D2D then
+  1007→        for name, elem in pairs(self.VM3D2D) do
+  1008→            if not elem.bone or not elem.draw_func then continue end
+  1009→            local boneIdx = vm:LookupBone(elem.bone)
+  1010→            if not boneIdx then continue end
+  1011→            local bonePos, boneAng = vm:GetBonePosition(boneIdx)
+  1012→            if not bonePos then continue end
+  1013→            local pos = Vector(bonePos)
+  1014→            local ang = Angle(boneAng)
+  1015→            pos = pos + ang:Right()*(elem.pos and elem.pos.x or 0)
+  1016→            pos = pos + ang:Forward()*(elem.pos and elem.pos.y or 0)
+  1017→            pos = pos + ang:Up()*(elem.pos and elem.pos.z or 0)
+  1018→            ang:RotateAroundAxis(ang:Right(), (elem.ang and elem.ang.p) or 0)
+  1019→            ang:RotateAroundAxis(ang:Up(), (elem.ang and elem.ang.y) or 0)
+  1020→            ang:RotateAroundAxis(ang:Forward(), (elem.ang and elem.ang.r) or 0)
+  1021→            cam.Start3D2D(pos, ang, elem.size or 0.004)
+  1022→                elem.draw_func(self)
+  1023→            cam.End3D2D()
+  1024→        end
+  1025→    end
+  1026→end
+  1027→
+  1028→-- ============================================================
+  1029→-- HUD
+  1030→-- ============================================================
+  1031→function SWEP:HUDShouldDraw(name)
+  1032→    if GetConVar("uh_hud"):GetBool() and (name == "CHudAmmo" or name == "CHudSecondaryAmmo") then
+  1033→        return false
+  1034→    end
+  1035→    return true
+  1036→end
+  1037→
+  1038→function SWEP:DrawWeaponSelection(x, y, wide, tall, alpha)
+  1039→    y = y + 10; x = x + 10; wide = wide - 20; tall = tall - 20
+  1040→    if self.WorldModel and self.WorldModel ~= "" then
+  1041→        if not IsValid(self._selectionModel) then
+  1042→            self._selectionModel = ClientsideModel(self.WorldModel, RENDER_GROUP_OPAQUE_ENTITY)
+  1043→            self._selectionModel:SetNoDraw(true)
+  1044→        else
+  1045→            self._selectionModel:SetModel(self.WorldModel)
+  1046→            local vec = Vector(48, 48, 48)
+  1047→            local ang = Vector(-48, -48, -48):Angle()
+  1048→            cam.Start3D(vec, ang, 20, x, y+35, wide, tall, 5, 4096)
+  1049→                cam.IgnoreZ(true)
+  1050→                render.SuppressEngineLighting(true)
+  1051→                render.SetLightingOrigin(self:GetPos())
+  1052→                render.ResetModelLighting(50/255, 50/255, 50/255)
+  1053→                render.SetColorModulation(1, 1, 1)
+  1054→                render.SetBlend(alpha/255)
+  1055→                render.SetModelLighting(4, 1, 1, 1)
+  1056→                -- FIXED: operator precedence
+  1057→                self._selectionModel:SetRenderAngles(Angle(0, (RealTime()*30) % 360, 0))
+  1058→                self._selectionModel:DrawModel()
+  1059→                self._selectionModel:SetRenderAngles()
+  1060→                render.SetColorModulation(1, 1, 1)
+  1061→                render.SetBlend(1)
+  1062→                render.SuppressEngineLighting(false)
+  1063→                cam.IgnoreZ(false)
+  1064→            cam.End3D()
+  1065→        end
+  1066→    else
+  1067→        surface.SetDrawColor(255, 255, 255, alpha)
+  1068→        surface.SetTexture(self.WepSelectIcon or -1)
+  1069→        surface.DrawTexturedRect(x, y, wide, tall)
+  1070→    end
+  1071→    if self.Primary.ClipSize > 0 then
+  1072→        local col = (self:Clip1()/self.Primary.ClipSize > 0.25) and Color(255,230,0,alpha) or Color(255,0,0,alpha)
+  1073→        draw.SimpleText(self:Clip1().."/"..(IsValid(self.Owner) and self.Owner:GetAmmoCount(self.Primary.Ammo) or 0),
+  1074→            "HudSelectionText", x+wide/2, y+tall-14, col, TEXT_ALIGN_CENTER, TEXT_ALIGN_BOTTOM)
+  1075→    end
+  1076→end
+  1077→

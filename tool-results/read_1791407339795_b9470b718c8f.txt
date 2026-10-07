@@ -1,0 +1,690 @@
+     1→-- sh_cuh_attachments.lua
+     2→-- CustomUH Attachment System — Autorun loader
+     3→-- CUH BUILD: v0.5.4-camera-bone-diag (2026-10-02)
+     4→-- ============================================================
+     5→-- This file lives in lua/autorun/ and handles ONLY:
+     6→--   1. Attachment data file registration (file.Find + include)
+     7→--   2. Networking (CUH2_AttSelect, CUH2_AttSync, CUH2_AttLoad)
+     8→--   3. Save/load (JSON per SteamID)
+     9→--
+    10→-- It does NOT define any SWEP: methods — those are all in
+    11→-- weapon_cuh_base_gun.lua directly. This keeps the architecture
+    12→-- clean: SWEP methods in weapon files, data/logic in autorun.
+    13→-- ============================================================
+    14→
+    15→AddCSLuaFile()
+    16→
+    17→print("[CUH] sh_cuh_attachments.lua loading (realm=" .. (SERVER and "SERVER" or "CLIENT") .. ")")
+    18→
+    19→-- ============================================================
+    20→-- NAMESPACE
+    21→-- ============================================================
+    22→CustomUH = CustomUH or {}
+    23→CustomUH.Attachments = CustomUH.Attachments or {}
+    24→CustomUH.Version = "3.0"
+    25→
+    26→-- UI colors
+    27→CustomUH.Colors = {
+    28→    Background  = Color(30, 30, 30, 240),
+    29→    Panel       = Color(40, 40, 40, 240),
+    30→    Text        = Color(220, 220, 220, 255),
+    31→    TextBright   = Color(255, 255, 255, 255),
+    32→    TextDim      = Color(150, 150, 150, 255),
+    33→    Accent       = Color(0, 150, 255, 255),
+    34→    AccentDim    = Color(0, 80, 140, 200),
+    35→    Selected     = Color(0, 200, 100, 60),
+    36→    Hover        = Color(255, 255, 255, 20),
+    37→    StatPositive = Color(100, 255, 100, 255),
+    38→    StatNegative = Color(255, 100, 100, 255),
+    39→    StatNeutral  = Color(200, 200, 200, 255),
+    40→}
+    41→
+    42→-- Convar for menu key (guard against double-registration)
+    43→if not ConVarExists("cuh_menu_key") then
+    44→    CreateClientConVar("cuh_menu_key", "c", true, false, "Key to open weapon customization")
+    45→end
+    46→
+    47→-- ============================================================
+    48→-- ATTACHMENT REGISTRATION
+    49→-- ============================================================
+    50→-- Find every attachment file ONCE at addon-load time and:
+    51→--   * SERVER: AddCSLuaFile() it so it gets pushed to every client
+    52→--     that ever connects. Doing this during addon load (rather than
+    53→--     inside a Think hook) guarantees clients receive the file BEFORE
+    54→--     they try to include() it. The previous code called AddCSLuaFile
+    55→--     inside RegisterAttachments (a Think hook), which was too late
+    56→--     for already-connected clients and caused include() to fail
+    57→--     silently under pcall — so CustomUH.Attachments stayed empty
+    58→--     and the menu showed slot headers with zero attachment buttons.
+    59→--   * BOTH: include() it and register the ATTACHMENT table.
+    60→-- ============================================================
+    61→
+    62→CustomUH._attFiles = file.Find("cuh_attachments/*.lua", "LUA")
+    63→
+    64→if SERVER then
+    65→    for _, filename in ipairs(CustomUH._attFiles) do
+    66→        AddCSLuaFile("cuh_attachments/" .. filename)
+    67→    end
+    68→end
+    69→
+    70→function CustomUH.RegisterAttachments()
+    71→    -- Use the file list captured at addon-load time. On a server-only
+    72→    -- install (where the client never had the addon mounted locally),
+    73→    -- the server pushes this list over net via CUH2_AttList and the
+    74→    -- client replaces CustomUH._attFiles with the networked copy.
+    75→    local files = CustomUH._attFiles or {}
+    76→    print("[CUH-DBG] RegisterAttachments CALLED  realm=" .. (SERVER and "SERVER" or "CLIENT")
+    77→        .. "  file count=" .. #files)
+    78→    for i, fn in ipairs(files) do
+    79→        print("[CUH-DBG]   file[" .. i .. "] = " .. tostring(fn))
+    80→    end
+    81→    for _, filename in ipairs(files) do
+    82→        ATTACHMENT = {}
+    83→        local path = "cuh_attachments/" .. filename
+    84→
+    85→        local ok, err = pcall(include, path)
+    86→        if not ok then
+    87→            print("[CUH-DBG]   Error loading " .. filename .. ": " .. tostring(err))
+    88→            print("[CustomUH] Error loading " .. filename .. ": " .. tostring(err))
+    89→        end
+    90→
+    91→        if ATTACHMENT and ATTACHMENT.Name then
+    92→            local id = string.StripExtension(filename)
+    93→            ATTACHMENT.ID = id
+    94→            CustomUH.Attachments[id] = ATTACHMENT
+    95→            print("[CUH-DBG]   registered attachment id='" .. id .. "'  Name='" .. tostring(ATTACHMENT.Name) .. "'  PartClass=" .. tostring(ATTACHMENT.PartClass))
+    96→        else
+    97→            print("[CUH-DBG]   ATTACHMENT skipped (no .Name): " .. filename)
+    98→            print("[CustomUH] Attachment skipped (no .Name): " .. filename)
+    99→        end
+   100→        ATTACHMENT = nil
+   101→    end
+   102→    print("[CUH-DBG] RegisterAttachments DONE  total registered = " .. table.Count(CustomUH.Attachments))
+   103→end
+   104→
+   105→-- ============================================================
+   106→-- AMMO TYPE REGISTRATION
+   107→-- ============================================================
+   108→CustomUH.AmmoTypes = CustomUH.AmmoTypes or {}
+   109→
+   110→function CustomUH.RegisterAmmo(ammoID, displayName, maxReserve)
+   111→    CustomUH.AmmoTypes[ammoID] = {
+   112→        Name = displayName or ammoID,
+   113→        Max = maxReserve or 999,
+   114→    }
+   115→end
+   116→
+   117→function CustomUH.GetAmmoName(ammoID)
+   118→    local ammo = CustomUH.AmmoTypes[ammoID]
+   119→    return ammo and ammo.Name or ammoID
+   120→end
+   121→
+   122→-- ============================================================
+   123→-- SAVE/LOAD SYSTEM
+   124→-- ============================================================
+   125→local SAVE_DIR = "cuh_saves"
+   126→
+   127→function CustomUH.GetSavePath(ply)
+   128→    if not IsValid(ply) or not ply:IsPlayer() then return nil end
+   129→    return SAVE_DIR .. "/" .. ply:SteamID64() .. ".json"
+   130→end
+   131→
+   132→function CustomUH.LoadAttachments(wep, ply)
+   133→    if not IsValid(ply) then ply = wep:GetOwner() end
+   134→    if not IsValid(ply) then return end
+   135→    if not wep.Attachments then return end
+   136→
+   137→    local path = CustomUH.GetSavePath(ply)
+   138→    if not path or not file.Exists(path, "DATA") then
+   139→        print("[CUH-DBG] LoadAttachments: no save file at " .. tostring(path))
+   140→        return
+   141→    end
+   142→
+   143→    local data = util.JSONToTable(file.Read(path, "DATA") or "")
+   144→    if not data then
+   145→        print("[CUH-DBG] LoadAttachments: save file is invalid JSON")
+   146→        return
+   147→    end
+   148→
+   149→    local class = wep:GetClass()
+   150→    local saved = data[class]
+   151→    if not saved then
+   152→        print("[CUH-DBG] LoadAttachments: no save entry for " .. class)
+   153→        return
+   154→    end
+   155→
+   156→    print("[CUH-DBG] LoadAttachments: loading saved selections for " .. class)
+   157→    local changed = false
+   158→    local tempData = {}
+   159→
+   160→    for slot, index in pairs(saved) do
+   161→        slot = tonumber(slot) or slot
+   162→        if wep.Attachments[slot] then
+   163→            if index == 0 or (wep.Attachments[slot].atts and index <= #wep.Attachments[slot].atts) then
+   164→                wep.Attachments[slot].sel = index
+   165→                changed = true
+   166→                tempData[#tempData + 1] = { slot = slot, index = index }
+   167→                print("[CUH-DBG]   loaded slot=" .. slot .. "  index=" .. index)
+   168→            end
+   169→        end
+   170→    end
+   171→
+   172→    if changed then
+   173→        wep:ApplyAttachments()
+   174→
+   175→        -- Send saved state to client
+   176→        net.Start("CUH2_AttLoad")
+   177→            net.WriteEntity(wep)
+   178→            net.WriteUInt(#tempData, 8)
+   179→            for i = 1, #tempData do
+   180→                net.WriteUInt(tempData[i].slot, 8)
+   181→                net.WriteUInt(tempData[i].index, 8)
+   182→            end
+   183→        net.Send(ply)
+   184→    end
+   185→end
+   186→
+   187→function CustomUH.SaveAttachments(wep, ply)
+   188→    if not IsValid(ply) then ply = wep:GetOwner() end
+   189→    if not IsValid(ply) then return end
+   190→    if not wep.Attachments then return end
+   191→
+   192→    local path = CustomUH.GetSavePath(ply)
+   193→    if not path then return end
+   194→
+   195→    local data = {}
+   196→    if file.Exists(path, "DATA") then
+   197→        data = util.JSONToTable(file.Read(path, "DATA") or "") or {}
+   198→    end
+   199→
+   200→    local class = wep:GetClass()
+   201→    local current = {}
+   202→    local hasAttachments = false
+   203→
+   204→    for slot, slotData in pairs(wep.Attachments) do
+   205→        if slotData.sel and slotData.sel > 0 then
+   206→            current[tostring(slot)] = slotData.sel
+   207→            hasAttachments = true
+   208→        else
+   209→            current[tostring(slot)] = 0
+   210→        end
+   211→    end
+   212→
+   213→    if hasAttachments then
+   214→        data[class] = current
+   215→    else
+   216→        data[class] = nil
+   217→    end
+   218→
+   219→    if not file.Exists(SAVE_DIR, "DATA") then
+   220→        file.CreateDir(SAVE_DIR)
+   221→    end
+   222→
+   223→    file.Write(path, util.TableToJSON(data, true))
+   224→    print("[CUH-DBG] SaveAttachments: saved to " .. path .. "  class=" .. class .. "  entries=" .. table.Count(current))
+   225→end
+   226→
+   227→function CustomUH.SaveAllAttachments(ply)
+   228→    if not IsValid(ply) then return end
+   229→    for _, wep in pairs(ply:GetWeapons()) do
+   230→        if wep.Attachments then
+   231→            CustomUH.SaveAttachments(wep, ply)
+   232→        end
+   233→    end
+   234→end
+   235→
+   236→-- ============================================================
+   237→-- NETWORKING
+   238→-- ============================================================
+   239→if SERVER then
+   240→    util.AddNetworkString("CUH2_AttSelect")
+   241→    util.AddNetworkString("CUH2_AttSync")
+   242→    util.AddNetworkString("CUH2_AttLoad")
+   243→    util.AddNetworkString("CUH2_AttList")
+   244→end
+   245→
+   246→-- ============================================================
+   247→-- CUH2_AttList — server pushes the attachment filename list to
+   248→-- clients that don't have the addon mounted locally. The client
+   249→-- then include()s each (which works because we AddCSLuaFile'd
+   250→-- them at addon-load time on the server).
+   251→-- ============================================================
+   252→if SERVER then
+   253→    local function SendAttList(ply)
+   254→        net.Start("CUH2_AttList")
+   255→            net.WriteUInt(#CustomUH._attFiles, 8)
+   256→            for _, fn in ipairs(CustomUH._attFiles) do
+   257→                net.WriteString(fn)
+   258→            end
+   259→        net.Send(ply)
+   260→    end
+   261→
+   262→    -- Send to a player as soon as they finish initializing
+   263→    hook.Add("PlayerInitialSpawn", "CUH2_SendAttList", function(ply)
+   264→        timer.Simple(1, function()
+   265→            if IsValid(ply) then SendAttList(ply) end
+   266→        end)
+   267→    end)
+   268→end
+   269→
+   270→if CLIENT then
+   271→    net.Receive("CUH2_AttList", function()
+   272→        local n = net.ReadUInt(8)
+   273→        local list = {}
+   274→        for i = 1, n do
+   275→            list[i] = net.ReadString()
+   276→        end
+   277→        -- Only adopt the server's list if we didn't find any files
+   278→        -- locally — preserves the local file.Find result when the
+   279→        -- addon is mounted on the client (which is faster and works
+   280→        -- even before PlayerInitialSpawn fires).
+   281→        if not CustomUH._attFiles or #CustomUH._attFiles == 0 then
+   282→            CustomUH._attFiles = list
+   283→            CustomUH.RegisterAttachments()
+   284→        end
+   285→    end)
+   286→end
+   287→
+   288→if SERVER then
+   289→    net.Receive("CUH2_AttSelect", function(len, ply)
+   290→        local wep = net.ReadEntity()
+   291→        local slot = net.ReadUInt(8)
+   292→        local index = net.ReadUInt(8)
+   293→
+   294→        print("[CUH-DBG] SERVER net CUH2_AttSelect  ply=" .. tostring(ply) .. "  wep=" .. tostring(wep)
+   295→            .. "  slot=" .. tostring(slot) .. "  index=" .. tostring(index))
+   296→
+   297→        if not IsValid(wep) then
+   298→            print("[CUH-DBG]   ABORT: wep not valid")
+   299→            return
+   300→        end
+   301→        if wep:GetOwner() ~= ply then
+   302→            print("[CUH-DBG]   ABORT: owner mismatch  owner=" .. tostring(wep:GetOwner()))
+   303→            return
+   304→        end
+   305→        if not wep.Attachments or not wep.Attachments[slot] then
+   306→            print("[CUH-DBG]   ABORT: wep.Attachments or slot missing")
+   307→            return
+   308→        end
+   309→
+   310→        -- Validate index
+   311→        if index > 0 and (not wep.Attachments[slot].atts or index > #wep.Attachments[slot].atts) then
+   312→            print("[CUH-DBG]   ABORT: index out of range")
+   313→            return
+   314→        end
+   315→
+   316→        -- forceDefault check
+   317→        if index == 0 and wep.Attachments[slot].forceDefault
+   318→            and wep.Attachments[slot].default and wep.Attachments[slot].default > 0 then
+   319→            index = wep.Attachments[slot].default
+   320→            print("[CUH-DBG]   forceDefault snapped 0 -> " .. tostring(index))
+   321→        end
+   322→
+   323→        wep.Attachments[slot].sel = index
+   324→        print("[CUH-DBG]   SERVER calling wep:ApplyAttachments() ...")
+   325→        wep:ApplyAttachments()
+   326→        print("[CUH-DBG]   SERVER calling CustomUH.SaveAttachments ...")
+   327→        CustomUH.SaveAttachments(wep, ply)
+   328→
+   329→        -- Broadcast to all clients
+   330→        net.Start("CUH2_AttSync")
+   331→            net.WriteEntity(wep)
+   332→            net.WriteUInt(slot, 8)
+   333→            net.WriteUInt(index, 8)
+   334→        net.Broadcast()
+   335→        print("[CUH-DBG]   SERVER broadcast CUH2_AttSync done")
+   336→    end)
+   337→end
+   338→
+   339→if CLIENT then
+   340→    net.Receive("CUH2_AttSync", function()
+   341→        local wep = net.ReadEntity()
+   342→        local slot = net.ReadUInt(8)
+   343→        local index = net.ReadUInt(8)
+   344→
+   345→        print("[CUH-DBG] CLIENT net CUH2_AttSync  wep=" .. tostring(wep) .. "  slot=" .. tostring(slot) .. "  index=" .. tostring(index))
+   346→
+   347→        if IsValid(wep) and wep.Attachments and wep.Attachments[slot] then
+   348→            wep.Attachments[slot].sel = index
+   349→            print("[CUH-DBG]   CLIENT calling wep:ApplyAttachments() ...")
+   350→            wep:ApplyAttachments()
+   351→        else
+   352→            print("[CUH-DBG]   ABORT: wep invalid or Attachments/slot missing")
+   353→        end
+   354→    end)
+   355→
+   356→    net.Receive("CUH2_AttLoad", function()
+   357→        local wep = net.ReadEntity()
+   358→        local count = net.ReadUInt(8)
+   359→
+   360→        if not IsValid(wep) or not wep.Attachments then return end
+   361→
+   362→        for i = 1, count do
+   363→            local slot = net.ReadUInt(8)
+   364→            local index = net.ReadUInt(8)
+   365→            if wep.Attachments[slot] then
+   366→                wep.Attachments[slot].sel = index
+   367→            end
+   368→        end
+   369→        wep:ApplyAttachments()
+   370→    end)
+   371→end
+   372→
+   373→-- ============================================================
+   374→-- HOOKS — auto save/load
+   375→-- ============================================================
+   376→
+   377→-- Load on weapon switch — PlayerSwitchWeapon is a real GMod hook
+   378→-- that fires when a player switches TO a new weapon.
+   379→-- The old code used "WeaponDeployed" which is NOT a standard GMod
+   380→-- hook and was never called, so LoadAttachments never ran and saved
+   381→-- attachments were never loaded back.
+   382→hook.Add("PlayerSwitchWeapon", "CUH2_LoadOnSwitch", function(ply, oldWep, newWep)
+   383→    if not IsValid(ply) or not IsValid(newWep) then return end
+   384→    if not newWep.IsCUHWeapon then return end
+   385→    if not newWep.Attachments then return end
+   386→    if SERVER then
+   387→        -- Defer to next tick so the weapon is fully initialized
+   388→        timer.Simple(0, function()
+   389→            if IsValid(newWep) and IsValid(ply) then
+   390→                CustomUH.LoadAttachments(newWep, ply)
+   391→            end
+   392→        end)
+   393→    end
+   394→end)
+   395→
+   396→-- Save on player death
+   397→hook.Add("PlayerDeath", "CUH2_SaveOnDeath", function(ply)
+   398→    if IsValid(ply) then CustomUH.SaveAllAttachments(ply) end
+   399→end)
+   400→
+   401→-- Save on disconnect
+   402→hook.Add("PlayerDisconnected", "CUH2_SaveOnDisconnect", function(ply)
+   403→    if IsValid(ply) then CustomUH.SaveAllAttachments(ply) end
+   404→end)
+   405→
+   406→-- ============================================================
+   407→-- INIT — register immediately at addon load, plus a Think fallback
+   408→-- ============================================================
+   409→-- Call RegisterAttachments() right now (the file list was captured
+   410→-- at addon-load time, AddCSLuaFile ran on the server during addon
+   411→-- load, and local clients have the lua files mounted). This avoids
+   412→-- the previous 1-frame delay where opening the menu in the very
+   413→-- first tick could see an empty CustomUH.Attachments table.
+   414→-- ============================================================
+   415→CustomUH.RegisterAttachments()
+   416→
+   417→-- Register default ammo types
+   418→CustomUH.RegisterAmmo("ar2", "7.62mm", 300)
+   419→CustomUH.RegisterAmmo("smg1", "9mm", 240)
+   420→CustomUH.RegisterAmmo("pistol", ".45 ACP", 150)
+   421→CustomUH.RegisterAmmo("357", ".357 Magnum", 60)
+   422→CustomUH.RegisterAmmo("buckshot", "12 Gauge", 80)
+   423→CustomUH.RegisterAmmo("SniperPenetratedRound", ".50 BMG", 60)
+   424→CustomUH.RegisterAmmo("RPG_Round", "RPG", 20)
+   425→
+   426→-- Think fallback: re-register on the first Think in case the early
+   427→-- call ran before the addon's lua files were fully available on the
+   428→-- client (rare, but harmless — RegisterAttachments is idempotent).
+   429→hook.Add("Think", "CUH2_Register", function()
+   430→    if CustomUH._registered then return end
+   431→    CustomUH._registered = true
+   432→    CustomUH.RegisterAttachments()
+   433→end)
+   434→
+   435→-- ============================================================
+   436→-- DIAGNOSTIC CONSOLE COMMANDS
+   437→-- ============================================================
+   438→-- These are for debugging attachment issues. They print detailed
+   439→-- state info to the console so you can see exactly what's happening.
+   440→
+   441→-- cuh_debug — prints the full state of the active weapon's attachments,
+   442→-- VElements, stat cache, and CustomUH.Attachments registration table.
+   443→concommand.Add("cuh_debug", function(ply, cmd, args)
+   444→    if not IsValid(ply) or not ply:IsPlayer() then return end
+   445→    local wep = ply:GetActiveWeapon()
+   446→    if not IsValid(wep) then
+   447→        print("[CUH-DEBUG] No active weapon")
+   448→        return
+   449→    end
+   450→
+   451→    print("[CUH-DEBUG] === Active Weapon State ===")
+   452→    print("  class:       " .. tostring(wep:GetClass()))
+   453→    print("  PrintName:   " .. tostring(wep.PrintName))
+   454→    print("  IsCUHWeapon: " .. tostring(wep.IsCUHWeapon))
+   455→    print("  Base:        " .. tostring(wep.Base))
+   456→    print("  has SetAttachment:       " .. tostring(wep.SetAttachment ~= nil))
+   457→    print("  has ApplyAttachments:    " .. tostring(wep.ApplyAttachments ~= nil))
+   458→    print("  has InitVElements:       " .. tostring(wep.InitVElements ~= nil))
+   459→    print("  has InitStatCache:       " .. tostring(wep.InitStatCache ~= nil))
+   460→    print("  has _statCache:          " .. tostring(wep._statCache ~= nil))
+   461→    print("  has _statOrigins:        " .. tostring(wep._statOrigins ~= nil))
+   462→    print("  has _vElementsInit:      " .. tostring(wep._vElementsInit))
+   463→
+   464→    print("")
+   465→    print("[CUH-DEBUG] === CustomUH.Attachments Registration ===")
+   466→    if CustomUH and CustomUH.Attachments then
+   467→        print("  total registered: " .. table.Count(CustomUH.Attachments))
+   468→        local sorted = {}
+   469→        for id, _ in pairs(CustomUH.Attachments) do sorted[#sorted+1] = id end
+   470→        table.sort(sorted)
+   471→        for _, id in ipairs(sorted) do
+   472→            local att = CustomUH.Attachments[id]
+   473→            print(string.format("  %-20s  Name=%-20s  PartClass=%-12s  ModelPath=%s",
+   474→                id, tostring(att.Name), tostring(att.PartClass), tostring(att.ModelPath)))
+   475→        end
+   476→    else
+   477→        print("  CustomUH.Attachments is NIL!")
+   478→    end
+   479→
+   480→    print("")
+   481→    print("[CUH-DEBUG] === Weapon Attachments Slots ===")
+   482→    if wep.Attachments then
+   483→        for i, slotData in ipairs(wep.Attachments) do
+   484→            local sel = wep.GetEffectiveAttachment and wep:GetEffectiveAttachment(i) or (slotData.sel or 0)
+   485→            local atts = ""
+   486→            for _, a in ipairs(slotData.atts or {}) do atts = atts .. a .. " " end
+   487→            print(string.format("  slot %d  sel(eff)=%s  default=%s  atts=[%s]",
+   488→                i, tostring(sel), tostring(slotData.default), atts))
+   489→        end
+   490→    else
+   491→        print("  wep.Attachments is NIL!")
+   492→    end
+   493→
+   494→    print("")
+   495→    print("[CUH-DEBUG] === ViewModelElements ===")
+   496→    if wep.ViewModelElements then
+   497→        for name, elem in pairs(wep.ViewModelElements) do
+   498→            print(string.format("  %-15s  model=%-50s  active=%s  _csModel=%s  _defaultSnapshot=%s",
+   499→                name, tostring(elem.model), tostring(elem.active),
+   500→                tostring(elem._csModel), tostring(elem._defaultSnapshot ~= nil)))
+   501→        end
+   502→    else
+   503→        print("  wep.ViewModelElements is NIL!")
+   504→    end
+   505→
+   506→    print("")
+   507→    print("[CUH-DEBUG] === Stat Cache (key stats) ===")
+   508→    if wep._statOrigins then
+   509→        for _, path in ipairs({"Primary.Spread", "Primary.Delay", "Primary.Damage",
+   510→                                "IronSightTime", "MoveSpeed", "Primary.IronAccuracy"}) do
+   511→            print(string.format("  %-25s  origin=%s  current=%s",
+   512→                path, tostring(wep._statOrigins[path]), tostring(wep.Primary and wep.Primary[string.match(path, "%.(.+)") or path])))
+   513→        end
+   514→    else
+   515→        print("  _statOrigins is NIL — InitStatCache has not run!")
+   516→    end
+   517→    print("[CUH-DEBUG] === End ===")
+   518→end)
+   519→
+   520→-- cuh_apply — manually triggers ApplyAttachments on the active weapon.
+   521→-- Use this to test if ApplyAttachments works without clicking in the menu.
+   522→concommand.Add("cuh_apply", function(ply, cmd, args)
+   523→    if not IsValid(ply) or not ply:IsPlayer() then return end
+   524→    local wep = ply:GetActiveWeapon()
+   525→    if not IsValid(wep) then
+   526→        print("[CUH] No active weapon")
+   527→        return
+   528→    end
+   529→    if not wep.ApplyAttachments then
+   530→        print("[CUH] Active weapon has no ApplyAttachments method — not a CUH weapon?")
+   531→        return
+   532→    end
+   533→    print("[CUH] Manually calling wep:ApplyAttachments() ...")
+   534→    wep:ApplyAttachments()
+   535→    print("[CUH] Done.")
+   536→end)
+   537→
+   538→-- cuh_set <slot> <index> — manually sets an attachment without the menu.
+   539→-- Example: cuh_set 2 2  → selects Hvy-B barrel (slot 2, index 2)
+   540→concommand.Add("cuh_set", function(ply, cmd, args)
+   541→    if not IsValid(ply) or not ply:IsPlayer() then return end
+   542→    local wep = ply:GetActiveWeapon()
+   543→    if not IsValid(wep) then return end
+   544→    if not wep.SetAttachment then
+   545→        print("[CUH] Active weapon has no SetAttachment method")
+   546→        return
+   547→    end
+   548→    local slot = tonumber(args[1] or "0")
+   549→    local index = tonumber(args[2] or "0")
+   550→    print("[CUH] Calling wep:SetAttachment(" .. slot .. ", " .. index .. ") ...")
+   551→    wep:SetAttachment(slot, index)
+   552→    print("[CUH] Done.")
+   553→end)
+   554→
+   555→-- cuh_reset — resets all attachment selections to defaults (or None).
+   556→concommand.Add("cuh_reset", function(ply, cmd, args)
+   557→    if not IsValid(ply) or not ply:IsPlayer() then return end
+   558→    local wep = ply:GetActiveWeapon()
+   559→    if not IsValid(wep) then return end
+   560→    if not wep.Attachments then return end
+   561→    print("[CUH] Resetting all slots to defaults ...")
+   562→    for slot, slotData in ipairs(wep.Attachments) do
+   563→        if wep.SetAttachment then
+   564→            wep:SetAttachment(slot, slotData.default or 0)
+   565→        end
+   566→    end
+   567→    print("[CUH] Done.")
+   568→end)
+   569→
+   570→-- cuh_save — manually saves the current attachment selections.
+   571→-- Use this to test if saving works.
+   572→concommand.Add("cuh_save", function(ply, cmd, args)
+   573→    if not IsValid(ply) or not ply:IsPlayer() then return end
+   574→    local wep = ply:GetActiveWeapon()
+   575→    if not IsValid(wep) then return end
+   576→    if not wep.Attachments then return end
+   577→    if not CustomUH.SaveAttachments then
+   578→        print("[CUH] SaveAttachments function not found!")
+   579→        return
+   580→    end
+   581→    print("[CUH] Manually calling SaveAttachments ...")
+   582→    CustomUH.SaveAttachments(wep, ply)
+   583→    -- Verify the save file was written
+   584→    local path = CustomUH.GetSavePath(ply)
+   585→    if path and file.Exists(path, "DATA") then
+   586→        print("[CUH] Save file exists at: " .. path)
+   587→        local contents = file.Read(path, "DATA")
+   588→        print("[CUH] Save file size: " .. #contents .. " bytes")
+   589→        print("[CUH] Save file contents:")
+   590→        print(contents)
+   591→    else
+   592→        print("[CUH] ERROR: Save file was NOT created!")
+   593→    end
+   594→end)
+   595→
+   596→-- cuh_load — manually loads saved attachments.
+   597→concommand.Add("cuh_load", function(ply, cmd, args)
+   598→    if not IsValid(ply) or not ply:IsPlayer() then return end
+   599→    local wep = ply:GetActiveWeapon()
+   600→    if not IsValid(wep) then return end
+   601→    if not wep.Attachments then return end
+   602→    if not CustomUH.LoadAttachments then
+   603→        print("[CUH] LoadAttachments function not found!")
+   604→        return
+   605→    end
+   606→    print("[CUH] Manually calling LoadAttachments ...")
+   607→    CustomUH.LoadAttachments(wep, ply)
+   608→    print("[CUH] Done. Run cuh_debug to see the loaded state.")
+   609→end)
+   610→
+   611→-- cuh_camtest — diagnostic for camera bone system.
+   612→-- Checks if CalcView exists on the weapon and where it comes from.
+   613→concommand.Add("cuh_camtest", function(ply, cmd, args)
+   614→    if not IsValid(ply) or not ply:IsPlayer() then return end
+   615→    local wep = ply:GetActiveWeapon()
+   616→    if not IsValid(wep) then return end
+   617→
+   618→    print("[CUH-CAM] === Camera Bone Diagnostic ===")
+   619→    print("  weapon class: " .. tostring(wep:GetClass()))
+   620→    print("  CameraAttachment: " .. tostring(wep.CameraAttachment))
+   621→    print("  CameraReserve: " .. tostring(wep.CameraReserve))
+   622→    print("  CameraOffset: " .. tostring(wep.CameraOffset))
+   623→    print("  has CalcView method: " .. tostring(wep.CalcView ~= nil))
+   624→
+   625→    -- Check if the class table has CameraAttachment
+   626→    -- (instance should inherit via metatable)
+   627→    local class = weapons.GetStored(wep:GetClass())
+   628→    if class then
+   629→        print("  CLASS table CameraAttachment: " .. tostring(class.CameraAttachment))
+   630→        print("  CLASS table Base: " .. tostring(class.Base))
+   631→        -- Count how many keys are on the class table
+   632→        local n = 0
+   633→        for _ in pairs(class) do n = n + 1 end
+   634→        print("  CLASS table key count: " .. n)
+   635→        -- List the first 20 keys to see what IS there
+   636→        local keys = {}
+   637→        for k, _ in pairs(class) do keys[#keys+1] = tostring(k) end
+   638→        table.sort(keys)
+   639→        print("  CLASS table keys: " .. table.concat(keys, ", "))
+   640→    else
+   641→        print("  CLASS table NOT FOUND via weapons.GetStored!")
+   642→    end
+   643→
+   644→    -- Walk the inheritance chain looking for CameraAttachment
+   645→    print("  inheritance chain:")
+   646→    local cur = class
+   647→    local depth = 0
+   648→    while cur and depth < 10 do
+   649→        depth = depth + 1
+   650→        print("    [depth " .. depth .. "] class=" .. tostring(cur.ClassName or cur.Base or "?")
+   651→            .. "  CameraAttachment=" .. tostring(cur.CameraAttachment))
+   652→        if not cur.Base then break end
+   653→        cur = weapons.GetStored(cur.Base)
+   654→    end
+   655→
+   656→    if wep.CalcView then
+   657→        local info = debug.getinfo(wep.CalcView, "S")
+   658→        if info then
+   659→            print("  CalcView source: " .. tostring(info.short_src) .. ":" .. tostring(info.linedefined))
+   660→            if string.find(info.short_src or "", "weapon_cuh_base_gun", 1, true) then
+   661→                print("  -> CalcView is OURS (CUH base)")
+   662→            else
+   663→                print("  -> WARNING: CalcView is NOT from CUH base!")
+   664→                print("  -> Another addon is shadowing it.")
+   665→            end
+   666→        end
+   667→    end
+   668→
+   669→    -- Check the viewmodel's "camera" attachment
+   670→    local vm = ply:GetViewModel()
+   671→    if IsValid(vm) then
+   672→        print("  viewmodel: " .. tostring(vm))
+   673→        print("  vm model: " .. tostring(vm:GetModel()))
+   674→        -- Try both capitalizations
+   675→        local attID1 = vm:LookupAttachment("Camera")
+   676→        local attID2 = vm:LookupAttachment("camera")
+   677→        print("  LookupAttachment('Camera') = " .. tostring(attID1))
+   678→        print("  LookupAttachment('camera') = " .. tostring(attID2))
+   679→        -- List all attachments
+   680→        local atts = vm:GetAttachments()
+   681→        print("  all attachments on VM:")
+   682→        for _, a in ipairs(atts) do
+   683→            print("    " .. tostring(a.name) .. " (id=" .. tostring(a.id) .. ")")
+   684→        end
+   685→    else
+   686→        print("  viewmodel is NOT valid!")
+   687→    end
+   688→    print("[CUH-CAM] === End ===")
+   689→end)
+   690→
