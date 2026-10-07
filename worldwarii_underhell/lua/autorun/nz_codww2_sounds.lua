@@ -3223,13 +3223,13 @@ sound.Add({
     sound = {"weapons/tfa_codww2/m1garand/wpn_m1garand_mid_01.wav", "weapons/tfa_codww2/m1garand/wpn_m1garand_mid_02.wav", "weapons/tfa_codww2/m1garand/wpn_m1garand_mid_03.wav"}
 })
 --sound.Add({
-    name = "TFA_CODWW2_M1GRND.Low.Lyr",
-    channel = CHAN_WEAPON,
-    volume = 1,
-    level = 140,
-    pitch = {100},
-    sound = {"weapons/tfa_codww2/m1garand/wpn_m1garand_low_lyr_01.wav"}
-})
+    --name = "TFA_CODWW2_M1GRND.Low.Lyr",
+    --channel = CHAN_WEAPON,
+    --volume = 1,
+    --level = 140,
+    --pitch = {100},
+    --sound = {"weapons/tfa_codww2/m1garand/wpn_m1garand_low_lyr_01.wav"}
+--})
 sound.Add({
     name = "TFA_CODWW2_M1GRND.Sub",
     channel = CHAN_WEAPON,
@@ -3531,13 +3531,13 @@ sound.Add({
     sound = {"weapons/tfa_codww2/stg44/wpn_stg44_lyr_2_01.wav", "weapons/tfa_codww2/stg44/wpn_stg44_lyr_2_02.wav", "weapons/tfa_codww2/stg44/wpn_stg44_lyr_2_03.wav"}
 })
 --sound.Add({
-    name = "TFA_CODWW2_STG44.Sub",
-    channel = CHAN_WEAPON,
-    volume = 1,
-    level = 140,
-    pitch = {100},
-    sound = {"weapons/tfa_codww2/stg44/wpn_stg44_sub.wav"}
-})
+    --name = "TFA_CODWW2_STG44.Sub",
+    --channel = CHAN_WEAPON,
+    --volume = 1,
+    --level = 140,
+    --pitch = {100},
+    --sound = {"weapons/tfa_codww2/stg44/wpn_stg44_sub.wav"}
+--})
 sound.Add({
     name = "TFA_CODWW2_STG44.Ext.Mp",
     channel = CHAN_WEAPON,
@@ -6753,13 +6753,13 @@ sound.Add({
     sound = {"weapons/tfa_codww2/kbsp1938/wpn_karabin_shot_01.wav", "weapons/tfa_codww2/kbsp1938/wpn_karabin_shot_02.wav", "weapons/tfa_codww2/kbsp1938/wpn_karabin_shot_03.wav", "weapons/tfa_codww2/kbsp1938/wpn_karabin_shot_04.wav"}
 })
 --sound.Add({
-    name = "TFA_CODWW2_KBSP.Ext",
-    channel = CHAN_WEAPON,
-    volume = 1,
-    level = 140,
-    pitch = {100},
-    sound = {"weapons/tfa_codww2/kbsp1938/wpn_karabin_tail_01.wav", "weapons/tfa_codww2/kbsp1938/wpn_karabin_tail_02.wav"}
-})
+    --name = "TFA_CODWW2_KBSP.Ext",
+    --channel = CHAN_WEAPON,
+    --volume = 1,
+    --level = 140,
+    --pitch = {100},
+    --sound = {"weapons/tfa_codww2/kbsp1938/wpn_karabin_tail_01.wav", "weapons/tfa_codww2/kbsp1938/wpn_karabin_tail_02.wav"}
+--})
 sound.Add({
     name = "TFA_CODWW2_KBSP.ShootLast",
     channel = CHAN_WEAPON,
