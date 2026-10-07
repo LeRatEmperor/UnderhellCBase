@@ -339,7 +339,9 @@ end
 -- ============================================================
 
 function SWEP:Holster(wep)
-    self._justExitedSprint = false
+    self._burstRemaining = nil
+    self._burstNextFire = nil
+self._justExitedSprint = false
     self.wasZooming = false
     self.wasRunning = false
     return BaseClass.Holster(self, wep)
@@ -604,11 +606,3 @@ SWEP.CustomThink = function(self, ct)
     end
 end
 
--- Cancel burst on holster
-local _origHolster = SWEP.Holster
-function SWEP:Holster(wep)
-    self._burstRemaining = nil
-    self._burstNextFire = nil
-    if _origHolster then return _origHolster(self, wep) end
-    return true
-end
