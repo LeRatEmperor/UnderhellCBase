@@ -139,13 +139,60 @@ SWEP.Animations = {
 }
 
 SWEP.AnimSounds = {
+    ["draw"] = {
+        { time = 0.0333, sound = "TFA_CODWW2_RIFLE.Raise" },
+    },
+    ["draw_empty"] = {
+        { time = 0.0333, sound = "TFA_CODWW2_RIFLE.Raise" },
+    },
+    ["draw_first"] = {
+        { time = 0.3333, sound = "TFA_CODWW2_KAR98K.FPO" },
+    },
+    ["holster"] = {
+        { time = 0.0333, sound = "TFA_CODWW2_RIFLE.Holster" },
+    },
+    ["holster_empty"] = {
+        { time = 0.0333, sound = "TFA_CODWW2_RIFLE.Holster" },
+    },
     ["inspect"] = {
+        { time = 0.0333, sound = "TFA_CODWW2_ARISAKA.Inspect1" },
+        { time = 1.6667, sound = "TFA_CODWW2_ARISAKA.Inspect2" },
+    },
+    ["inspect_empty"] = {
         { time = 0.0333, sound = "TFA_CODWW2_ARISAKA.Inspect1" },
         { time = 1.6667, sound = "TFA_CODWW2_ARISAKA.Inspect2" },
     },
     ["inspect_epic"] = {
         { time = 0.0333, sound = "TFA_CODWW2_ARISAKA.EpicInspect1" },
-        { time = 1.6667, sound = "TFA_CODWW2_ARISAKA.EpicInspect2" },
+        { time = 3.6667, sound = "TFA_CODWW2_ARISAKA.EpicInspect2" },
+    },
+    ["rechamber"] = {
+        { time = 0.1667, sound = "TFA_CODWW2_KAR98K.CycleOpen" },
+        { time = 0.5000, sound = "TFA_CODWW2_KAR98K.CycleClose" },
+    },
+    ["rechamber_ads"] = {
+        { time = 0.1667, sound = "TFA_CODWW2_KAR98K.CycleAdsOpen" },
+        { time = 0.5000, sound = "TFA_CODWW2_KAR98K.CycleAdsClose" },
+    },
+    ["reload"] = {
+        { time = 0.0333, sound = "TFA_CODWW2_KAR98K.TacOpen" },
+        { time = 1.8333, sound = "TFA_CODWW2_KAR98K.TacClipin" },
+        { time = 2.5000, sound = "TFA_CODWW2_KAR98K.TacClose" },
+    },
+    ["reload_empty"] = {
+        { time = 0.0333, sound = "TFA_CODWW2_KAR98K.EmptyOpen" },
+        { time = 1.8333, sound = "TFA_CODWW2_KAR98K.EmptyClipin" },
+        { time = 2.5000, sound = "TFA_CODWW2_KAR98K.EmptyClose" },
+    },
+    ["reload_ext"] = {
+        { time = 0.0333, sound = "TFA_CODWW2_KAR98K.TacExtMagout" },
+        { time = 2.0000, sound = "TFA_CODWW2_KAR98K.TacExtMagin" },
+    },
+    ["reload_ext_empty"] = {
+        { time = 0.1667, sound = "TFA_CODWW2_KAR98K.EmptyExtOpen" },
+        { time = 1.1667, sound = "TFA_CODWW2_KAR98K.EmptyExtMagout" },
+        { time = 2.6667, sound = "TFA_CODWW2_KAR98K.EmptyExtMagin" },
+        { time = 3.3333, sound = "TFA_CODWW2_KAR98K.EmptyExtClose" },
     },
 }
 

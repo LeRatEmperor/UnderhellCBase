@@ -139,20 +139,32 @@ SWEP.Animations = {
 }
 
 SWEP.AnimSounds = {
+    ["draw"] = {
+        { time = 0.0333, sound = "TFA_CODWW2_RIFLE.Raise" },
+    },
+    ["draw_empty"] = {
+        { time = 0.0333, sound = "TFA_CODWW2_RIFLE.Raise" },
+    },
     ["draw_first"] = {
-        { time = 0.3333, sound = "TFA_CODWW2_ENFIELD.FPO" },
+        { time = 0.0333, sound = "TFA_CODWW2_ENFIELD.FPO" },
     },
     ["draw_first_epic"] = {
-        { time = 0.1667, sound = "TFA_CODWW2_ENFIELD.FPOEpic1" },
-        { time = 0.5000, sound = "TFA_CODWW2_ENFIELD.FPOEpic2" },
+        { time = 0.1667, sound = "TFA_CODWW2_ENFIELD.CycleOpen" },
+        { time = 1.1667, sound = "TFA_CODWW2_ENFIELD.CycleClose" },
+    },
+    ["holster"] = {
+        { time = 0.0333, sound = "TFA_CODWW2_RIFLE.Holster" },
+    },
+    ["holster_empty"] = {
+        { time = 0.0333, sound = "TFA_CODWW2_RIFLE.Holster" },
     },
     ["inspect"] = {
         { time = 0.0333, sound = "TFA_CODWW2_ENFIELD.Inspect1" },
         { time = 1.6667, sound = "TFA_CODWW2_ENFIELD.Inspect2" },
     },
-    ["inspect_epic"] = {
-        { time = 0.0333, sound = "TFA_CODWW2_ENFIELD.EpicInspect1" },
-        { time = 1.6667, sound = "TFA_CODWW2_ENFIELD.EpicInspect2" },
+    ["inspect_empty"] = {
+        { time = 0.0333, sound = "TFA_CODWW2_ENFIELD.Inspect1" },
+        { time = 1.6667, sound = "TFA_CODWW2_ENFIELD.Inspect2" },
     },
     ["rechamber"] = {
         { time = 0.1667, sound = "TFA_CODWW2_ENFIELD.CycleOpen" },
@@ -164,12 +176,12 @@ SWEP.AnimSounds = {
     },
     ["reload"] = {
         { time = 0.1667, sound = "TFA_CODWW2_ENFIELD.TacOpen" },
-        { time = 1.8333, sound = "TFA_CODWW2_ENFIELD.TacClipin" },
+        { time = 1.6667, sound = "TFA_CODWW2_ENFIELD.TacClipin" },
         { time = 2.3333, sound = "TFA_CODWW2_ENFIELD.TacClose" },
     },
     ["reload_empty"] = {
         { time = 0.1667, sound = "TFA_CODWW2_ENFIELD.EmptyOpen" },
-        { time = 1.8333, sound = "TFA_CODWW2_ENFIELD.EmptyClipin" },
+        { time = 1.6667, sound = "TFA_CODWW2_ENFIELD.EmptyClipin" },
         { time = 2.5000, sound = "TFA_CODWW2_ENFIELD.EmptyClose" },
     },
     ["reload_ext"] = {

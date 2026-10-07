@@ -134,9 +134,35 @@ SWEP.Animations = {
 }
 
 SWEP.AnimSounds = {
+    ["draw"] = {
+        { time = 0.0667, sound = "TFA_CODWW2_PSTL.Raise" },
+    },
+    ["draw_knife"] = {
+        { time = 0.0667, sound = "TFA_CODWW2_PSTL.Raise" },
+    },
+    ["holster"] = {
+        { time = 0.0667, sound = "TFA_CODWW2_PSTL.Holster" },
+    },
+    ["holster_knife"] = {
+        { time = 0.0667, sound = "TFA_CODWW2_PSTL.Holster" },
+    },
     ["inspect"] = {
         { time = 0.0333, sound = "TFA_CODWW2_NO2.Inspect1" },
-        { time = 1.6667, sound = "TFA_CODWW2_NO2.Inspect2" },
+    },
+    ["inspect_knife"] = {
+        { time = 0.0333, sound = "TFA_CODWW2_1911.Inspect1" },
+    },
+    ["reload"] = {
+        { time = 0.3333, sound = "TFA_CODWW2_NO2.Open" },
+    },
+    ["reload_empty"] = {
+        { time = 0.3333, sound = "TFA_CODWW2_NO2.Open" },
+    },
+    ["reload_knife"] = {
+        { time = 0.3333, sound = "TFA_CODWW2_NO2.Open" },
+    },
+    ["reload_knife_empty"] = {
+        { time = 0.3333, sound = "TFA_CODWW2_NO2.Open" },
     },
 }
 

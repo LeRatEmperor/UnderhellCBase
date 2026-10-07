@@ -139,20 +139,85 @@ SWEP.Animations = {
 }
 
 SWEP.AnimSounds = {
+    ["draw"] = {
+        { time = 0.0333, sound = "TFA_CODWW2_RIFLE.Raise" },
+    },
+    ["draw_empty"] = {
+        { time = 0.0333, sound = "TFA_CODWW2_RIFLE.Raise" },
+    },
     ["draw_first"] = {
-        { time = 0.3333, sound = "TFA_CODWW2_GEWEHR.FPO" },
+        { time = 0.0333, sound = "TFA_CODWW2_GEWEHR.FPO" },
+    },
+    ["draw_grenade"] = {
+        { time = 0.0333, sound = "TFA_CODWW2_RIFLE.Raise" },
+    },
+    ["draw_grenade_empty"] = {
+        { time = 0.0333, sound = "TFA_CODWW2_RIFLE.Raise" },
+    },
+    ["grenade_in"] = {
+        { time = 0.0333, sound = "TFA_CODWW2_RFLGRND.Foley" },
+        { time = 0.8333, sound = "TFA_CODWW2_RFLGRND.On" },
+    },
+    ["grenade_in_empty"] = {
+        { time = 0.0333, sound = "TFA_CODWW2_SML.Raise" },
+    },
+    ["grenade_out"] = {
+        { time = 0.6667, sound = "TFA_CODWW2_RFLGRND.Off" },
+    },
+    ["grenade_out_empty"] = {
+        { time = 0.0333, sound = "TFA_CODWW2_SML.Holster" },
+    },
+    ["holster"] = {
+        { time = 0.0667, sound = "TFA_CODWW2_RIFLE.Holster" },
+    },
+    ["holster_empty"] = {
+        { time = 0.0667, sound = "TFA_CODWW2_RIFLE.Holster" },
+    },
+    ["holster_grenade"] = {
+        { time = 0.0667, sound = "TFA_CODWW2_RIFLE.Holster" },
+    },
+    ["holster_grenade_empty"] = {
+        { time = 0.0667, sound = "TFA_CODWW2_RIFLE.Holster" },
     },
     ["inspect"] = {
         { time = 0.0333, sound = "TFA_CODWW2_GEWEHR.Inspect1" },
         { time = 1.6667, sound = "TFA_CODWW2_GEWEHR.Inspect2" },
     },
-    ["inspect_epic"] = {
-        { time = 0.0333, sound = "TFA_CODWW2_GEWEHR.EpicInspect1" },
-        { time = 1.6667, sound = "TFA_CODWW2_GEWEHR.EpicInspect2" },
+    ["inspect_empty"] = {
+        { time = 0.0333, sound = "TFA_CODWW2_GEWEHR.Inspect1" },
+        { time = 1.6667, sound = "TFA_CODWW2_GEWEHR.Inspect2" },
+    },
+    ["inspect_grenade"] = {
+        { time = 0.0333, sound = "TFA_CODWW2_STG44.Inspect1" },
+        { time = 1.6667, sound = "TFA_CODWW2_STG44.Inspect1b" },
+        { time = 3.8333, sound = "TFA_CODWW2_STG44.Inspect2" },
+    },
+    ["inspect_grenade_empty"] = {
+        { time = 0.0333, sound = "TFA_CODWW2_STG44.Inspect1" },
+        { time = 1.6667, sound = "TFA_CODWW2_STG44.Inspect1b" },
+        { time = 3.8333, sound = "TFA_CODWW2_STG44.Inspect2" },
     },
     ["reload"] = {
-        { time = 0.5000, sound = "TFA_CODWW2_GEWEHR.TacMagOut" },
-        { time = 1.8333, sound = "TFA_CODWW2_GEWEHR.TacMagIn" },
+        { time = 0.3333, sound = "TFA_CODWW2_GEWEHR.TacMagOut" },
+        { time = 1.3333, sound = "TFA_CODWW2_GEWEHR.TacMagIn" },
+    },
+    ["reload_empty"] = {
+        { time = 0.3333, sound = "TFA_CODWW2_GEWEHR.MagOut" },
+        { time = 1.3333, sound = "TFA_CODWW2_GEWEHR.MagIn" },
+        { time = 2.1667, sound = "TFA_CODWW2_GEWEHR.Charge" },
+    },
+    ["reload_ext"] = {
+        { time = 0.3333, sound = "TFA_CODWW2_GEWEHR.TacMagOut" },
+        { time = 1.3333, sound = "TFA_CODWW2_GEWEHR.TacMagIn" },
+    },
+    ["reload_ext_empty"] = {
+        { time = 0.3333, sound = "TFA_CODWW2_GEWEHR.MagOut" },
+        { time = 1.3333, sound = "TFA_CODWW2_GEWEHR.MagIn" },
+        { time = 2.1667, sound = "TFA_CODWW2_GEWEHR.Charge" },
+    },
+    ["reload_grenade"] = {
+        { time = 0.0333, sound = "TFA_CODWW2_RFLGRND.Foley" },
+        { time = 0.8333, sound = "TFA_CODWW2_RFLGRND.On" },
     },
 }
 

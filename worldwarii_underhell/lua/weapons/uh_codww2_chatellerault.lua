@@ -137,15 +137,49 @@ SWEP.Animations = {
 
 SWEP.AnimSounds = {
     ["draw"] = {
-        { time = 0.0333, sound = "TFA_CODWW2_AXE.Raise" },
+        { time = 0.0333, sound = "TFA_CODWW2_LRG.Raise" },
+    },
+    ["draw_empty"] = {
+        { time = 0.0333, sound = "TFA_CODWW2_LRG.Raise" },
+    },
+    ["draw_first"] = {
+        { time = 0.5000, sound = "TFA_CODWW2_BREN.FPO" },
     },
     ["holster"] = {
-        { time = 0.0333, sound = "TFA_CODWW2_AXE.Holster" },
+        { time = 0.0667, sound = "TFA_CODWW2_LRG.Holster" },
+    },
+    ["holster_empty"] = {
+        { time = 0.0667, sound = "TFA_CODWW2_LRG.Holster" },
     },
     ["inspect"] = {
-        { time = 0.0333, sound = "TFA_CODWW2_AXE.Inspect1" },
-        { time = 1.6667, sound = "TFA_CODWW2_AXE.Inspect2" },
-        { time = 3.6667, sound = "TFA_CODWW2_AXE.Inspect3" },
+        { time = 0.0333, sound = "TFA_CODWW2_BREN.Inspect1" },
+        { time = 2.5000, sound = "TFA_CODWW2_BREN.Inspect2" },
+    },
+    ["inspect_empty"] = {
+        { time = 0.0333, sound = "TFA_CODWW2_BREN.Inspect1" },
+        { time = 2.5000, sound = "TFA_CODWW2_BREN.Inspect2" },
+    },
+    ["inspect_epic"] = {
+        { time = 0.0333, sound = "TFA_CODWW2_BREN.EpicInspect1" },
+        { time = 2.6667, sound = "TFA_CODWW2_BREN.EpicInspect2" },
+    },
+    ["reload"] = {
+        { time = 0.5000, sound = "TFA_CODWW2_BREN.TacMagOut" },
+        { time = 2.5000, sound = "TFA_CODWW2_BREN.TacMagIn" },
+    },
+    ["reload_empty"] = {
+        { time = 0.5000, sound = "TFA_CODWW2_BREN.MagOut" },
+        { time = 2.5000, sound = "TFA_CODWW2_BREN.MagIn" },
+        { time = 4.3333, sound = "TFA_CODWW2_BREN.Charge" },
+    },
+    ["reload_ext"] = {
+        { time = 0.5000, sound = "TFA_CODWW2_BREN.ExtTacMagOut" },
+        { time = 2.1667, sound = "TFA_CODWW2_BREN.ExtTacMagIn" },
+    },
+    ["reload_ext_empty"] = {
+        { time = 0.5000, sound = "TFA_CODWW2_BREN.ExtMagOut" },
+        { time = 2.1667, sound = "TFA_CODWW2_BREN.ExtMagIn" },
+        { time = 4.0000, sound = "TFA_CODWW2_BREN.ExtCharge" },
     },
 }
 

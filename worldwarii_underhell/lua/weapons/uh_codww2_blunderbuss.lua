@@ -137,16 +137,34 @@ SWEP.Animations = {
 }
 
 SWEP.AnimSounds = {
+    ["draw"] = {
+        { time = 0.0333, sound = "TFA_CODWW2_MED.Raise" },
+    },
     ["draw_first"] = {
-        { time = 0.3333, sound = "TFA_CODWW2_BLUNDER.FPO" },
+        { time = 0.0000, sound = "TFA_CODWW2_BLUNDER.FPO" },
+    },
+    ["holster"] = {
+        { time = 0.0333, sound = "TFA_CODWW2_MED.Holster" },
     },
     ["inspect"] = {
+        { time = 0.0333, sound = "TFA_CODWW2_BLUNDER.Inspect1" },
+        { time = 1.6667, sound = "TFA_CODWW2_BLUNDER.Inspect2" },
+    },
+    ["inspect_empty"] = {
         { time = 0.0333, sound = "TFA_CODWW2_BLUNDER.Inspect1" },
         { time = 1.6667, sound = "TFA_CODWW2_BLUNDER.Inspect2" },
     },
     ["inspect_epic"] = {
         { time = 0.0333, sound = "TFA_CODWW2_BLUNDER.EpicInspect1" },
         { time = 1.6667, sound = "TFA_CODWW2_BLUNDER.EpicInspect2" },
+    },
+    ["reload"] = {
+        { time = 0.0333, sound = "TFA_CODWW2_BLUNDER.Open" },
+        { time = 1.5000, sound = "TFA_CODWW2_BLUNDER.Pack" },
+        { time = 2.6667, sound = "TFA_CODWW2_BLUNDER.Pushrod" },
+    },
+    ["shoot"] = {
+        { time = 0.0333, sound = "TFA_CODWW2_BLUNDER.Mech" },
     },
 }
 

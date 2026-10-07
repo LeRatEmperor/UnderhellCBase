@@ -137,16 +137,50 @@ SWEP.Animations = {
 }
 
 SWEP.AnimSounds = {
+    ["draw"] = {
+        { time = 0.0333, sound = "TFA_CODWW2_RIFLE.Raise" },
+    },
+    ["draw_empty"] = {
+        { time = 0.0333, sound = "TFA_CODWW2_RIFLE.Raise" },
+    },
     ["draw_first"] = {
-        { time = 0.3333, sound = "TFA_CODWW2_MOSIN.FPO" },
+        { time = 0.0333, sound = "TFA_CODWW2_MOSIN.FPO" },
+    },
+    ["holster"] = {
+        { time = 0.0333, sound = "TFA_CODWW2_RIFLE.Holster" },
+    },
+    ["holster_empty"] = {
+        { time = 0.0333, sound = "TFA_CODWW2_RIFLE.Holster" },
     },
     ["inspect"] = {
         { time = 0.0333, sound = "TFA_CODWW2_MOSIN.Inspect1" },
-        { time = 1.6667, sound = "TFA_CODWW2_MOSIN.Inspect2" },
+    },
+    ["inspect_empty"] = {
+        { time = 0.0333, sound = "TFA_CODWW2_MOSIN.Inspect1" },
     },
     ["inspect_epic"] = {
         { time = 0.0333, sound = "TFA_CODWW2_MOSIN.InspectEpic1" },
-        { time = 1.6667, sound = "TFA_CODWW2_MOSIN.InspectEpic2" },
+    },
+    ["rechamber"] = {
+        { time = 0.0333, sound = "TFA_CODWW2_MOSIN.Cycle" },
+    },
+    ["rechamber_ads"] = {
+        { time = 0.0333, sound = "TFA_CODWW2_MOSIN.CycleAds" },
+    },
+    ["reload"] = {
+        { time = 0.2333, sound = "TFA_CODWW2_MOSIN.Open" },
+    },
+    ["reload_deployed"] = {
+        { time = 0.2333, sound = "TFA_CODWW2_MOSIN.Open" },
+    },
+    ["reload_empty"] = {
+        { time = 0.2333, sound = "TFA_CODWW2_MOSIN.Open" },
+    },
+    ["reload_end"] = {
+        { time = 0.2333, sound = "TFA_CODWW2_MOSIN.Open" },
+    },
+    ["reload_silenced"] = {
+        { time = 0.2333, sound = "TFA_CODWW2_MOSIN.Open" },
     },
 }
 

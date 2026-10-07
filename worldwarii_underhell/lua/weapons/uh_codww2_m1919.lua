@@ -134,26 +134,30 @@ SWEP.Animations = {
 }
 
 SWEP.AnimSounds = {
+    ["draw"] = {
+        { time = 0.0333, sound = "TFA_CODWW2_LRG.Raise" },
+    },
     ["draw_first"] = {
-        { time = 0.3333, sound = "TFA_CODWW2_M1919.FPO" },
+        { time = 0.1667, sound = "TFA_CODWW2_M1919.FPO" },
+    },
+    ["holster"] = {
+        { time = 0.0667, sound = "TFA_CODWW2_LRG.Holster" },
     },
     ["inspect"] = {
         { time = 0.0333, sound = "TFA_CODWW2_M1919.Inspect1" },
         { time = 1.6667, sound = "TFA_CODWW2_M1919.Inspect2" },
     },
-    ["inspect_epic"] = {
-        { time = 0.0333, sound = "TFA_CODWW2_M1919.EpicInspect1" },
-        { time = 1.6667, sound = "TFA_CODWW2_M1919.EpicInspect2" },
-    },
     ["reload"] = {
         { time = 0.1667, sound = "TFA_CODWW2_M1919.TacOpen" },
-        { time = 2.3333, sound = "TFA_CODWW2_M1919.TacClose" },
+        { time = 3.0000, sound = "TFA_CODWW2_M1919.TacBeltIn" },
+        { time = 4.8333, sound = "TFA_CODWW2_M1919.TacClose" },
+        { time = 6.0000, sound = "TFA_CODWW2_M1919.TacCharge" },
     },
-    ["reload_ext"] = {
-        { time = 0.0333, sound = "TFA_CODWW2_M1919.ExtTacMagOut" },
-        { time = 0.1667, sound = "TFA_CODWW2_M1919.ExtTacOpen" },
-        { time = 2.1667, sound = "TFA_CODWW2_M1919.ExtTacMagIn" },
-        { time = 2.3333, sound = "TFA_CODWW2_M1919.ExtTacClose" },
+    ["reload_empty"] = {
+        { time = 0.1667, sound = "TFA_CODWW2_M1919.Open" },
+        { time = 2.1667, sound = "TFA_CODWW2_M1919.BeltIn" },
+        { time = 4.1667, sound = "TFA_CODWW2_M1919.Close" },
+        { time = 6.0000, sound = "TFA_CODWW2_M1919.Charge" },
     },
 }
 

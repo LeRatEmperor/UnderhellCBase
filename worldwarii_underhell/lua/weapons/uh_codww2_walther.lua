@@ -140,17 +140,29 @@ SWEP.Animations = {
 }
 
 SWEP.AnimSounds = {
+    ["draw"] = {
+        { time = 0.0333, sound = "TFA_CODWW2_MED.Raise" },
+    },
     ["draw_first"] = {
         { time = 0.3333, sound = "TFA_CODWW2_WALTHER.FPO" },
     },
+    ["holster"] = {
+        { time = 0.0333, sound = "TFA_CODWW2_MED.Holster" },
+    },
     ["inspect"] = {
         { time = 0.0333, sound = "TFA_CODWW2_WALTHER.Inspect1" },
-        { time = 1.6667, sound = "TFA_CODWW2_WALTHER.Inspect2" },
     },
     ["reload"] = {
-        { time = 0.1000, sound = "TFA_CODWW2_WALTHER.TacFoley" },
-        { time = 0.5000, sound = "TFA_CODWW2_WALTHER.TacMagOut" },
-        { time = 1.8333, sound = "TFA_CODWW2_WALTHER.TacMagIn" },
+        { time = 0.0333, sound = "TFA_CODWW2_WALTHER.TacFoley" },
+    },
+    ["reload_empty"] = {
+        { time = 0.3333, sound = "TFA_CODWW2_WALTHER.Open" },
+    },
+    ["reload_ext"] = {
+        { time = 0.0333, sound = "TFA_CODWW2_WALTHER.TacFoley" },
+    },
+    ["reload_ext_empty"] = {
+        { time = 0.1667, sound = "TFA_CODWW2_WALTHER.Open" },
     },
 }
 

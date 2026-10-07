@@ -137,34 +137,43 @@ SWEP.Animations = {
 }
 
 SWEP.AnimSounds = {
-    ["after_reload"] = {
-        { time = 0.5000, sound = "TFA_CODWW2_M30.RifleClose" },
-    },
     ["draw"] = {
         { time = 0.0333, sound = "TFA_CODWW2_M30.Draw" },
     },
     ["draw_first"] = {
-        { time = 0.3333, sound = "TFA_CODWW2_M30.FPO" },
+        { time = 0.0333, sound = "TFA_CODWW2_M30.FPO" },
+    },
+    ["holster"] = {
+        { time = 0.0333, sound = "TFA_CODWW2_MED.Holster" },
+    },
+    ["idle_to_rifle"] = {
+        { time = 0.0333, sound = "TFA_CODWW2_M30.SwitchOn" },
     },
     ["inspect"] = {
         { time = 0.0333, sound = "TFA_CODWW2_M30.Inspect1" },
-        { time = 1.6667, sound = "TFA_CODWW2_M30.Inspect2" },
+        { time = 1.3333, sound = "TFA_CODWW2_M30.Inspect2" },
+    },
+    ["inspect_rifle"] = {
+        { time = 0.0333, sound = "TFA_CODWW2_M30.Inspect1" },
+        { time = 1.3333, sound = "TFA_CODWW2_M30.Inspect2" },
     },
     ["reload"] = {
-        { time = 0.1667, sound = "TFA_CODWW2_M30.TacOpen" },
-        { time = 1.8333, sound = "TFA_CODWW2_M30.TacInsert" },
-        { time = 2.3333, sound = "TFA_CODWW2_M30.TacClose" },
+        { time = 0.3333, sound = "TFA_CODWW2_M30.TacOpen" },
+        { time = 1.6667, sound = "TFA_CODWW2_M30.TacInsert" },
+        { time = 2.5000, sound = "TFA_CODWW2_M30.TacClose" },
     },
     ["reload_empty"] = {
-        { time = 0.1667, sound = "TFA_CODWW2_M30.EmptyOpen" },
-        { time = 1.3333, sound = "TFA_CODWW2_M30.EmptyInsert" },
-        { time = 2.5000, sound = "TFA_CODWW2_M30.EmptyClose" },
+        { time = 0.3333, sound = "TFA_CODWW2_M30.EmptyOpen" },
+        { time = 1.6667, sound = "TFA_CODWW2_M30.EmptyInsert" },
+        { time = 3.3333, sound = "TFA_CODWW2_M30.EmptyClose" },
     },
-    ["reload_loop"] = {
-        { time = 0.3333, sound = "TFA_CODWW2_M30.RifleChamber" },
+    ["reload_rifle"] = {
+        { time = 0.3333, sound = "TFA_CODWW2_M30.RifleOpen" },
+        { time = 1.6667, sound = "TFA_CODWW2_M30.RifleChamber" },
+        { time = 2.5000, sound = "TFA_CODWW2_M30.RifleClose" },
     },
-    ["start_reload"] = {
-        { time = 0.1667, sound = "TFA_CODWW2_M30.RifleOpen" },
+    ["rifle_to_idle"] = {
+        { time = 0.0333, sound = "TFA_CODWW2_M30.SwitchOFF" },
     },
 }
 

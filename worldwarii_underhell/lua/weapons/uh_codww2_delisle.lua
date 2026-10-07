@@ -139,20 +139,59 @@ SWEP.Animations = {
 }
 
 SWEP.AnimSounds = {
+    ["draw"] = {
+        { time = 0.0333, sound = "TFA_CODWW2_RIFLE.Raise" },
+    },
+    ["draw_empty"] = {
+        { time = 0.0333, sound = "TFA_CODWW2_RIFLE.Raise" },
+    },
     ["draw_first"] = {
-        { time = 0.3333, sound = "TFA_CODWW2_DELISLE.FPO" },
+        { time = 0.0333, sound = "TFA_CODWW2_DELISLE.Open" },
+        { time = 1.1667, sound = "TFA_CODWW2_DELISLE.Close" },
+    },
+    ["holster"] = {
+        { time = 0.0333, sound = "TFA_CODWW2_RIFLE.Holster" },
+    },
+    ["holster_empty"] = {
+        { time = 0.0333, sound = "TFA_CODWW2_RIFLE.Holster" },
     },
     ["inspect"] = {
         { time = 0.0333, sound = "TFA_CODWW2_DELISLE.Inspect1" },
-        { time = 1.6667, sound = "TFA_CODWW2_DELISLE.Inspect2" },
+        { time = 0.1667, sound = "TFA_CODWW2_DELISLE.Inspect2" },
+    },
+    ["inspect_empty"] = {
+        { time = 0.0333, sound = "TFA_CODWW2_DELISLE.Inspect1" },
+        { time = 1.8333, sound = "TFA_CODWW2_DELISLE.Inspect2" },
     },
     ["inspect_epic"] = {
         { time = 0.0333, sound = "TFA_CODWW2_DELISLE.EpicInspect1" },
-        { time = 1.6667, sound = "TFA_CODWW2_DELISLE.EpicInspect2" },
+        { time = 4.1667, sound = "TFA_CODWW2_DELISLE.EpicInspect2" },
+    },
+    ["rechamber"] = {
+        { time = 0.0333, sound = "TFA_CODWW2_DELISLE.Cycle" },
+    },
+    ["rechamber_ads"] = {
+        { time = 0.0333, sound = "TFA_CODWW2_DELISLE.CycleAds" },
     },
     ["reload"] = {
-        { time = 0.5000, sound = "TFA_CODWW2_DELISLE.TacMagOut" },
-        { time = 1.8333, sound = "TFA_CODWW2_DELISLE.TacMagIn" },
+        { time = 0.1667, sound = "TFA_CODWW2_DELISLE.TacMagOut" },
+        { time = 2.1667, sound = "TFA_CODWW2_DELISLE.TacMagIn" },
+    },
+    ["reload_empty"] = {
+        { time = 0.1667, sound = "TFA_CODWW2_DELISLE.Open" },
+        { time = 0.8333, sound = "TFA_CODWW2_DELISLE.MagOut" },
+        { time = 2.6667, sound = "TFA_CODWW2_DELISLE.MagIn" },
+        { time = 3.3333, sound = "TFA_CODWW2_DELISLE.Close" },
+    },
+    ["reload_ext"] = {
+        { time = 0.1667, sound = "TFA_CODWW2_DELISLE.TacMagOut" },
+        { time = 2.1667, sound = "TFA_CODWW2_DELISLE.TacMagIn" },
+    },
+    ["reload_ext_empty"] = {
+        { time = 0.1667, sound = "TFA_CODWW2_DELISLE.Open" },
+        { time = 0.8333, sound = "TFA_CODWW2_DELISLE.MagOut" },
+        { time = 2.6667, sound = "TFA_CODWW2_DELISLE.MagIn" },
+        { time = 3.3333, sound = "TFA_CODWW2_DELISLE.Close" },
     },
 }
 

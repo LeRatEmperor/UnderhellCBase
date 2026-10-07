@@ -154,16 +154,41 @@ SWEP.Animations = {
 }
 
 SWEP.AnimSounds = {
+    ["draw"] = {
+        { time = 0.0667, sound = "TFA_CODWW2_SML.Raise" },
+    },
+    ["draw_empty"] = {
+        { time = 0.0667, sound = "TFA_CODWW2_SML.Raise" },
+    },
     ["draw_first"] = {
-        { time = 0.1000, sound = "TFA_CODWW2_ZK383.FPOCharge" },
+        { time = 0.3333, sound = "TFA_CODWW2_ZK383.FPOCharge" },
+    },
+    ["holster"] = {
+        { time = 0.0667, sound = "TFA_CODWW2_SML.Holster" },
+    },
+    ["holster_empty"] = {
+        { time = 0.0667, sound = "TFA_CODWW2_SML.Holster" },
     },
     ["inspect"] = {
         { time = 0.0333, sound = "TFA_CODWW2_ZK383.Inspect1" },
-        { time = 1.6667, sound = "TFA_CODWW2_ZK383.Inspect2" },
+    },
+    ["inspect_empty"] = {
+        { time = 0.0333, sound = "TFA_CODWW2_ZK383.Inspect1" },
     },
     ["reload"] = {
-        { time = 0.5000, sound = "TFA_CODWW2_ZK383.TacMagOut" },
-        { time = 1.8333, sound = "TFA_CODWW2_ZK383.TacMagIn" },
+        { time = 0.1667, sound = "TFA_CODWW2_ZK383.TacMagOut" },
+    },
+    ["reload_empty"] = {
+        { time = 0.1667, sound = "TFA_CODWW2_ZK383.MagOut" },
+    },
+    ["rof_switch"] = {
+        { time = 0.0333, sound = "TFA_CODWW2_GEN.Switch" },
+    },
+    ["suppressor_attach"] = {
+        { time = 0.0333, sound = "TFA_CODWW2_MP40.SuppOn" },
+    },
+    ["suppressor_remove"] = {
+        { time = 0.0333, sound = "TFA_CODWW2_MP40.SuppOff" },
     },
 }
 

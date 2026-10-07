@@ -138,13 +138,65 @@ SWEP.Animations = {
 }
 
 SWEP.AnimSounds = {
+    ["draw"] = {
+        { time = 0.0667, sound = "TFA_CODWW2_PSTL.Raise" },
+    },
+    ["draw_empty"] = {
+        { time = 0.0667, sound = "TFA_CODWW2_PSTL.Raise" },
+    },
+    ["draw_knife"] = {
+        { time = 0.0667, sound = "TFA_CODWW2_PSTL.Raise" },
+    },
+    ["draw_knife_empty"] = {
+        { time = 0.0667, sound = "TFA_CODWW2_PSTL.Raise" },
+    },
+    ["holster"] = {
+        { time = 0.0667, sound = "TFA_CODWW2_PSTL.Holster" },
+    },
+    ["holster_empty"] = {
+        { time = 0.0667, sound = "TFA_CODWW2_PSTL.Holster" },
+    },
+    ["holster_knife"] = {
+        { time = 0.0667, sound = "TFA_CODWW2_PSTL.Holster" },
+    },
+    ["holster_knife_empty"] = {
+        { time = 0.0667, sound = "TFA_CODWW2_PSTL.Holster" },
+    },
     ["inspect"] = {
         { time = 0.0333, sound = "TFA_CODWW2_P38.Inspect1" },
-        { time = 1.6667, sound = "TFA_CODWW2_P38.Inspect2" },
+    },
+    ["inspect_empty"] = {
+        { time = 0.0333, sound = "TFA_CODWW2_P38.Inspect1" },
+    },
+    ["inspect_knife"] = {
+        { time = 0.0333, sound = "TFA_CODWW2_P38.Inspect1" },
+    },
+    ["inspect_knife_empty"] = {
+        { time = 0.0333, sound = "TFA_CODWW2_P38.Inspect1" },
     },
     ["reload"] = {
-        { time = 0.5000, sound = "TFA_CODWW2_P38.TacMagOut" },
-        { time = 1.8333, sound = "TFA_CODWW2_P38.TacMagIn" },
+        { time = 0.1667, sound = "TFA_CODWW2_P38.TacMagOut" },
+    },
+    ["reload_empty"] = {
+        { time = 0.1667, sound = "TFA_CODWW2_P38.MagOut" },
+    },
+    ["reload_ext"] = {
+        { time = 0.1667, sound = "TFA_CODWW2_P38.MagOut" },
+    },
+    ["reload_ext_empty"] = {
+        { time = 0.1667, sound = "TFA_CODWW2_P38.MagOut" },
+    },
+    ["reload_ext_knife"] = {
+        { time = 0.1667, sound = "TFA_CODWW2_P38.MagOut" },
+    },
+    ["reload_ext_knife_empty"] = {
+        { time = 0.1667, sound = "TFA_CODWW2_P38.MagOut" },
+    },
+    ["reload_knife"] = {
+        { time = 0.1667, sound = "TFA_CODWW2_P38.MagOut" },
+    },
+    ["reload_knife_empty"] = {
+        { time = 0.1667, sound = "TFA_CODWW2_P38.MagOut" },
     },
 }
 

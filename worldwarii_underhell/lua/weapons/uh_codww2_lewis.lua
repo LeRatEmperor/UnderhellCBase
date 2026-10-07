@@ -134,16 +134,67 @@ SWEP.Animations = {
 }
 
 SWEP.AnimSounds = {
-    ["draw_first_epic"] = {
-        { time = 0.3333, sound = "TFA_CODWW2_LEWIS.FPOEpic" },
+    ["draw"] = {
+        { time = 0.0333, sound = "TFA_CODWW2_LRG.Raise" },
+    },
+    ["draw_empty"] = {
+        { time = 0.0667, sound = "TFA_CODWW2_LRG.Raise" },
+    },
+    ["draw_first"] = {
+        { time = 0.0333, sound = "TFA_CODWW2_M1928.Start" },
+        { time = 0.3333, sound = "TFA_CODWW2_LSAT.Charge" },
+    },
+    ["holster"] = {
+        { time = 0.0667, sound = "TFA_CODWW2_LRG.Holster" },
+    },
+    ["holster_empty"] = {
+        { time = 0.0667, sound = "TFA_CODWW2_LRG.Holster" },
     },
     ["inspect"] = {
         { time = 0.0333, sound = "TFA_CODWW2_LEWIS.Inspect1" },
-        { time = 1.6667, sound = "TFA_CODWW2_LEWIS.Inspect2" },
+        { time = 3.3333, sound = "TFA_CODWW2_LEWIS.Inspect2" },
+    },
+    ["inspect_empty"] = {
+        { time = 0.0333, sound = "TFA_CODWW2_LEWIS.Inspect1" },
+        { time = 3.3333, sound = "TFA_CODWW2_LEWIS.Inspect2" },
     },
     ["inspect_epic"] = {
-        { time = 0.0333, sound = "TFA_CODWW2_LEWIS.EpicInspect1" },
-        { time = 1.6667, sound = "TFA_CODWW2_LEWIS.EpicInspect2" },
+        { time = 0.0333, sound = "TFA_CODWW2_LEWIS.Inspect1" },
+        { time = 2.6667, sound = "TFA_CODWW2_LEWIS.Inspect2" },
+    },
+    ["reload"] = {
+        { time = 0.0333, sound = "TFA_CODWW2_LSAT.EmptyFoley" },
+        { time = 1.1667, sound = "TFA_CODWW2_GM6.PreMagOut" },
+        { time = 1.8333, sound = "TFA_CODWW2_RHINO.MagOut" },
+        { time = 4.5000, sound = "TFA_CODWW2_SAW.PreMagIn" },
+        { time = 5.1667, sound = "TFA_CODWW2_THOR.MagIn" },
+        { time = 5.8333, sound = "TFA_CODWW2_M1928.MagSmack" },
+    },
+    ["reload_empty"] = {
+        { time = 0.0333, sound = "TFA_CODWW2_LSAT.EmptyFoley" },
+        { time = 1.1667, sound = "TFA_CODWW2_GM6.PreMagOut" },
+        { time = 1.8333, sound = "TFA_CODWW2_RHINO.MagOut" },
+        { time = 4.5000, sound = "TFA_CODWW2_SAW.PreMagIn" },
+        { time = 5.1667, sound = "TFA_CODWW2_THOR.MagIn" },
+        { time = 5.8333, sound = "TFA_CODWW2_M1928.MagSmack" },
+        { time = 6.6667, sound = "TFA_CODWW2_LSAT.Charge" },
+        { time = 6.8333, sound = "TFA_CODWW2_EPM3.ChargeLyr" },
+    },
+    ["reload_knife"] = {
+        { time = 0.0333, sound = "TFA_CODWW2_LSAT.EmptyFoley" },
+        { time = 1.0000, sound = "TFA_CODWW2_LEWIS.XTacUnlock" },
+        { time = 2.0000, sound = "TFA_CODWW2_GM6.PreMagOut" },
+        { time = 2.5000, sound = "TFA_CODWW2_RHINO.MagOut" },
+        { time = 4.6667, sound = "TFA_CODWW2_LEWIS.XTacMagIn" },
+    },
+    ["reload_knife_empty"] = {
+        { time = 0.0333, sound = "TFA_CODWW2_LSAT.EmptyFoley" },
+        { time = 1.0000, sound = "TFA_CODWW2_LEWIS.XTacUnlock" },
+        { time = 2.0000, sound = "TFA_CODWW2_GM6.PreMagOut" },
+        { time = 2.5000, sound = "TFA_CODWW2_RHINO.MagOut" },
+        { time = 4.6667, sound = "TFA_CODWW2_LEWIS.XTacMagIn" },
+        { time = 6.6667, sound = "TFA_CODWW2_LSAT.Charge" },
+        { time = 6.8333, sound = "TFA_CODWW2_EPM3.ChargeLyr" },
     },
 }
 
