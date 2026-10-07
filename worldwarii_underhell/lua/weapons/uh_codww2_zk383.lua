@@ -211,6 +211,16 @@ end
 -- THINK
 -- ============================================================
 
+-- WWII models use attachment "2" (tag_flash) for muzzle,
+-- "0" (tag_brass) for shell eject, "1" (tag_silencer) for silenced
+function SWEP:GetMuzzle()
+    return 2  -- tag_flash
+end
+
+function SWEP:GetShellEject()
+    return 0  -- tag_brass
+end
+
 function SWEP:Think()
     local ct = CurTime()
     BaseClass.Think(self)

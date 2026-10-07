@@ -207,6 +207,57 @@ end
 -- THINK
 -- ============================================================
 
+-- WWII models use attachment "2" (tag_flash) for muzzle,
+-- "0" (tag_brass) for shell eject, "1" (tag_silencer) for silenced
+function SWEP:GetMuzzle()
+    return 2  -- tag_flash
+end
+
+function SWEP:GetShellEject()
+    return 0  -- tag_brass
+end
+
+-- ============================================================
+-- RECHAMBER / PUMP ACTION
+-- ============================================================
+-- Plays the rechamber animation after firing (bolt-action or pump)
+function SWEP:DoRechamber()
+    local vm = IsValid(self.Owner) and self.Owner:GetViewModel() or nil
+    if not IsValid(vm) then return end
+    if self.Animations and self.Animations["rechamber"] then
+        local seq = vm:LookupSequence(self.Animations["rechamber"])
+        if seq and seq >= 0 then
+            timer.Simple(self.RechamberDelay or 0.1, function()
+                if not IsValid(self) or not IsValid(self.Owner) then return end
+                if self.Owner:GetActiveWeapon() ~= self then return end
+                if self:GetUHBool("Reloading") then return end
+                vm:SendViewModelMatchingSequence(seq)
+                vm:SetCycle(0)
+            end)
+        end
+    end
+end
+
+-- Override PrimaryAttack to call DoRechamber after firing
+function SWEP:PrimaryAttack()
+    if self._meleeActive then return end
+    if self._mantleActive then return end
+    if self.Owner:KeyDown(IN_USE) then
+        local ct = CurTime()
+        if ct < (self._nextMelee or 0) then return end
+        if self:GetUHBool("Reloading") then return end
+        if self:GetNWFloat("DeployTime") > ct then return end
+        if self:GetNWInt("FireMode") == 0 then return end
+        if SERVER or IsFirstTimePredicted() then self:MeleeAttack() end
+        return
+    end
+    BaseClass.PrimaryAttack(self)
+    -- Play rechamber after firing
+    if self:Clip1() > 0 or not self:GetUHBool("Reloading") then
+        self:DoRechamber()
+    end
+end
+
 function SWEP:Think()
     local ct = CurTime()
     BaseClass.Think(self)

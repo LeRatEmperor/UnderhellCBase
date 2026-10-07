@@ -210,6 +210,101 @@ end
 -- THINK
 -- ============================================================
 
+-- WWII models use attachment "2" (tag_flash) for muzzle,
+-- "0" (tag_brass) for shell eject, "1" (tag_silencer) for silenced
+function SWEP:GetMuzzle()
+    return 2  -- tag_flash
+end
+
+function SWEP:GetShellEject()
+    return 0  -- tag_brass
+end
+
+-- ============================================================
+-- SHOTGUN RELOAD — shell-by-shell insertion
+-- ============================================================
+SWEP.IsPump = true
+SWEP.PumpDelay = 0.5
+SWEP.Primary.ReloadTime = 0.5
+
+function SWEP:Reload()
+    local ct = CurTime()
+    if not IsValid(self.Owner) then return end
+    
+    -- If already reloading, handle shotgun loop
+    if self:GetUHBool("Reloading") then
+        -- Stop conditions
+        if self:Clip1() >= self.Primary.ClipSize
+           or self.Owner:GetAmmoCount(self.Primary.Ammo) <= 0
+           or self.Owner:KeyPressed(IN_ATTACK) then
+            -- Finish reload
+            self:EasySendWeaponAnim("reload_end", ACT_SHOTGUN_RELOAD_FINISH)
+            local vm = self.Owner:GetViewModel()
+            local endDur = IsValid(vm) and vm:SequenceDuration() or 0.8
+            self:SetUHBool("Reloading", false)
+            self:SetNWFloat("ReloadTime", 0)
+            self:SetNWFloat("ReloadEndTime", 0)
+            self:SetNextPrimaryFire(ct + endDur)
+            self:SetNextSecondaryFire(ct + endDur)
+            self.NextReload = ct + endDur
+            return
+        end
+        -- Insert next shell
+        if not self._nextShellTime or ct >= self._nextShellTime then
+            self._nextShellTime = ct + (self.Primary.ReloadTime or 0.5)
+            self:EasySendWeaponAnim("reload_loop", ACT_VM_RELOAD)
+            self:SetClip1(self:Clip1() + 1)
+            self.Owner:RemoveAmmo(1, self.Primary.Ammo, false)
+            self:SetNextPrimaryFire(self._nextShellTime)
+        end
+        return
+    end
+    
+    -- Start shotgun reload
+    if self.NextReload < ct and not self:GetUHBool("Running")
+       and self:GetNWFloat("DeployTime") < ct then
+        if self.Owner:GetAmmoCount(self.Primary.Ammo) > 0 and self:Clip1() < self.Primary.ClipSize then
+            self.Owner:DoReloadEvent()
+            self.NextReload = ct + 0.5
+            self._nextShellTime = ct + (self.Primary.ReloadTime or 0.5)
+            self:EasySendWeaponAnim("reload_start", ACT_SHOTGUN_RELOAD_START)
+            self:SetNextPrimaryFire(ct + 0.5)
+            self:SetNextSecondaryFire(ct + 0.5)
+            self:SetUHBool("Reloading", true)
+            self:SetUHBool("Zooming", false)
+        end
+    end
+end
+
+-- Override PostShoot for pump action
+function SWEP:PostShoot()
+    if self.IsPump and self:Clip1() > 0 then
+        timer.Simple(self.PumpDelay or 0.5, function()
+            if not IsValid(self) or not IsValid(self.Owner) then return end
+            if self.Owner:GetActiveWeapon() ~= self then return end
+            if self:GetUHBool("Reloading") then return end
+            self:EasySendWeaponAnim("rechamber", ACT_SHOTGUN_PUMP)
+        end)
+    end
+end
+
+-- Override PrimaryAttack for pump after fire
+function SWEP:PrimaryAttack()
+    if self._meleeActive then return end
+    if self._mantleActive then return end
+    if self.Owner:KeyDown(IN_USE) then
+        local ct = CurTime()
+        if ct < (self._nextMelee or 0) then return end
+        if self:GetUHBool("Reloading") then return end
+        if self:GetNWFloat("DeployTime") > ct then return end
+        if self:GetNWInt("FireMode") == 0 then return end
+        if SERVER or IsFirstTimePredicted() then self:MeleeAttack() end
+        return
+    end
+    BaseClass.PrimaryAttack(self)
+    self:PostShoot()
+end
+
 function SWEP:Think()
     local ct = CurTime()
     BaseClass.Think(self)
