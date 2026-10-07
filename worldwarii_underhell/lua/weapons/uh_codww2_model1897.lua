@@ -124,6 +124,8 @@ SWEP.Animations = {
     ["start_reload"]   = "reload_start",
     ["reload_loop"]    = "reload_loop",
     ["after_reload"]   = "reload_end",
+    ["shotgun_reload_start"]  = "reload_start",
+    ["shotgun_reload_finish"] = "reload_end",
     ["iron_fire"]    = "fire_ads",
     ["idle"]         = "idle",
     ["idle_empty"]   = "idle_empty",
@@ -303,51 +305,32 @@ SWEP.IsPump = true
 SWEP.PumpDelay = 0.5
 SWEP.Primary.ReloadTime = 0.5
 
+-- Shotgun reload — START only. The shell-by-shell loop is handled by
+-- ReloadShotgun() which is dispatched every tick from CustomThink.
 function SWEP:Reload()
     local ct = CurTime()
     if not IsValid(self.Owner) then return end
-    
-    -- If already reloading, handle shotgun loop
-    if self:GetUHBool("Reloading") then
-        -- Stop conditions
-        if self:Clip1() >= self.Primary.ClipSize
-           or self.Owner:GetAmmoCount(self.Primary.Ammo) <= 0
-           or self.Owner:KeyPressed(IN_ATTACK) then
-            -- Finish reload
-            self:EasySendWeaponAnim("reload_end", ACT_SHOTGUN_RELOAD_FINISH)
-            local vm = self.Owner:GetViewModel()
-            local endDur = IsValid(vm) and vm:SequenceDuration() or 0.8
-            self:SetUHBool("Reloading", false)
-            self:SetNWFloat("ReloadTime", 0)
-            self:SetNWFloat("ReloadEndTime", 0)
-            self:SetNextPrimaryFire(ct + endDur)
-            self:SetNextSecondaryFire(ct + endDur)
-            self.NextReload = ct + endDur
-            return
-        end
-        -- Insert next shell
-        if not self._nextShellTime or ct >= self._nextShellTime then
-            self._nextShellTime = ct + (self.Primary.ReloadTime or 0.5)
-            self:EasySendWeaponAnim("reload_loop", ACT_VM_RELOAD)
-            self:SetClip1(self:Clip1() + 1)
-            self.Owner:RemoveAmmo(1, self.Primary.Ammo, false)
-            self:SetNextPrimaryFire(self._nextShellTime)
-        end
-        return
-    end
-    
+
+    -- If already reloading, let ReloadShotgun (via CustomThink) handle the loop.
+    -- Do NOT process shell insertion here — that would conflict with ReloadShotgun.
+    if self:GetUHBool("Reloading") then return end
+
     -- Start shotgun reload
     if self.NextReload < ct and not self:GetUHBool("Running")
        and self:GetNWFloat("DeployTime") < ct then
         if self.Owner:GetAmmoCount(self.Primary.Ammo) > 0 and self:Clip1() < self.Primary.ClipSize then
             self.Owner:DoReloadEvent()
             self.NextReload = ct + 0.5
-            self._nextShellTime = ct + (self.Primary.ReloadTime or 0.5)
-            self:EasySendWeaponAnim("reload_start", ACT_SHOTGUN_RELOAD_START)
-            self:SetNextPrimaryFire(ct + 0.5)
-            self:SetNextSecondaryFire(ct + 0.5)
+            self:EasySendWeaponAnim("shotgun_reload_start", ACT_SHOTGUN_RELOAD_START)
+            local vm = IsValid(self.Owner) and self.Owner:GetViewModel() or nil
+            local startDur = IsValid(vm) and vm:SequenceDuration() or 0.5
+            self:SetNextPrimaryFire(ct + startDur + 0.1)
+            self:SetNextSecondaryFire(ct + startDur + 0.1)
+            self.NextReload = ct + startDur + 0.1
             self:SetUHBool("Reloading", true)
             self:SetUHBool("Zooming", false)
+            -- The shell insertion timing is driven by the reload_loop animation
+            -- cycle (vm:GetCycle() >= 1) in ReloadShotgun, not a timer.
         end
     end
 end
@@ -370,7 +353,7 @@ function SWEP:PostShoot()
     end)
 end
 
--- Override PrimaryAttack for pump after fire
+-- Override PrimaryAttack (PostShoot is called automatically by BaseClass)
 function SWEP:PrimaryAttack()
     if self._meleeActive then return end
     if self._mantleActive then return end
@@ -384,7 +367,7 @@ function SWEP:PrimaryAttack()
         return
     end
     BaseClass.PrimaryAttack(self)
-    self:PostShoot()
+    -- PostShoot is already called by BaseClass.PrimaryAttack — do NOT call it again
 end
 
 function SWEP:Think()
@@ -626,7 +609,8 @@ function SWEP:ReloadShotgun(ct)
         or self.Owner:GetAmmoCount(self:GetPrimaryAmmoType()) <= 0
         or self.Owner:KeyPressed(IN_ATTACK) then
         self:ClearAnimSounds()
-        self:EasySendWeaponAnim("after_reload", ACT_SHOTGUN_RELOAD_FINISH)
+        -- Use "shotgun_reload_finish" key to match TFA EventTable ACT_SHOTGUN_RELOAD_FINISH
+        self:EasySendWeaponAnim("shotgun_reload_finish", ACT_SHOTGUN_RELOAD_FINISH)
         local vm = IsValid(self.Owner) and self.Owner:GetViewModel() or nil
         local endDur = IsValid(vm) and vm:SequenceDuration() or 0.8
         self:SetUHBool("Reloading", false)
