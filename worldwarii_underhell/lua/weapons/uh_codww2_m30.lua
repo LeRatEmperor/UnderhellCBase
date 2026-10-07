@@ -121,9 +121,6 @@ SWEP.Animations = {
     ["rechamber"]    = "rechamber",  -- pump action
     ["reload"]       = "ACT_VM_RELOAD",
     ["reload_empty"] = "ACT_VM_RELOAD_EMPTY",
-    ["start_reload"]   = "reload_start",
-    ["reload_loop"]    = "reload_loop",
-    ["after_reload"]   = "reload_end",
     ["iron_fire"]    = "fire_ads",
     ["idle"]         = "idle",
     ["idle_empty"]   = "idle_empty",
@@ -140,35 +137,34 @@ SWEP.Animations = {
 }
 
 SWEP.AnimSounds = {
-    ["draw_first"] = {
-        { time = 0.0333, sound = "TFA_CODWW2_M30.FPO" },
+    ["after_reload"] = {
+        { time = 0.5000, sound = "TFA_CODWW2_M30.RifleClose" },
     },
     ["draw"] = {
         { time = 0.0333, sound = "TFA_CODWW2_M30.Draw" },
     },
-    ["holster"] = {
-        { time = 0.0333, sound = "TFA_CODWW2_MED.Holster" },
-    },
-    ["reload"] = {
-        { time = 0.3333, sound = "TFA_CODWW2_M30.TacOpen" },
-    },
-    ["reload_empty"] = {
-        { time = 0.3333, sound = "TFA_CODWW2_M30.EmptyOpen" },
-    },
-    ["reload_rifle"] = {
-        { time = 0.3333, sound = "TFA_CODWW2_M30.RifleOpen" },
+    ["draw_first"] = {
+        { time = 0.3333, sound = "TFA_CODWW2_M30.FPO" },
     },
     ["inspect"] = {
         { time = 0.0333, sound = "TFA_CODWW2_M30.Inspect1" },
+        { time = 1.6667, sound = "TFA_CODWW2_M30.Inspect2" },
     },
-    ["inspect_rifle"] = {
-        { time = 0.0333, sound = "TFA_CODWW2_M30.Inspect1" },
+    ["reload"] = {
+        { time = 0.1667, sound = "TFA_CODWW2_M30.TacOpen" },
+        { time = 1.8333, sound = "TFA_CODWW2_M30.TacInsert" },
+        { time = 2.3333, sound = "TFA_CODWW2_M30.TacClose" },
     },
-    ["idle_to_rifle"] = {
-        { time = 0.0333, sound = "TFA_CODWW2_M30.SwitchOn" },
+    ["reload_empty"] = {
+        { time = 0.1667, sound = "TFA_CODWW2_M30.EmptyOpen" },
+        { time = 1.3333, sound = "TFA_CODWW2_M30.EmptyInsert" },
+        { time = 2.5000, sound = "TFA_CODWW2_M30.EmptyClose" },
     },
-    ["rifle_to_idle"] = {
-        { time = 0.0333, sound = "TFA_CODWW2_M30.SwitchOFF" },
+    ["reload_loop"] = {
+        { time = 0.3333, sound = "TFA_CODWW2_M30.RifleChamber" },
+    },
+    ["start_reload"] = {
+        { time = 0.1667, sound = "TFA_CODWW2_M30.RifleOpen" },
     },
 }
 
@@ -251,110 +247,6 @@ function SWEP:GetShellEject()
     return 0  -- tag_brass
 end
 
--- ============================================================
--- SHOTGUN RELOAD — shell-by-shell insertion
--- ============================================================
-SWEP.IsPump = true
-SWEP.PumpDelay = 0.5
-SWEP.Primary.ReloadTime = 0.5
-
-function SWEP:Reload()
-    local ct = CurTime()
-    if not IsValid(self.Owner) then return end
-    
-    -- If already reloading, handle shotgun loop
-    if self:GetUHBool("Reloading") then
-        -- Stop conditions
-        if self:Clip1() >= self.Primary.ClipSize
-           or self.Owner:GetAmmoCount(self.Primary.Ammo) <= 0
-           or self.Owner:KeyPressed(IN_ATTACK) then
-            -- Finish reload
-            self:EasySendWeaponAnim("reload_end", ACT_SHOTGUN_RELOAD_FINISH)
-            local vm = self.Owner:GetViewModel()
-            local endDur = IsValid(vm) and vm:SequenceDuration() or 0.8
-            self:SetUHBool("Reloading", false)
-            self:SetNWFloat("ReloadTime", 0)
-            self:SetNWFloat("ReloadEndTime", 0)
-            self:SetNextPrimaryFire(ct + endDur)
-            self:SetNextSecondaryFire(ct + endDur)
-            self.NextReload = ct + endDur
-            return
-        end
-        -- Insert next shell
-        if not self._nextShellTime or ct >= self._nextShellTime then
-            self._nextShellTime = ct + (self.Primary.ReloadTime or 0.5)
-            self:EasySendWeaponAnim("reload_loop", ACT_VM_RELOAD)
-            self:SetClip1(self:Clip1() + 1)
-            self.Owner:RemoveAmmo(1, self.Primary.Ammo, false)
-            self:SetNextPrimaryFire(self._nextShellTime)
-        end
-        return
-    end
-    
-    -- Start shotgun reload
-    if self.NextReload < ct and not self:GetUHBool("Running")
-       and self:GetNWFloat("DeployTime") < ct then
-        if self.Owner:GetAmmoCount(self.Primary.Ammo) > 0 and self:Clip1() < self.Primary.ClipSize then
-            self.Owner:DoReloadEvent()
-            self.NextReload = ct + 0.5
-            self._nextShellTime = ct + (self.Primary.ReloadTime or 0.5)
-            self:EasySendWeaponAnim("reload_start", ACT_SHOTGUN_RELOAD_START)
-            self:SetNextPrimaryFire(ct + 0.5)
-            self:SetNextSecondaryFire(ct + 0.5)
-            self:SetUHBool("Reloading", true)
-            self:SetUHBool("Zooming", false)
-        end
-    end
-end
-
--- Override PostShoot for pump action
-function SWEP:PostShoot()
-    if not self.IsPump then return end
-    local ct = CurTime()
-    local pumpDelay = self.PumpDelay or 0.5
-    -- Lock fire for at least pumpDelay (but never shorten a longer Primary.Delay)
-    self:SetNextPrimaryFire(math.max(self:GetNextPrimaryFire(), ct + pumpDelay))
-    self:SetNextSecondaryFire(math.max(self:GetNextSecondaryFire(), ct + pumpDelay))
-    timer.Simple(pumpDelay, function()
-        if not IsValid(self) or not IsValid(self.Owner)
-           or not IsValid(self.Owner:GetActiveWeapon())
-           or self.Owner:GetActiveWeapon() ~= self then return end
-        if self:GetUHBool("Reloading") then return end
-        local animKey = self:GetUHBool("Zooming") and "rechamber_ads" or "rechamber"
-        self:EasySendWeaponAnim(animKey, ACT_SHOTGUN_PUMP)
-    end)
-end
-
--- Override PrimaryAttack for pump after fire
-function SWEP:PrimaryAttack()
-    if self._meleeActive then return end
-    if self._mantleActive then return end
-    if self.Owner:KeyDown(IN_USE) then
-        local ct = CurTime()
-        if ct < (self._nextMelee or 0) then return end
-        if self:GetUHBool("Reloading") then return end
-        if self:GetNWFloat("DeployTime") > ct then return end
-        if self:GetNWInt("FireMode") == 0 then return end
-        if SERVER or IsFirstTimePredicted() then self:MeleeAttack() end
-        return
-    end
-    BaseClass.PrimaryAttack(self)
-    self:PostShoot()
-end
-
-function SWEP:Think()
-    local ct = CurTime()
-    BaseClass.Think(self)
-    self:HandleSprintingAnimations()
-    self:HandleIdle()
-    self:HandleInspect()
-end
-
-function SWEP:SecondaryAttack()
-    if self._meleeActive then return end
-    if self._mantleActive then return end
-    return BaseClass.SecondaryAttack(self)
-end
 
 -- ============================================================
 -- HOLSTER / DEPLOY
@@ -554,44 +446,3 @@ SWEP.Attachments = {
     [4] = { name = "Slot 4", atts = { "tfa_codww2_rapidfire", "tfa_codww2_incenshells", "tfa_codww2_riflebullet" }, default = 0 },
 }
 
--- ============================================================
--- SHOTGUN SHELL-BY-SHELL RELOAD
--- ============================================================
-SWEP.Shotgun = true
-SWEP.ShellLoadTime = SWEP.ShellLoadTime or 0.5
-
-function SWEP:ReloadShotgun(ct)
-    if not self:GetUHBool("Reloading") then return end
-    if self:Clip1() >= self.Primary.ClipSize
-        or self.Owner:GetAmmoCount(self:GetPrimaryAmmoType()) <= 0
-        or self.Owner:KeyPressed(IN_ATTACK) then
-        self:ClearAnimSounds()
-        self:EasySendWeaponAnim("after_reload", ACT_SHOTGUN_RELOAD_FINISH)
-        local vm = IsValid(self.Owner) and self.Owner:GetViewModel() or nil
-        local endDur = IsValid(vm) and vm:SequenceDuration() or 0.8
-        self:SetUHBool("Reloading", false)
-        self:SetNWFloat("ReloadTime", 0)
-        self:SetNWFloat("ReloadEndTime", 0)
-        self:SetNextPrimaryFire(ct + endDur)
-        self:SetNextSecondaryFire(ct + endDur)
-        self.NextReload = ct + endDur
-        self.reloaddelay = nil
-        if self.PostReload then self:PostReload() end
-        return
-    end
-    local vm = IsValid(self.Owner) and self.Owner:GetViewModel() or nil
-    if IsValid(vm) and vm:GetCycle() >= 1 then
-        if SERVER then
-            self:SetClip1(self:Clip1() + 1)
-            self.Owner:RemoveAmmo(1, self.Primary.Ammo, false)
-        end
-        self:EasySendWeaponAnim("reload_loop", ACT_VM_RELOAD)
-    end
-end
-
--- CustomThink: dispatches ReloadShotgun every tick while reloading
-SWEP.CustomThink = function(self, ct)
-    if self.Shotgun and self.ReloadShotgun and self:GetUHBool("Reloading") then
-        self:ReloadShotgun(ct)
-    end
-end

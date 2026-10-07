@@ -145,53 +145,24 @@ SWEP.Animations = {
 }
 
 SWEP.AnimSounds = {
-    ["draw_first"] = {
-        { time = 0.0333, sound = "TFA_CODWW2_M1897.FPOFoley" },
+    ["after_reload"] = {
+        { time = 0.1667, sound = "TFA_CODWW2_M1897.EndStart" },
+        { time = 0.3333, sound = "TFA_CODWW2_M1897.EndPump" },
     },
     ["draw"] = {
-        { time = 0.1667, sound = "TFA_CODWW2_M1897.Draw" },
-    },
-    ["draw_empty"] = {
         { time = 0.0333, sound = "TFA_CODWW2_M1897.Draw" },
     },
-    ["holster"] = {
-        { time = 0.0667, sound = "TFA_CODWW2_MED.Holster" },
-    },
-    ["holster_empty"] = {
-        { time = 0.0667, sound = "TFA_CODWW2_MED.Holster" },
-    },
-    ["rechamber"] = {
-        { time = 0.0333, sound = "TFA_CODWW2_M1897.Rack" },
-    },
-    ["rechamber_ads"] = {
-        { time = 0.0333, sound = "TFA_CODWW2_M1897.Rack" },
-    },
-    ["reload_empty"] = {
-        { time = 0.0333, sound = "TFA_CODWW2_M1897.ADSFoley" },
-    },
-    ["reload"] = {
-        { time = 0.1667, sound = "TFA_CODWW2_M1897.ShellIn" },
+    ["draw_first"] = {
+        { time = 0.0667, sound = "TFA_CODWW2_M1897.FPOGrab" },
+        { time = 0.1000, sound = "TFA_CODWW2_M1897.FPOCharge" },
+        { time = 0.1667, sound = "TFA_CODWW2_M1897.FPOFoley" },
     },
     ["inspect"] = {
         { time = 0.0333, sound = "TFA_CODWW2_M1897.Inspect1" },
+        { time = 1.6667, sound = "TFA_CODWW2_M1897.Inspect2" },
     },
-    ["inspect_empty"] = {
-        { time = 0.0333, sound = "TFA_CODWW2_M1897.Inspect1" },
-    },
-    ["reload_start_dragon_empty"] = {
-        { time = 0.0333, sound = "TFA_CODWW2_M1897.DRGStart" },
-    },
-    ["reload_start_dragon"] = {
-        { time = 0.8333, sound = "TFA_CODWW2_M1897.ShellIn" },
-    },
-    ["reload_loop_dragon"] = {
-        { time = 0.0333, sound = "TFA_CODWW2_M1897.ShellIn" },
-    },
-    ["reload_end_dragon"] = {
-        { time = 0.0333, sound = "TFA_CODWW2_M1897.ADSFoley" },
-    },
-    ["rechamber_dragon"] = {
-        { time = 0.0333, sound = "TFA_CODWW2_M1897.Rack" },
+    ["start_reload"] = {
+        { time = 0.1667, sound = "TFA_CODWW2_M1897.ShellStart" },
     },
 }
 

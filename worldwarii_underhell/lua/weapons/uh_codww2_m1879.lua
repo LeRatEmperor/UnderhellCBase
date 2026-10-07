@@ -140,47 +140,9 @@ SWEP.Animations = {
 }
 
 SWEP.AnimSounds = {
-    ["fire"] = {
-        { time = 0.1667, sound = "TFA_CODWW2_M1879.Hammer" },
-    },
-    ["fire_ads"] = {
-        { time = 0.1667, sound = "TFA_CODWW2_M1879.Hammer" },
-    },
-    ["draw"] = {
-        { time = 0.0667, sound = "TFA_CODWW2_PSTL.Raise" },
-    },
-    ["holster"] = {
-        { time = 0.0667, sound = "TFA_CODWW2_PSTL.Holster" },
-    },
-    ["reload"] = {
-        { time = 0.0000, sound = "TFA_CODWW2_M1879.Insert" },
-    },
     ["inspect"] = {
         { time = 0.0333, sound = "TFA_CODWW2_M1879.Inspect1" },
-    },
-    ["fire_knife"] = {
-        { time = 0.1667, sound = "TFA_CODWW2_M1879.Hammer" },
-    },
-    ["fire_knife_ads"] = {
-        { time = 0.1667, sound = "TFA_CODWW2_M1879.Hammer" },
-    },
-    ["draw_knife"] = {
-        { time = 0.0667, sound = "TFA_CODWW2_PSTL.Raise" },
-    },
-    ["holster_knife"] = {
-        { time = 0.0667, sound = "TFA_CODWW2_PSTL.Holster" },
-    },
-    ["reload_in_knife"] = {
-        { time = 0.1667, sound = "TFA_CODWW2_M1879.Open" },
-    },
-    ["reload_knife"] = {
-        { time = 0.0000, sound = "TFA_CODWW2_M1879.Insert" },
-    },
-    ["reload_out_knife"] = {
-        { time = 0.0000, sound = "TFA_CODWW2_M1879.Close" },
-    },
-    ["inspect_knife"] = {
-        { time = 0.0333, sound = "TFA_CODWW2_M1879.Inspect1" },
+        { time = 1.6667, sound = "TFA_CODWW2_M1879.Inspect2" },
     },
 }
 

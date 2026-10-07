@@ -137,61 +137,20 @@ SWEP.Animations = {
 
 SWEP.AnimSounds = {
     ["draw_first"] = {
-        { time = 0.1667, sound = "TFA_CODWW2_BREDA.FPO" },
-    },
-    ["draw"] = {
-        { time = 0.0333, sound = "TFA_CODWW2_LRG.Raise" },
-    },
-    ["draw_empty"] = {
-        { time = 0.0333, sound = "TFA_CODWW2_LRG.Raise" },
-    },
-    ["holster"] = {
-        { time = 0.0667, sound = "TFA_CODWW2_LRG.Holster" },
-    },
-    ["holster_empty"] = {
-        { time = 0.0667, sound = "TFA_CODWW2_LRG.Holster" },
-    },
-    ["reload"] = {
-        { time = 0.0333, sound = "TFA_CODWW2_BREDA.TacOpen" },
-    },
-    ["reload_empty"] = {
-        { time = 0.0333, sound = "TFA_CODWW2_BREDA.Open" },
+        { time = 0.3333, sound = "TFA_CODWW2_BREDA.FPO" },
     },
     ["inspect"] = {
         { time = 0.0333, sound = "TFA_CODWW2_BREDA.Inspect1" },
-    },
-    ["inspect_empty"] = {
-        { time = 0.0333, sound = "TFA_CODWW2_BREDA.Inspect1" },
+        { time = 1.6667, sound = "TFA_CODWW2_BREDA.Inspect2" },
     },
     ["inspect_epic"] = {
         { time = 0.0333, sound = "TFA_CODWW2_BREDA.EpicInspect1" },
+        { time = 1.6667, sound = "TFA_CODWW2_BREDA.EpicInspect2" },
     },
-    ["draw_first_knife"] = {
-        { time = 0.1667, sound = "TFA_CODWW2_BREDA.FPO" },
-    },
-    ["draw_knife"] = {
-        { time = 0.0333, sound = "TFA_CODWW2_LRG.Raise" },
-    },
-    ["draw_knife_empty"] = {
-        { time = 0.0333, sound = "TFA_CODWW2_LRG.Raise" },
-    },
-    ["holster_knife"] = {
-        { time = 0.0667, sound = "TFA_CODWW2_LRG.Holster" },
-    },
-    ["holster_knife_empty"] = {
-        { time = 0.0667, sound = "TFA_CODWW2_LRG.Holster" },
-    },
-    ["reload_knife"] = {
-        { time = 0.0333, sound = "TFA_CODWW2_BREDA.TacOpen" },
-    },
-    ["reload_knife_empty"] = {
-        { time = 0.0333, sound = "TFA_CODWW2_BREDA.Open" },
-    },
-    ["inspect_knife"] = {
-        { time = 0.0333, sound = "TFA_CODWW2_BREDA.Inspect1" },
-    },
-    ["inspect_knife_empty"] = {
-        { time = 0.0333, sound = "TFA_CODWW2_BREDA.Inspect1" },
+    ["reload"] = {
+        { time = 0.1667, sound = "TFA_CODWW2_BREDA.TacOpen" },
+        { time = 2.1667, sound = "TFA_CODWW2_BREDA.TacLoad" },
+        { time = 2.3333, sound = "TFA_CODWW2_BREDA.TacClose" },
     },
 }
 

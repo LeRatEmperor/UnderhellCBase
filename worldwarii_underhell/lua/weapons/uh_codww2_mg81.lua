@@ -135,43 +135,25 @@ SWEP.Animations = {
 
 SWEP.AnimSounds = {
     ["draw_first"] = {
-        { time = 0.1667, sound = "TFA_CODWW2_MG81.FPO" },
-    },
-    ["draw"] = {
-        { time = 0.0333, sound = "TFA_CODWW2_LRG.Raise" },
-    },
-    ["holster"] = {
-        { time = 0.0667, sound = "TFA_CODWW2_LRG.Holster" },
-    },
-    ["reload"] = {
-        { time = 0.6667, sound = "TFA_CODWW2_MG81.TacOpen" },
-    },
-    ["reload_empty"] = {
-        { time = 0.6667, sound = "TFA_CODWW2_MG81.Open" },
+        { time = 0.3333, sound = "TFA_CODWW2_MG81.FPO" },
     },
     ["inspect"] = {
         { time = 0.0333, sound = "TFA_CODWW2_MG81.Inspect1" },
+        { time = 1.6667, sound = "TFA_CODWW2_MG81.Inspect2" },
     },
     ["inspect_epic"] = {
         { time = 0.0333, sound = "TFA_CODWW2_MG81.EpicInspect1" },
+        { time = 1.6667, sound = "TFA_CODWW2_MG81.EpicInspect2" },
     },
-    ["draw_first_knife"] = {
-        { time = 0.1667, sound = "TFA_CODWW2_BREDA.FPO" },
+    ["reload"] = {
+        { time = 0.1667, sound = "TFA_CODWW2_MG81.TacOpen" },
+        { time = 2.3333, sound = "TFA_CODWW2_MG81.TacClose" },
     },
-    ["draw_knife"] = {
-        { time = 0.0333, sound = "TFA_CODWW2_LRG.Raise" },
-    },
-    ["holster_knife"] = {
-        { time = 0.0667, sound = "TFA_CODWW2_LRG.Holster" },
-    },
-    ["reload_knife"] = {
-        { time = 0.0333, sound = "TFA_CODWW2_MG81.ExtTacOpen" },
-    },
-    ["reload_knife_empty"] = {
-        { time = 0.1667, sound = "TFA_CODWW2_MG81.ExtOpen" },
-    },
-    ["inspect_knife"] = {
-        { time = 0.0333, sound = "TFA_CODWW2_MG81.Inspect1" },
+    ["reload_ext"] = {
+        { time = 0.0333, sound = "TFA_CODWW2_MG81.ExtTacMagOut" },
+        { time = 0.1667, sound = "TFA_CODWW2_MG81.ExtTacOpen" },
+        { time = 2.1667, sound = "TFA_CODWW2_MG81.ExtTacMagIn" },
+        { time = 2.3333, sound = "TFA_CODWW2_MG81.ExtTacClose" },
     },
 }
 
