@@ -1,0 +1,10 @@
+{
+    "title": "World War II - Underhell",
+    "type": "weapon",
+    "tags": ["fun", "combat"],
+    "ignore": [
+        "*.psd",
+        "*.vcproj",
+        "*.svn"
+    ]
+}
