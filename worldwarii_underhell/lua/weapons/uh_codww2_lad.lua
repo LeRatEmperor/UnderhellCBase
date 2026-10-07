@@ -133,7 +133,65 @@ SWEP.Animations = {
     ["sprint_out"]    = "sprint_out",
 }
 
-SWEP.AnimSounds = {}
+SWEP.AnimSounds = {
+    ["draw_first"] = {
+        { time = 0.0333, sound = "TFA_CODWW2_LRG.Raise" },
+    },
+    ["draw"] = {
+        { time = 0.0333, sound = "TFA_CODWW2_LRG.Raise" },
+    },
+    ["draw_empty"] = {
+        { time = 0.0333, sound = "TFA_CODWW2_LRG.Raise" },
+    },
+    ["holster"] = {
+        { time = 0.0667, sound = "TFA_CODWW2_LRG.Holster" },
+    },
+    ["holster_empty"] = {
+        { time = 0.0667, sound = "TFA_CODWW2_LRG.Holster" },
+    },
+    ["reload"] = {
+        { time = 0.1667, sound = "TFA_CODWW2_LAD.TacOpen" },
+    },
+    ["reload_empty"] = {
+        { time = 0.1667, sound = "TFA_CODWW2_LAD.Open" },
+    },
+    ["inspect"] = {
+        { time = 0.0333, sound = "TFA_CODWW2_LAD.Inspect1" },
+    },
+    ["inspect_empty"] = {
+        { time = 0.0333, sound = "TFA_CODWW2_LAD.Inspect1" },
+    },
+    ["inspect_epic"] = {
+        { time = 0.0333, sound = "TFA_CODWW2_LAD.EpicInspect1" },
+    },
+    ["draw_first_knife"] = {
+        { time = 0.0333, sound = "TFA_CODWW2_LAD.FPO" },
+    },
+    ["draw_knife"] = {
+        { time = 0.0333, sound = "TFA_CODWW2_LRG.Raise" },
+    },
+    ["draw_knife_empty"] = {
+        { time = 0.0333, sound = "TFA_CODWW2_LRG.Raise" },
+    },
+    ["holster_knife"] = {
+        { time = 0.0667, sound = "TFA_CODWW2_LRG.Holster" },
+    },
+    ["holster_knife_empty"] = {
+        { time = 0.0667, sound = "TFA_CODWW2_LRG.Holster" },
+    },
+    ["reload_knife"] = {
+        { time = 0.1667, sound = "TFA_CODWW2_LAD.ExtTacOpen" },
+    },
+    ["reload_knife_empty"] = {
+        { time = 0.0333, sound = "TFA_CODWW2_LAD.ExtOpen" },
+    },
+    ["inspect_knife"] = {
+        { time = 0.0333, sound = "TFA_CODWW2_LAD.Inspect1" },
+    },
+    ["inspect_knife_empty"] = {
+        { time = 0.0333, sound = "TFA_CODWW2_LAD.Inspect1" },
+    },
+}
 
 function SWEP:ShootAnimation()
     if self:GetUHBool("Zooming") and self.Animations and self.Animations["iron_fire"] then

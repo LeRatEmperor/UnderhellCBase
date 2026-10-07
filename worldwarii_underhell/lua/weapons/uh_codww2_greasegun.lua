@@ -137,7 +137,59 @@ SWEP.Animations = {
     ["suppressor_attach_knife"]        = "suppressor_attach",
 }
 
-SWEP.AnimSounds = {}
+SWEP.AnimSounds = {
+    ["draw_first"] = {
+        { time = 0.0333, sound = "TFA_CODWW2_GG.FPO" },
+    },
+    ["draw"] = {
+        { time = 0.0333, sound = "TFA_CODWW2_GG.Pullout" },
+    },
+    ["draw_empty"] = {
+        { time = 0.0667, sound = "TFA_CODWW2_GG.Pullout" },
+    },
+    ["holster"] = {
+        { time = 0.0667, sound = "TFA_CODWW2_MED.Holster" },
+    },
+    ["holster_empty"] = {
+        { time = 0.0667, sound = "TFA_CODWW2_MED.Holster" },
+    },
+    ["reload"] = {
+        { time = 0.1667, sound = "TFA_CODWW2_GG.MagOut" },
+    },
+    ["reload_empty"] = {
+        { time = 0.1667, sound = "TFA_CODWW2_GG.MagOut" },
+    },
+    ["inspect"] = {
+        { time = 0.0333, sound = "TFA_CODWW2_GG.Inspect1" },
+    },
+    ["inspect_empty"] = {
+        { time = 0.0333, sound = "TFA_CODWW2_GG.Inspect1" },
+    },
+    ["draw_knife"] = {
+        { time = 0.0667, sound = "TFA_CODWW2_SML.Raise" },
+    },
+    ["draw_knife_empty"] = {
+        { time = 0.0667, sound = "TFA_CODWW2_SML.Raise" },
+    },
+    ["holster_knife"] = {
+        { time = 0.0667, sound = "TFA_CODWW2_SML.Holster" },
+    },
+    ["holster_knife_empty"] = {
+        { time = 0.0667, sound = "TFA_CODWW2_SML.Holster" },
+    },
+    ["reload_ext"] = {
+        { time = 0.1667, sound = "TFA_CODWW2_GG.MagOut" },
+    },
+    ["reload_ext_empty"] = {
+        { time = 0.1667, sound = "TFA_CODWW2_GG.MagOut" },
+    },
+    ["suppressor_attach"] = {
+        { time = 0.0333, sound = "TFA_CODWW2_GG.SuppOn" },
+    },
+    ["suppressor_remove"] = {
+        { time = 0.0333, sound = "TFA_CODWW2_GG.SuppOff" },
+    },
+}
 
 function SWEP:ShootAnimation()
     if self:GetUHBool("Zooming") and self.Animations and self.Animations["iron_fire"] then

@@ -133,7 +133,38 @@ SWEP.Animations = {
     ["sprint_out"]    = "sprint_out",
 }
 
-SWEP.AnimSounds = {}
+SWEP.AnimSounds = {
+    ["draw"] = {
+        { time = 0.0667, sound = "TFA_CODWW2_PSTL.Raise" },
+    },
+    ["holster"] = {
+        { time = 0.0667, sound = "TFA_CODWW2_PSTL.Holster" },
+    },
+    ["reload"] = {
+        { time = 0.3333, sound = "TFA_CODWW2_NO2.Open" },
+    },
+    ["reload_empty"] = {
+        { time = 0.3333, sound = "TFA_CODWW2_NO2.Open" },
+    },
+    ["inspect"] = {
+        { time = 0.0333, sound = "TFA_CODWW2_NO2.Inspect1" },
+    },
+    ["draw_knife"] = {
+        { time = 0.0667, sound = "TFA_CODWW2_PSTL.Raise" },
+    },
+    ["holster_knife"] = {
+        { time = 0.0667, sound = "TFA_CODWW2_PSTL.Holster" },
+    },
+    ["reload_knife"] = {
+        { time = 0.3333, sound = "TFA_CODWW2_NO2.Open" },
+    },
+    ["reload_knife_empty"] = {
+        { time = 0.3333, sound = "TFA_CODWW2_NO2.Open" },
+    },
+    ["inspect_knife"] = {
+        { time = 0.0333, sound = "TFA_CODWW2_1911.Inspect1" },
+    },
+}
 
 function SWEP:ShootAnimation()
     if self:GetUHBool("Zooming") and self.Animations and self.Animations["iron_fire"] then

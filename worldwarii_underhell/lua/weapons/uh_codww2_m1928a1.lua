@@ -135,7 +135,26 @@ SWEP.Animations = {
     ["suppressor_attach"]        = "suppressor_attach",
 }
 
-SWEP.AnimSounds = {}
+SWEP.AnimSounds = {
+    ["draw_first"] = {
+        { time = 0.6667, sound = "TFA_CODWW2_M1928.FPOCharge" },
+    },
+    ["draw"] = {
+        { time = 0.0333, sound = "TFA_CODWW2_SML.Raise" },
+    },
+    ["holster"] = {
+        { time = 0.0667, sound = "TFA_CODWW2_SML.Holster" },
+    },
+    ["reload"] = {
+        { time = 0.0333, sound = "TFA_CODWW2_M1928.Start" },
+    },
+    ["reload_empty"] = {
+        { time = 0.0333, sound = "TFA_CODWW2_M1928.Start" },
+    },
+    ["inspect"] = {
+        { time = 0.0333, sound = "TFA_CODWW2_M1928.Inspect1" },
+    },
+}
 
 function SWEP:ShootAnimation()
     if self:GetUHBool("Zooming") and self.Animations and self.Animations["iron_fire"] then

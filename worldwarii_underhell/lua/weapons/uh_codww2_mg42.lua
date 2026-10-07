@@ -133,7 +133,50 @@ SWEP.Animations = {
     ["sprint_out"]    = "sprint_out",
 }
 
-SWEP.AnimSounds = {}
+SWEP.AnimSounds = {
+    ["draw_first"] = {
+        { time = 0.1667, sound = "TFA_CODWW2_MG42.FPO" },
+    },
+    ["draw"] = {
+        { time = 0.0333, sound = "TFA_CODWW2_LRG.Raise" },
+    },
+    ["draw_empty"] = {
+        { time = 0.0333, sound = "TFA_CODWW2_LRG.Raise" },
+    },
+    ["holster"] = {
+        { time = 0.0667, sound = "TFA_CODWW2_LRG.Holster" },
+    },
+    ["holster_empty"] = {
+        { time = 0.0667, sound = "TFA_CODWW2_LRG.Holster" },
+    },
+    ["reload"] = {
+        { time = 0.0333, sound = "TFA_CODWW2_MG42.TacOpen" },
+    },
+    ["reload_empty"] = {
+        { time = 0.0333, sound = "TFA_CODWW2_MG42.Open" },
+    },
+    ["inspect"] = {
+        { time = 0.0333, sound = "TFA_CODWW2_MG42.Inspect1" },
+    },
+    ["inspect_empty"] = {
+        { time = 0.0333, sound = "TFA_CODWW2_MG42.Inspect1" },
+    },
+    ["inspect_epic"] = {
+        { time = 0.0333, sound = "TFA_CODWW2_MG42.EpicInspect1" },
+    },
+    ["reload_knife"] = {
+        { time = 0.0333, sound = "TFA_CODWW2_MG42.ExtTacOpen" },
+    },
+    ["reload_knife_empty"] = {
+        { time = 0.0333, sound = "TFA_CODWW2_MG42.ExtOpen" },
+    },
+    ["inspect_knife"] = {
+        { time = 0.0333, sound = "TFA_CODWW2_MG42.Inspect1" },
+    },
+    ["inspect_knife_empty"] = {
+        { time = 0.0333, sound = "TFA_CODWW2_MG42.Inspect1" },
+    },
+}
 
 function SWEP:ShootAnimation()
     if self:GetUHBool("Zooming") and self.Animations and self.Animations["iron_fire"] then

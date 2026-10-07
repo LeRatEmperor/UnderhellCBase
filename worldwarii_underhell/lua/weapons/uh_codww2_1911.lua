@@ -137,7 +137,92 @@ SWEP.Animations = {
     ["reload_ext_empty"]        = "reload_ext_empty",
 }
 
-SWEP.AnimSounds = {}
+SWEP.AnimSounds = {
+    ["draw"] = {
+        { time = 0.0667, sound = "TFA_CODWW2_PSTL.Raise" },
+    },
+    ["draw_empty"] = {
+        { time = 0.0667, sound = "TFA_CODWW2_PSTL.Raise" },
+    },
+    ["holster"] = {
+        { time = 0.0667, sound = "TFA_CODWW2_PSTL.Holster" },
+    },
+    ["holster_empty"] = {
+        { time = 0.0667, sound = "TFA_CODWW2_PSTL.Holster" },
+    },
+    ["fire_last"] = {
+        { time = 0.0333, sound = "TFA_CODWW2_1911.MechEmpty" },
+    },
+    ["reload"] = {
+        { time = 0.3333, sound = "TFA_CODWW2_1911.TacMagOut" },
+    },
+    ["reload_empty"] = {
+        { time = 0.3333, sound = "TFA_CODWW2_1911.MagOut" },
+    },
+    ["inspect"] = {
+        { time = 0.0333, sound = "TFA_CODWW2_1911.Inspect1" },
+    },
+    ["inspect_empty"] = {
+        { time = 0.0333, sound = "TFA_CODWW2_1911.Inspect1" },
+    },
+    ["inspect_epic"] = {
+        { time = 0.0333, sound = "TFA_CODWW2_1911.EpicInspect1" },
+    },
+    ["draw_midempty_dw"] = {
+        { time = 0.0333, sound = "TFA_CODWW2_PSTL.Raise" },
+    },
+    ["holster_midempty_dw"] = {
+        { time = 0.0333, sound = "TFA_CODWW2_PSTL.Holster" },
+    },
+    ["reload_dw"] = {
+        { time = 0.3333, sound = "TFA_CODWW2_1911.TacMagOut_R" },
+    },
+    ["reload_midempty_dw"] = {
+        { time = 0.3333, sound = "TFA_CODWW2_1911.TacMagOut_R" },
+    },
+    ["reload_empty_dw"] = {
+        { time = 0.3333, sound = "TFA_CODWW2_1911.MagOut_L" },
+    },
+    ["inspect_midempty"] = {
+        { time = 0.0333, sound = "TFA_CODWW2_1911.Inspect1" },
+    },
+    ["draw_knife"] = {
+        { time = 0.0667, sound = "TFA_CODWW2_PSTL.Raise" },
+    },
+    ["draw_knife_empty"] = {
+        { time = 0.0667, sound = "TFA_CODWW2_PSTL.Raise" },
+    },
+    ["holster_knife"] = {
+        { time = 0.0667, sound = "TFA_CODWW2_PSTL.Holster" },
+    },
+    ["holster_knife_empty"] = {
+        { time = 0.0667, sound = "TFA_CODWW2_PSTL.Holster" },
+    },
+    ["reload_knife"] = {
+        { time = 0.3333, sound = "TFA_CODWW2_1911.MagOut" },
+    },
+    ["reload_knife_empty"] = {
+        { time = 0.3333, sound = "TFA_CODWW2_1911.MagOut" },
+    },
+    ["inspect_knife"] = {
+        { time = 0.0333, sound = "TFA_CODWW2_1911.Inspect1" },
+    },
+    ["inspect_knife_empty"] = {
+        { time = 0.0333, sound = "TFA_CODWW2_1911.Inspect1" },
+    },
+    ["reload_ext"] = {
+        { time = 0.3333, sound = "TFA_CODWW2_1911.MagOut" },
+    },
+    ["reload_ext_empty"] = {
+        { time = 0.3333, sound = "TFA_CODWW2_1911.MagOut" },
+    },
+    ["reload_ext_knife"] = {
+        { time = 0.3333, sound = "TFA_CODWW2_1911.MagOut" },
+    },
+    ["reload_ext_knife_empty"] = {
+        { time = 0.3333, sound = "TFA_CODWW2_1911.MagOut" },
+    },
+}
 
 function SWEP:ShootAnimation()
     if self:GetUHBool("Zooming") and self.Animations and self.Animations["iron_fire"] then

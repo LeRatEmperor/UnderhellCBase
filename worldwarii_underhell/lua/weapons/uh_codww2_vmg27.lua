@@ -135,7 +135,44 @@ SWEP.Animations = {
     ["reload_ext_empty"]        = "reload_ext_empty",
 }
 
-SWEP.AnimSounds = {}
+SWEP.AnimSounds = {
+    ["draw_first"] = {
+        { time = 0.1667, sound = "TFA_CODWW2_VMG27.FPO" },
+    },
+    ["draw"] = {
+        { time = 0.0333, sound = "TFA_CODWW2_LRG.Raise" },
+    },
+    ["draw_empty"] = {
+        { time = 0.0333, sound = "TFA_CODWW2_LRG.Raise" },
+    },
+    ["holster"] = {
+        { time = 0.0667, sound = "TFA_CODWW2_LRG.Holster" },
+    },
+    ["holster_empty"] = {
+        { time = 0.0667, sound = "TFA_CODWW2_LRG.Holster" },
+    },
+    ["reload"] = {
+        { time = 0.0333, sound = "TFA_CODWW2_LSAT.EmptyFoley" },
+    },
+    ["reload_empty"] = {
+        { time = 0.0333, sound = "TFA_CODWW2_LSAT.EmptyFoley" },
+    },
+    ["inspect"] = {
+        { time = 0.0333, sound = "TFA_CODWW2_VMG27.Inspect1" },
+    },
+    ["inspect_epic"] = {
+        { time = 0.0333, sound = "TFA_CODWW2_VMG27.EpicInspect1" },
+    },
+    ["inspect_empty"] = {
+        { time = 0.0333, sound = "TFA_CODWW2_VMG27.Inspect1" },
+    },
+    ["reload_ext"] = {
+        { time = 0.0333, sound = "TFA_CODWW2_LSAT.EmptyFoley" },
+    },
+    ["reload_ext_empty"] = {
+        { time = 0.0333, sound = "TFA_CODWW2_LSAT.EmptyFoley" },
+    },
+}
 
 function SWEP:ShootAnimation()
     if self:GetUHBool("Zooming") and self.Animations and self.Animations["iron_fire"] then

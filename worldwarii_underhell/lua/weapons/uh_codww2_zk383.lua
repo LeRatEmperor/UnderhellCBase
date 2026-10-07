@@ -31,14 +31,27 @@ SWEP.HoldType = "ar2"
 SWEP.PassiveAnim = "passive"
 SWEP.ZoomFov = 20
 
+-- ============================================================
+-- BURST FIRE LOGIC (modeled on BO3 M8A7)
+-- ============================================================
+SWEP.BurstCount = SWEP.BurstFireCount or 3
+SWEP.BurstDelay = SWEP.BurstDelay or 0.075
+
 SWEP.FireModes = {
-    { name = "Burst" },
-    { name = "Semi-Auto" },
+    {
+        name = "Burst",
+        shoot = function(ply, wep)
+            -- Don't start a new burst if one is in flight
+            if wep._burstRemaining and wep._burstRemaining > 0 then return true end
+            if not wep:CanPrimaryAttack() then return false end
+            wep._burstRemaining = wep.BurstCount
+            wep._burstDelay = wep.BurstDelay
+            wep:FireBurstRound()
+            return true
+        end
+    },
+    { name = "Semi-Auto" }
 }
-SWEP.BurstFireCount = 3
-SWEP.BurstDelay = 0.075
-SWEP.OnlyBurstFire = false
-SWEP.DisableBurstFire = false
 
 
 -- Primary stats (from TFA source)
@@ -140,7 +153,44 @@ SWEP.Animations = {
     ["rof_switch"]        = "rof_switch",
 }
 
-SWEP.AnimSounds = {}
+SWEP.AnimSounds = {
+    ["draw_first"] = {
+        { time = 0.3333, sound = "TFA_CODWW2_ZK383.FPOCharge" },
+    },
+    ["draw"] = {
+        { time = 0.0667, sound = "TFA_CODWW2_SML.Raise" },
+    },
+    ["draw_empty"] = {
+        { time = 0.0667, sound = "TFA_CODWW2_SML.Raise" },
+    },
+    ["holster"] = {
+        { time = 0.0667, sound = "TFA_CODWW2_SML.Holster" },
+    },
+    ["holster_empty"] = {
+        { time = 0.0667, sound = "TFA_CODWW2_SML.Holster" },
+    },
+    ["reload"] = {
+        { time = 0.1667, sound = "TFA_CODWW2_ZK383.TacMagOut" },
+    },
+    ["reload_empty"] = {
+        { time = 0.1667, sound = "TFA_CODWW2_ZK383.MagOut" },
+    },
+    ["inspect"] = {
+        { time = 0.0333, sound = "TFA_CODWW2_ZK383.Inspect1" },
+    },
+    ["inspect_empty"] = {
+        { time = 0.0333, sound = "TFA_CODWW2_ZK383.Inspect1" },
+    },
+    ["suppressor_attach"] = {
+        { time = 0.0333, sound = "TFA_CODWW2_MP40.SuppOn" },
+    },
+    ["suppressor_remove"] = {
+        { time = 0.0333, sound = "TFA_CODWW2_MP40.SuppOff" },
+    },
+    ["rof_switch"] = {
+        { time = 0.0333, sound = "TFA_CODWW2_GEN.Switch" },
+    },
+}
 
 function SWEP:ShootAnimation()
     if self:GetUHBool("Zooming") and self.Animations and self.Animations["iron_fire"] then
@@ -453,3 +503,82 @@ SWEP.Attachments = {
     [5] = { name = "Slot 5", atts = { "tfa_codww2_stock", "tfa_codww2_quickdraw", "tfa_codww2_grip" }, default = 0 },
     [6] = { name = "Slot 6", atts = { "tfa_codww2_rapidfire_zk", "tfa_codww2_fmj" }, default = 0 },
 }
+
+-- ============================================================
+-- BURST FIRE LOGIC
+-- ============================================================
+function SWEP:FireBurstRound()
+    if not IsValid(self) or not IsValid(self.Owner) then return end
+    if not self:CanPrimaryAttack() then
+        self._burstRemaining = nil
+        return
+    end
+    local ct = CurTime()
+    local sp = game.SinglePlayer()
+    local iftp = IsFirstTimePredicted()
+
+    -- Bullets
+    if SERVER or iftp then
+        local dmg = math.random(self.Primary.MinDamage, self.Primary.MaxDamage)
+        if self:GetNWBool("Silenced") then dmg = math.Round(dmg * 0.95) end
+        self:ShootBullets(self.Owner:GetShootPos(), self.Owner:GetAimVector(), dmg, self.Penetration or 2)
+    end
+
+    -- Recoil
+    local recoil = util.SharedRandom("uh_recoil", self.Primary.MinRecoil, self.Primary.MaxRecoil)
+        * (self:GetUHBool("Zooming") and 0.35 or 1)
+    if sp or (CLIENT and iftp) then
+        self:DoMuzzleFlash()
+        self:CreateSmoke(self:GetMuzzle(), self.Primary.Delay + 0.14)
+        if not self.NoShell then self:CreateShell(self.ShellDelay or 0, self.ShellHeat) end
+        self.Owner:SetEyeAngles(self.Owner:EyeAngles() + Angle(recoil, 0, 0))
+    end
+    self.Owner:ViewPunch(Angle(recoil, 0, 0))
+
+    -- Animation
+    local shootAnim = self:ShootAnimation()
+    if type(shootAnim) == "string" then
+        self:EasySendWeaponAnim(shootAnim, ACT_VM_PRIMARYATTACK)
+    else
+        self:SendWeaponAnim(ACT_VM_PRIMARYATTACK)
+    end
+    self.Owner:SetAnimation(PLAYER_ATTACK1)
+    self.Owner:MuzzleFlash()
+
+    local fireSound = self:GetShootSound()
+    self:EmitSound(fireSound, 110, 100, 1, CHAN_WEAPON)
+    self:TakePrimaryAmmo(self.Primary.TakeAmmo)
+    self.NextReload = CurTime() + 0.5
+    self:PostShoot()
+
+    -- Burst timing
+    if SERVER or iftp then
+        self._burstRemaining = self._burstRemaining - 1
+        if self._burstRemaining > 0 then
+            self._burstNextFire = ct + self._burstDelay
+            self:SetNextPrimaryFire(ct + self._burstDelay)
+        else
+            self._burstRemaining = nil
+            self:SetNextPrimaryFire(ct + self.Primary.Delay * 3)
+            self:SetNextSecondaryFire(ct + self.Primary.Delay * 3)
+        end
+    end
+end
+
+-- CustomThink: continues burst rounds even if player released M1
+SWEP.CustomThink = function(self, ct)
+    if self._burstRemaining and self._burstRemaining > 0 then
+        if ct >= (self._burstNextFire or 0) then
+            self:FireBurstRound()
+        end
+    end
+end
+
+-- Cancel burst on holster
+local _origHolster = SWEP.Holster
+function SWEP:Holster(wep)
+    self._burstRemaining = nil
+    self._burstNextFire = nil
+    if _origHolster then return _origHolster(self, wep) end
+    return true
+end

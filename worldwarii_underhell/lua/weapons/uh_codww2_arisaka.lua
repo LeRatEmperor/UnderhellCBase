@@ -138,7 +138,50 @@ SWEP.Animations = {
     ["reload_ext_empty"]        = "reload_ext_empty",
 }
 
-SWEP.AnimSounds = {}
+SWEP.AnimSounds = {
+    ["draw_first"] = {
+        { time = 0.3333, sound = "TFA_CODWW2_KAR98K.FPO" },
+    },
+    ["draw"] = {
+        { time = 0.0333, sound = "TFA_CODWW2_RIFLE.Raise" },
+    },
+    ["holster"] = {
+        { time = 0.0333, sound = "TFA_CODWW2_RIFLE.Holster" },
+    },
+    ["draw_empty"] = {
+        { time = 0.0333, sound = "TFA_CODWW2_RIFLE.Raise" },
+    },
+    ["holster_empty"] = {
+        { time = 0.0333, sound = "TFA_CODWW2_RIFLE.Holster" },
+    },
+    ["rechamber"] = {
+        { time = 0.1667, sound = "TFA_CODWW2_KAR98K.CycleOpen" },
+    },
+    ["rechamber_ads"] = {
+        { time = 0.1667, sound = "TFA_CODWW2_KAR98K.CycleAdsOpen" },
+    },
+    ["reload"] = {
+        { time = 0.0333, sound = "TFA_CODWW2_KAR98K.TacOpen" },
+    },
+    ["reload_empty"] = {
+        { time = 0.0333, sound = "TFA_CODWW2_KAR98K.EmptyOpen" },
+    },
+    ["reload_ext"] = {
+        { time = 0.0333, sound = "TFA_CODWW2_KAR98K.TacExtMagout" },
+    },
+    ["reload_ext_empty"] = {
+        { time = 0.1667, sound = "TFA_CODWW2_KAR98K.EmptyExtOpen" },
+    },
+    ["inspect"] = {
+        { time = 0.0333, sound = "TFA_CODWW2_ARISAKA.Inspect1" },
+    },
+    ["inspect_empty"] = {
+        { time = 0.0333, sound = "TFA_CODWW2_ARISAKA.Inspect1" },
+    },
+    ["inspect_epic"] = {
+        { time = 0.0333, sound = "TFA_CODWW2_ARISAKA.EpicInspect1" },
+    },
+}
 
 function SWEP:ShootAnimation()
     if self:GetUHBool("Zooming") and self.Animations and self.Animations["iron_fire"] then
@@ -223,22 +266,6 @@ end
 -- RECHAMBER / PUMP ACTION
 -- ============================================================
 -- Plays the rechamber animation after firing (bolt-action or pump)
-function SWEP:DoRechamber()
-    local vm = IsValid(self.Owner) and self.Owner:GetViewModel() or nil
-    if not IsValid(vm) then return end
-    if self.Animations and self.Animations["rechamber"] then
-        local seq = vm:LookupSequence(self.Animations["rechamber"])
-        if seq and seq >= 0 then
-            timer.Simple(self.RechamberDelay or 0.1, function()
-                if not IsValid(self) or not IsValid(self.Owner) then return end
-                if self.Owner:GetActiveWeapon() ~= self then return end
-                if self:GetUHBool("Reloading") then return end
-                vm:SendViewModelMatchingSequence(seq)
-                vm:SetCycle(0)
-            end)
-        end
-    end
-end
 
 -- Override PrimaryAttack to call DoRechamber after firing
 function SWEP:PrimaryAttack()
@@ -254,10 +281,6 @@ function SWEP:PrimaryAttack()
         return
     end
     BaseClass.PrimaryAttack(self)
-    -- Play rechamber after firing
-    if self:Clip1() > 0 or not self:GetUHBool("Reloading") then
-        self:DoRechamber()
-    end
 end
 
 function SWEP:Think()
@@ -266,25 +289,6 @@ function SWEP:Think()
     self:HandleSprintingAnimations()
     self:HandleIdle()
     self:HandleInspect()
-end
-
--- ============================================================
--- ATTACK GUARDS
--- ============================================================
-
-function SWEP:PrimaryAttack()
-    if self._meleeActive then return end
-    if self._mantleActive then return end
-    if self.Owner:KeyDown(IN_USE) then
-        local ct = CurTime()
-        if ct < (self._nextMelee or 0) then return end
-        if self:GetUHBool("Reloading") then return end
-        if self:GetNWFloat("DeployTime") > ct then return end
-        if self:GetNWInt("FireMode") == 0 then return end
-        if SERVER or IsFirstTimePredicted() then self:MeleeAttack() end
-        return
-    end
-    return BaseClass.PrimaryAttack(self)
 end
 
 function SWEP:SecondaryAttack()
@@ -488,3 +492,25 @@ SWEP.Attachments = {
     [1] = { name = "Slot 1", atts = { "tfa_codww2_xmag", "tfa_codww2_ballistic" }, default = 0 },
     [2] = { name = "Slot 2", atts = { "tfa_codww2_rapidfire_sg", "tfa_codww2_fmj" }, default = 0 },
 }
+
+-- ============================================================
+-- BOLT-ACTION RECHAMBER (KRM-style PostShoot override)
+-- ============================================================
+SWEP.PumpDelay = SWEP.PumpDelay or 0.8  -- bolt cycle time
+
+function SWEP:PostShoot()
+    local ct = CurTime()
+    local pumpDelay = self.PumpDelay or 0.8
+    -- Lock fire for at least pumpDelay (but never shorten a longer Primary.Delay)
+    self:SetNextPrimaryFire(math.max(self:GetNextPrimaryFire(), ct + pumpDelay))
+    self:SetNextSecondaryFire(math.max(self:GetNextSecondaryFire(), ct + pumpDelay))
+    timer.Simple(pumpDelay, function()
+        if not IsValid(self) or not IsValid(self.Owner)
+           or not IsValid(self.Owner:GetActiveWeapon())
+           or self.Owner:GetActiveWeapon() ~= self then return end
+        if self:GetUHBool("Reloading") then return end
+        local animKey = self:GetUHBool("Zooming") and "rechamber_ads" or "rechamber"
+        -- Use EasySendWeaponAnim so AnimSounds get triggered
+        self:EasySendWeaponAnim(animKey, ACT_VM_PULLBACK_HIGH)
+    end)
+end

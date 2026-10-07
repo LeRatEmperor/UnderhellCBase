@@ -135,7 +135,65 @@ SWEP.Animations = {
     ["reload_knife_empty"]        = "reload_knife_empty",
 }
 
-SWEP.AnimSounds = {}
+SWEP.AnimSounds = {
+    ["draw_first"] = {
+        { time = 0.1667, sound = "TFA_CODWW2_BREDA.FPO" },
+    },
+    ["draw"] = {
+        { time = 0.0333, sound = "TFA_CODWW2_LRG.Raise" },
+    },
+    ["draw_empty"] = {
+        { time = 0.0333, sound = "TFA_CODWW2_LRG.Raise" },
+    },
+    ["holster"] = {
+        { time = 0.0667, sound = "TFA_CODWW2_LRG.Holster" },
+    },
+    ["holster_empty"] = {
+        { time = 0.0667, sound = "TFA_CODWW2_LRG.Holster" },
+    },
+    ["reload"] = {
+        { time = 0.0333, sound = "TFA_CODWW2_BREDA.TacOpen" },
+    },
+    ["reload_empty"] = {
+        { time = 0.0333, sound = "TFA_CODWW2_BREDA.Open" },
+    },
+    ["inspect"] = {
+        { time = 0.0333, sound = "TFA_CODWW2_BREDA.Inspect1" },
+    },
+    ["inspect_empty"] = {
+        { time = 0.0333, sound = "TFA_CODWW2_BREDA.Inspect1" },
+    },
+    ["inspect_epic"] = {
+        { time = 0.0333, sound = "TFA_CODWW2_BREDA.EpicInspect1" },
+    },
+    ["draw_first_knife"] = {
+        { time = 0.1667, sound = "TFA_CODWW2_BREDA.FPO" },
+    },
+    ["draw_knife"] = {
+        { time = 0.0333, sound = "TFA_CODWW2_LRG.Raise" },
+    },
+    ["draw_knife_empty"] = {
+        { time = 0.0333, sound = "TFA_CODWW2_LRG.Raise" },
+    },
+    ["holster_knife"] = {
+        { time = 0.0667, sound = "TFA_CODWW2_LRG.Holster" },
+    },
+    ["holster_knife_empty"] = {
+        { time = 0.0667, sound = "TFA_CODWW2_LRG.Holster" },
+    },
+    ["reload_knife"] = {
+        { time = 0.0333, sound = "TFA_CODWW2_BREDA.TacOpen" },
+    },
+    ["reload_knife_empty"] = {
+        { time = 0.0333, sound = "TFA_CODWW2_BREDA.Open" },
+    },
+    ["inspect_knife"] = {
+        { time = 0.0333, sound = "TFA_CODWW2_BREDA.Inspect1" },
+    },
+    ["inspect_knife_empty"] = {
+        { time = 0.0333, sound = "TFA_CODWW2_BREDA.Inspect1" },
+    },
+}
 
 function SWEP:ShootAnimation()
     if self:GetUHBool("Zooming") and self.Animations and self.Animations["iron_fire"] then

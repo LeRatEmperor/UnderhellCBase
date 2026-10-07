@@ -137,7 +137,74 @@ SWEP.Animations = {
     ["suppressor_attach_knife"]        = "suppressor_attach_knife",
 }
 
-SWEP.AnimSounds = {}
+SWEP.AnimSounds = {
+    ["draw_first"] = {
+        { time = 0.1667, sound = "TFA_CODWW2_TOKYO.FPOCharge" },
+    },
+    ["draw"] = {
+        { time = 0.0333, sound = "TFA_CODWW2_SML.Raise" },
+    },
+    ["draw_empty"] = {
+        { time = 0.0667, sound = "TFA_CODWW2_SML.Raise" },
+    },
+    ["holster"] = {
+        { time = 0.0667, sound = "TFA_CODWW2_SML.Holster" },
+    },
+    ["holster_empty"] = {
+        { time = 0.0667, sound = "TFA_CODWW2_SML.Holster" },
+    },
+    ["reload"] = {
+        { time = 0.1667, sound = "TFA_CODWW2_TOKYO.TacMagOut" },
+    },
+    ["reload_empty"] = {
+        { time = 0.1667, sound = "TFA_CODWW2_TOKYO.MagOut" },
+    },
+    ["inspect"] = {
+        { time = 0.0333, sound = "TFA_CODWW2_TOKYO.Inspect1" },
+    },
+    ["inspect_epic"] = {
+        { time = 0.0333, sound = "TFA_CODWW2_TOKYO.Inspect1" },
+    },
+    ["inspect_empty"] = {
+        { time = 0.0333, sound = "TFA_CODWW2_TOKYO.EpicInspect1" },
+    },
+    ["draw_knife"] = {
+        { time = 0.0667, sound = "TFA_CODWW2_SML.Raise" },
+    },
+    ["draw_knife_empty"] = {
+        { time = 0.0667, sound = "TFA_CODWW2_SML.Raise" },
+    },
+    ["holster_knife"] = {
+        { time = 0.0667, sound = "TFA_CODWW2_SML.Holster" },
+    },
+    ["holster_knife_empty"] = {
+        { time = 0.0667, sound = "TFA_CODWW2_SML.Holster" },
+    },
+    ["reload_knife"] = {
+        { time = 0.1667, sound = "TFA_CODWW2_TOKYO.TacMagOut" },
+    },
+    ["reload_knife_empty"] = {
+        { time = 0.1667, sound = "TFA_CODWW2_TOKYO.MagOut" },
+    },
+    ["inspect_knife"] = {
+        { time = 0.0333, sound = "TFA_CODWW2_TOKYO.Inspect1" },
+    },
+    ["inspect_knife_empty"] = {
+        { time = 0.0333, sound = "TFA_CODWW2_TOKYO.Inspect1" },
+    },
+    ["suppressor_attach"] = {
+        { time = 0.0333, sound = "TFA_CODWW2_MP40.SuppOn" },
+    },
+    ["suppressor_remove"] = {
+        { time = 0.0333, sound = "TFA_CODWW2_MP40.SuppOff" },
+    },
+    ["suppressor_attach_knife"] = {
+        { time = 0.0333, sound = "TFA_CODWW2_MP40.SuppOn" },
+    },
+    ["suppressor_remove_knife"] = {
+        { time = 0.0333, sound = "TFA_CODWW2_MP40.SuppOff" },
+    },
+}
 
 function SWEP:ShootAnimation()
     if self:GetUHBool("Zooming") and self.Animations and self.Animations["iron_fire"] then

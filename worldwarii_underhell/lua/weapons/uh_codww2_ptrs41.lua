@@ -135,7 +135,44 @@ SWEP.Animations = {
     ["reload_ext_empty"]        = "reload_ext_empty",
 }
 
-SWEP.AnimSounds = {}
+SWEP.AnimSounds = {
+    ["draw_first"] = {
+        { time = 0.0333, sound = "TFA_CODWW2_PTRS.FPO" },
+    },
+    ["draw"] = {
+        { time = 0.0333, sound = "TFA_CODWW2_RIFLE.Raise" },
+    },
+    ["draw_empty"] = {
+        { time = 0.0333, sound = "TFA_CODWW2_RIFLE.Raise" },
+    },
+    ["holster"] = {
+        { time = 0.0333, sound = "TFA_CODWW2_RIFLE.Holster" },
+    },
+    ["holster_empty"] = {
+        { time = 0.0333, sound = "TFA_CODWW2_RIFLE.Holster" },
+    },
+    ["reload"] = {
+        { time = 0.1667, sound = "TFA_CODWW2_PTRS.TacOpen" },
+    },
+    ["reload_empty"] = {
+        { time = 0.5000, sound = "TFA_CODWW2_PTRS.Open" },
+    },
+    ["reload_ext"] = {
+        { time = 0.1667, sound = "TFA_CODWW2_PTRS.TacOpen" },
+    },
+    ["reload_ext_empty"] = {
+        { time = 0.5000, sound = "TFA_CODWW2_PTRS.Open" },
+    },
+    ["inspect"] = {
+        { time = 0.0333, sound = "TFA_CODWW2_PTRS.Inspect1" },
+    },
+    ["inspect_empty"] = {
+        { time = 0.0333, sound = "TFA_CODWW2_PTRS.Inspect1" },
+    },
+    ["inspect_epic"] = {
+        { time = 0.0333, sound = "TFA_CODWW2_PTRS.EpicInspect1" },
+    },
+}
 
 function SWEP:ShootAnimation()
     if self:GetUHBool("Zooming") and self.Animations and self.Animations["iron_fire"] then
