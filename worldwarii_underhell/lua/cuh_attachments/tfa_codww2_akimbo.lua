@@ -8,9 +8,9 @@ ATTACHMENT.Name = "Akimbo"
 ATTACHMENT.AttachSound = Sound("TFA_CODWW2_ATT.Equip")
 ATTACHMENT.DetachSound = Sound("TFA_CODWW2_ATT.Unequip")
 ATTACHMENT.Description = {
-	TFA.AttachmentColors["+"], "2x Clip Size",
-	TFA.AttachmentColors["+"], "+3 Additional mags",
-	TFA.AttachmentColors["-"], "Can't use other attachments",
+	Color(100, 255, 100), "2x Clip Size",
+	Color(100, 255, 100), "+3 Additional mags",
+	Color(255, 100, 100), "Can't use other attachments",
 }
 ATTACHMENT.Icon = "entities/tfa_codww2_akimbo.png" --Revers to label, please give it an icon though!  This should be the path to a png, like "entities/tfa_ammo_match.png"
 ATTACHMENT.ShortName = "DUAL"
@@ -50,7 +50,7 @@ ATTACHMENT.WeaponTable = {
 	["Animations"] = {
 		["draw"] = function(wep, val)
 			val = table.Copy(val)
-			val["type"] = TFA.Enum.ANIMATION_SEQ
+			val["type"] = 1
 			if wep:Clip1() == 1 then
 				val["value"] = "draw_midempty_dw"
 			else
@@ -60,7 +60,7 @@ ATTACHMENT.WeaponTable = {
 		end,
 		["shoot1"] = function(wep,val)
 			val = table.Copy(val)
-			val["type"] = TFA.Enum.ANIMATION_SEQ --Sequence or act
+			val["type"] = 1 --Sequence or act
 			if wep:Clip1() == 2 then
 				val["value"] = "fire_last_r"
 			elseif wep:GetAnimCycle() == 0 and not wep.Akimbo_Inverted then
@@ -72,7 +72,7 @@ ATTACHMENT.WeaponTable = {
 		end,
 		["shoot1_last"] = function(wep,val)
 			val = table.Copy(val)
-			val["type"] = TFA.Enum.ANIMATION_SEQ --Sequence or act
+			val["type"] = 1 --Sequence or act
 			if wep:Clip1() == 2 then
 				val["value"] = "fire_last_r"
 			elseif wep:Clip1() == 1 then
@@ -82,7 +82,7 @@ ATTACHMENT.WeaponTable = {
 		end,
 		["idle"] = function(wep,val)
 			val = table.Copy(val)
-			val["type"] = TFA.Enum.ANIMATION_SEQ --Sequence or act
+			val["type"] = 1 --Sequence or act
 			if wep:Clip1() == 1 then
 				val["value"] = "idle_midempty"
 			else
@@ -92,7 +92,7 @@ ATTACHMENT.WeaponTable = {
 		end,
 		["holster"] = function(wep, val)
 			val = table.Copy(val)
-			val["type"] = TFA.Enum.ANIMATION_SEQ
+			val["type"] = 1
 			if wep:Clip1() == 1 then
 				val["value"] = "holster_midempty_dw"
 			else
@@ -102,7 +102,7 @@ ATTACHMENT.WeaponTable = {
 		end,
 		["reload"] = function(wep, val)
 			val = table.Copy(val)
-			val["type"] = TFA.Enum.ANIMATION_SEQ
+			val["type"] = 1
 			if wep:Clip1() == 1 then
 				val["value"] = "reload_midempty_dw"
 			else
@@ -112,7 +112,7 @@ ATTACHMENT.WeaponTable = {
 		end,
 		["inspect"] = function(wep, val)
 			val = table.Copy(val)
-			val["type"] = TFA.Enum.ANIMATION_ACT
+			val["type"] = 2
 			if wep:Clip1() == 1 then
 				val["value"] = ACT_RPG_FIDGET_UNLOADED
 			else
@@ -122,7 +122,7 @@ ATTACHMENT.WeaponTable = {
 		end,
 		["bash"] = function(wep, val)
 			val = table.Copy(val)
-			val["type"] = TFA.Enum.ANIMATION_SEQ
+			val["type"] = 1
 			if wep:Clip1() == 1 then
 				val["value"] = "melee_midempty"
 			else
@@ -135,7 +135,7 @@ ATTACHMENT.WeaponTable = {
 		["in"] = function(wep,val)
 			if not wep.SprintAnimation["in"] then return end
 			val = table.Copy(val) or {}
-			val["type"] = TFA.Enum.ANIMATION_SEQ --Sequence or act
+			val["type"] = 1 --Sequence or act
 			if wep:Clip1() == 1 then
 				val["value"] = "sprint_in_midempty"
 			else
@@ -149,7 +149,7 @@ ATTACHMENT.WeaponTable = {
 		["loop"] = function(wep,val)
 			if not wep.SprintAnimation.loop then return end
 			val = table.Copy(val) or {}
-			val["type"] = TFA.Enum.ANIMATION_SEQ --Sequence or act
+			val["type"] = 1 --Sequence or act
 			if wep:Clip1() == 1 then
 				val["value"] = "sprint_loop_midempty"
 			else
@@ -163,7 +163,7 @@ ATTACHMENT.WeaponTable = {
 		["out"] = function(wep,val)
 			if not wep.SprintAnimation.out then return end
 			val = table.Copy(val) or {}
-			val["type"] = TFA.Enum.ANIMATION_SEQ --Sequence or act
+			val["type"] = 1 --Sequence or act
 			if wep:Clip1() == 1 then
 				val["value"] = "sprint_out_midempty"
 			else
@@ -185,27 +185,11 @@ ATTACHMENT.WeaponTable = {
 	["InspectAng"] = function( wep, val ) return wep.InspectAng_DW or val end,
 }
 
-ATTACHMENT.DInv2_GridSizeX = 1
-ATTACHMENT.DInv2_GridSizeY = 1
-ATTACHMENT.DInv2_Volume = nil
-ATTACHMENT.DInv2_Mass = nil
-ATTACHMENT.DInv2_StackSize = 1
 
 ATTACHMENT.Ammo = "pistol"
 
 function ATTACHMENT:Attach(wep)
-	wep.StatCache_Blacklist["Akimbo"] = true
-	wep.StatCache_Blacklist["Akimbo_Inverted"] = true
-	wep.StatCache_Blacklist["AnimCycle"] = true
-	
-	self.DefaultClip = (wep:GetStat("Primary.ClipSize_DW") * 3)
-	
-	if SERVER and not wep.HasBeenGivenDWAmmo and (IsValid(wep:GetOwner()) and wep:GetOwner().GiveAmmo) then
-		wep:SetClip1( math.Clamp( self.DefaultClip,0,1 ) )
-		wep:GetOwner():GiveAmmo( math.max( self.DefaultClip - 1, 0 ), self.Ammo )
-		wep:EmitSound( wep:GetStat("Primary.PickupSound") )
-		wep.HasBeenGivenDWAmmo = 1
-	end
+end
 
 	wep:Unload()
 	
@@ -218,7 +202,7 @@ function ATTACHMENT:Attach(wep)
 	end
 	wep:SetModel(wep.WorldModel)
 	
-	if TFA.Enum.ReadyStatus[wep:GetStatus()] then
+	if -- Enum.ReadyStatus[wep:GetStatus()] then
 		wep:ChooseIdleAnim()
 		if game.SinglePlayer() then
 			wep:CallOnClient("ChooseIdleAnim","")
@@ -228,17 +212,7 @@ function ATTACHMENT:Attach(wep)
 end
 
 function ATTACHMENT:Detach(wep)
-	wep.StatCache_Blacklist["Akimbo"] = false
-	wep.StatCache_Blacklist["Akimbo_Inverted"] = false
-	wep.StatCache_Blacklist["AnimCycle"] = false
-
-	wep:Unload()
-	
-	if wep.ViewModelKitOld then
-		wep.ViewModel = wep.ViewModelKitOld
-		if IsValid(wep.OwnerViewModel) then
-			wep.OwnerViewModel:SetModel(wep.ViewModel)
-		end
+end
 		wep.ViewModelKitOld = nil
 	end
 	if wep.WorldModelKitOld then
@@ -247,7 +221,7 @@ function ATTACHMENT:Detach(wep)
 		wep.ViewModelKitOld = nil
 	end
 	
-	if TFA.Enum.ReadyStatus[wep:GetStatus()] then
+	if -- Enum.ReadyStatus[wep:GetStatus()] then
 		wep:ChooseIdleAnim()
 		if game.SinglePlayer() then
 			wep:CallOnClient("ChooseIdleAnim","")
@@ -256,6 +230,4 @@ function ATTACHMENT:Detach(wep)
 	wep:SetNextIdleAnim(-1)
 end
 
-if not TFA_ATTACHMENT_ISUPDATING then
-	TFAUpdateAttachments()
-end
+-- TFA attachment registration removed (CUH base handles this)

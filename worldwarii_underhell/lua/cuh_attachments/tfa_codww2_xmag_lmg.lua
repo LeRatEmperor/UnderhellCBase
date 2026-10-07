@@ -6,7 +6,7 @@ ATTACHMENT.Name = "Extended Mags"
 --ATTACHMENT.ID = "base" -- normally this is just your filename
 ATTACHMENT.AttachSound = Sound("TFA_CODWW2_ATT.Equip")
 ATTACHMENT.DetachSound = Sound("TFA_CODWW2_ATT.Unequip")
-ATTACHMENT.Description = { TFA.AttachmentColors["+"], "Increased magazine size"}
+ATTACHMENT.Description = { Color(100, 255, 100), "Increased magazine size"}
 ATTACHMENT.Icon = "entities/tfa_codww2_xmag.png" --Revers to label, please give it an icon though!  This should be the path to a png, like "entities/tfa_ammo_match.png"
 ATTACHMENT.ShortName = "XMAG"
 
@@ -33,39 +33,39 @@ ATTACHMENT.WeaponTable = {
 	},
 	["Animations"] = {
 		["draw"] = {
-			["type"] = TFA.Enum.ANIMATION_SEQ, --Sequence or act
+			["type"] = 1, --Sequence or act
 			["value"] = "draw_knife"
 		},
 		["draw_empty"] = {
-			["type"] = TFA.Enum.ANIMATION_SEQ, --Sequence or act
+			["type"] = 1, --Sequence or act
 			["value"] = "draw_knife_empty"
 		},
 		["shoot1"] = {
-			["type"] = TFA.Enum.ANIMATION_SEQ, --Sequence or act
+			["type"] = 1, --Sequence or act
 			["value"] = "fire_knife"
 		},
 		["shoot1_is"] = {
-			["type"] = TFA.Enum.ANIMATION_SEQ, --Sequence or act
+			["type"] = 1, --Sequence or act
 			["value"] = "fire_knife_ads"
 		},
 		["shoot1_last"] = {
-			["type"] = TFA.Enum.ANIMATION_SEQ, --Sequence or act
+			["type"] = 1, --Sequence or act
 			["value"] = "fire_knife_last"
 		},
 		["reload"] = {
-			["type"] = TFA.Enum.ANIMATION_SEQ, --Sequence or act
+			["type"] = 1, --Sequence or act
 			["value"] = "reload_knife"
 		},
 		["reload_empty"] = {
-			["type"] = TFA.Enum.ANIMATION_SEQ, --Sequence or act
+			["type"] = 1, --Sequence or act
 			["value"] = "reload_knife_empty"
 		},
 		["inspect"] = {
-			["type"] = TFA.Enum.ANIMATION_SEQ, --Sequence or act
+			["type"] = 1, --Sequence or act
 			["value"] = "inspect_knife"
 		},
 		["inspect_empty"] = {
-			["type"] = TFA.Enum.ANIMATION_SEQ, --Sequence or act
+			["type"] = 1, --Sequence or act
 			["value"] = "inspect_knife_empty"
 		},
 	},
@@ -79,7 +79,7 @@ ATTACHMENT.WeaponTable = {
 					val["value"] = wep.SprintAnimation_Tactical["in"].value or "sprint_in"
 				end
 			else
-				val["type"] = TFA.Enum.ANIMATION_SEQ --Sequence or act
+				val["type"] = 1 --Sequence or act
 				if val.value then
 					val["value"] = "sprint_in"
 				end
@@ -101,7 +101,7 @@ ATTACHMENT.WeaponTable = {
 					val["value_empty"] = wep.SprintAnimation_Tactical["loop"].value_empty or "sprint_loop_empty"
 				end
 			else
-				val["type"] = TFA.Enum.ANIMATION_SEQ --Sequence or act
+				val["type"] = 1 --Sequence or act
 				if val.value then
 					val["value"] = "sprint_loop"
 				end
@@ -123,7 +123,7 @@ ATTACHMENT.WeaponTable = {
 					val["value_empty"] = wep.SprintAnimation_Tactical["out"].value_empty or "sprint_out_empty"
 				end
 			else
-				val["type"] = TFA.Enum.ANIMATION_SEQ --Sequence or act
+				val["type"] = 1 --Sequence or act
 				if val.value then
 					val["value"] = "sprint_out"
 				end
@@ -138,7 +138,7 @@ ATTACHMENT.WeaponTable = {
 		["shoot"] = function(wep,val)
 			if not wep.IronAnimation.shoot then return end
 			val = table.Copy(val) or {}
-			val["type"] = TFA.Enum.ANIMATION_SEQ --Sequence or act
+			val["type"] = 1 --Sequence or act
 			if val.value then
 				val["value"] = "fire_knife_ads"
 			end
@@ -154,34 +154,19 @@ ATTACHMENT.WeaponTable = {
 	["VMAng"] = function( wep, val ) return wep.VMAng_TAC or val end,
 }
 
-function ATTACHMENT:Attach( wep )
-	if TFA.Enum.ReadyStatus[wep:GetStatus()] then
-		wep:ChooseIdleAnim()
-		if game.SinglePlayer() then
-			wep:CallOnClient("ChooseIdleAnim","")
-		end
+function ATTACHMENT:Attach(wep)
+end
 	end
 	wep:SetNextIdleAnim(-1)
 	wep:Unload()
 end
 
-function ATTACHMENT:Detach( wep )
-	if TFA.Enum.ReadyStatus[wep:GetStatus()] then
-		wep:ChooseIdleAnim()
-		if game.SinglePlayer() then
-			wep:CallOnClient("ChooseIdleAnim","")
-		end
+function ATTACHMENT:Detach(wep)
+end
 	end
 	wep:SetNextIdleAnim(-1)
 	wep:Unload()
 end
 
-ATTACHMENT.DInv2_GridSizeX = 1
-ATTACHMENT.DInv2_GridSizeY = 1
-ATTACHMENT.DInv2_Volume = nil
-ATTACHMENT.DInv2_Mass = nil
-ATTACHMENT.DInv2_StackSize = 64
 
-if not TFA_ATTACHMENT_ISUPDATING then
-	TFAUpdateAttachments()
-end
+-- TFA attachment registration removed (CUH base handles this)

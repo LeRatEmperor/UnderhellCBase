@@ -6,7 +6,7 @@ ATTACHMENT.Name = "Tone Deaf"
 --ATTACHMENT.ID = "base" -- normally this is just your filename
 ATTACHMENT.AttachSound = Sound("TFA_CODWW2_ATT.Equip")
 ATTACHMENT.DetachSound = Sound("TFA_CODWW2_ATT.Unequip")
-ATTACHMENT.Description = { TFA.AttachmentColors["+"], "Annoy everyone around you" }
+ATTACHMENT.Description = { Color(100, 255, 100), "Annoy everyone around you" }
 ATTACHMENT.Icon = "entities/areallyfuckingbadidea.png" --Revers to label, please give it an icon though!  This should be the path to a png, like "entities/tfa_ammo_match.png"
 ATTACHMENT.ShortName = "JOKE"
 
@@ -27,12 +27,5 @@ function ATTACHMENT:Detach(wep)
 	wep:SetSilenced(false)
 end
 
-ATTACHMENT.DInv2_GridSizeX = 1
-ATTACHMENT.DInv2_GridSizeY = 1
-ATTACHMENT.DInv2_Volume = nil
-ATTACHMENT.DInv2_Mass = nil
-ATTACHMENT.DInv2_StackSize = 1
 
-if not TFA_ATTACHMENT_ISUPDATING then
-	TFAUpdateAttachments()
-end
+-- TFA attachment registration removed (CUH base handles this)

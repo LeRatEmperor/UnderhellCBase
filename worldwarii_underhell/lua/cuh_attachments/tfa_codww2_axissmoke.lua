@@ -7,7 +7,7 @@ ATTACHMENT.Name = "Axis Smoke Grenade"
 ATTACHMENT.AttachSound = Sound("TFA_CODWW2_ATT.Equip")
 ATTACHMENT.DetachSound = Sound("TFA_CODWW2_ATT.Unequip")
 ATTACHMENT.Description = {
-	TFA.AttachmentColors["="], "Swaps grenade model to Axis version",
+	Color(255, 255, 255), "Swaps grenade model to Axis version",
 }
 ATTACHMENT.Icon = "entities/tfa_codww2_m18_smoke.png" --Revers to label, please give it an icon though!  This should be the path to a png, like "entities/tfa_ammo_match.png"
 ATTACHMENT.ShortName = "SMOKE"
@@ -18,11 +18,6 @@ ATTACHMENT.WeaponTable = {
 	},
 }
 
-ATTACHMENT.DInv2_GridSizeX = 1
-ATTACHMENT.DInv2_GridSizeY = 1
-ATTACHMENT.DInv2_Volume = nil
-ATTACHMENT.DInv2_Mass = nil
-ATTACHMENT.DInv2_StackSize = 64
 
 function ATTACHMENT:Attach(wep)
 	wep.ViewModelKitOld = wep.ViewModelKitOld or wep.ViewModel
@@ -62,6 +57,4 @@ function ATTACHMENT:Detach(wep)
 	wep:SetNextIdleAnim(-1)
 end
 
-if not TFA_ATTACHMENT_ISUPDATING then
-	TFAUpdateAttachments()
-end
+-- TFA attachment registration removed (CUH base handles this)
