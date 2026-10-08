@@ -1121,14 +1121,9 @@ function SWEP:IsTFAWeapon()
     return false
 end
 
--- TFA's keybind module also calls these — stub them out too
-function SWEP:GetStat(name, default)
-    return default
-end
-
-function SWEP:GetStatRaw(name, default)
-    return default
-end
+-- NOTE: Do NOT define GetStat here — it shadows the stat cache GetStat at line 238
+-- which breaks function-transform attachments in ApplyAttachments.
+-- TFA's GetStatL is the one that needs stubbing (different name, no conflict).
 
 -- ============================================================
 -- MELEE ATTACK
