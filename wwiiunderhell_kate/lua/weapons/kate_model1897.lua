@@ -64,7 +64,8 @@ SWEP.Primary.SpreadIncrement    = 2.0
 SWEP.Primary.SpreadRecovery     = 2.0
 SWEP.TwoHanded              = true
 SWEP.ReloadSpeed            = 1
-SWEP.Chambering             = false          -- TFA: DisableChambering = true
+SWEP.Chambering             = false
+SWEP.AnimatedSprint = true          -- TFA: DisableChambering = true
 
 -- Range falloff (from TFA Primary.RangeFalloffLUT)
 SWEP.Primary.RangeFalloffLUT = {
@@ -82,8 +83,8 @@ SWEP.Primary.RangeFalloffLUT = {
 -- Shotgun config
 SWEP.Shotgun = true
 SWEP.IsPump = true
-SWEP.PumpDelay = 0.6667           -- 20/30 from SequenceLengthOverride[ACT_VM_PULLBACK_HIGH]
-SWEP.Primary.ReloadTime = 0.5     -- per-shell insertion time (template default)
+SWEP.PumpDelay = 0.4           -- 20/30 from SequenceLengthOverride[ACT_VM_PULLBACK_HIGH]
+SWEP.Primary.ReloadTime = 0.7     -- per-shell insertion time (template default)
 
 -- Ironsights (from TFA source)
 SWEP.IronSightsPos = Vector(-3.345, -2, 1.3)
@@ -157,8 +158,8 @@ SWEP.Animations = {
     ["start_reload"]  = "reload_start",
     ["reload_loop"]   = "reload_loop",
     ["after_reload"]  = "reload_end",
-    ["shotgun_reload_start"]  = "reload_start",
-    ["shotgun_reload_finish"] = "reload_end",
+    ["start_reload"]  = "reload_start",
+    ["after_reload"] = "reload_end",
     ["sprint_idle"]  = "sprint_loop",
     ["sprint_in"]    = "sprint_in",
     ["sprint_out"]   = "sprint_out",
@@ -201,7 +202,7 @@ SWEP.AnimSounds = {
     ["rechamber_ads"] = {
         { time = 0.0333, sound = "TFA_CODWW2_M1897.Rack" },
     },
-    ["shotgun_reload_start"] = {
+    ["start_reload"] = {
         { time = 0.0333, sound = "TFA_CODWW2_M1897.ADSFoley" },
         { time = 0.0333, sound = "TFA_CODWW2_M1897.ShellStart" },
         { time = 1.0000, sound = "TFA_CODWW2_M1897.ShellIn" },
@@ -214,7 +215,7 @@ SWEP.AnimSounds = {
     ["reload"] = {
         { time = 0.1667, sound = "TFA_CODWW2_M1897.ShellIn" },
     },
-    ["shotgun_reload_finish"] = {
+    ["after_reload"] = {
         { time = 0.0333, sound = "TFA_CODWW2_M1897.EndStart" },
         { time = 0.3333, sound = "TFA_CODWW2_M1897.EndPump" },
     },
@@ -257,7 +258,7 @@ SWEP.AnimSounds = {
 function SWEP:PostShoot()
     if not self.IsPump then return end
     local ct = CurTime()
-    local pumpDelay = self.PumpDelay or 0.5
+    local pumpDelay = self.PumpDelay or 0.4
     self:SetNextPrimaryFire(math.max(self:GetNextPrimaryFire(), ct + pumpDelay))
     self:SetNextSecondaryFire(math.max(self:GetNextSecondaryFire(), ct + pumpDelay))
     timer.Simple(pumpDelay, function()

@@ -66,7 +66,8 @@ SWEP.Primary.SpreadIncrement    = 3.0
 SWEP.Primary.SpreadRecovery     = 6.0
 SWEP.TwoHanded              = true
 SWEP.ReloadSpeed            = 1
-SWEP.Chambering             = false          -- TFA: DisableChambering = true
+SWEP.Chambering             = false
+SWEP.AnimatedSprint = true          -- TFA: DisableChambering = true
 
 -- Range falloff (from TFA Primary.RangeFalloffLUT)
 SWEP.Primary.RangeFalloffLUT = {
@@ -82,7 +83,7 @@ SWEP.Primary.RangeFalloffLUT = {
 -- Shotgun config (shell reload, but NO pump)
 SWEP.Shotgun = true
 SWEP.IsPump = false         -- ← KEY DIFFERENCE: no pump rechamber
-SWEP.Primary.ReloadTime = 0.5     -- per-shell insertion time (template default)
+SWEP.Primary.ReloadTime = 0.4     -- per-shell insertion time (template default)
 
 -- Ironsights (from TFA source)
 SWEP.IronSightsPos = Vector(-4.07, -3, 1.05)
@@ -157,8 +158,8 @@ SWEP.Animations = {
     ["start_reload"]  = "reload_start",
     ["reload_loop"]   = "reload_loop",
     ["after_reload"]  = "reload_end",
-    ["shotgun_reload_start"]  = "reload_start",
-    ["shotgun_reload_finish"] = "reload_end",
+    ["start_reload"]  = "reload_start",
+    ["after_reload"] = "reload_end",
     ["sprint_idle"]  = "sprint_loop",
     ["sprint_in"]    = "sprint_in",
     ["sprint_out"]   = "sprint_out",
@@ -182,14 +183,14 @@ SWEP.AnimSounds = {
     ["holster"] = {
         { time = 0.0667, sound = "TFA_CODWW2_PSTL.Holster" },
     },
-    ["shotgun_reload_start"] = {
+    ["start_reload"] = {
         { time = 0.1667, sound = "TFA_CODWW2_M1879.Open" },
         { time = 0.5000, sound = "TFA_CODWW2_M1879.Insert" },
     },
     ["reload"] = {
         { time = 0.0000, sound = "TFA_CODWW2_M1879.Insert" },
     },
-    ["shotgun_reload_finish"] = {
+    ["after_reload"] = {
         { time = 0.0000, sound = "TFA_CODWW2_M1879.Close" },
     },
     ["inspect"] = {

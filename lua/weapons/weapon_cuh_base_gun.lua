@@ -1224,22 +1224,23 @@ end
 -- 2. End the melee at _meleeEndTime
 -- Without this, _meleeActive stays true forever and the weapon locks up.
 function SWEP:Think()
-    BaseClass.Think(self)
-    if not IsValid(self.Owner) then return end
     local ct = CurTime()
 
-    -- Melee state machine
+    -- Melee state machine — run BEFORE BaseClass.Think so the parent's
+    -- zoom/idle/reload logic doesn't interfere with melee state.
+    -- This matches the BO3 base gun pattern (weapon_bo3_base_gun.lua).
     if self._meleeActive then
-        -- Do the hit trace at the scheduled time
         if not self._meleeHitDone and self._meleeHitTime and ct >= self._meleeHitTime then
             self._meleeHitDone = true
             if SERVER or IsFirstTimePredicted() then
                 self:DoMeleeTrace()
             end
         end
-        -- End the melee when the animation finishes
         if self._meleeEndTime and ct >= self._meleeEndTime then
             self:EndMelee()
         end
     end
+
+    BaseClass.Think(self)
+    if not IsValid(self.Owner) then return end
 end

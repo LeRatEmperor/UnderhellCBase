@@ -64,7 +64,8 @@ SWEP.Primary.SpreadIncrement    = 1.5
 SWEP.Primary.SpreadRecovery     = 3.0
 SWEP.TwoHanded              = true
 SWEP.ReloadSpeed            = 1
-SWEP.Chambering             = false            -- TFA: DisableChambering = true
+SWEP.Chambering             = false
+SWEP.AnimatedSprint = true            -- TFA: DisableChambering = true
 
 -- Range falloff (from TFA Primary.RangeFalloffLUT)
 SWEP.Primary.RangeFalloffLUT = {
@@ -78,7 +79,7 @@ SWEP.Primary.RangeFalloffLUT = {
 
 -- Bolt-action rechamber config
 SWEP.IsBoltAction = true
-SWEP.PumpDelay = 1.1667   -- 35/30 from SequenceLengthOverride[ACT_VM_PULLBACK_HIGH]
+SWEP.PumpDelay = 0.4   -- 35/30 from SequenceLengthOverride[ACT_VM_PULLBACK_HIGH]
 
 -- Ironsights (from TFA source)
 SWEP.IronSightsPos = Vector(-4.6, -4.5, 1.33)
@@ -227,7 +228,7 @@ SWEP.AnimSounds = {
 -- Locks fire for PumpDelay, then plays the bolt-cycle animation.
 function SWEP:PostShoot()
     local ct = CurTime()
-    local pumpDelay = self.PumpDelay or 0.5
+    local pumpDelay = self.PumpDelay or 0.4
     -- Lock fire for at least pumpDelay
     self:SetNextPrimaryFire(math.max(self:GetNextPrimaryFire(), ct + pumpDelay))
     self:SetNextSecondaryFire(math.max(self:GetNextSecondaryFire(), ct + pumpDelay))

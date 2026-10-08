@@ -85,7 +85,8 @@ SWEP.Primary.SpreadIncrement    = 1.0
 SWEP.Primary.SpreadRecovery     = 6.0
 SWEP.TwoHanded              = true
 SWEP.ReloadSpeed            = 1
-SWEP.Chambering             = false          -- TFA: DisableChambering = true
+SWEP.Chambering             = false
+SWEP.AnimatedSprint = true          -- TFA: DisableChambering = true
 
 -- Range falloff (from TFA Primary.RangeFalloffLUT)
 SWEP.Primary.RangeFalloffLUT = {
