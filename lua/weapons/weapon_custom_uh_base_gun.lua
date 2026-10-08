@@ -879,7 +879,12 @@ function SWEP:Think()
             if self.ReloadSpeed and self.ReloadSpeed ~= 1 then
                 vm:SetPlaybackRate(self.ReloadSpeed)
             end
-            if self._reloadEndTime and ct >= self._reloadEndTime then
+            -- Complete reload when EITHER:
+            -- 1. The viewmodel animation finishes (cycle >= 1) — visual completion
+            -- 2. The timer expires (_reloadEndTime) — server-authoritative timeout
+            -- This prevents a dead window where the animation has finished
+            -- but ammo hasn't been added yet.
+            if vm:GetCycle() >= 1 or (self._reloadEndTime and ct >= self._reloadEndTime) then
                 self:_FinishReload()
             end
         end
