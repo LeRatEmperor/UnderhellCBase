@@ -249,6 +249,18 @@ SWEP.AnimSounds = {
 -- SMART MUZZLE / SHELL AUTO-DETECT
 -- ============================================================
 -- WWII models use: tag_flash (muzzle), tag_brass (shell eject), tag_silencer
+function SWEP:GetDisplay()
+    -- Override: return the index of attachment "1" (tag_silencer)
+    -- so the 3D2D ammo counter appears near the muzzle/sights,
+    -- not at __illumPosition on j_gun (the grip).
+    local vm = IsValid(self.Owner) and self.Owner:GetViewModel() or nil
+    if IsValid(vm) then
+        local att = vm:LookupAttachment("1")
+        if att > 0 then return att end
+    end
+    return 1
+end
+
 function SWEP:GetMuzzle()
     -- TFA WWII models use attachment name "1" (on bone tag_silencer)
     local vm = IsValid(self.Owner) and self.Owner:GetViewModel() or nil
