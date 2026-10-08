@@ -293,13 +293,13 @@ function SWEP:FireProjectile()
     local pos = owner:EyePos() + aim * 30 - owner:GetUp() * 10 +
         (self:GetUHBool("Zooming") and Vector(0, 0, 0) or owner:GetRight() * 5)
 
+    -- Set position and angles BEFORE Spawn
     ent:SetPos(pos)
     ent:SetAngles(owner:EyeAngles())
-    ent:Spawn()
-    ent:Activate()
-    ent:SetOwner(owner)
 
-    -- Configure projectile
+    -- CRITICAL: set ALL config fields BEFORE Spawn() so Initialize()
+    -- can read them. If set after Spawn, the physics hull is initialized
+    -- with the wrong model and PhysicsCollide never fires.
     ent.ProjectileModel = self.ProjectileModel
     ent.IsBolt = self.ProjectileIsBolt
     ent.Damage = self.ProjectileDamage
@@ -307,6 +307,11 @@ function SWEP:FireProjectile()
     ent.ExplodeOnImpact = not self.ProjectileIsBolt
     ent.ExplosionSound = self.ProjectileExplosionSound
     ent.TrailSound = self.ProjectileTrailSound
+
+    -- NOW spawn — Initialize() will read the correct fields
+    ent:Spawn()
+    ent:Activate()
+    ent:SetOwner(owner)
 
     -- Apply force (same pattern as RPG reference)
     local phys = ent:GetPhysicsObject()
