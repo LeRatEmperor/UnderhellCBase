@@ -55,7 +55,7 @@ SWEP.Primary.Automatic      = false
 SWEP.Primary.TakeAmmo       = 1
 SWEP.Primary.Force          = 1
 SWEP.Primary.Spread         = 0.001
-SWEP.Primary.Delay          = 0.24
+SWEP.Primary.Delay          = 1.0
 SWEP.Primary.NumberofShots  = 1
 SWEP.Primary.MinRecoil      = -2.0
 SWEP.Primary.MaxRecoil      = -2.0
@@ -162,20 +162,23 @@ end
 -- SMART MUZZLE / SHELL
 -- ============================================================
 function SWEP:GetMuzzle()
+    -- TFA WWII models use attachment name "1" (on bone tag_silencer)
     local vm = IsValid(self.Owner) and self.Owner:GetViewModel() or nil
     if IsValid(vm) then
-        local att = vm:LookupAttachment("tag_flash")
+        local att = vm:LookupAttachment("1")
         if att > 0 then return att end
-        att = vm:LookupAttachment("tag_silencer")
+        -- Fallback: try attachment name "2" (on bone tag_flash, some models)
+        att = vm:LookupAttachment("2")
         if att > 0 then return att end
     end
     return 1
 end
 
 function SWEP:GetShellEject()
+    -- TFA WWII models use attachment name "0" (on bone tag_brass)
     local vm = IsValid(self.Owner) and self.Owner:GetViewModel() or nil
     if IsValid(vm) then
-        local att = vm:LookupAttachment("tag_brass")
+        local att = vm:LookupAttachment("0")
         if att > 0 then return att end
     end
     return 2
