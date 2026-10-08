@@ -585,14 +585,16 @@ function SWEP:HandleRunning(ct)
         end
         self:SetUHBool("Running", true)
         self:SetUHBool("Zooming", false)
-        -- FIXED: cancel reload properly
+        -- Don't cancel an active reload — let it finish first.
+        -- Previously, sprinting would cancel the reload unconditionally,
+        -- even at 99% completion, causing ammo state desync.
+        -- Now sprint waits until the reload completes (ammo added) before
+        -- taking over the weapon state.
         if self:GetUHBool("Reloading") then
-            self:SetUHBool("Reloading", false)
-            self:SetNWFloat("ReloadTime", 0)
-            self:SetNWFloat("ReloadEndTime", 0)
-            if timer.Exists("UHReload_"..self.Owner:SteamID()) then
-                timer.Remove("UHReload_"..self.Owner:SteamID())
-            end
+            -- Reload is still in progress — don't set Running yet.
+            -- The reload Think() completion will fire, then sprint
+            -- can engage on the next Think tick.
+            self:SetUHBool("Running", false)
         end
     elseif self:GetUHBool("Running") then
         if self:GetNextPrimaryFire() < ct + 0.5 then
