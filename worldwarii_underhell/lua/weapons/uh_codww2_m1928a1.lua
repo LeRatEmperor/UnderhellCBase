@@ -136,23 +136,29 @@ SWEP.Animations = {
 }
 
 SWEP.AnimSounds = {
-    ["draw_first"] = {
-        { time = 0.6667, sound = "TFA_CODWW2_M1928.FPOCharge" },
-    },
     ["draw"] = {
         { time = 0.0333, sound = "TFA_CODWW2_SML.Raise" },
+    },
+    ["draw_first"] = {
+        { time = 0.6667, sound = "TFA_CODWW2_M1928.FPOCharge" },
     },
     ["holster"] = {
         { time = 0.0667, sound = "TFA_CODWW2_SML.Holster" },
     },
+    ["inspect"] = {
+        { time = 0.0333, sound = "TFA_CODWW2_M1928.Inspect1" },
+        { time = 1.6667, sound = "TFA_CODWW2_M1928.Inspect2" },
+    },
     ["reload"] = {
         { time = 0.0333, sound = "TFA_CODWW2_M1928.Start" },
+        { time = 0.3333, sound = "TFA_CODWW2_M1928.TacMagOut" },
+        { time = 1.3333, sound = "TFA_CODWW2_M1928.TacMagIn" },
     },
     ["reload_empty"] = {
         { time = 0.0333, sound = "TFA_CODWW2_M1928.Start" },
-    },
-    ["inspect"] = {
-        { time = 0.0333, sound = "TFA_CODWW2_M1928.Inspect1" },
+        { time = 0.5000, sound = "TFA_CODWW2_M1928.MagOut" },
+        { time = 1.5000, sound = "TFA_CODWW2_M1928.MagIn" },
+        { time = 2.1667, sound = "TFA_CODWW2_M1928.MagTap" },
     },
 }
 

@@ -139,20 +139,32 @@ SWEP.Animations = {
 }
 
 SWEP.AnimSounds = {
-    ["draw_first"] = {
-        { time = 0.5000, sound = "TFA_CODWW2_WZ35.FPO" },
-    },
     ["draw"] = {
         { time = 0.0333, sound = "TFA_CODWW2_RIFLE.Raise" },
-    },
-    ["holster"] = {
-        { time = 0.0333, sound = "TFA_CODWW2_RIFLE.Holster" },
     },
     ["draw_empty"] = {
         { time = 0.0333, sound = "TFA_CODWW2_RIFLE.Raise" },
     },
+    ["draw_first"] = {
+        { time = 0.5000, sound = "TFA_CODWW2_WZ35.FPO" },
+    },
+    ["holster"] = {
+        { time = 0.0333, sound = "TFA_CODWW2_RIFLE.Holster" },
+    },
     ["holster_empty"] = {
         { time = 0.0333, sound = "TFA_CODWW2_RIFLE.Holster" },
+    },
+    ["inspect"] = {
+        { time = 0.0333, sound = "TFA_CODWW2_WZ35.Inspect1" },
+        { time = 1.8333, sound = "TFA_CODWW2_WZ35.Inspect2" },
+    },
+    ["inspect_empty"] = {
+        { time = 0.0333, sound = "TFA_CODWW2_WZ35.Inspect1" },
+        { time = 1.8333, sound = "TFA_CODWW2_WZ35.Inspect2" },
+    },
+    ["inspect_epic"] = {
+        { time = 0.0333, sound = "TFA_CODWW2_WZ35.EpicInspect1" },
+        { time = 2.3333, sound = "TFA_CODWW2_WZ35.EpicInspect2" },
     },
     ["rechamber"] = {
         { time = 0.1667, sound = "TFA_CODWW2_WZ35.Cycle" },
@@ -162,24 +174,23 @@ SWEP.AnimSounds = {
     },
     ["reload"] = {
         { time = 0.8333, sound = "TFA_CODWW2_WZ35.TacMagOut" },
+        { time = 1.8333, sound = "TFA_CODWW2_WZ35.TacMagIn" },
     },
     ["reload_empty"] = {
         { time = 0.0333, sound = "TFA_CODWW2_WZ35.Open" },
+        { time = 1.1667, sound = "TFA_CODWW2_WZ35.MagOut" },
+        { time = 1.8333, sound = "TFA_CODWW2_WZ35.MagIn" },
+        { time = 2.6667, sound = "TFA_CODWW2_WZ35.Close" },
     },
     ["reload_ext"] = {
         { time = 0.8333, sound = "TFA_CODWW2_WZ35.TacMagOut" },
+        { time = 1.8333, sound = "TFA_CODWW2_WZ35.TacMagIn" },
     },
     ["reload_ext_empty"] = {
         { time = 0.0333, sound = "TFA_CODWW2_WZ35.Open" },
-    },
-    ["inspect"] = {
-        { time = 0.0333, sound = "TFA_CODWW2_WZ35.Inspect1" },
-    },
-    ["inspect_empty"] = {
-        { time = 0.0333, sound = "TFA_CODWW2_WZ35.Inspect1" },
-    },
-    ["inspect_epic"] = {
-        { time = 0.0333, sound = "TFA_CODWW2_WZ35.EpicInspect1" },
+        { time = 1.1667, sound = "TFA_CODWW2_WZ35.MagOut" },
+        { time = 1.8333, sound = "TFA_CODWW2_WZ35.MagIn" },
+        { time = 2.6667, sound = "TFA_CODWW2_WZ35.Close" },
     },
 }
 
@@ -483,7 +494,7 @@ SWEP.Attachments = {
 -- ============================================================
 -- BOLT-ACTION RECHAMBER (KRM-style PostShoot override)
 -- ============================================================
-SWEP.PumpDelay = SWEP.PumpDelay or 0.8  -- bolt cycle time
+SWEP.PumpDelay = SWEP.PumpDelay or 0.5  -- bolt cycle time
 
 function SWEP:PostShoot()
     local ct = CurTime()

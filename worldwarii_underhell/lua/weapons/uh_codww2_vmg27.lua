@@ -136,14 +136,14 @@ SWEP.Animations = {
 }
 
 SWEP.AnimSounds = {
-    ["draw_first"] = {
-        { time = 0.1667, sound = "TFA_CODWW2_VMG27.FPO" },
-    },
     ["draw"] = {
         { time = 0.0333, sound = "TFA_CODWW2_LRG.Raise" },
     },
     ["draw_empty"] = {
         { time = 0.0333, sound = "TFA_CODWW2_LRG.Raise" },
+    },
+    ["draw_first"] = {
+        { time = 0.1667, sound = "TFA_CODWW2_VMG27.FPO" },
     },
     ["holster"] = {
         { time = 0.0667, sound = "TFA_CODWW2_LRG.Holster" },
@@ -151,26 +151,39 @@ SWEP.AnimSounds = {
     ["holster_empty"] = {
         { time = 0.0667, sound = "TFA_CODWW2_LRG.Holster" },
     },
-    ["reload"] = {
-        { time = 0.0333, sound = "TFA_CODWW2_LSAT.EmptyFoley" },
-    },
-    ["reload_empty"] = {
-        { time = 0.0333, sound = "TFA_CODWW2_LSAT.EmptyFoley" },
-    },
     ["inspect"] = {
         { time = 0.0333, sound = "TFA_CODWW2_VMG27.Inspect1" },
-    },
-    ["inspect_epic"] = {
-        { time = 0.0333, sound = "TFA_CODWW2_VMG27.EpicInspect1" },
+        { time = 2.0000, sound = "TFA_CODWW2_VMG27.Inspect2" },
     },
     ["inspect_empty"] = {
         { time = 0.0333, sound = "TFA_CODWW2_VMG27.Inspect1" },
+        { time = 2.0000, sound = "TFA_CODWW2_VMG27.Inspect2" },
+    },
+    ["inspect_epic"] = {
+        { time = 0.0333, sound = "TFA_CODWW2_VMG27.EpicInspect1" },
+        { time = 5.3333, sound = "TFA_CODWW2_VMG27.EpicInspect2" },
+    },
+    ["reload"] = {
+        { time = 0.0333, sound = "TFA_CODWW2_LSAT.EmptyFoley" },
+        { time = 1.3333, sound = "TFA_CODWW2_VMG27.TacMagOut" },
+        { time = 4.8333, sound = "TFA_CODWW2_VMG27.TacMagIn" },
+    },
+    ["reload_empty"] = {
+        { time = 0.0333, sound = "TFA_CODWW2_LSAT.EmptyFoley" },
+        { time = 1.3333, sound = "TFA_CODWW2_VMG27.MagOut" },
+        { time = 4.8333, sound = "TFA_CODWW2_VMG27.MagIn" },
+        { time = 6.6667, sound = "TFA_CODWW2_VMG27.Charge" },
     },
     ["reload_ext"] = {
         { time = 0.0333, sound = "TFA_CODWW2_LSAT.EmptyFoley" },
+        { time = 1.0000, sound = "TFA_CODWW2_VMG27.ExtTacMagOut" },
+        { time = 3.8333, sound = "TFA_CODWW2_VMG27.ExtTacMagIn" },
     },
     ["reload_ext_empty"] = {
         { time = 0.0333, sound = "TFA_CODWW2_LSAT.EmptyFoley" },
+        { time = 1.0000, sound = "TFA_CODWW2_VMG27.ExtMagOut" },
+        { time = 3.8333, sound = "TFA_CODWW2_VMG27.ExtMagIn" },
+        { time = 5.8333, sound = "TFA_CODWW2_VMG27.ExtCharge" },
     },
 }
 

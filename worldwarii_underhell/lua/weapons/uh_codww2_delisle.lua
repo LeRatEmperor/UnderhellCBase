@@ -139,20 +139,33 @@ SWEP.Animations = {
 }
 
 SWEP.AnimSounds = {
-    ["draw_first"] = {
-        { time = 0.0333, sound = "TFA_CODWW2_DELISLE.Open" },
-    },
     ["draw"] = {
         { time = 0.0333, sound = "TFA_CODWW2_RIFLE.Raise" },
     },
     ["draw_empty"] = {
         { time = 0.0333, sound = "TFA_CODWW2_RIFLE.Raise" },
     },
+    ["draw_first"] = {
+        { time = 0.0333, sound = "TFA_CODWW2_DELISLE.Open" },
+        { time = 1.1667, sound = "TFA_CODWW2_DELISLE.Close" },
+    },
     ["holster"] = {
         { time = 0.0333, sound = "TFA_CODWW2_RIFLE.Holster" },
     },
     ["holster_empty"] = {
         { time = 0.0333, sound = "TFA_CODWW2_RIFLE.Holster" },
+    },
+    ["inspect"] = {
+        { time = 0.0333, sound = "TFA_CODWW2_DELISLE.Inspect1" },
+        { time = 0.1667, sound = "TFA_CODWW2_DELISLE.Inspect2" },
+    },
+    ["inspect_empty"] = {
+        { time = 0.0333, sound = "TFA_CODWW2_DELISLE.Inspect1" },
+        { time = 1.8333, sound = "TFA_CODWW2_DELISLE.Inspect2" },
+    },
+    ["inspect_epic"] = {
+        { time = 0.0333, sound = "TFA_CODWW2_DELISLE.EpicInspect1" },
+        { time = 4.1667, sound = "TFA_CODWW2_DELISLE.EpicInspect2" },
     },
     ["rechamber"] = {
         { time = 0.0333, sound = "TFA_CODWW2_DELISLE.Cycle" },
@@ -162,24 +175,23 @@ SWEP.AnimSounds = {
     },
     ["reload"] = {
         { time = 0.1667, sound = "TFA_CODWW2_DELISLE.TacMagOut" },
+        { time = 2.1667, sound = "TFA_CODWW2_DELISLE.TacMagIn" },
     },
     ["reload_empty"] = {
         { time = 0.1667, sound = "TFA_CODWW2_DELISLE.Open" },
+        { time = 0.8333, sound = "TFA_CODWW2_DELISLE.MagOut" },
+        { time = 2.6667, sound = "TFA_CODWW2_DELISLE.MagIn" },
+        { time = 3.3333, sound = "TFA_CODWW2_DELISLE.Close" },
     },
     ["reload_ext"] = {
         { time = 0.1667, sound = "TFA_CODWW2_DELISLE.TacMagOut" },
+        { time = 2.1667, sound = "TFA_CODWW2_DELISLE.TacMagIn" },
     },
     ["reload_ext_empty"] = {
         { time = 0.1667, sound = "TFA_CODWW2_DELISLE.Open" },
-    },
-    ["inspect"] = {
-        { time = 0.0333, sound = "TFA_CODWW2_DELISLE.Inspect1" },
-    },
-    ["inspect_empty"] = {
-        { time = 0.0333, sound = "TFA_CODWW2_DELISLE.Inspect1" },
-    },
-    ["inspect_epic"] = {
-        { time = 0.0333, sound = "TFA_CODWW2_DELISLE.EpicInspect1" },
+        { time = 0.8333, sound = "TFA_CODWW2_DELISLE.MagOut" },
+        { time = 2.6667, sound = "TFA_CODWW2_DELISLE.MagIn" },
+        { time = 3.3333, sound = "TFA_CODWW2_DELISLE.Close" },
     },
 }
 
@@ -483,7 +495,7 @@ SWEP.Attachments = {
 -- ============================================================
 -- BOLT-ACTION RECHAMBER (KRM-style PostShoot override)
 -- ============================================================
-SWEP.PumpDelay = SWEP.PumpDelay or 0.8  -- bolt cycle time
+SWEP.PumpDelay = SWEP.PumpDelay or 0.5  -- bolt cycle time
 
 function SWEP:PostShoot()
     local ct = CurTime()
