@@ -67,18 +67,7 @@ SWEP.Primary.SpreadRecovery     = 6.0
 SWEP.TwoHanded              = true
 SWEP.ReloadSpeed            = 1
 SWEP.Chambering             = false
-SWEP.AnimatedSprint = true          -- TFA: DisableChambering = true
-
--- Range falloff (from TFA Primary.RangeFalloffLUT)
-SWEP.Primary.RangeFalloffLUT = {
-    bezier = false,
-    range_func = "linear",
-    units = "meters",
-    lut = {
-        {range = 36, damage = 1},
-        {range = 39, damage = 0.46},
-    }
-}
+SWEP.AnimatedSprint = true          
 
 -- Shotgun config (shell reload, but NO pump)
 SWEP.Shotgun = true
@@ -127,7 +116,7 @@ SWEP.MeleeMissSound = ""
 SWEP.MeleeInterruptReload = true
 
 -- Shell ejection (from TFA LuaShell*)
--- LuaShellEject = false → model handles its own ejection; CUH skips lua eject
+-- model handles its own shell ejection
 SWEP.NoShell   = true
 SWEP.ShellHeat = 0.8
 SWEP.Shell     = "models/entities/tfa_codww2/shells/fx_9mm.mdl"   -- LuaShellModel

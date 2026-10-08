@@ -63,20 +63,7 @@ SWEP.Primary.SpreadRecovery     = 6.0
 SWEP.TwoHanded              = true
 SWEP.ReloadSpeed            = 1
 SWEP.Chambering             = false
-SWEP.AnimatedSprint = true        -- TFA: DisableChambering = true
-
--- Range falloff (from TFA Primary.RangeFalloffLUT)
-SWEP.Primary.RangeFalloffLUT = {
-    bezier = false,
-    range_func = "linear",
-    units = "meters",
-    lut = {
-        {range = 20, damage = 1},
-        {range = 22, damage = 0.86},
-        {range = 36, damage = 0.86},
-        {range = 38, damage = 0.6},
-    }
-}
+SWEP.AnimatedSprint = true        
 
 -- Ironsights (from TFA source)
 SWEP.IronSightsPos = Vector(-4.184, -2.75, 1.3)
@@ -430,7 +417,7 @@ end
 -- ============================================================
 -- VELEMENTS / WELEMENTS (ported 1:1 from TFA VElements/WElements)
 -- Renames: angle→ang, size→scale, bodygroup→bodygroups
--- Dynamic sight_nydar_lens entry (TFA.CODWW2.GetHoloSightReticle) skipped — resolves to nil in CUH
+-- Dynamic sight_nydar_lens entry skipped (runtime helper not available in CUH)
 -- ============================================================
 SWEP.ViewModelElements = {
     ["sight_nydar"] = {

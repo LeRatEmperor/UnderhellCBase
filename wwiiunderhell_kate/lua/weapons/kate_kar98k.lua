@@ -65,21 +65,11 @@ SWEP.Primary.SpreadRecovery     = 3.0
 SWEP.TwoHanded              = true
 SWEP.ReloadSpeed            = 1
 SWEP.Chambering             = false
-SWEP.AnimatedSprint = true            -- TFA: DisableChambering = true
-
--- Range falloff (from TFA Primary.RangeFalloffLUT)
-SWEP.Primary.RangeFalloffLUT = {
-    bezier = false,
-    range_func = "linear",
-    units = "meters",
-    lut = {
-        {range = 200, damage = 1},
-    }
-}
+SWEP.AnimatedSprint = true            
 
 -- Bolt-action rechamber config
 SWEP.IsBoltAction = true
-SWEP.PumpDelay = 0.4   -- 35/30 from SequenceLengthOverride[ACT_VM_PULLBACK_HIGH]
+SWEP.PumpDelay = 0.4   -- bolt cycle time
 
 -- Ironsights (from TFA source)
 SWEP.IronSightsPos = Vector(-4.6, -4.5, 1.33)

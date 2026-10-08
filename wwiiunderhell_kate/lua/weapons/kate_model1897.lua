@@ -65,25 +65,12 @@ SWEP.Primary.SpreadRecovery     = 2.0
 SWEP.TwoHanded              = true
 SWEP.ReloadSpeed            = 1
 SWEP.Chambering             = false
-SWEP.AnimatedSprint = true          -- TFA: DisableChambering = true
-
--- Range falloff (from TFA Primary.RangeFalloffLUT)
-SWEP.Primary.RangeFalloffLUT = {
-    bezier = false,
-    range_func = "linear",
-    units = "meters",
-    lut = {
-        {range = 12, damage = 1},
-        {range = 15, damage = 0.75},
-        {range = 20, damage = 0.75},
-        {range = 22, damage = 0.55},
-    }
-}
+SWEP.AnimatedSprint = true          
 
 -- Shotgun config
 SWEP.Shotgun = true
 SWEP.IsPump = true
-SWEP.PumpDelay = 0.4           -- 20/30 from SequenceLengthOverride[ACT_VM_PULLBACK_HIGH]
+SWEP.PumpDelay = 0.4           -- pump cycle time
 SWEP.Primary.ReloadTime = 0.7     -- per-shell insertion time (template default)
 
 -- Ironsights (from TFA source)
@@ -547,7 +534,7 @@ end
 -- ============================================================
 -- VELEMENTS / WELEMENTS (ported 1:1 from TFA VElements/WElements)
 -- Renames: angle→ang, size→scale, bodygroup→bodygroups
--- Dynamic sight_nydar_lens entry (TFA.CODWW2.GetHoloSightReticle) skipped — resolves to nil in CUH
+-- Dynamic sight_nydar_lens entry skipped (runtime helper not available in CUH)
 -- ============================================================
 SWEP.ViewModelElements = {
     ["sight_nydar"] = {

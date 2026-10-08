@@ -63,20 +63,7 @@ SWEP.Primary.SpreadRecovery     = 5.0
 SWEP.TwoHanded              = false
 SWEP.ReloadSpeed            = 1
 SWEP.Chambering             = false
-SWEP.AnimatedSprint = true       -- TFA: DisableChambering = true
-
--- Range falloff (from TFA Primary.RangeFalloffLUT)
-SWEP.Primary.RangeFalloffLUT = {
-    bezier = false,
-    range_func = "linear",
-    units = "meters",
-    lut = {
-        {range = 12, damage = 1},
-        {range = 13, damage = 0.8},
-        {range = 27, damage = 0.8},
-        {range = 28, damage = 0.55},
-    }
-}
+SWEP.AnimatedSprint = true       
 
 -- Ironsights (from TFA source)
 SWEP.IronSightsPos = Vector(-4.08, -3, 0.8)

@@ -77,7 +77,7 @@ SWEP.Primary.SpreadIncrement    = 0.5
 SWEP.Primary.SpreadRecovery     = 2.0
 SWEP.TwoHanded              = false
 SWEP.ReloadSpeed            = 1
-SWEP.Chambering             = false  -- all WWII weapons have DisableChambering=true
+SWEP.Chambering             = false  -- all WWII weapons have no +1 chamber
 
 -- Ironsights (FILL THESE IN)
 SWEP.IronSightsPos = Vector(-5.5, -6, 2.5)
