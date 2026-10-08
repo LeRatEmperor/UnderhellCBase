@@ -212,7 +212,7 @@ SWEP.AnimSounds = {
         { time = 0.0333, sound = "TFA_CODWW2_M1897.ShellStart" },
         { time = 1.0000, sound = "TFA_CODWW2_M1897.ShellIn" },
     },
-    ["reload"] = {
+    ["reload_loop"] = {
         { time = 0.1667, sound = "TFA_CODWW2_M1897.ShellIn" },
     },
     ["after_reload"] = {

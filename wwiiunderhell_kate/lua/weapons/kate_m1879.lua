@@ -187,7 +187,7 @@ SWEP.AnimSounds = {
         { time = 0.1667, sound = "TFA_CODWW2_M1879.Open" },
         { time = 0.5000, sound = "TFA_CODWW2_M1879.Insert" },
     },
-    ["reload"] = {
+    ["reload_loop"] = {
         { time = 0.0000, sound = "TFA_CODWW2_M1879.Insert" },
     },
     ["after_reload"] = {

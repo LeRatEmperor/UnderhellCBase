@@ -1126,17 +1126,27 @@ end
 -- TFA's GetStatL is the one that needs stubbing (different name, no conflict).
 
 -- ============================================================
--- MELEE ATTACK
+-- MELEE ATTACK — DIRECT PORT FROM BO3 BASE GUN
 -- ============================================================
--- Plays the melee animation, schedules the hit trace, and
--- locks controls for the duration.
+-- This is a verbatim port of the working melee system from
+-- weapon_bo3_base_gun.lua (repos/tfa_wwii_original/).
+-- Do NOT modify or "optimize" — this is the proven working code.
+
 function SWEP:MeleeAttack()
     local ct = CurTime()
-    if not (game.SinglePlayer() or IsFirstTimePredicted()) then return end
+    local sp = game.SinglePlayer()
+    local iftp = IsFirstTimePredicted()
 
+    if not (sp or iftp) then return end
+
+    -- Cancel conflicting states
     self:SetUHBool("Zooming", false)
-    if self:GetUHBool("Running") then self:SetUHBool("Running", false) end
 
+    if self:GetUHBool("Running") then
+        self:SetUHBool("Running", false)
+    end
+
+    -- Optionally cancel reload
     if self.MeleeInterruptReload ~= false and self:GetUHBool("Reloading") then
         self:SetUHBool("Reloading", false)
         self:SetNWFloat("ReloadTime", 0)
@@ -1146,45 +1156,79 @@ function SWEP:MeleeAttack()
         end
     end
 
+    -- Set melee state
     self._meleeActive = true
+    self._engineWantsIdle = nil
+    self._customIdleActive = false
     self:ClearAnimSounds()
+
+    -- Play ["melee"] animation via EasySendWeaponAnim
+    -- Falls back to ACT_VM_MELEE if the key doesn't exist.
     self:EasySendWeaponAnim("melee", ACT_VM_MELEE)
 
-    local vm = IsValid(self.Owner) and self.Owner:GetViewModel() or nil
+    local vm = self.Owner:GetViewModel()
     local animDuration = IsValid(vm) and vm:SequenceDuration() or 0.5
+
+    -- Timing
     self._meleeHitTime = ct + (self.MeleeHitDelay or 0.15)
     self._meleeHitDone = false
     self._meleeEndTime = ct + animDuration
     self._nextMelee = ct + (self.MeleeDelay or 0.6)
+
+    -- Lock controls
     self:SetNextPrimaryFire(ct + animDuration)
     self:SetNextSecondaryFire(ct + animDuration)
     self.NextReload = ct + animDuration
 
+    -- Play thirdperson shove animation (combine soldier/elite style)
     local seqIdx = self.Owner:SelectWeightedSequence(ACT_GMOD_GESTURE_MELEE_SHOVE_2HAND)
-    if seqIdx and seqIdx >= 0 then
+    if seqIdx and seqIdx > 0 then
         self.Owner:AddVCDSequenceToGestureSlot(GESTURE_SLOT_ATTACK_AND_RELOAD, seqIdx, 0, true)
     end
 
-    local snd = self.MeleeSound
-    if istable(snd) then snd = snd[math.random(1, #snd)] end
+    -- Play swing sound
+    self:PlayMeleeSound(self.MeleeSound, 75, 100)
+end
+
+function SWEP:PlayMeleeSound(soundEntry, vol, pitch)
+    -- Supports both single strings and tables of strings (random pick)
+    if not soundEntry then return end
+    local snd = soundEntry
+    if istable(soundEntry) then
+        snd = soundEntry[math.random(1, #soundEntry)]
+    end
     if snd and snd ~= "" then
-        self:EmitSound(snd, 75, 100, 1, CHAN_USER_BASE)
+        self:EmitSound(snd, vol or 75, pitch or 100, 1, CHAN_USER_BASE)
     end
 end
+
+-- ==========================================
+-- MELEE HIT TRACE
+-- ==========================================
+-- Hull trace forward. Applies damage to valid targets.
+-- Called from Think() at MeleeHitDelay seconds after melee start.
 
 function SWEP:DoMeleeTrace()
     local ply = self.Owner
     if not IsValid(ply) then return end
+
     local pos = ply:GetShootPos()
     local aim = ply:GetAimVector()
     local range = self.MeleeRange or 64
+
     local tr = util.TraceHull({
-        start = pos, endpos = pos + aim * range,
-        filter = ply, mask = MASK_SHOT_HULL,
-        mins = Vector(-10,-10,-10), maxs = Vector(10,10,10),
+        start = pos,
+        endpos = pos + aim * range,
+        filter = ply,
+        mins = Vector(-10, -10, -10),
+        maxs = Vector(10, 10, 10),
+        mask = MASK_SHOT_HULL,
     })
+
     if tr.Hit then
-        if IsValid(tr.Entity) and SERVER then
+        local target = tr.Entity
+
+        if IsValid(target) and SERVER then
             local dmg = DamageInfo()
             dmg:SetDamage(self.MeleeDamage or 50)
             dmg:SetAttacker(ply)
@@ -1192,21 +1236,26 @@ function SWEP:DoMeleeTrace()
             dmg:SetDamageForce(aim * (self.MeleeForce or 300))
             dmg:SetDamagePosition(tr.HitPos)
             dmg:SetDamageType(DMG_CLUB)
-            tr.Entity:TakeDamageInfo(dmg)
+
+            target:TakeDamageInfo(dmg)
         end
-        if SERVER then util.ScreenShake(tr.HitPos, 3, 0.1, 0.3, 32) end
-        local hitSnd = self.MeleeHitSound
-        if istable(hitSnd) then hitSnd = hitSnd[math.random(1, #hitSnd)] end
-        if hitSnd and hitSnd ~= "" then
-            self:EmitSound(hitSnd, 75, 100, 1, CHAN_USER_BASE)
+
+        if SERVER then
+            util.ScreenShake(tr.HitPos, 3, 0.1, 0.3, 32)
         end
+
+        self:PlayMeleeSound(self.MeleeHitSound, 75, 100)
     else
-        if self.MeleeMissSound and self.MeleeMissSound ~= "" then
-            self:EmitSound(self.MeleeMissSound, 65, 100, 1, CHAN_USER_BASE)
-        end
+        self:PlayMeleeSound(self.MeleeMissSound, 65, 100)
     end
-    ply:ViewPunch(self.MeleeViewPunch or Angle(-3,0,0))
+
+    ply:ViewPunch(self.MeleeViewPunch or Angle(-3, 0, 0))
 end
+
+-- ==========================================
+-- MELEE END
+-- ==========================================
+-- Resets state and lets idle take over.
 
 function SWEP:EndMelee()
     self._meleeActive = false
@@ -1214,31 +1263,27 @@ function SWEP:EndMelee()
     self._meleeHitDone = nil
     self._meleeEndTime = nil
     self:ClearAnimSounds()
+    self._engineWantsIdle = true
 end
 
 -- ============================================================
--- THINK — melee state machine
+-- THINK — melee state machine (DIRECT PORT FROM BO3 BASE)
 -- ============================================================
--- The parent's Think() doesn't know about melee. We need to:
--- 1. Fire the hit trace at _meleeHitTime
--- 2. End the melee at _meleeEndTime
--- Without this, _meleeActive stays true forever and the weapon locks up.
+-- Runs melee state machine BEFORE BaseClass.Think, then delegates.
 function SWEP:Think()
     local ct = CurTime()
 
-    -- Melee state machine — run BEFORE BaseClass.Think so the parent's
-    -- zoom/idle/reload logic doesn't interfere with melee state.
-    -- This matches the BO3 base gun pattern (weapon_bo3_base_gun.lua).
-    if self._meleeActive then
-        if not self._meleeHitDone and self._meleeHitTime and ct >= self._meleeHitTime then
-            self._meleeHitDone = true
-            if SERVER or IsFirstTimePredicted() then
-                self:DoMeleeTrace()
-            end
+    -- Melee hit timing
+    if self._meleeActive and not self._meleeHitDone and self._meleeHitTime and ct >= self._meleeHitTime then
+        self._meleeHitDone = true
+        if SERVER or IsFirstTimePredicted() then
+            self:DoMeleeTrace()
         end
-        if self._meleeEndTime and ct >= self._meleeEndTime then
-            self:EndMelee()
-        end
+    end
+
+    -- Melee end timing
+    if self._meleeActive and self._meleeEndTime and ct >= self._meleeEndTime then
+        self:EndMelee()
     end
 
     BaseClass.Think(self)
