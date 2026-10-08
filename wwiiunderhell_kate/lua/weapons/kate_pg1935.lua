@@ -439,6 +439,16 @@ function SWEP:Think()
     if not IsValid(self.Owner) then return end
     local ct = CurTime()
 
+    -- Melee hit timing
+    if self._meleeActive and not self._meleeHitDone and self._meleeHitTime and ct >= self._meleeHitTime then
+        self._meleeHitDone = true
+        if SERVER or IsFirstTimePredicted() then self:DoMeleeTrace() end
+    end
+    if self._meleeActive and self._meleeEndTime and ct >= self._meleeEndTime then
+        self:EndMelee()
+    end
+
+
     -- Continue burst rounds even if player released M1
     if self._burstRemaining and self._burstRemaining > 0 then
         if ct >= (self._burstNextFire or 0) then

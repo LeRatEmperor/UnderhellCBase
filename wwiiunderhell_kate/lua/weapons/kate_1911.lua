@@ -407,6 +407,16 @@ end
 -- THINK
 -- ============================================================
 function SWEP:Think()
+    local ct = CurTime()
+
+    -- Melee hit timing
+    if self._meleeActive and not self._meleeHitDone and self._meleeHitTime and ct >= self._meleeHitTime then
+        self._meleeHitDone = true
+        if SERVER or IsFirstTimePredicted() then self:DoMeleeTrace() end
+    end
+    if self._meleeActive and self._meleeEndTime and ct >= self._meleeEndTime then
+        self:EndMelee()
+    end
     BaseClass.Think(self)
     if not IsValid(self.Owner) then return end
     self:HandleSprintingAnimations()

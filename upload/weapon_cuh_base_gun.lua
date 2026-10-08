@@ -1105,25 +1105,12 @@ end
 -- ============================================================
 -- TFA COMPATIBILITY STUBS
 -- ============================================================
--- TFA Base's keybind system calls GetStatL, GetActivityEnabled, and
--- IsTFAWeapon on all weapons. We don't use TFA's stat system, so we
--- stub these out to prevent 'attempt to call method GetStatL (a nil
--- value)' errors when the player presses TFA-bound keys (like T).
+-- TFA Base's keybind system calls GetActivityEnabled on
+-- all weapons. We don't use TFA's activity system, so we
+-- stub it out to prevent errors.
 function SWEP:GetActivityEnabled()
     return false
 end
-
-function SWEP:GetStatL(name, default)
-    return default
-end
-
-function SWEP:IsTFAWeapon()
-    return false
-end
-
--- NOTE: Do NOT define GetStat here — it shadows the stat cache GetStat at line 238
--- which breaks function-transform attachments in ApplyAttachments.
--- TFA's GetStatL is the one that needs stubbing (different name, no conflict).
 
 -- ============================================================
 -- MELEE ATTACK
