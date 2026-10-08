@@ -3,7 +3,6 @@
 -- Source: nz_kate_codww2_fliegerfaust (TFA WWII Kate)
 -- Template: template_burst (3-Round Burst Launcher)
 -- ============================================================
--- NOTE: Projectile system not yet implemented in CUH base. This port
 -- only includes burst-fire scaffolding. When projectile support is
 -- added, override FireBurstRound() to spawn rocket entities.
 -- ============================================================
@@ -180,6 +179,7 @@ SWEP.AnimSounds = {
 -- ============================================================
 -- BURST FIRE LOGIC
 -- ============================================================
+
 function SWEP:FireBurstRound()
     if not IsValid(self) or not IsValid(self.Owner) then return end
     if not self:CanPrimaryAttack() then
@@ -189,13 +189,9 @@ function SWEP:FireBurstRound()
     local ct = CurTime()
     local iftp = IsFirstTimePredicted()
 
-    -- Bullets
+    -- Fire projectile instead of bullets
     if SERVER or iftp then
-        local dmg = math.random(self.Primary.MinDamage, self.Primary.MaxDamage)
-        if self:GetNWBool("Silenced") then dmg = math.Round(dmg * 0.95) end
-        self:ShootBullets(self.Owner:GetShootPos(), self.Owner:GetAimVector(), dmg, self.Penetration or 2)
-        -- TODO: When projectile system is added, replace ShootBullets with
-        -- spawning a wavy_missile entity at 5000 HU/s using self.Primary.ProjectileModel
+        self:FireProjectile()
     end
 
     -- Recoil
@@ -204,7 +200,6 @@ function SWEP:FireBurstRound()
     if SERVER or (CLIENT and iftp) then
         self:DoMuzzleFlash()
         self:CreateSmoke(self:GetMuzzle(), self.Primary.Delay + 0.14)
-        if not self.NoShell then self:CreateShell(self.ShellDelay or 0, self.ShellHeat) end
         self.Owner:SetEyeAngles(self.Owner:EyeAngles() + Angle(recoil, 0, 0))
     end
     self.Owner:ViewPunch(Angle(recoil, 0, 0))
@@ -220,7 +215,9 @@ function SWEP:FireBurstRound()
     self.Owner:MuzzleFlash()
 
     local fireSound = self:GetShootSound()
-    self:EmitSound(fireSound, 110, 100, 1, CHAN_WEAPON)
+    if fireSound and fireSound ~= "" then
+        self:EmitSound(fireSound, 110, 100, 1, CHAN_WEAPON)
+    end
     self:TakePrimaryAmmo(self.Primary.TakeAmmo)
     self.NextReload = CurTime() + 0.5
 
@@ -337,6 +334,55 @@ end
 -- ============================================================
 -- ATTACK
 -- ============================================================
+
+-- ============================================================
+-- PROJECTILE FIRING (reference: weapon_uh_heav_rpg.lua pattern)
+-- ============================================================
+-- Spawns ent_kate_projectile with weapon-specific config.
+-- Pattern matches the RPG reference: ents.Create → SetPos → Spawn → ApplyForceCenter
+SWEP.ProjectileModel = "models/weapons/w_ammo_missile.mdl"
+SWEP.ProjectileForce = 5000
+SWEP.ProjectileIsBolt = false
+SWEP.ProjectileDamage = 300
+SWEP.ProjectileRadius = 256
+SWEP.ProjectileExplosionSound = "TFA_CODWW2_BAZOOKA.Boom"
+SWEP.ProjectileTrailSound = "TFA_CODWW2_BAZOOKA.Loop"
+
+function SWEP:FireProjectile()
+    if not SERVER then return end
+
+    local ent = ents.Create("ent_kate_projectile")
+    if not IsValid(ent) then return end
+
+    local owner = self.Owner
+    local aim = owner:GetAimVector()
+    local pos = owner:EyePos() + aim * 30 - owner:GetUp() * 10 +
+        (self:GetUHBool("Zooming") and Vector(0, 0, 0) or owner:GetRight() * 5)
+
+    ent:SetPos(pos)
+    ent:SetAngles(owner:EyeAngles())
+    ent:Spawn()
+    ent:Activate()
+    ent:SetOwner(owner)
+
+    -- Configure projectile
+    ent.ProjectileModel = self.ProjectileModel
+    ent.IsBolt = self.ProjectileIsBolt
+    ent.Damage = self.ProjectileDamage
+    ent.DamageRadius = self.ProjectileRadius
+    ent.ExplodeOnImpact = not self.ProjectileIsBolt
+    ent.ExplosionSound = self.ProjectileExplosionSound
+    ent.TrailSound = self.ProjectileTrailSound
+
+    -- Apply force (same pattern as RPG reference)
+    local phys = ent:GetPhysicsObject()
+    if IsValid(phys) then
+        phys:ApplyForceCenter(aim * self.ProjectileForce)
+    end
+
+    return ent
+end
+
 function SWEP:PrimaryAttack()
     if self._meleeActive then return end
     if self.Owner:KeyDown(IN_USE) then

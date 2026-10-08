@@ -3,7 +3,6 @@
 -- Source: nz_kate_codww2_crossbow (TFA WWII Kate)
 -- Template: template_semi (Semi-Auto — projectile system deferred)
 -- ============================================================
--- NOTE: Projectile system not yet implemented in CUH base. This port
 -- only includes animation/sound/reload scaffolding. When projectile
 -- support is added, override PrimaryAttack to fire the bolt entity.
 -- ============================================================
@@ -275,6 +274,55 @@ end
 -- ============================================================
 -- ATTACK
 -- ============================================================
+
+-- ============================================================
+-- PROJECTILE FIRING (reference: weapon_uh_heav_rpg.lua pattern)
+-- ============================================================
+-- Spawns ent_kate_projectile with weapon-specific config.
+-- Pattern matches the RPG reference: ents.Create → SetPos → Spawn → ApplyForceCenter
+SWEP.ProjectileModel = "models/crossbow_bolt.mdl"
+SWEP.ProjectileForce = 2800
+SWEP.ProjectileIsBolt = true
+SWEP.ProjectileDamage = 200
+SWEP.ProjectileRadius = 0
+SWEP.ProjectileExplosionSound = ""
+SWEP.ProjectileTrailSound = ""
+
+function SWEP:FireProjectile()
+    if not SERVER then return end
+
+    local ent = ents.Create("ent_kate_projectile")
+    if not IsValid(ent) then return end
+
+    local owner = self.Owner
+    local aim = owner:GetAimVector()
+    local pos = owner:EyePos() + aim * 30 - owner:GetUp() * 10 +
+        (self:GetUHBool("Zooming") and Vector(0, 0, 0) or owner:GetRight() * 5)
+
+    ent:SetPos(pos)
+    ent:SetAngles(owner:EyeAngles())
+    ent:Spawn()
+    ent:Activate()
+    ent:SetOwner(owner)
+
+    -- Configure projectile
+    ent.ProjectileModel = self.ProjectileModel
+    ent.IsBolt = self.ProjectileIsBolt
+    ent.Damage = self.ProjectileDamage
+    ent.DamageRadius = self.ProjectileRadius
+    ent.ExplodeOnImpact = not self.ProjectileIsBolt
+    ent.ExplosionSound = self.ProjectileExplosionSound
+    ent.TrailSound = self.ProjectileTrailSound
+
+    -- Apply force (same pattern as RPG reference)
+    local phys = ent:GetPhysicsObject()
+    if IsValid(phys) then
+        phys:ApplyForceCenter(aim * self.ProjectileForce)
+    end
+
+    return ent
+end
+
 function SWEP:PrimaryAttack()
     if self._meleeActive then return end
     if self.Owner:KeyDown(IN_USE) then
@@ -286,9 +334,45 @@ function SWEP:PrimaryAttack()
         if SERVER or IsFirstTimePredicted() then self:MeleeAttack() end
         return
     end
-    BaseClass.PrimaryAttack(self)
-    -- TODO: When projectile system is added, override PrimaryAttack to fire
-    -- a codww2_bolt_default entity at 2800 HU/s using self.Primary.ProjectileModel
+    if not self:CanPrimaryAttack() then return end
+    local ct = CurTime()
+
+    -- Fire projectile (same pattern as weapon_uh_heav_rpg.lua)
+    if SERVER or IsFirstTimePredicted() then
+        self:FireProjectile()
+    end
+
+    -- Visual feedback
+    local recoil = util.SharedRandom("uh_recoil", self.Primary.MinRecoil, self.Primary.MaxRecoil)
+    if SERVER or (CLIENT and IsFirstTimePredicted()) then
+        self:DoMuzzleFlash()
+        self:CreateSmoke(self:GetMuzzle(), self.Primary.Delay + 0.32)
+    end
+    self.Owner:ViewPunch(Angle(recoil, 0, 0))
+    self.Owner:SetAnimation(PLAYER_ATTACK1)
+
+    -- Animation
+    local shootAnim = self:ShootAnimation()
+    if type(shootAnim) == "string" then
+        self:EasySendWeaponAnim(shootAnim, ACT_VM_PRIMARYATTACK)
+    else
+        self:SendWeaponAnim(ACT_VM_PRIMARYATTACK)
+    end
+
+    -- Sound
+    local fireSound = self:GetShootSound()
+    if fireSound and fireSound ~= "" then
+        self:EmitSound(fireSound, 110, 100, 1, CHAN_WEAPON)
+    end
+
+    -- Ammo
+    self:TakePrimaryAmmo(self.Primary.TakeAmmo)
+
+    -- Timing
+    self:SetNextPrimaryFire(ct + self.Primary.Delay)
+    self:SetNextSecondaryFire(ct + self.Primary.Delay)
+    self.NextReload = ct + 0.5
+    self:PostShoot()
 end
 
 function SWEP:SecondaryAttack()

@@ -3,7 +3,6 @@
 -- Source: nz_kate_codww2_1911_upgraded (TFA WWII Kate Upgrades)
 -- Template: template_semi (Semi-Auto)
 --
--- NOTE: TFA source fires a projectile entity (codww2_mustang_exp).
 -- For now, this is ported as a standard semi-auto pistol using
 -- Primary.Sound. The projectile system will be added later.
 -- SWEP.Primary.Damage is set to the TFA damage value (1115).
@@ -327,6 +326,55 @@ end
 -- ============================================================
 -- ATTACK
 -- ============================================================
+
+-- ============================================================
+-- PROJECTILE FIRING (reference: weapon_uh_heav_rpg.lua pattern)
+-- ============================================================
+-- Spawns ent_kate_projectile with weapon-specific config.
+-- Pattern matches the RPG reference: ents.Create → SetPos → Spawn → ApplyForceCenter
+SWEP.ProjectileModel = "models/weapons/w_ammo_missile.mdl"
+SWEP.ProjectileForce = 3000
+SWEP.ProjectileIsBolt = false
+SWEP.ProjectileDamage = 800
+SWEP.ProjectileRadius = 512
+SWEP.ProjectileExplosionSound = "TFA_CODWW2_MUSTANG.Boom"
+SWEP.ProjectileTrailSound = ""
+
+function SWEP:FireProjectile()
+    if not SERVER then return end
+
+    local ent = ents.Create("ent_kate_projectile")
+    if not IsValid(ent) then return end
+
+    local owner = self.Owner
+    local aim = owner:GetAimVector()
+    local pos = owner:EyePos() + aim * 30 - owner:GetUp() * 10 +
+        (self:GetUHBool("Zooming") and Vector(0, 0, 0) or owner:GetRight() * 5)
+
+    ent:SetPos(pos)
+    ent:SetAngles(owner:EyeAngles())
+    ent:Spawn()
+    ent:Activate()
+    ent:SetOwner(owner)
+
+    -- Configure projectile
+    ent.ProjectileModel = self.ProjectileModel
+    ent.IsBolt = self.ProjectileIsBolt
+    ent.Damage = self.ProjectileDamage
+    ent.DamageRadius = self.ProjectileRadius
+    ent.ExplodeOnImpact = not self.ProjectileIsBolt
+    ent.ExplosionSound = self.ProjectileExplosionSound
+    ent.TrailSound = self.ProjectileTrailSound
+
+    -- Apply force (same pattern as RPG reference)
+    local phys = ent:GetPhysicsObject()
+    if IsValid(phys) then
+        phys:ApplyForceCenter(aim * self.ProjectileForce)
+    end
+
+    return ent
+end
+
 function SWEP:PrimaryAttack()
     if self._meleeActive then return end
     if self.Owner:KeyDown(IN_USE) then
@@ -338,7 +386,45 @@ function SWEP:PrimaryAttack()
         if SERVER or IsFirstTimePredicted() then self:MeleeAttack() end
         return
     end
-    BaseClass.PrimaryAttack(self)
+    if not self:CanPrimaryAttack() then return end
+    local ct = CurTime()
+
+    -- Fire projectile (same pattern as weapon_uh_heav_rpg.lua)
+    if SERVER or IsFirstTimePredicted() then
+        self:FireProjectile()
+    end
+
+    -- Visual feedback
+    local recoil = util.SharedRandom("uh_recoil", self.Primary.MinRecoil, self.Primary.MaxRecoil)
+    if SERVER or (CLIENT and IsFirstTimePredicted()) then
+        self:DoMuzzleFlash()
+        self:CreateSmoke(self:GetMuzzle(), self.Primary.Delay + 0.32)
+    end
+    self.Owner:ViewPunch(Angle(recoil, 0, 0))
+    self.Owner:SetAnimation(PLAYER_ATTACK1)
+
+    -- Animation
+    local shootAnim = self:ShootAnimation()
+    if type(shootAnim) == "string" then
+        self:EasySendWeaponAnim(shootAnim, ACT_VM_PRIMARYATTACK)
+    else
+        self:SendWeaponAnim(ACT_VM_PRIMARYATTACK)
+    end
+
+    -- Sound
+    local fireSound = self:GetShootSound()
+    if fireSound and fireSound ~= "" then
+        self:EmitSound(fireSound, 110, 100, 1, CHAN_WEAPON)
+    end
+
+    -- Ammo
+    self:TakePrimaryAmmo(self.Primary.TakeAmmo)
+
+    -- Timing
+    self:SetNextPrimaryFire(ct + self.Primary.Delay)
+    self:SetNextSecondaryFire(ct + self.Primary.Delay)
+    self.NextReload = ct + 0.5
+    self:PostShoot()
 end
 
 function SWEP:SecondaryAttack()
