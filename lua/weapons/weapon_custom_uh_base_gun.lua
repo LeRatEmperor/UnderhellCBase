@@ -961,6 +961,15 @@ if CLIENT then
         if not IsCustomUHWeapon(wep) then return end
         if not wep.ScopeTexture then return end
         if wep:GetUHBool("Zooming") and not wep.ScopeDisabled then
+            -- Ensure RenderTarget exists before using it
+            if not wep.RenderTarget then
+                local scale = ScrH() / 1080
+                local quality = { 256, 512, 768, 1080 }
+                local num = math.Clamp(GetConVar("uh_rt_quality"):GetInt(), 1, 4)
+                wep.RT_Size = quality[num] * scale
+                wep.RenderTarget = GetRenderTarget("CustomUH_ScopeRT_" .. wep:EntIndex(), wep.RT_Size, wep.RT_Size, false)
+            end
+            if not wep.RenderTarget then return end
             local size = wep.RT_Size or 512
             render.PushRenderTarget(wep.RenderTarget, 0, 0, size, size)
             local ang = LocalPlayer():EyeAngles()
