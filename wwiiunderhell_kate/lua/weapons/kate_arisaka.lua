@@ -397,6 +397,13 @@ end
 -- Renames: angle→ang, size→scale, bodygroup→bodygroups
 -- ============================================================
 SWEP.ViewModelElements = {
+    ["scope_default"] = {
+        type = "Model", model = "models/weapons/tfa_codww2/arisaka/c_arisaka_scope.mdl",
+        bone = "tag_weapon", pos = Vector(0, 0, 0), ang = Angle(0, 0, 0),
+        scale = Vector(1, 1, 1), material = "", skin = 0,
+        bodygroups = {}, bonemerge = true,
+        active = false, _defaultActive = false,
+    },
     ["scope_acog"] = {
         type = "Model", model = "models/weapons/tfa_codww2/arisaka/c_arisaka_4x.mdl",
         bone = "tag_weapon", pos = Vector(0, 0, 0), ang = Angle(0, 0, 0),
@@ -449,6 +456,13 @@ SWEP.ViewModelElements = {
 }
 
 SWEP.WorldModelElements = {
+    ["scope_default"] = {
+        type = "Model", model = "models/weapons/tfa_codww2/arisaka/w_arisaka_scope.mdl",
+        bone = "tag_weapon", pos = Vector(0, 0, 0), ang = Angle(0, 0, 0),
+        scale = Vector(1, 1, 1), material = "", skin = 0,
+        bodygroups = {}, bonemerge = true,
+        active = false, _defaultActive = false,
+    },
     ["scope_acog"] = {
         type = "Model", model = "models/weapons/tfa_codww2/arisaka/w_arisaka_4x.mdl",
         bone = "tag_weapon", pos = Vector(0, 0, 0), ang = Angle(0, 0, 0),
@@ -498,6 +512,7 @@ SWEP.WorldModelElements = {
 -- Note: TFA source starts at index [2] (no [1] slot) — preserved.
 -- ============================================================
 SWEP.Attachments = {
-    [2] = { name = "Slot 2", atts = { "tfa_codww2_xmag", "tfa_codww2_ballistic" }, default = 0 },
+        [1] = { name = "Optic", atts = { "tfa_codww2_arisaka_scope", "tfa_codww2_4x" }, default = 0 },
+[2] = { name = "Slot 2", atts = { "tfa_codww2_xmag", "tfa_codww2_ballistic" }, default = 0 },
     [3] = { name = "Slot 3", atts = { "tfa_codww2_rapidfire_sg", "tfa_codww2_fmj" }, default = 0 },
 }

@@ -540,6 +540,7 @@ SWEP.WorldModelElements = {
 -- Note: TFA source starts at index [2] (no [1] slot) — preserved.
 -- ============================================================
 SWEP.Attachments = {
-    [2] = { name = "Slot 2", atts = { "tfa_codww2_xmag", "tfa_codww2_ballistic" }, default = 0 },
+        [1] = { name = "Optic", atts = { "tfa_codww2_kar98k_scope", "tfa_codww2_4x" }, default = 0 },
+[2] = { name = "Slot 2", atts = { "tfa_codww2_xmag", "tfa_codww2_ballistic" }, default = 0 },
     [3] = { name = "Slot 3", atts = { "tfa_codww2_rapidfire_sg", "tfa_codww2_fmj" }, default = 0 },
 }
