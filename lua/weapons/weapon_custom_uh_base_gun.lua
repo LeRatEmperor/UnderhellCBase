@@ -569,6 +569,7 @@ end
 -- ============================================================
 function SWEP:DoMuzzleFlash()
     if self:GetNWBool("Silenced") then return end
+    if self.SuppressedFlash then return end  -- attachment-level silencer (no NW bool)
 
     if self.MuzzleFlashType == "particle" and self.MuzzleFlashParticle and self.MuzzleFlashParticle ~= "" then
         local vm = IsValid(self.Owner) and self.Owner:GetViewModel() or nil

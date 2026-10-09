@@ -16,17 +16,28 @@ ATTACHMENT.WeaponTable = {
     ["WElements"] = {
         ["suppressor"] = { ["active"] = true },
     },
+    -- Override the shoot sound to use the silenced variant.
+    -- This replaces Primary.Sound at the stat-cache level, so
+    -- GetShootSound() returns the silenced sound.
+    -- We do NOT set the 'Silenced' NW bool — that would trigger
+    -- the animation system's '_sil' suffix lookup which breaks
+    -- WWII weapon animations (they don't have _sil sequence variants).
+    ["Primary"] = {
+        ["Sound"] = function(wep, val) return wep.Primary.SilSound or val end,
+    },
+    -- Flag for muzzle flash suppression. The weapon's DoMuzzleFlash
+    -- checks this field instead of the NW 'Silenced' bool.
+    ["SuppressedFlash"] = true,
 }
 
 function ATTACHMENT:Attach(wep)
-    -- Enable the Underhell native silencer system
-    wep.HasSilencer = true
-    wep:SetNWBool("Silenced", true)
+    -- Set the non-networked flag for muzzle flash suppression.
+    -- This does NOT trigger the animation swap system.
+    wep.SuppressedFlash = true
 end
 
 function ATTACHMENT:Detach(wep)
-    wep:SetNWBool("Silenced", false)
-    wep.HasSilencer = false
+    wep.SuppressedFlash = false
 end
 
 -- CUH base handles registration
