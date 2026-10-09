@@ -23,18 +23,9 @@ ATTACHMENT.WeaponTable = {
 	["MeleeRange"] = function(wep, val) return val + 20 end,
 	-- Empty-mag variant: overrides use _empty animation sequences
 	["Animations"] = {
-		["shoot1_last"] = {
-			["type"] = 1,
-			["value"] = "fire_bayonet_empty",
-		},
-		["reload_empty"] = {
-			["type"] = 1,
-			["value"] = "reload_bayonet_empty",
-		},
-		["inspect_empty"] = {
-			["type"] = 1,
-			["value"] = "inspect_bayonet_empty",
-		},
+		["shoot1_last"] = "fire_bayonet_empty",
+		["reload_empty"] = "reload_bayonet_empty",
+		["inspect_empty"] = "inspect_bayonet_empty",
 	},
 }
 

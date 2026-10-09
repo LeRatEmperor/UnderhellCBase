@@ -36,14 +36,8 @@ ATTACHMENT.WeaponTable = {
                 ["ClipSize"] = function(wep, val) return val * 2 end,
         },
         ["Animations"] = {
-                ["reload"] = {
-                        ["type"] = 1,
-                        ["value"] = "reload_ext",
-                },
-                ["reload_empty"] = {
-                        ["type"] = 1,
-                        ["value"] = "reload_ext_empty",
-                },
+                ["reload"] = "reload_ext",
+                ["reload_empty"] = "reload_ext_empty",
         },
 }
 
