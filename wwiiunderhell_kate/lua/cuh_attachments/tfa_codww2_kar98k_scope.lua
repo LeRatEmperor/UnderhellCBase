@@ -18,6 +18,8 @@ ATTACHMENT.WeaponTable = {
     ["ScopeFov"] = 7,
     ["ZoomFov"] = 15,
     ["Sensitivity"] = 0.2,
+    ["IronSightsPos"] = function(wep, val) return wep.IronSightsPos_7X or val end,
+    ["IronSightsAng"] = function(wep, val) return wep.IronSightsAng_7X or val end,
 }
 
 function ATTACHMENT:Attach(wep)
