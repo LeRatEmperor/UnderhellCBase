@@ -960,18 +960,47 @@ if CLIENT then
         if not IsValid(wep) then return end
         if not IsCustomUHWeapon(wep) then return end
         if not wep.ScopeTexture then return end
-        if wep:GetUHBool("Zooming") and not wep.ScopeDisabled then
+
+        local isZooming = wep:GetUHBool("Zooming")
+        local scopeDisabled = wep.ScopeDisabled
+        local scopeTex = wep.ScopeTexture
+        local rt = wep.RenderTarget
+        local wepClass = wep:GetClass()
+
+        -- Debug: log every 60 frames (once per second)
+        if not wep._rtDebugCounter then wep._rtDebugCounter = 0 end
+        wep._rtDebugCounter = wep._rtDebugCounter + 1
+        if wep._rtDebugCounter >= 60 then
+            wep._rtDebugCounter = 0
+            print("[RT-DBG] " .. wepClass ..
+                " | zooming=" .. tostring(isZooming) ..
+                " | scopeDisabled=" .. tostring(scopeDisabled) ..
+                " | scopeTexture=" .. tostring(scopeTex) ..
+                " | renderTarget=" .. tostring(rt) ..
+                " | rtSize=" .. tostring(wep.RT_Size) ..
+                " | scopeFov=" .. tostring(wep.ScopeFov) ..
+                " | zoomFov=" .. tostring(wep.ZoomFov) ..
+                " | use2DScope=" .. tostring(wep.Use2DScope) ..
+                " | sensitivity=" .. tostring(wep.Sensitivity))
+        end
+
+        if isZooming and not scopeDisabled then
             -- Ensure RenderTarget exists before using it
-            if not wep.RenderTarget then
+            if not rt then
                 local scale = ScrH() / 1080
                 local quality = { 256, 512, 768, 1080 }
                 local num = math.Clamp(GetConVar("uh_rt_quality"):GetInt(), 1, 4)
                 wep.RT_Size = quality[num] * scale
                 wep.RenderTarget = GetRenderTarget("CustomUH_ScopeRT_" .. wep:EntIndex(), wep.RT_Size, wep.RT_Size, false)
+                rt = wep.RenderTarget
+                print("[RT-DBG] " .. wepClass .. " | Created RenderTarget lazily: " .. tostring(rt))
             end
-            if not wep.RenderTarget then return end
+            if not rt then
+                print("[RT-DBG] " .. wepClass .. " | ERROR: RenderTarget still nil after lazy init!")
+                return
+            end
             local size = wep.RT_Size or 512
-            render.PushRenderTarget(wep.RenderTarget, 0, 0, size, size)
+            render.PushRenderTarget(rt, 0, 0, size, size)
             local ang = LocalPlayer():EyeAngles()
             local pos = LocalPlayer():EyePos()
             render.RenderView({
@@ -981,10 +1010,10 @@ if CLIENT then
                 dopostprocess = false, fov = wep.ScopeFov or 8,
             })
             render.PopRenderTarget()
-            wep.ScopeTexture:SetTexture("$basetexture", wep.RenderTarget)
+            scopeTex:SetTexture("$basetexture", rt)
         else
-            if wep.ScopeTexture then
-                wep.ScopeTexture:SetTexture("$basetexture", devzoom:GetTexture("$basetexture"))
+            if scopeTex then
+                scopeTex:SetTexture("$basetexture", devzoom:GetTexture("$basetexture"))
             end
         end
     end)
