@@ -276,50 +276,43 @@ end
 -- ============================================================
 
 -- ============================================================
--- PROJECTILE FIRING (reference: weapon_uh_heav_rpg.lua pattern)
+-- PROJECTILE FIRING — spawns sent_uh_arrow (same as weapon_uh_snip_crossbow)
 -- ============================================================
--- Spawns ent_kate_projectile with weapon-specific config.
--- Pattern matches the RPG reference: ents.Create → SetPos → Spawn → ApplyForceCenter
-SWEP.ProjectileModel = "models/crossbow_bolt.mdl"
-SWEP.ProjectileForce = 2800
-SWEP.ProjectileIsBolt = true
-SWEP.ProjectileDamage = 200
-SWEP.ProjectileRadius = 0
-SWEP.ProjectileExplosionSound = ""
-SWEP.ProjectileTrailSound = ""
+-- Pattern copied 1:1 from the working crossbow reference
+-- (weapon_uh_snip_crossbow.lua). The sent_uh_arrow entity
+-- (lua/entities/sent_uh_arrow/) already has:
+--   - Model: models/crossbow_arrow.mdl
+--   - Physics: PhysicsInitBox + SOLID_VPHYSICS / MOVETYPE_VPHYSICS, mass=6, gravity OFF
+--   - Think() applies a small gravity-compensating force each frame
+--   - PhysicsCollide: stick into world/props (30-40 dmg, parent, remove @ 10s),
+--     into players/NPCs (90-110 dmg, remove immediately), into sky (remove)
+--   - Plays weapons/xbow/hit.wav on impact, Impact.Concrete decal on world
+-- The weapon only needs to spawn the entity, set Owner + Angles, and apply force.
+-- NOTE: ent.Owner is assigned AFTER Spawn() (matches crossbow reference exactly).
+SWEP.ProjectileForce = 15000   -- matches crossbow reference (arrow needs big initial impulse)
 
 function SWEP:FireProjectile()
     if not SERVER then return end
 
-    local ent = ents.Create("ent_kate_projectile")
-    if not IsValid(ent) then return end
-
     local owner = self.Owner
     local aim = owner:GetAimVector()
-    local pos = owner:EyePos() + aim * 30 - owner:GetUp() * 10 +
-        (self:GetUHBool("Zooming") and Vector(0, 0, 0) or owner:GetRight() * 5)
+    local pos = owner:EyePos() + aim * 16
 
-    -- Set position and angles BEFORE Spawn
+    local ent = ents.Create("sent_uh_arrow")
+    if not IsValid(ent) then return end
+
+    -- Set position BEFORE Spawn() (entity reads it in Initialize)
     ent:SetPos(pos)
-    ent:SetAngles(owner:EyeAngles())
 
-    -- CRITICAL: set ALL config fields BEFORE Spawn() so Initialize()
-    -- can read them. If set after Spawn, the physics hull is initialized
-    -- with the wrong model and PhysicsCollide never fires.
-    ent.ProjectileModel = self.ProjectileModel
-    ent.IsBolt = self.ProjectileIsBolt
-    ent.Damage = self.ProjectileDamage
-    ent.DamageRadius = self.ProjectileRadius
-    ent.ExplodeOnImpact = not self.ProjectileIsBolt
-    ent.ExplosionSound = self.ProjectileExplosionSound
-    ent.TrailSound = self.ProjectileTrailSound
-
-    -- NOW spawn — Initialize() will read the correct fields
+    -- Spawn the entity — Initialize() sets model, physics box, mass, gravity OFF
     ent:Spawn()
     ent:Activate()
-    ent:SetOwner(owner)
 
-    -- Apply force (same pattern as RPG reference)
+    -- Assign Owner + Angles AFTER Spawn() (matches crossbow reference exactly)
+    ent.Owner = owner
+    ent:SetAngles(owner:GetAngles())
+
+    -- Apply large initial impulse (arrow has no self-thrust)
     local phys = ent:GetPhysicsObject()
     if IsValid(phys) then
         phys:ApplyForceCenter(aim * self.ProjectileForce)
