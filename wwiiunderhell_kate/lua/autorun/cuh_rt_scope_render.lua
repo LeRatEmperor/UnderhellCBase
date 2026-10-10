@@ -130,15 +130,21 @@ hook.Add("RenderScene", "CUH_RTScope_RenderScene", function(origin, angles, fov)
     if not wep.ScopeTexture then return end
     if not wep.RenderTarget then return end
 
-    -- Optional debug logging
+    -- Optional debug logging (prints every 60 frames regardless of zoom state)
     if GetConVar("cuh_rt_scope_debug"):GetBool() then
         _dbgCounter = _dbgCounter + 1
         if _dbgCounter >= 60 then
             _dbgCounter = 0
             local zooming = wep.GetUHBool and wep:GetUHBool("Zooming") or false
-            print(string.format("[CUH RT] zooming=%s scopeFov=%s rtSize=%s matName=%s subMatIdx=%s",
-                tostring(zooming), tostring(wep.ScopeFov), tostring(wep.RT_Size),
-                tostring(wep._rtScopeMatName), tostring(wep._rtScopeSubMatIndex)))
+            local r1 = GetReticleMaterial(wep)
+            local r2 = Material("gmod/scope")
+            local r3 = Material("models/weapons/v_models/sniper_scout/lens")
+            print(string.format("[CUH RT] zooming=%s | reticle1=%s err=%s | gmod/scope err=%s | scout_lens err=%s",
+                tostring(zooming),
+                tostring(wep.ScopeReticle or "nil"),
+                tostring(r1 and r1:IsError() or "nil"),
+                tostring(r2 and r2:IsError() or "nil"),
+                tostring(r3 and r3:IsError() or "nil")))
         end
     end
 
@@ -166,9 +172,6 @@ hook.Add("RenderScene", "CUH_RTScope_RenderScene", function(origin, angles, fov)
             drawviewmodel = false, drawhud = false,
             dopostprocess = false,
             fov = wep.ScopeFov or 8,
-            -- Use a small znear to avoid fisheye distortion.
-            -- Too high (8+) causes extreme close-range clipping that
-            -- looks like fisheye. Default is ~1.
             znear = 1,
         })
 
@@ -177,12 +180,12 @@ hook.Add("RenderScene", "CUH_RTScope_RenderScene", function(origin, angles, fov)
         -- ============================================================
         -- COMPOSITE RETICLE INTO THE RT (baked into lens texture)
         -- ============================================================
-        -- Draw TWO reticle layers on top of the 3D scene:
+        -- Draw THREE reticle layers on top of the 3D scene:
         --   Layer 1: weapon's ScopeReticle (scope_c texture from TFA)
-        --   Layer 2: Underhell reticle (gmod/scope — the crossbow scope
-        --            texture used by Scout/G36K)
-        -- This dual-layer approach ensures the reticle appears even if
-        -- one texture fails to load.
+        --   Layer 2: Underhell gmod/scope (crossbow scope texture)
+        --   Layer 3: Scout sniper lens texture (models/weapons/v_models/sniper_scout/lens)
+        -- This multi-layer approach ensures the reticle appears even if
+        -- some textures fail to load.
         cam.Start2D()
             -- Layer 1: weapon-specific scope_c reticle (if set)
             local reticleMat = GetReticleMaterial(wep)
@@ -192,31 +195,23 @@ hook.Add("RenderScene", "CUH_RTScope_RenderScene", function(origin, angles, fov)
                 surface.DrawTexturedRect(0, 0, size, size)
             end
 
-            -- Layer 2: Underhell reticle (gmod/scope — always available)
-            -- This is the same texture family used by the Scout sniper
-            -- and G36K. It's a crosshair-style reticle that should
-            -- always be visible.
+            -- Layer 2: gmod/scope (GMod crossbow scope — always available)
             local uhReticle = Material("gmod/scope")
             if uhReticle and not uhReticle:IsError() then
                 surface.SetDrawColor(255, 255, 255, 255)
                 surface.SetMaterial(uhReticle)
                 surface.DrawTexturedRect(0, 0, size, size)
             end
-        cam.End2D()
 
-        -- Debug: log texture status every 60 frames
-        if GetConVar("cuh_rt_scope_debug"):GetBool() then
-            _dbgCounter = _dbgCounter + 1
-            if _dbgCounter >= 60 then
-                _dbgCounter = 0
-                local r1 = GetReticleMaterial(wep)
-                local r2 = Material("gmod/scope")
-                print(string.format("[CUH RT] reticle1=%s err=%s | reticle2=gmod/scope err=%s",
-                    tostring(wep.ScopeReticle or "nil"),
-                    tostring(r1 and r1:IsError() or "nil"),
-                    tostring(r2 and r2:IsError() or "nil")))
+            -- Layer 3: Scout sniper lens texture (the actual Underhell reticle)
+            -- This is the exact material the Scout sniper uses for its scope.
+            local scoutLens = Material("models/weapons/v_models/sniper_scout/lens")
+            if scoutLens and not scoutLens:IsError() then
+                surface.SetDrawColor(255, 255, 255, 255)
+                surface.SetMaterial(scoutLens)
+                surface.DrawTexturedRect(0, 0, size, size)
             end
-        end
+        cam.End2D()
 
         render.PopRenderTarget()
         render.SetViewPort(0, 0, ScrW(), ScrH())
