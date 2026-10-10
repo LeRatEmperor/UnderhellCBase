@@ -139,12 +139,16 @@ hook.Add("RenderScene", "CUH_RTScope_RenderScene", function(origin, angles, fov)
             local r1 = GetReticleMaterial(wep)
             local r2 = Material("gmod/scope")
             local r3 = Material("models/weapons/v_models/sniper_scout/lens")
-            print(string.format("[CUH RT] zooming=%s | reticle1=%s err=%s | gmod/scope err=%s | scout_lens err=%s",
+            -- Fixed debug logic: use if-else instead of 'and/or' which
+            -- evaluates to "nil" when IsError() returns false
+            local function errStr(m)
+                if not m then return "nil" end
+                return m:IsError() and "ERROR" or "ok"
+            end
+            print(string.format("[CUH RT] zooming=%s | reticle1=%s [%s] | gmod/scope [%s] | scout_lens [%s]",
                 tostring(zooming),
-                tostring(wep.ScopeReticle or "nil"),
-                tostring(r1 and r1:IsError() or "nil"),
-                tostring(r2 and r2:IsError() or "nil"),
-                tostring(r3 and r3:IsError() or "nil")))
+                tostring(wep.ScopeReticle or "nil"), errStr(r1),
+                errStr(r2), errStr(r3)))
         end
     end
 
@@ -165,7 +169,6 @@ hook.Add("RenderScene", "CUH_RTScope_RenderScene", function(origin, angles, fov)
         wep._rtScopeSuppressVElem = true
 
         -- Render the 3D scene into the RT.
-        -- No render.Clear (GMod bug #2085 breaks surface alpha on RTs).
         render.RenderView({
             x = 0, y = 0, w = size, h = size,
             origin = pos, angles = ang,
@@ -177,41 +180,38 @@ hook.Add("RenderScene", "CUH_RTScope_RenderScene", function(origin, angles, fov)
 
         wep._rtScopeSuppressVElem = false
 
+        -- CRITICAL: Clear the depth buffer after render.RenderView.
+        -- render.RenderView leaves depth values from the 3D scene.
+        -- Without clearing, the 2D reticle draws (which use default
+        -- depth) get depth-tested out and never appear on the RT.
+        render.ClearDepth()
+
         -- ============================================================
         -- COMPOSITE RETICLE INTO THE RT (baked into lens texture)
         -- ============================================================
-        -- Draw THREE reticle layers on top of the 3D scene:
-        --   Layer 1: weapon's ScopeReticle (scope_c texture from TFA)
-        --   Layer 2: Underhell gmod/scope (crossbow scope texture)
-        --   Layer 3: Scout sniper lens texture (models/weapons/v_models/sniper_scout/lens)
-        -- This multi-layer approach ensures the reticle appears even if
-        -- some textures fail to load.
-        cam.Start2D()
-            -- Layer 1: weapon-specific scope_c reticle (if set)
-            local reticleMat = GetReticleMaterial(wep)
-            if reticleMat and not reticleMat:IsError() then
-                surface.SetDrawColor(255, 255, 255, 255)
-                surface.SetMaterial(reticleMat)
-                surface.DrawTexturedRect(0, 0, size, size)
-            end
+        -- Use render.SetMaterial + render.DrawScreenQuadEx (the render
+        -- library) instead of surface.* functions. The render library
+        -- is lower-level and more reliable inside PushRenderTarget.
+        -- We also cleared the depth buffer above so the draws appear.
+        local reticleMat = GetReticleMaterial(wep)
+        if reticleMat and not reticleMat:IsError() then
+            render.SetMaterial(reticleMat)
+            render.DrawScreenQuadEx(0, 0, size, size)
+        end
 
-            -- Layer 2: gmod/scope (GMod crossbow scope — always available)
-            local uhReticle = Material("gmod/scope")
-            if uhReticle and not uhReticle:IsError() then
-                surface.SetDrawColor(255, 255, 255, 255)
-                surface.SetMaterial(uhReticle)
-                surface.DrawTexturedRect(0, 0, size, size)
-            end
+        -- Layer 2: gmod/scope (GMod crossbow scope — always available)
+        local uhReticle = Material("gmod/scope")
+        if uhReticle and not uhReticle:IsError() then
+            render.SetMaterial(uhReticle)
+            render.DrawScreenQuadEx(0, 0, size, size)
+        end
 
-            -- Layer 3: Scout sniper lens texture (the actual Underhell reticle)
-            -- This is the exact material the Scout sniper uses for its scope.
-            local scoutLens = Material("models/weapons/v_models/sniper_scout/lens")
-            if scoutLens and not scoutLens:IsError() then
-                surface.SetDrawColor(255, 255, 255, 255)
-                surface.SetMaterial(scoutLens)
-                surface.DrawTexturedRect(0, 0, size, size)
-            end
-        cam.End2D()
+        -- Layer 3: Scout sniper lens texture (the actual Underhell reticle)
+        local scoutLens = Material("models/weapons/v_models/sniper_scout/lens")
+        if scoutLens and not scoutLens:IsError() then
+            render.SetMaterial(scoutLens)
+            render.DrawScreenQuadEx(0, 0, size, size)
+        end
 
         render.PopRenderTarget()
         render.SetViewPort(0, 0, ScrW(), ScrH())
