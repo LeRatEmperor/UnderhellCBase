@@ -196,6 +196,40 @@ hook.Add("RenderScene", "CUH_RTScope_RenderScene", function(origin, angles, fov)
 end)
 
 -- ============================================================
+-- Fix: Sensitivity stays low after deselecting scoped weapon
+-- ============================================================
+-- The base's AdjustMouseSensitivity returns the low scope sensitivity
+-- when GetUHBool("Zooming") is true. When you switch weapons while
+-- zoomed, the Zooming bool stays true on the old weapon, and the
+-- engine's sensitivity system may use the stale state.
+--
+-- Fix: Force-clear Zooming on ALL CUH weapons when the player
+-- switches weapons or releases right-click.
+hook.Add("PlayerSwitchWeapon", "CUH_ClearZoomOnSwitch", function(ply, old, new)
+    -- Clear Zooming on the old weapon when switching
+    if IsValid(old) and old.GetUHBool and old:GetUHBool("Zooming") then
+        old:SetUHBool("Zooming", false)
+    end
+end)
+
+-- Also clear Zooming when the player releases right-click (extra safety)
+-- This catches cases where the zoom-release detection in Think() misses a frame
+hook.Add("Tick", "CUH_ClearZoomOnRelease", function()
+    local ply = LocalPlayer()
+    if not IsValid(ply) then return end
+    local wep = ply:GetActiveWeapon()
+    if not IsValid(wep) then return end
+    if not wep.IsCUHWeapon then return end
+    if not wep.GetUHBool then return end
+
+    -- If Zooming is true but the player is NOT holding right-click,
+    -- and not reloading or doing other actions, clear it.
+    if wep:GetUHBool("Zooming") and not ply:KeyDown(IN_ATTACK2) then
+        wep:SetUHBool("Zooming", false)
+    end
+end)
+
+-- ============================================================
 -- Console command: cuh_ironsight_dump
 -- Dumps the current ironsight state to verify overrides are applied.
 -- ============================================================
