@@ -149,11 +149,11 @@ hook.Add("RenderScene", "CUH_RTScope_RenderScene", function(origin, angles, fov)
 
     if isZooming then
         local size = wep.RT_Size or 512
+        -- render.PushRenderTarget already sets the viewport per the docs:
+        -- "Pushes the current render target and viewport to the RT stack
+        --  then sets a new current render target and viewport."
+        -- So we do NOT need a separate render.SetViewPort call.
         render.PushRenderTarget(wep.RenderTarget, 0, 0, size, size)
-        render.SetViewPort(0, 0, size, size)
-
-        -- Clear the RT to black before rendering
-        render.Clear(0, 0, 0, 255, true, true)
 
         local ang = ply:EyeAngles()
         local pos = ply:EyePos()
@@ -164,7 +164,12 @@ hook.Add("RenderScene", "CUH_RTScope_RenderScene", function(origin, angles, fov)
         -- from being drawn into the RT.
         wep._rtScopeSuppressVElem = true
 
-        -- Render the 3D scene into the RT
+        -- Render the 3D scene into the RT.
+        -- render.RenderView fills the entire RT, so no render.Clear needed.
+        -- CRITICAL: We do NOT call render.Clear because of GMod bug #2085:
+        -- "This sets the alpha incorrectly for surface draw calls for
+        --  render targets." Calling render.Clear would make the reticle
+        -- invisible (alpha 0) when drawn with surface.DrawTexturedRect.
         render.RenderView({
             x = 0, y = 0, w = size, h = size,
             origin = pos, angles = ang,
@@ -181,21 +186,13 @@ hook.Add("RenderScene", "CUH_RTScope_RenderScene", function(origin, angles, fov)
         -- ============================================================
         -- COMPOSITE RETICLE INTO THE RT (baked into lens texture)
         -- ============================================================
-        -- Use cam.Start2D + surface.* to draw the reticle texture on
-        -- top of the 3D scene in the RT. This is the approach that
-        -- was working (RT showed the 3D scene). The render.DrawScreenQuadEx
-        -- approach broke the RT (missing texture), so we reverted.
+        -- Draw the reticle texture on top of the 3D scene in the RT.
+        -- cam.Start2D works with the current render target (set by
+        -- PushRenderTarget). surface.DrawTexturedRect draws to the RT.
         --
-        -- TODO: The reticle texture itself isn't appearing yet.
-        -- Brainstorm needed on how to composite the scope_c reticle
-        -- onto the RT. Options to explore:
-        --   A. Use render.SetMaterial + render.DrawScreenQuad (not Ex)
-        --   B. Draw the reticle as a separate material overlay via
-        --      SetSubMaterial on a separate VElement
-        --   C. Use the scope_c texture as the ScopeTexture basetexture
-        --      directly (no RT compositing — just static reticle)
-        --   D. Use a stencil-based approach to draw the reticle only
-        --      inside the scope lens circle
+        -- CRITICAL: We must NOT call render.Clear before this, because
+        -- GMod bug #2085 breaks surface alpha after render.Clear on RTs.
+        -- render.RenderView fills the entire RT, so clearing is unnecessary.
         cam.Start2D()
             local reticleMat = GetReticleMaterial(wep)
             if reticleMat and not reticleMat:IsError() then
