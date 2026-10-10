@@ -67,6 +67,21 @@ function ATTACHMENT:Attach(wep)
         wep._rtScopeSubMatIndex = nil
         wep._rtScopeOverrideSet = false
 
+        -- CRITICAL: Override DrawVElements per-instance to skip drawing
+        -- during the RT render pass. The base's DrawVElements is called
+        -- during render.RenderView (via PostDrawViewModel), which draws
+        -- VElements (long barrels, suppressors, front sights) into the RT.
+        -- SetNoDraw doesn't help because DrawModel() is called explicitly.
+        -- This per-instance override checks the _rtScopeSuppressVElem flag
+        -- set by the RenderScene hook in cuh_rt_scope_render.lua.
+        wep._rtScopePrevDrawVE = wep.DrawVElements
+        wep.DrawVElements = function(self, vm)
+            if self._rtScopeSuppressVElem then return end
+            if self._rtScopePrevDrawVE then
+                self._rtScopePrevDrawVE(self, vm)
+            end
+        end
+
         if not wep._rtScopeHooked then
             wep._rtScopeHooked = true
             local prevThink = wep.CustomThink
@@ -182,6 +197,11 @@ function ATTACHMENT:Detach(wep)
         wep._rtScopeVElement = nil
         wep._rtScopeSubMatIndex = nil
         wep._rtScopeHooked = nil
+        -- Restore original DrawVElements
+        if wep._rtScopePrevDrawVE then
+            wep.DrawVElements = wep._rtScopePrevDrawVE
+            wep._rtScopePrevDrawVE = nil
+        end
         wep._rtScopeOverrideSet = nil
     end
 end
