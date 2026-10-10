@@ -67,9 +67,6 @@ SWEP.AnimatedSprint = true
 -- Ironsights (from TFA source)
 SWEP.IronSightsPos = Vector(-4.07, 1, 2.5)
 SWEP.IronSightsAng = Vector(0, 0, 0)
--- Lens sight ironsight position (computed default: IronSightsPos + delta)
-SWEP.IronSightsPos_Lens = Vector(-3.57, 1, 2.1)
-SWEP.IronSightsAng_Lens = Vector(0, 0, 0)
 SWEP.IronSightTime = 0.3
 SWEP.SwayPosition = 2.0
 SWEP.AlternativePos = Vector(0, 0, 0)
