@@ -26,7 +26,6 @@ function ATTACHMENT:Attach(wep)
     wep.ScopeFov = 15
     wep.ZoomFov = 25
     wep.ScopeDisabled = false
-    wep.Sensitivity = 0.2
     wep.Use2DScope = false
 
     if CLIENT then
@@ -214,7 +213,6 @@ function ATTACHMENT:Detach(wep)
     wep.ScopeTexture = nil
     wep.ScopeFov = nil
     wep.ZoomFov = 20
-    wep.Sensitivity = nil
     wep.Use2DScope = false
 
     if CLIENT then
