@@ -190,14 +190,18 @@ hook.Add("RenderScene", "CUH_RTScope_RenderScene", function(origin, angles, fov)
         render.SetViewPort(0, 0, size, size)
         render.ClearDepth()
 
-        -- Draw the reticle overlay using render.DrawScreenQuadEx.
-        -- This is a 3D render operation (full-screen quad), not a 2D
-        -- surface draw, so it works inside PushRenderTarget contexts.
-        local reticleMat = GetReticleMaterial(wep)
-        if reticleMat and not reticleMat:IsError() then
-            render.SetMaterial(reticleMat)
-            render.DrawScreenQuadEx(0, 0, size, size)
-        end
+        -- Use cam.Start2D to set up a 2D ortho projection for the RT,
+        -- then use surface.DrawTexturedRect to draw the reticle.
+        -- cam.Start2D is "almost always used with a render target" per
+        -- the glua skill reference.
+        cam.Start2D()
+            local reticleMat = GetReticleMaterial(wep)
+            if reticleMat and not reticleMat:IsError() then
+                surface.SetDrawColor(255, 255, 255, 255)
+                surface.SetMaterial(reticleMat)
+                surface.DrawTexturedRect(0, 0, size, size)
+            end
+        cam.End2D()
 
         render.PopRenderTarget()
         render.SetViewPort(0, 0, ScrW(), ScrH())
