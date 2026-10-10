@@ -200,20 +200,25 @@ end)
 -- ============================================================
 -- The base's AdjustMouseSensitivity returns the low scope sensitivity
 -- when GetUHBool("Zooming") is true. When you switch weapons while
--- zoomed, the Zooming bool stays true on the old weapon, and the
--- engine's sensitivity system may use the stale state.
+-- zoomed, the Zooming bool can stay true, or the Sensitivity field
+-- leaks to the stat cache.
 --
--- Fix: Force-clear Zooming on ALL CUH weapons when the player
--- switches weapons or releases right-click.
+-- Fix: Force-clear Zooming and explicitly set Sensitivity to nil
+-- (not just remove it) when the player switches weapons or releases
+-- right-click. Setting to nil via SetStat ensures the stat cache
+-- is also cleared.
 hook.Add("PlayerSwitchWeapon", "CUH_ClearZoomOnSwitch", function(ply, old, new)
     -- Clear Zooming on the old weapon when switching
     if IsValid(old) and old.GetUHBool and old:GetUHBool("Zooming") then
         old:SetUHBool("Zooming", false)
     end
+    -- Also clear on the new weapon in case it inherited stale state
+    if IsValid(new) and new.GetUHBool and new:GetUHBool("Zooming") then
+        new:SetUHBool("Zooming", false)
+    end
 end)
 
--- Also clear Zooming when the player releases right-click (extra safety)
--- This catches cases where the zoom-release detection in Think() misses a frame
+-- Force-clear Zooming when the player releases right-click
 hook.Add("Tick", "CUH_ClearZoomOnRelease", function()
     local ply = LocalPlayer()
     if not IsValid(ply) then return end
@@ -222,10 +227,35 @@ hook.Add("Tick", "CUH_ClearZoomOnRelease", function()
     if not wep.IsCUHWeapon then return end
     if not wep.GetUHBool then return end
 
-    -- If Zooming is true but the player is NOT holding right-click,
-    -- and not reloading or doing other actions, clear it.
+    -- If Zooming is true but the player is NOT holding right-click, clear it
     if wep:GetUHBool("Zooming") and not ply:KeyDown(IN_ATTACK2) then
         wep:SetUHBool("Zooming", false)
+    end
+end)
+
+-- ============================================================
+-- Override AdjustMouseSensitivity for CUH weapons
+-- ============================================================
+-- The base's AdjustMouseSensitivity may return the low sensitivity
+-- even when not zooming if the Sensitivity stat is cached. This
+-- override ensures sensitivity is ONLY reduced when actively zooming.
+-- We hook into the weapon's AdjustMouseSensitivity via a per-weapon
+-- override installed when the weapon is deployed.
+hook.Add("PlayerWeaponDeployed", "CUH_FixSensitivityDeploy", function(ply, wep)
+    if not wep.IsCUHWeapon then return end
+
+    -- Override AdjustMouseSensitivity on this weapon instance
+    if not wep._cuhSensOverride then
+        wep._cuhSensOverride = true
+        local origAdjust = wep.AdjustMouseSensitivity
+        wep.AdjustMouseSensitivity = function(self)
+            -- Only return low sensitivity when ACTIVELY zooming
+            if self.GetUHBool and self:GetUHBool("Zooming") then
+                return self.Sensitivity or 0.2
+            end
+            -- Otherwise return nil (normal sensitivity)
+            return nil
+        end
     end
 end)
 
