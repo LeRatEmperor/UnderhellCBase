@@ -58,37 +58,50 @@ function ATTACHMENT:Attach(wep)
         -- and rebuilds the ClientsideModels AFTER Attach() runs, so
         -- any SetSubMaterial called in Attach() is lost. By applying
         -- it every frame in CustomThink, the override persists.
-        wep._rtScopePrevThink = wep.CustomThink
-        wep.CustomThink = function(w, ct)
-            -- Run any previous CustomThink
-            if w._rtScopePrevThink then w._rtScopePrevThink(w, ct) end
+        -- CRITICAL: only hook CustomThink ONCE per weapon.
+        -- The OLD code re-saved prev think into wep._rtScopePrevThink every
+        -- Attach() call, but the closure body read w._rtScopePrevThink at
+        -- *call time*. After a second Attach() (which happens routinely —
+        -- ApplyAttachments re-runs on every attachment change, weapon switch,
+        -- SWEP:Initialize), the field pointed back at our own closure →
+        -- infinite recursion → stack overflow.
+        -- Fix: capture prevThink as a LOCAL upvalue, and gate with _rtScopeHooked.
+        if not wep._rtScopeHooked then
+            wep._rtScopeHooked = true
+            local prevThink = wep.CustomThink
+            wep._rtScopePrevThink = prevThink
 
-            if not w._rtScopeMatName then return end
-            if not w.ViewModelElements then return end
-            local elem = w.ViewModelElements[w._rtScopeVElement]
-            if not elem or not IsValid(elem._csModel) then return end
-            local csModel = elem._csModel
+            wep.CustomThink = function(w, ct)
+                -- Run previous CustomThink via the LOCAL upvalue
+                if prevThink then prevThink(w, ct) end
 
-            -- Find the lens sub-material index (only once, then cache it)
-            if not w._rtScopeSubMatIndex then
-                local mats = csModel:GetMaterials()
-                if mats then
-                    for i = 1, #mats do
-                        local mn = string.lower(tostring(mats[i]))
-                        if string.find(mn, "lens") or string.find(mn, "optic") or string.find(mn, "scope") then
-                            w._rtScopeSubMatIndex = i - 1  -- 0-based
-                            break
+                if not w._rtScopeMatName then return end
+                if not w.ViewModelElements then return end
+                local elem = w.ViewModelElements[w._rtScopeVElement]
+                if not elem or not IsValid(elem._csModel) then return end
+                local csModel = elem._csModel
+
+                -- Find the lens sub-material index (only once, then cache it)
+                if not w._rtScopeSubMatIndex then
+                    local mats = csModel:GetMaterials()
+                    if mats then
+                        for i = 1, #mats do
+                            local mn = string.lower(tostring(mats[i]))
+                            if string.find(mn, "lens") or string.find(mn, "optic") or string.find(mn, "scope") then
+                                w._rtScopeSubMatIndex = i - 1  -- 0-based
+                                break
+                            end
                         end
                     end
+                    -- If not found by name, try index 0 (first material is often the lens)
+                    if not w._rtScopeSubMatIndex then
+                        w._rtScopeSubMatIndex = 0
+                    end
                 end
-                -- If not found by name, try index 0 (first material is often the lens)
-                if not w._rtScopeSubMatIndex then
-                    w._rtScopeSubMatIndex = 0
-                end
-            end
 
-            -- Apply the sub-material override EVERY FRAME
-            csModel:SetSubMaterial(w._rtScopeSubMatIndex, w._rtScopeMatName)
+                -- Apply the sub-material override EVERY FRAME
+                csModel:SetSubMaterial(w._rtScopeSubMatIndex, w._rtScopeMatName)
+            end
         end
     end
 end
@@ -123,6 +136,7 @@ function ATTACHMENT:Detach(wep)
         wep._rtScopeMatName = nil
         wep._rtScopeVElement = nil
         wep._rtScopeSubMatIndex = nil
+        wep._rtScopeHooked = nil  -- allow a future Attach() to re-hook
     end
 end
 
