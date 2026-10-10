@@ -186,9 +186,11 @@ hook.Add("RenderScene", "CUH_RTScope_RenderScene", function(origin, angles, fov)
 
         wep._rtScopeSuppressVElem = false
 
-        -- CRITICAL: Clear the depth buffer after render.RenderView.
-        -- render.RenderView leaves depth values from the 3D scene.
-        -- Without clearing, the 2D reticle draws get depth-tested out.
+        -- CRITICAL: render.RenderView resets the current render target
+        -- back to the screen. We must re-set the RT before drawing the
+        -- reticle, otherwise the 2D draws go to the screen (invisible)
+        -- instead of the RT.
+        render.SetRenderTarget(wep.RenderTarget)
         render.ClearDepth()
 
         -- ============================================================
