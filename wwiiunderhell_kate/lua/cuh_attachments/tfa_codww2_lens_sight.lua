@@ -193,6 +193,19 @@ function ATTACHMENT:Detach(wep)
     wep.ZoomFov = 20
     wep.Use2DScope = false
 
+    -- CRITICAL: Purge Sensitivity from the stat cache.
+    -- Sensitivity is NOT in the topLevel stat cache list, so
+    -- RestoreStat can't restore its original value. The stale 0.2
+    -- value persists in _statCache and gets re-applied by FlushStats.
+    -- We must manually purge it here.
+    if wep._statCache then
+        wep._statCache["Sensitivity"] = nil
+    end
+    if wep._statOrigins then
+        wep._statOrigins["Sensitivity"] = nil
+    end
+    wep.Sensitivity = nil
+
     if CLIENT then
         if wep.ViewModelElements and wep._rtScopeVElement then
             local elem = wep.ViewModelElements[wep._rtScopeVElement]
