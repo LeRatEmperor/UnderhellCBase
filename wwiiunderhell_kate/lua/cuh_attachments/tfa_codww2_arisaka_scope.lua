@@ -72,13 +72,27 @@ function ATTACHMENT:Attach(wep)
             wep._rtScopePrevThink = prevThink
 
             wep.CustomThink = function(w, ct)
-                -- Run previous CustomThink via the LOCAL upvalue
-                if prevThink then prevThink(w, ct) end
+                -- Re-entry guard: if we're already inside this closure
+                -- (e.g. due to stale state from a previous Lua refresh),
+                -- bail out immediately to prevent any recursion.
+                if w._rtScopeInThink then return end
+                w._rtScopeInThink = true
 
-                if not w._rtScopeMatName then return end
-                if not w.ViewModelElements then return end
+                -- Run previous CustomThink via the LOCAL upvalue.
+                -- NEVER call ourselves (recursion guard): if prevThink
+                -- happens to be the same function as w.CustomThink,
+                -- skip the call.
+                if prevThink and prevThink ~= w.CustomThink then
+                    prevThink(w, ct)
+                end
+
+                if not w._rtScopeMatName then
+                    w._rtScopeInThink = nil
+                    return
+                end
+                if not w.ViewModelElements then w._rtScopeInThink = nil return end
                 local elem = w.ViewModelElements[w._rtScopeVElement]
-                if not elem or not IsValid(elem._csModel) then return end
+                if not elem or not IsValid(elem._csModel) then w._rtScopeInThink = nil return end
                 local csModel = elem._csModel
 
                 -- Find the lens sub-material index (only once, then cache it)
@@ -101,6 +115,7 @@ function ATTACHMENT:Attach(wep)
 
                 -- Apply the sub-material override EVERY FRAME
                 csModel:SetSubMaterial(w._rtScopeSubMatIndex, w._rtScopeMatName)
+                w._rtScopeInThink = nil
             end
         end
     end
