@@ -74,6 +74,10 @@ SWEP.ScopeReticle = "scopes/scope_overlay_german"
 -- ACOG ironsight position (from TFA source)
 SWEP.IronSightsPos_ACOG = Vector(-2.286, -3, 0.892)
 SWEP.IronSightsAng_ACOG = Vector(0, 0, 0)
+-- 7x scope ironsight position (from TFA source — Mosin scope)
+SWEP.IronSightsPos_7X = Vector(-3.671, -3, 0.476)
+SWEP.IronSightsAng_7X = Vector(0, 0, 0)
+SWEP.IronSightsAng_ACOG = Vector(0, 0, 0)
 SWEP.IronSightTime = 0.5
 SWEP.SwayPosition = 2.0
 SWEP.AlternativePos = Vector(0, 0, 0)
@@ -305,6 +309,33 @@ function SWEP:HandleInspect()
 end
 
 -- ============================================================
+
+-- ============================================================
+-- RECHAMBER GUARD (CanPrimaryAttack override)
+-- ============================================================
+-- Prevents spamming fire to bypass the bolt-action rechamber delay.
+-- The base CanPrimaryAttack doesn't check GetNextPrimaryFire(), so
+-- players could click rapidly to fire faster than the PumpDelay.
+-- This override blocks fire until the rechamber sequence completes.
+function SWEP:CanPrimaryAttack()
+    if self:GetNWInt("FireMode") == 0 then return false end
+    if self:GetNWFloat("DeployTime") > CurTime() then return false end
+    if self:GetUHBool("Running") then return false end
+    if self:GetUHBool("Reloading") then return false end
+    -- CRITICAL: Block fire during bolt-action rechamber
+    if self.IsBoltAction and CurTime() < self:GetNextPrimaryFire() then
+        return false
+    end
+    if self:Clip1() <= 0 then
+        if not self:GetUHBool("Reloading") then
+            self:EmitSound("Weapon_SMG1.Empty", 75, 100, 1, CHAN_USER_BASE)
+        end
+        self:SetNextPrimaryFire(CurTime() + 0.4)
+        return false
+    end
+    return true
+end
+
 -- ATTACK
 -- ============================================================
 function SWEP:PrimaryAttack()

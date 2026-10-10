@@ -73,6 +73,9 @@ SWEP.IronSightsPos = Vector(-4.4, -1, 1.33)
 SWEP.IronSightsPos_7X = Vector(-4.395, -4.75, 0.123)
 SWEP.IronSightsAng_7X = Vector(0, 0, 0)
 SWEP.IronSightsAng = Vector(0.1, 0, 0)
+-- Reticle texture for RT scope (faction scope overlay)
+SWEP.ScopeReticle = "scopes/scope_overlay_german"
+
 -- ACOG ironsight position (from TFA source)
 SWEP.IronSightsPos_ACOG = Vector(-3.115, -6, 0.741)
 SWEP.IronSightsAng_ACOG = Vector(0, 0, 0)
@@ -207,6 +210,33 @@ SWEP.AnimSounds = {
 -- BOLT-ACTION RECHAMBER (PostShoot override)
 -- ============================================================
 function SWEP:PostShoot()
+
+-- ============================================================
+-- RECHAMBER GUARD (CanPrimaryAttack override)
+-- ============================================================
+-- Prevents spamming fire to bypass the bolt-action rechamber delay.
+-- The base CanPrimaryAttack doesn't check GetNextPrimaryFire(), so
+-- players could click rapidly to fire faster than the PumpDelay.
+-- This override blocks fire until the rechamber sequence completes.
+function SWEP:CanPrimaryAttack()
+    if self:GetNWInt("FireMode") == 0 then return false end
+    if self:GetNWFloat("DeployTime") > CurTime() then return false end
+    if self:GetUHBool("Running") then return false end
+    if self:GetUHBool("Reloading") then return false end
+    -- CRITICAL: Block fire during bolt-action rechamber
+    if self.IsBoltAction and CurTime() < self:GetNextPrimaryFire() then
+        return false
+    end
+    if self:Clip1() <= 0 then
+        if not self:GetUHBool("Reloading") then
+            self:EmitSound("Weapon_SMG1.Empty", 75, 100, 1, CHAN_USER_BASE)
+        end
+        self:SetNextPrimaryFire(CurTime() + 0.4)
+        return false
+    end
+    return true
+end
+
     local ct = CurTime()
     local pumpDelay = self.PumpDelay or 0.4
     self:SetNextPrimaryFire(math.max(self:GetNextPrimaryFire(), ct + pumpDelay))
