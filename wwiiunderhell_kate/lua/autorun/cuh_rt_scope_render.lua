@@ -160,6 +160,9 @@ hook.Add("RenderScene", "CUH_RTScope_RenderScene", function(origin, angles, fov)
     if isZooming then
         local size = wep.RT_Size or 512
 
+        -- ============================================================
+        -- STEP 1: Render the 3D scene into the RT
+        -- ============================================================
         render.PushRenderTarget(wep.RenderTarget, 0, 0, size, size)
 
         local ang = ply:EyeAngles()
@@ -169,7 +172,6 @@ hook.Add("RenderScene", "CUH_RTScope_RenderScene", function(origin, angles, fov)
         -- per-instance) skips drawing during the RT render pass.
         wep._rtScopeSuppressVElem = true
 
-        -- Render the 3D scene into the RT.
         render.RenderView({
             x = 0, y = 0, w = size, h = size,
             origin = pos, angles = ang,
@@ -181,20 +183,18 @@ hook.Add("RenderScene", "CUH_RTScope_RenderScene", function(origin, angles, fov)
 
         wep._rtScopeSuppressVElem = false
 
+        -- Pop the RT — render.RenderView leaves the RT state messy,
+        -- so we pop and do a clean push for the reticle compositing.
+        render.PopRenderTarget()
+
         -- ============================================================
-        -- COMPOSITE RETICLE ONTO THE RT
+        -- STEP 2: Composite the reticle onto the RT (clean push)
         -- ============================================================
-        -- render.RenderView resets the render target to the screen.
-        -- We must re-set the RT before drawing the reticle.
-        render.SetRenderTarget(wep.RenderTarget)
-        render.SetViewPort(0, 0, size, size)
+        render.PushRenderTarget(wep.RenderTarget, 0, 0, size, size)
         render.ClearDepth()
 
-        -- Use cam.Start2D to set up a 2D ortho projection for the RT,
-        -- then use surface.DrawTexturedRect to draw the reticle.
-        -- cam.Start2D is "almost always used with a render target" per
-        -- the glua skill reference.
         cam.Start2D()
+            -- Draw the reticle overlay texture
             local reticleMat = GetReticleMaterial(wep)
             if reticleMat and not reticleMat:IsError() then
                 surface.SetDrawColor(255, 255, 255, 255)
