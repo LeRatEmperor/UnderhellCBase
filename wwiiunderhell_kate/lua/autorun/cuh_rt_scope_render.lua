@@ -181,17 +181,29 @@ hook.Add("RenderScene", "CUH_RTScope_RenderScene", function(origin, angles, fov)
         -- ============================================================
         -- COMPOSITE RETICLE INTO THE RT (baked into lens texture)
         -- ============================================================
-        -- Use render.SetMaterial + render.DrawScreenQuadEx (the render
-        -- library approach) instead of surface.* functions. The render
-        -- library is more reliable inside PushRenderTarget contexts.
-        -- This matches what the TFA TFA_COD_Scope C++ proxy does:
-        -- composite the weapon's scope_c reticle texture on top of the
-        -- zoomed 3D scene in the RT.
-        local reticleMat = GetReticleMaterial(wep)
-        if reticleMat and not reticleMat:IsError() then
-            render.SetMaterial(reticleMat)
-            render.DrawScreenQuadEx(0, 0, size, size)
-        end
+        -- Use cam.Start2D + surface.* to draw the reticle texture on
+        -- top of the 3D scene in the RT. This is the approach that
+        -- was working (RT showed the 3D scene). The render.DrawScreenQuadEx
+        -- approach broke the RT (missing texture), so we reverted.
+        --
+        -- TODO: The reticle texture itself isn't appearing yet.
+        -- Brainstorm needed on how to composite the scope_c reticle
+        -- onto the RT. Options to explore:
+        --   A. Use render.SetMaterial + render.DrawScreenQuad (not Ex)
+        --   B. Draw the reticle as a separate material overlay via
+        --      SetSubMaterial on a separate VElement
+        --   C. Use the scope_c texture as the ScopeTexture basetexture
+        --      directly (no RT compositing — just static reticle)
+        --   D. Use a stencil-based approach to draw the reticle only
+        --      inside the scope lens circle
+        cam.Start2D()
+            local reticleMat = GetReticleMaterial(wep)
+            if reticleMat and not reticleMat:IsError() then
+                surface.SetDrawColor(255, 255, 255, 255)
+                surface.SetMaterial(reticleMat)
+                surface.DrawTexturedRect(0, 0, size, size)
+            end
+        cam.End2D()
 
         render.PopRenderTarget()
         render.SetViewPort(0, 0, ScrW(), ScrH())
