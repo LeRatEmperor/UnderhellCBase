@@ -1,30 +1,79 @@
-if not ATTACHMENT then ATTACHMENT = {} end
+#!/usr/bin/env python3
+"""
+Fix RT scopes: use CustomThink to re-apply SetSubMaterial EVERY FRAME.
 
-ATTACHMENT.Name = "Kar98k Scope"
-ATTACHMENT.ShortName = "SCOPE"
-ATTACHMENT.Icon = "entities/tfa_codww2_scope.png"
-ATTACHMENT.Description = {
-    Color(255, 255, 255), "Kar98k Scope",
-    Color(255, 100, 100), "+25% Zoom time",
+The problem: ApplyAttachments Stage 6 (CleanupVElements + InitVElements)
+DESTROYS and REBUILDS the ClientsideModels AFTER Attach() runs.
+So SetSubMaterial called in Attach() is applied to a model that gets
+destroyed immediately. The new model has default materials (with the
+TFA proxy).
+
+Fix: instead of SetSubMaterial in Attach(), set a CustomThink function
+that re-applies SetSubMaterial EVERY FRAME on the current ClientsideModel.
+This ensures the override persists even after the model is rebuilt.
+"""
+import os
+
+ATT_DIR = "/home/z/my-project/wwiiunderhell_kate/lua/cuh_attachments"
+
+SCOPES = {
+    'tfa_codww2_kar98k_scope.lua': {
+        'name': 'Kar98k Scope', 'velement': 'scope_default', 'fov': 7, 'zoom': 15,
+    },
+    'tfa_codww2_arisaka_scope.lua': {
+        'name': 'Arisaka Scope', 'velement': 'scope_default', 'fov': 7, 'zoom': 15,
+    },
+    'tfa_codww2_enfield_scope.lua': {
+        'name': 'Enfield Scope', 'velement': 'scope_default', 'fov': 7, 'zoom': 15,
+    },
+    'tfa_codww2_mosin_scope.lua': {
+        'name': 'Mosin Scope', 'velement': 'scope_default', 'fov': 7, 'zoom': 15,
+    },
+    'tfa_codww2_springfield_scope.lua': {
+        'name': 'Springfield Scope', 'velement': 'scope_default', 'fov': 7, 'zoom': 15,
+    },
+    'tfa_codww2_scope.lua': {
+        'name': '7x Scope', 'velement': 'scope_default', 'fov': 7, 'zoom': 15,
+    },
+    'tfa_codww2_4x.lua': {
+        'name': '4x ACOG', 'velement': 'scope_acog', 'fov': 15, 'zoom': 25,
+    },
 }
 
-ATTACHMENT.WeaponTable = {
-    ["VElements"] = {
-        ["scope_default"] = { ["active"] = true },
-    },
-    ["WElements"] = {
-        ["scope_default"] = { ["active"] = true },
-    },
-    ["ScopeFov"] = 7,
-    ["ZoomFov"] = 15,
+
+def write_scope_attachment(filepath, config):
+    name = config['name']
+    velem = config['velement']
+    fov = config['fov']
+    zoom = config['zoom']
+
+    content = f'''if not ATTACHMENT then ATTACHMENT = {{}} end
+
+ATTACHMENT.Name = "{name}"
+ATTACHMENT.ShortName = "SCOPE"
+ATTACHMENT.Icon = "entities/tfa_codww2_scope.png"
+ATTACHMENT.Description = {{
+    Color(255, 255, 255), "{name}",
+    Color(255, 100, 100), "+25% Zoom time",
+}}
+
+ATTACHMENT.WeaponTable = {{
+    ["VElements"] = {{
+        ["{velem}"] = {{ ["active"] = true }},
+    }},
+    ["WElements"] = {{
+        ["{velem}"] = {{ ["active"] = true }},
+    }},
+    ["ScopeFov"] = {fov},
+    ["ZoomFov"] = {zoom},
     ["Sensitivity"] = 0.2,
     ["IronSightsPos"] = function(wep, val) return wep.IronSightsPos_7X or wep.IronSightsPos_ACOG or val end,
     ["IronSightsAng"] = function(wep, val) return wep.IronSightsAng_7X or wep.IronSightsAng_ACOG or val end,
-}
+}}
 
 function ATTACHMENT:Attach(wep)
-    wep.ScopeFov = 7
-    wep.ZoomFov = 15
+    wep.ScopeFov = {fov}
+    wep.ZoomFov = {zoom}
     wep.ScopeDisabled = false
     wep.Sensitivity = 0.2
     wep.Use2DScope = false
@@ -34,20 +83,20 @@ function ATTACHMENT:Attach(wep)
         -- The TFA_COD_Scope proxy in the WWII VMTs resets $basetexture
         -- every frame. Our custom material has no proxy, so SetTexture sticks.
         local matName = "kate_rt_scope_" .. wep:EntIndex()
-        local mat = CreateMaterial(matName, "UnlitGeneric", {
+        local mat = CreateMaterial(matName, "UnlitGeneric", {{
             ["$basetexture"] = "vgui/scope_lens",
             ["$model"] = "1",
             ["$translucent"] = "1",
-        })
+        }})
         wep.ScopeTexture = mat
         wep._rtScopeMatName = matName
-        wep._rtScopeVElement = "scope_default"
+        wep._rtScopeVElement = "{velem}"
         wep._rtScopeSubMatIndex = nil  -- will be found on first Think
 
         -- Initialize RenderTarget
         if not wep.RenderTarget then
             local scale = ScrH() / 1080
-            local quality = { 256, 512, 768, 1080 }
+            local quality = {{ 256, 512, 768, 1080 }}
             local num = math.Clamp(GetConVar("uh_rt_quality"):GetInt(), 1, 4)
             wep.RT_Size = quality[num] * scale
             wep.RenderTarget = GetRenderTarget("CustomUH_ScopeRT_" .. wep:EntIndex(), wep.RT_Size, wep.RT_Size, false)
@@ -127,3 +176,18 @@ function ATTACHMENT:Detach(wep)
 end
 
 -- CUH base handles registration
+'''
+    with open(filepath, 'w') as f:
+        f.write(content)
+
+
+def main():
+    print("=== Rewriting scope attachments with CustomThink SetSubMaterial ===\n")
+    for filename, config in SCOPES.items():
+        filepath = os.path.join(ATT_DIR, filename)
+        write_scope_attachment(filepath, config)
+        print(f"  {filename}: CustomThink re-applies SetSubMaterial every frame")
+
+
+if __name__ == '__main__':
+    main()

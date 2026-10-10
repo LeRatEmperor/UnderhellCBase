@@ -30,10 +30,9 @@ function ATTACHMENT:Attach(wep)
     wep.Use2DScope = false
 
     if CLIENT then
-        -- Create a custom RT material with NO VMT file = NO proxy block.
-        -- The TFA_COD_Scope proxy in the WWII lens VMTs resets $basetexture
-        -- every frame, overwriting our SetTexture call. By using a custom
-        -- material that has no proxy, SetTexture actually takes effect.
+        -- Create a custom RT material with NO VMT = NO proxy block.
+        -- The TFA_COD_Scope proxy in the WWII VMTs resets $basetexture
+        -- every frame. Our custom material has no proxy, so SetTexture sticks.
         local matName = "kate_rt_scope_" .. wep:EntIndex()
         local mat = CreateMaterial(matName, "UnlitGeneric", {
             ["$basetexture"] = "vgui/scope_lens",
@@ -41,6 +40,9 @@ function ATTACHMENT:Attach(wep)
             ["$translucent"] = "1",
         })
         wep.ScopeTexture = mat
+        wep._rtScopeMatName = matName
+        wep._rtScopeVElement = "scope_default"
+        wep._rtScopeSubMatIndex = nil  -- will be found on first Think
 
         -- Initialize RenderTarget
         if not wep.RenderTarget then
@@ -51,28 +53,42 @@ function ATTACHMENT:Attach(wep)
             wep.RenderTarget = GetRenderTarget("CustomUH_ScopeRT_" .. wep:EntIndex(), wep.RT_Size, wep.RT_Size, false)
         end
 
-        -- Find the lens sub-material index on the scope VElement's
-        -- ClientsideModel and override it with our custom RT material.
-        -- This bypasses the model's default material (which has the
-        -- TFA_COD_Scope proxy that resets $basetexture every frame).
-        if wep.ViewModelElements and wep.ViewModelElements["scope_default"] then
-            local elem = wep.ViewModelElements["scope_default"]
-            if IsValid(elem._csModel) then
-                local mats = elem._csModel:GetMaterials()
+        -- CustomThink re-applies SetSubMaterial EVERY FRAME.
+        -- This is necessary because ApplyAttachments Stage 6 destroys
+        -- and rebuilds the ClientsideModels AFTER Attach() runs, so
+        -- any SetSubMaterial called in Attach() is lost. By applying
+        -- it every frame in CustomThink, the override persists.
+        wep._rtScopePrevThink = wep.CustomThink
+        wep.CustomThink = function(w, ct)
+            -- Run any previous CustomThink
+            if w._rtScopePrevThink then w._rtScopePrevThink(w, ct) end
+
+            if not w._rtScopeMatName then return end
+            if not w.ViewModelElements then return end
+            local elem = w.ViewModelElements[w._rtScopeVElement]
+            if not elem or not IsValid(elem._csModel) then return end
+            local csModel = elem._csModel
+
+            -- Find the lens sub-material index (only once, then cache it)
+            if not w._rtScopeSubMatIndex then
+                local mats = csModel:GetMaterials()
                 if mats then
                     for i = 1, #mats do
-                        local matName2 = string.lower(tostring(mats[i]))
-                        if string.find(matName2, "lens") or string.find(matName2, "optic") or string.find(matName2, "scope") then
-                            -- Sub-material indices are 0-based in Source
-                            local subIndex = i - 1
-                            elem._csModel:SetSubMaterial(subIndex, matName)
-                            wep._rtScopeSubMatIndex = subIndex
-                            wep._rtScopeVElement = "scope_default"
+                        local mn = string.lower(tostring(mats[i]))
+                        if string.find(mn, "lens") or string.find(mn, "optic") or string.find(mn, "scope") then
+                            w._rtScopeSubMatIndex = i - 1  -- 0-based
                             break
                         end
                     end
                 end
+                -- If not found by name, try index 0 (first material is often the lens)
+                if not w._rtScopeSubMatIndex then
+                    w._rtScopeSubMatIndex = 0
+                end
             end
+
+            -- Apply the sub-material override EVERY FRAME
+            csModel:SetSubMaterial(w._rtScopeSubMatIndex, w._rtScopeMatName)
         end
     end
 end
@@ -86,7 +102,7 @@ function ATTACHMENT:Detach(wep)
     wep.Use2DScope = false
 
     if CLIENT then
-        -- Restore the original sub-material on the VElement's ClientsideModel
+        -- Restore the original sub-material
         if wep._rtScopeSubMatIndex and wep._rtScopeVElement then
             if wep.ViewModelElements and wep.ViewModelElements[wep._rtScopeVElement] then
                 local elem = wep.ViewModelElements[wep._rtScopeVElement]
@@ -94,9 +110,19 @@ function ATTACHMENT:Detach(wep)
                     elem._csModel:SetSubMaterial(wep._rtScopeSubMatIndex, "")
                 end
             end
-            wep._rtScopeSubMatIndex = nil
-            wep._rtScopeVElement = nil
         end
+
+        -- Restore previous CustomThink
+        if wep._rtScopePrevThink then
+            wep.CustomThink = wep._rtScopePrevThink
+            wep._rtScopePrevThink = nil
+        else
+            wep.CustomThink = nil
+        end
+
+        wep._rtScopeMatName = nil
+        wep._rtScopeVElement = nil
+        wep._rtScopeSubMatIndex = nil
     end
 end
 
