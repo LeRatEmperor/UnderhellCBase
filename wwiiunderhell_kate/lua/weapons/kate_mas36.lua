@@ -76,7 +76,7 @@ SWEP.Primary.ReloadTime = 0.5     -- per-shell insertion time
 SWEP.IronSightsPos = Vector(-3.575, 0, 1.41)
 SWEP.IronSightsAng = Vector(0.1, 0, 0)
 -- Reticle texture for RT scope (from TFA source scope_c.vtf)
-SWEP.ScopeReticle = "models/weapons/tfa_codww2/mas36/scope_c"
+SWEP.ScopeReticle = "scopes/scope_overlay_american"
 
 -- ACOG ironsight position (from TFA source)
 SWEP.IronSightsPos_ACOG = Vector(-2.601, -3, 0.888)
