@@ -149,10 +149,6 @@ hook.Add("RenderScene", "CUH_RTScope_RenderScene", function(origin, angles, fov)
 
     if isZooming then
         local size = wep.RT_Size or 512
-        -- render.PushRenderTarget already sets the viewport per the docs:
-        -- "Pushes the current render target and viewport to the RT stack
-        --  then sets a new current render target and viewport."
-        -- So we do NOT need a separate render.SetViewPort call.
         render.PushRenderTarget(wep.RenderTarget, 0, 0, size, size)
 
         local ang = ply:EyeAngles()
@@ -160,25 +156,20 @@ hook.Add("RenderScene", "CUH_RTScope_RenderScene", function(origin, angles, fov)
 
         -- CRITICAL: Set the suppress flag so DrawVElements (overridden
         -- per-instance) skips drawing during the RT render pass.
-        -- This prevents long barrels, suppressors, and front sights
-        -- from being drawn into the RT.
         wep._rtScopeSuppressVElem = true
 
         -- Render the 3D scene into the RT.
-        -- render.RenderView fills the entire RT, so no render.Clear needed.
-        -- CRITICAL: We do NOT call render.Clear because of GMod bug #2085:
-        -- "This sets the alpha incorrectly for surface draw calls for
-        --  render targets." Calling render.Clear would make the reticle
-        -- invisible (alpha 0) when drawn with surface.DrawTexturedRect.
+        -- No render.Clear (GMod bug #2085 breaks surface alpha on RTs).
         render.RenderView({
             x = 0, y = 0, w = size, h = size,
             origin = pos, angles = ang,
             drawviewmodel = false, drawhud = false,
             dopostprocess = false,
             fov = wep.ScopeFov or 8,
-            -- Push the near clip plane forward to clip any weapon geometry
-            -- that's very close to the camera.
-            znear = 8,
+            -- Use a small znear to avoid fisheye distortion.
+            -- Too high (8+) causes extreme close-range clipping that
+            -- looks like fisheye. Default is ~1.
+            znear = 1,
         })
 
         wep._rtScopeSuppressVElem = false
@@ -186,21 +177,46 @@ hook.Add("RenderScene", "CUH_RTScope_RenderScene", function(origin, angles, fov)
         -- ============================================================
         -- COMPOSITE RETICLE INTO THE RT (baked into lens texture)
         -- ============================================================
-        -- Draw the reticle texture on top of the 3D scene in the RT.
-        -- cam.Start2D works with the current render target (set by
-        -- PushRenderTarget). surface.DrawTexturedRect draws to the RT.
-        --
-        -- CRITICAL: We must NOT call render.Clear before this, because
-        -- GMod bug #2085 breaks surface alpha after render.Clear on RTs.
-        -- render.RenderView fills the entire RT, so clearing is unnecessary.
+        -- Draw TWO reticle layers on top of the 3D scene:
+        --   Layer 1: weapon's ScopeReticle (scope_c texture from TFA)
+        --   Layer 2: Underhell reticle (gmod/scope — the crossbow scope
+        --            texture used by Scout/G36K)
+        -- This dual-layer approach ensures the reticle appears even if
+        -- one texture fails to load.
         cam.Start2D()
+            -- Layer 1: weapon-specific scope_c reticle (if set)
             local reticleMat = GetReticleMaterial(wep)
             if reticleMat and not reticleMat:IsError() then
                 surface.SetDrawColor(255, 255, 255, 255)
                 surface.SetMaterial(reticleMat)
                 surface.DrawTexturedRect(0, 0, size, size)
             end
+
+            -- Layer 2: Underhell reticle (gmod/scope — always available)
+            -- This is the same texture family used by the Scout sniper
+            -- and G36K. It's a crosshair-style reticle that should
+            -- always be visible.
+            local uhReticle = Material("gmod/scope")
+            if uhReticle and not uhReticle:IsError() then
+                surface.SetDrawColor(255, 255, 255, 255)
+                surface.SetMaterial(uhReticle)
+                surface.DrawTexturedRect(0, 0, size, size)
+            end
         cam.End2D()
+
+        -- Debug: log texture status every 60 frames
+        if GetConVar("cuh_rt_scope_debug"):GetBool() then
+            _dbgCounter = _dbgCounter + 1
+            if _dbgCounter >= 60 then
+                _dbgCounter = 0
+                local r1 = GetReticleMaterial(wep)
+                local r2 = Material("gmod/scope")
+                print(string.format("[CUH RT] reticle1=%s err=%s | reticle2=gmod/scope err=%s",
+                    tostring(wep.ScopeReticle or "nil"),
+                    tostring(r1 and r1:IsError() or "nil"),
+                    tostring(r2 and r2:IsError() or "nil")))
+            end
+        end
 
         render.PopRenderTarget()
         render.SetViewPort(0, 0, ScrW(), ScrH())
