@@ -159,6 +159,12 @@ hook.Add("RenderScene", "CUH_RTScope_RenderScene", function(origin, angles, fov)
 
     if isZooming then
         local size = wep.RT_Size or 512
+
+        -- DEBUG: Confirm we're entering the zoom block
+        if GetConVar("cuh_rt_scope_debug"):GetBool() then
+            print("[CUH RT] ZOOM BLOCK ENTERED — compositing reticle onto RT")
+        end
+
         render.PushRenderTarget(wep.RenderTarget, 0, 0, size, size)
 
         local ang = ply:EyeAngles()
