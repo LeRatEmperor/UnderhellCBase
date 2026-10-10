@@ -161,9 +161,7 @@ hook.Add("RenderScene", "CUH_RTScope_RenderScene", function(origin, angles, fov)
         -- from being drawn into the RT.
         wep._rtScopeSuppressVElem = true
 
-        -- Render ONLY the 3D scene into the RT (no viewmodel, no HUD,
-        -- no reticle). The reticle is drawn as a 2D overlay in DrawHUD
-        -- (same approach as the Scout sniper and G36K).
+        -- Render the 3D scene into the RT
         render.RenderView({
             x = 0, y = 0, w = size, h = size,
             origin = pos, angles = ang,
@@ -177,6 +175,32 @@ hook.Add("RenderScene", "CUH_RTScope_RenderScene", function(origin, angles, fov)
 
         wep._rtScopeSuppressVElem = false
 
+        -- ============================================================
+        -- COMPOSITE RETICLE INTO THE RT (baked into lens texture)
+        -- ============================================================
+        -- The reticle is drawn INTO the RT texture so it appears baked
+        -- into the scope lens when the 3D weapon model renders.
+        -- This matches the Scout sniper approach: the lens material
+        -- shows the zoomed 3D scene WITH the reticle on top of it.
+        -- The area OUTSIDE the scope circle shows the normal game world.
+        cam.Start2D()
+            -- Draw the reticle texture on top of the 3D scene in the RT
+            local reticleMat = GetReticleMaterial(wep)
+            if reticleMat and not reticleMat:IsError() then
+                surface.SetDrawColor(255, 255, 255, 255)
+                surface.SetMaterial(reticleMat)
+                surface.DrawTexturedRect(0, 0, size, size)
+            end
+
+            -- Draw crosshair lines (thin, centered)
+            surface.SetDrawColor(0, 0, 0, 255)
+            local cx, cy = size / 2, size / 2
+            -- Horizontal line
+            surface.DrawRect(cx - size * 0.04, cy - 1, size * 0.08, 1)
+            -- Vertical line
+            surface.DrawRect(cx - 1, cy - size * 0.04, 1, size * 0.08)
+        cam.End2D()
+
         render.PopRenderTarget()
         render.SetViewPort(0, 0, ScrW(), ScrH())
         wep.ScopeTexture:SetTexture("$basetexture", wep.RenderTarget)
@@ -186,65 +210,6 @@ hook.Add("RenderScene", "CUH_RTScope_RenderScene", function(origin, angles, fov)
             wep.ScopeTexture:SetTexture("$basetexture", defaultTex)
         end
     end
-end)
-
--- ============================================================
--- HUD scope overlay: draws the 2D reticle/crosshair on screen
--- when zooming with a CUH RT scope. This matches the approach
--- used by the Scout sniper and G36K (Use2DScope system).
--- ============================================================
-local h_scope = 0
-
-hook.Add("HUDPaint", "CUH_RTScope_Reticle", function()
-    local ply = LocalPlayer()
-    if not IsValid(ply) then return end
-
-    local wep = ply:GetActiveWeapon()
-    if not IsValid(wep) then return end
-    if not wep.IsCUHWeapon then return end
-    if not wep.ScopeTexture then return end
-
-    -- Only draw when zooming
-    local isZooming = false
-    if wep.GetUHBool then
-        isZooming = wep:GetUHBool("Zooming") and not wep.ScopeDisabled
-    end
-    if not isZooming then
-        h_scope = math.Approach(h_scope or 0, 0, FrameTime() * 10)
-        return
-    end
-
-    -- Fade in
-    h_scope = math.Approach(h_scope or 0, 1, FrameTime() * 100)
-    if h_scope < 0.01 then return end
-
-    local w, h = ScrW(), ScrH()
-    -- Scope circle size (matches the base's 2D scope system)
-    local scopeSize = h * 1.25
-    local x = w / 2 - scopeSize / 2
-    local y = h / 2 - scopeSize / 2
-
-    -- Draw black border (screen boxing)
-    surface.SetDrawColor(0, 0, 0, 255 * h_scope)
-    surface.DrawRect(0, 0, x, h)
-    surface.DrawRect(x + scopeSize, 0, w - (x + scopeSize), h)
-    surface.DrawRect(x, 0, scopeSize, y)
-    surface.DrawRect(x, h - y, scopeSize, y)
-
-    -- Draw the reticle texture (scope lens overlay)
-    -- This is drawn on SCREEN, not composited into the RT.
-    -- The RT only contains the 3D scene; the reticle is a 2D HUD overlay.
-    local reticleMat = GetReticleMaterial(wep)
-    if reticleMat and not reticleMat:IsError() then
-        surface.SetDrawColor(0, 0, 0, 255)
-        surface.SetMaterial(reticleMat)
-        surface.DrawTexturedRect(x, y, scopeSize, scopeSize)
-    end
-
-    -- Draw crosshair lines over the scope (same as Scout/G36K)
-    surface.SetDrawColor(0, 0, 0, 255)
-    surface.DrawLine(0, h / 2, w, h / 2)       -- Horizontal
-    surface.DrawLine(w / 2, 0, w / 2, h)       -- Vertical
 end)
 
 -- ============================================================
