@@ -35,7 +35,7 @@ function ATTACHMENT:Attach(wep)
         -- every frame. Our custom material has no proxy, so SetTexture sticks.
         local matName = "kate_rt_scope_" .. wep:EntIndex()
         local mat = CreateMaterial(matName, "UnlitGeneric", {
-            ["$basetexture"] = "vgui/scope_lens",
+            ["$basetexture"] = "gmod/scope",
             ["$model"] = "1",
             ["$translucent"] = "1",
         })
