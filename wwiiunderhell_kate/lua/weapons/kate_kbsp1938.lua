@@ -53,7 +53,7 @@ SWEP.Primary.Automatic      = false
 SWEP.Primary.TakeAmmo       = 1
 SWEP.Primary.Force          = 1
 SWEP.Primary.Spread         = 0.05
-SWEP.Primary.Delay          = 0.2564       -- 60 / RPM(234)
+SWEP.Primary.Delay          = 1.0       -- 60 / RPM(234)
 SWEP.Primary.NumberofShots  = 1
 SWEP.Primary.MinRecoil      = -0.6          -- = -KickUp
 SWEP.Primary.MaxRecoil      = -0.5          -- = -KickDown
