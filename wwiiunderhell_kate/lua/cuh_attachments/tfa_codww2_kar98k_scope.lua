@@ -51,6 +51,12 @@ function ATTACHMENT:Attach(wep)
             ["$basetexture"] = "gmod/scope",
             ["$texture2"] = reticlePath,
             ["$model"] = "1",
+            -- Make the reticle overlay fully bright and visible.
+            -- $selfillum makes the texture glow at full brightness
+            -- regardless of scene lighting.
+            ["$selfillum"] = "1",
+            ["$selfillumtint"] = "[1 1 1]",
+            ["$color2"] = "[1 1 1]",
         })
         wep.ScopeTexture = mat
         wep._rtScopeMatName = matName
