@@ -960,14 +960,6 @@ if CLIENT then
         if not IsCustomUHWeapon(wep) then return end
         if not wep.ScopeTexture then return end
         if wep:GetUHBool("Zooming") and not wep.ScopeDisabled then
-            if not wep.RenderTarget then
-                local scale = ScrH() / 1080
-                local quality = { 256, 512, 768, 1080 }
-                local num = math.Clamp(GetConVar("uh_rt_quality"):GetInt(), 1, 4)
-                wep.RT_Size = quality[num] * scale
-                wep.RenderTarget = GetRenderTarget("CustomUH_ScopeRT_" .. wep:EntIndex(), wep.RT_Size, wep.RT_Size, false)
-            end
-            if not wep.RenderTarget then return end
             local size = wep.RT_Size or 512
             render.PushRenderTarget(wep.RenderTarget, 0, 0, size, size)
             local ang = LocalPlayer():EyeAngles()
@@ -980,37 +972,6 @@ if CLIENT then
             })
             render.PopRenderTarget()
             wep.ScopeTexture:SetTexture("$basetexture", wep.RenderTarget)
-
-            -- Deep debug: check basetexture after SetTexture
-            if not wep._rtDbgCt then wep._rtDbgCt = 0 end
-            wep._rtDbgCt = wep._rtDbgCt + 1
-            if wep._rtDbgCt >= 60 then
-                wep._rtDbgCt = 0
-                local bt = wep.ScopeTexture:GetTexture("$basetexture")
-                print("[RT-DBG] AFTER SetTexture(RT): basetexture=" .. tostring(bt))
-                -- Check VElement materials using GetMaterials()
-                if wep.ViewModelElements then
-                    for name, elem in pairs(wep.ViewModelElements) do
-                        if (name == "scope_default" or name == "scope_acog") and elem.active and IsValid(elem._csModel) then
-                            local mats = elem._csModel:GetMaterials()
-                            print("[RT-DBG] VElement '" .. name .. "' _csModel:GetMaterials() count: " .. (mats and #mats or 0))
-                            if mats then
-                                for i = 1, #mats do
-                                    print("[RT-DBG]   mat[" .. i .. "]: " .. tostring(mats[i]))
-                                    -- Check if this material matches our ScopeTexture
-                                    if mats[i] == "models/weapons/tfa_codww2/kar98k/mtl_generic_optic_ads_lens" then
-                                        print("[RT-DBG]   ^^^ THIS MATCHES ScopeTexture!")
-                                    end
-                                end
-                            end
-                            -- Also try GetMaterial on each sub-material
-                            local matCount = elem._csModel:GetNumBodyGroups and 0 or 0
-                            -- Try Entity:GetMaterial() (overall material override)
-                            print("[RT-DBG]   _csModel:GetMaterial() = " .. tostring(elem._csModel:GetMaterial()))
-                        end
-                    end
-                end
-            end
         else
             if wep.ScopeTexture then
                 wep.ScopeTexture:SetTexture("$basetexture", devzoom:GetTexture("$basetexture"))
