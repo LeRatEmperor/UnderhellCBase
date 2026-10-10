@@ -196,58 +196,26 @@ hook.Add("RenderScene", "CUH_RTScope_RenderScene", function(origin, angles, fov)
 end)
 
 -- ============================================================
--- Fix: Sensitivity stays low after deselecting scoped weapon
+-- Fix: Sensitivity stays low after deselecting scope attachment
 -- ============================================================
--- The base's AdjustMouseSensitivity returns the low scope sensitivity
--- when GetUHBool("Zooming") is true. When you switch weapons while
--- zoomed, the Zooming bool can stay true, or the Sensitivity field
--- leaks to the stat cache.
+-- When you detach a scope attachment, wep.Sensitivity is set to nil.
+-- But the base's AdjustMouseSensitivity has a check:
+--   if not hasScope and self.Sensitivity then hasScope = true end
+-- which can cause the low sensitivity to persist.
 --
--- Fix: Force-clear Zooming and explicitly set Sensitivity to nil
--- (not just remove it) when the player switches weapons or releases
--- right-click. Setting to nil via SetStat ensures the stat cache
--- is also cleared.
-hook.Add("PlayerSwitchWeapon", "CUH_ClearZoomOnSwitch", function(ply, old, new)
-    -- Clear Zooming on the old weapon when switching
-    if IsValid(old) and old.GetUHBool and old:GetUHBool("Zooming") then
-        old:SetUHBool("Zooming", false)
-    end
-    -- Also clear on the new weapon in case it inherited stale state
-    if IsValid(new) and new.GetUHBool and new:GetUHBool("Zooming") then
-        new:SetUHBool("Zooming", false)
-    end
-end)
-
--- Force-clear Zooming when the player releases right-click
-hook.Add("Tick", "CUH_ClearZoomOnRelease", function()
+-- Fix: Override AdjustMouseSensitivity on ALL CUH weapons via a
+-- Think hook that patches the method on any active CUH weapon.
+-- The override only returns the low sensitivity when ACTIVELY zooming.
+hook.Add("Think", "CUH_FixSensitivity", function()
     local ply = LocalPlayer()
     if not IsValid(ply) then return end
     local wep = ply:GetActiveWeapon()
     if not IsValid(wep) then return end
     if not wep.IsCUHWeapon then return end
-    if not wep.GetUHBool then return end
 
-    -- If Zooming is true but the player is NOT holding right-click, clear it
-    if wep:GetUHBool("Zooming") and not ply:KeyDown(IN_ATTACK2) then
-        wep:SetUHBool("Zooming", false)
-    end
-end)
-
--- ============================================================
--- Override AdjustMouseSensitivity for CUH weapons
--- ============================================================
--- The base's AdjustMouseSensitivity may return the low sensitivity
--- even when not zooming if the Sensitivity stat is cached. This
--- override ensures sensitivity is ONLY reduced when actively zooming.
--- We hook into the weapon's AdjustMouseSensitivity via a per-weapon
--- override installed when the weapon is deployed.
-hook.Add("PlayerWeaponDeployed", "CUH_FixSensitivityDeploy", function(ply, wep)
-    if not wep.IsCUHWeapon then return end
-
-    -- Override AdjustMouseSensitivity on this weapon instance
+    -- Override AdjustMouseSensitivity once per weapon instance
     if not wep._cuhSensOverride then
         wep._cuhSensOverride = true
-        local origAdjust = wep.AdjustMouseSensitivity
         wep.AdjustMouseSensitivity = function(self)
             -- Only return low sensitivity when ACTIVELY zooming
             if self.GetUHBool and self:GetUHBool("Zooming") then
@@ -256,6 +224,21 @@ hook.Add("PlayerWeaponDeployed", "CUH_FixSensitivityDeploy", function(ply, wep)
             -- Otherwise return nil (normal sensitivity)
             return nil
         end
+    end
+
+    -- Also force-clear Zooming if the player released right-click
+    if wep.GetUHBool and wep:GetUHBool("Zooming") and not ply:KeyDown(IN_ATTACK2) then
+        wep:SetUHBool("Zooming", false)
+    end
+end)
+
+-- Also clear Zooming on weapon switch
+hook.Add("PlayerSwitchWeapon", "CUH_ClearZoomOnSwitch", function(ply, old, new)
+    if IsValid(old) and old.GetUHBool and old:GetUHBool("Zooming") then
+        old:SetUHBool("Zooming", false)
+    end
+    if IsValid(new) and new.GetUHBool and new:GetUHBool("Zooming") then
+        new:SetUHBool("Zooming", false)
     end
 end)
 
