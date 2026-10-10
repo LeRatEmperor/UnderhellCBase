@@ -182,35 +182,50 @@ hook.Add("RenderScene", "CUH_RTScope_RenderScene", function(origin, angles, fov)
 
         -- CRITICAL: Clear the depth buffer after render.RenderView.
         -- render.RenderView leaves depth values from the 3D scene.
-        -- Without clearing, the 2D reticle draws (which use default
-        -- depth) get depth-tested out and never appear on the RT.
+        -- Without clearing, the 2D reticle draws get depth-tested out.
         render.ClearDepth()
 
         -- ============================================================
         -- COMPOSITE RETICLE INTO THE RT (baked into lens texture)
         -- ============================================================
-        -- Use render.SetMaterial + render.DrawScreenQuadEx (the render
-        -- library) instead of surface.* functions. The render library
-        -- is lower-level and more reliable inside PushRenderTarget.
-        -- We also cleared the depth buffer above so the draws appear.
+        -- Use render.OverrideBlend to force the reticle to draw on top
+        -- regardless of alpha/depth state. BLEND_ONE / BLEND_ONE with
+        -- BLENDFUNC_ADD = additive blending (reticle adds to the scene).
+        -- This is the most reliable way to composite onto an RT.
         local reticleMat = GetReticleMaterial(wep)
         if reticleMat and not reticleMat:IsError() then
             render.SetMaterial(reticleMat)
+            -- Force additive blending: Source*1 + Dest*1
+            render.OverrideBlend(true,
+                BLEND_ONE, BLEND_ONE, BLENDFUNC_ADD,
+                true,
+                BLEND_ONE, BLEND_ONE, BLENDFUNC_ADD)
             render.DrawScreenQuadEx(0, 0, size, size)
+            render.OverrideBlend(false)
         end
 
-        -- Layer 2: gmod/scope (GMod crossbow scope — always available)
+        -- Layer 2: gmod/scope
         local uhReticle = Material("gmod/scope")
         if uhReticle and not uhReticle:IsError() then
             render.SetMaterial(uhReticle)
+            render.OverrideBlend(true,
+                BLEND_ONE, BLEND_ONE, BLENDFUNC_ADD,
+                true,
+                BLEND_ONE, BLEND_ONE, BLENDFUNC_ADD)
             render.DrawScreenQuadEx(0, 0, size, size)
+            render.OverrideBlend(false)
         end
 
-        -- Layer 3: Scout sniper lens texture (the actual Underhell reticle)
+        -- Layer 3: Scout sniper lens texture
         local scoutLens = Material("models/weapons/v_models/sniper_scout/lens")
         if scoutLens and not scoutLens:IsError() then
             render.SetMaterial(scoutLens)
+            render.OverrideBlend(true,
+                BLEND_ONE, BLEND_ONE, BLENDFUNC_ADD,
+                true,
+                BLEND_ONE, BLEND_ONE, BLENDFUNC_ADD)
             render.DrawScreenQuadEx(0, 0, size, size)
+            render.OverrideBlend(false)
         end
 
         render.PopRenderTarget()
