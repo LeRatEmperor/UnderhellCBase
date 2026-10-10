@@ -1,0 +1,9 @@
+# FingerVar
+
+**Realm:** Shared  ·  **Members:** 0  ·  **Inherits:** `Panel`  ·  `INTERNAL`
+
+A panel used by Sandbox's Finger Poser tool.
+
+[wiki page](https://wiki.facepunch.com/gmod/FingerVar)
+
+
