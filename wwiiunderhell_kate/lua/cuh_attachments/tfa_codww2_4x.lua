@@ -43,10 +43,14 @@ function ATTACHMENT:Attach(wep)
         -- so no TFA proxy can touch it). UnlitGeneric has no proxy support,
         -- so SetTexture sticks permanently.
         local matName = "kate_rt_scope_" .. wep:EntIndex()
-        local mat = CreateMaterial(matName, "UnlitGeneric", {
+        -- Use Unlittwotexture shader: $basetexture gets the RT (3D scene),
+        -- $texture2 gets the reticle texture (static, always visible on top).
+        -- This is how the RPG-7 and Scout sniper keep the reticle visible.
+        local reticlePath = wep.ScopeReticle or "gmod/scope"
+        local mat = CreateMaterial(matName, "Unlittwotexture", {
             ["$basetexture"] = "gmod/scope",
+            ["$texture2"] = reticlePath,
             ["$model"] = "1",
-            ["$translucent"] = "1",
         })
         wep.ScopeTexture = mat
         wep._rtScopeMatName = matName
@@ -173,30 +177,12 @@ function ATTACHMENT:Attach(wep)
                     --      DrawModel again (this time it draws normally,
                     --      WITH our sub-material)
                     --   6. Our RenderOverride restores itself for next frame
-                    -- Set TWO sub-materials: lens (RT) + reticle (scope_c texture)
-                    -- The reticle renders ABOVE the RT lens on the scope model
-                    local reticleIdx = nil
-                    if mats and #mats > 0 then
-                        for i = 1, #mats do
-                            if (i - 1) ~= lensIdx then
-                                reticleIdx = i - 1
-                                break
-                            end
-                        end
-                    end
-                    if not reticleIdx then reticleIdx = 0 end
-                    w._rtScopeReticleIdx = reticleIdx
-
                     csModel.RenderOverride = function(self)
                         -- Set the RT on the lens material
                         if w._rtScopeMatName then
                             self:SetSubMaterial(w._rtScopeSubMatIndex or 0, "!" .. w._rtScopeMatName)
                         end
 
-                        -- Set the reticle texture on the OTHER material index
-                        if w.ScopeReticle then
-                            self:SetSubMaterial(w._rtScopeReticleIdx or 0, w.ScopeReticle)
-                        end
 
                         -- Temporarily remove RenderOverride so DrawModel
                         -- does the actual rendering (not recursion)

@@ -43,10 +43,14 @@ function ATTACHMENT:Attach(wep)
         -- so no TFA proxy can touch it). UnlitGeneric has no proxy support,
         -- so SetTexture sticks permanently.
         local matName = "kate_rt_scope_" .. wep:EntIndex()
-        local mat = CreateMaterial(matName, "UnlitGeneric", {
+        -- Use Unlittwotexture shader: $basetexture gets the RT (3D scene),
+        -- $texture2 gets the reticle texture (static, always visible on top).
+        -- This is how the RPG-7 and Scout sniper keep the reticle visible.
+        local reticlePath = wep.ScopeReticle or "gmod/scope"
+        local mat = CreateMaterial(matName, "Unlittwotexture", {
             ["$basetexture"] = "gmod/scope",
+            ["$texture2"] = reticlePath,
             ["$model"] = "1",
-            ["$translucent"] = "1",
         })
         wep.ScopeTexture = mat
         wep._rtScopeMatName = matName
@@ -191,9 +195,6 @@ function ATTACHMENT:Attach(wep)
 
                         -- Set the reticle texture on the OTHER material index
                         -- The scope_c texture is the reticle that renders above the RT
-                        if w.ScopeReticle then
-                            self:SetSubMaterial(w._rtScopeReticleIdx or 0, w.ScopeReticle)
-                        end
 
                         -- Temporarily remove RenderOverride so DrawModel
                         -- does the actual rendering (not recursion)
