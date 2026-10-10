@@ -68,11 +68,23 @@ function ATTACHMENT:Attach(wep)
         -- SetNoDraw doesn't help because DrawModel() is called explicitly.
         -- This per-instance override checks the _rtScopeSuppressVElem flag
         -- set by the RenderScene hook in cuh_rt_scope_render.lua.
-        wep._rtScopePrevDrawVE = wep.DrawVElements
-        wep.DrawVElements = function(self, vm)
-            if self._rtScopeSuppressVElem then return end
-            if self._rtScopePrevDrawVE then
-                self._rtScopePrevDrawVE(self, vm)
+        -- CRITICAL: capture prevDrawVE as a LOCAL upvalue (NOT a weapon
+        -- table field). Reading self._rtScopePrevDrawVE at call time causes
+        -- infinite recursion when Attach() runs a second time (the field
+        -- then points to our own closure). Same bug pattern as CustomThink.
+        -- Gate with _rtScopeDrawVEHooked so we only hook once per weapon.
+        if not wep._rtScopeDrawVEHooked then
+            wep._rtScopeDrawVEHooked = true
+            local prevDrawVE = wep.DrawVElements
+            wep._rtScopePrevDrawVE = prevDrawVE
+
+            wep.DrawVElements = function(self, vm)
+                if self._rtScopeSuppressVElem then return end
+                -- Call previous DrawVElements via the LOCAL upvalue.
+                -- NEVER call ourselves (recursion guard).
+                if prevDrawVE and prevDrawVE ~= self.DrawVElements then
+                    prevDrawVE(self, vm)
+                end
             end
         end
 
@@ -224,6 +236,7 @@ function ATTACHMENT:Detach(wep)
         wep._rtScopeVElement = nil
         wep._rtScopeSubMatIndex = nil
         wep._rtScopeHooked = nil
+        wep._rtScopeDrawVEHooked = nil
         -- Restore original DrawVElements
         if wep._rtScopePrevDrawVE then
             wep.DrawVElements = wep._rtScopePrevDrawVE
