@@ -68,6 +68,9 @@ SWEP.AnimatedSprint = true
 -- Ironsights (from TFA source)
 SWEP.IronSightsPos = Vector(-3.343, 0, 1.22)
 SWEP.IronSightsAng = Vector(0.75, 0, 0)
+-- Reticle texture for 4x ACOG RT scope
+SWEP.ScopeReticle = "scopes/scope_overlay_mp"
+
 -- ACOG ironsight position (from TFA source)
 SWEP.IronSightsPos_ACOG = Vector(-1.875, 0, 0.643)
 SWEP.IronSightsAng_ACOG = Vector(0, 0, 0)

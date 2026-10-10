@@ -68,6 +68,9 @@ SWEP.AnimatedSprint = true
 -- Ironsights (from TFA source)
 SWEP.IronSightsPos = Vector(-4.184, -2.75, 1.3)
 SWEP.IronSightsAng = Vector(0.2, 0, 0)
+-- Reticle texture for Lens Sight RT scope
+SWEP.ScopeReticle = "scopes/scope_overlay_mp"
+
 -- LENS ironsight position (from TFA source)
 SWEP.IronSightsPos_LENS = Vector(-4.175, -2.75, 1.3)
 SWEP.IronSightsAng_LENS = Vector(0, 0, 0)
