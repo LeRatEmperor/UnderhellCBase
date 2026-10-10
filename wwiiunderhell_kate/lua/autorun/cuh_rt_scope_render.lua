@@ -169,12 +169,7 @@ hook.Add("RenderScene", "CUH_RTScope_RenderScene", function(origin, angles, fov)
         -- per-instance) skips drawing during the RT render pass.
         wep._rtScopeSuppressVElem = true
 
-        -- Render ONLY the 3D scene into the RT.
-        -- NO reticle compositing — the reticle is part of the scope
-        -- model's texture, NOT composited into the RT. This matches
-        -- how the Scout sniper works: the RT only contains the 3D
-        -- scene, and the reticle renders as a texture on the scope
-        -- model above the RT lens.
+        -- Render the 3D scene into the RT.
         render.RenderView({
             x = 0, y = 0, w = size, h = size,
             origin = pos, angles = ang,
@@ -185,6 +180,24 @@ hook.Add("RenderScene", "CUH_RTScope_RenderScene", function(origin, angles, fov)
         })
 
         wep._rtScopeSuppressVElem = false
+
+        -- ============================================================
+        -- COMPOSITE RETICLE ONTO THE RT
+        -- ============================================================
+        -- render.RenderView resets the render target to the screen.
+        -- We must re-set the RT before drawing the reticle.
+        render.SetRenderTarget(wep.RenderTarget)
+        render.SetViewPort(0, 0, size, size)
+        render.ClearDepth()
+
+        -- Draw the reticle overlay using render.DrawScreenQuadEx.
+        -- This is a 3D render operation (full-screen quad), not a 2D
+        -- surface draw, so it works inside PushRenderTarget contexts.
+        local reticleMat = GetReticleMaterial(wep)
+        if reticleMat and not reticleMat:IsError() then
+            render.SetMaterial(reticleMat)
+            render.DrawScreenQuadEx(0, 0, size, size)
+        end
 
         render.PopRenderTarget()
         render.SetViewPort(0, 0, ScrW(), ScrH())

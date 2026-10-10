@@ -43,20 +43,13 @@ function ATTACHMENT:Attach(wep)
         -- so no TFA proxy can touch it). UnlitGeneric has no proxy support,
         -- so SetTexture sticks permanently.
         local matName = "kate_rt_scope_" .. wep:EntIndex()
-        -- Use Unlittwotexture shader: $basetexture gets the RT (3D scene),
-        -- $texture2 gets the reticle texture (static, always visible on top).
-        -- This is how the RPG-7 and Scout sniper keep the reticle visible.
-        local reticlePath = wep.ScopeReticle or "gmod/scope"
-        local mat = CreateMaterial(matName, "Unlittwotexture", {
+        -- Use UnlitGeneric shader (bright RT, no darkening).
+        -- The reticle is composited onto the RT in the RenderScene hook
+        -- via render.SetRenderTarget + render.DrawScreenQuadEx.
+        local mat = CreateMaterial(matName, "UnlitGeneric", {
             ["$basetexture"] = "gmod/scope",
-            ["$texture2"] = reticlePath,
             ["$model"] = "1",
-            -- Make the reticle overlay fully bright and visible.
-            -- $selfillum makes the texture glow at full brightness
-            -- regardless of scene lighting.
-            ["$selfillum"] = "1",
-            ["$selfillumtint"] = "[1 1 1]",
-            ["$color2"] = "[1 1 1]",
+            ["$translucent"] = "1",
         })
         wep.ScopeTexture = mat
         wep._rtScopeMatName = matName
