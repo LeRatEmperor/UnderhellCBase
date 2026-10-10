@@ -160,11 +160,6 @@ hook.Add("RenderScene", "CUH_RTScope_RenderScene", function(origin, angles, fov)
     if isZooming then
         local size = wep.RT_Size or 512
 
-        -- DEBUG: Confirm we're entering the zoom block
-        if GetConVar("cuh_rt_scope_debug"):GetBool() then
-            print("[CUH RT] ZOOM BLOCK ENTERED — compositing reticle onto RT")
-        end
-
         render.PushRenderTarget(wep.RenderTarget, 0, 0, size, size)
 
         local ang = ply:EyeAngles()
@@ -174,7 +169,12 @@ hook.Add("RenderScene", "CUH_RTScope_RenderScene", function(origin, angles, fov)
         -- per-instance) skips drawing during the RT render pass.
         wep._rtScopeSuppressVElem = true
 
-        -- Render the 3D scene into the RT.
+        -- Render ONLY the 3D scene into the RT.
+        -- NO reticle compositing — the reticle is part of the scope
+        -- model's texture, NOT composited into the RT. This matches
+        -- how the Scout sniper works: the RT only contains the 3D
+        -- scene, and the reticle renders as a texture on the scope
+        -- model above the RT lens.
         render.RenderView({
             x = 0, y = 0, w = size, h = size,
             origin = pos, angles = ang,
@@ -185,56 +185,6 @@ hook.Add("RenderScene", "CUH_RTScope_RenderScene", function(origin, angles, fov)
         })
 
         wep._rtScopeSuppressVElem = false
-
-        -- CRITICAL: render.RenderView resets the current render target
-        -- back to the screen. We must re-set the RT before drawing the
-        -- reticle, otherwise the 2D draws go to the screen (invisible)
-        -- instead of the RT.
-        render.SetRenderTarget(wep.RenderTarget)
-        render.ClearDepth()
-
-        -- ============================================================
-        -- COMPOSITE RETICLE INTO THE RT (baked into lens texture)
-        -- ============================================================
-        -- Use cam.Start2D + surface.* functions (the surface library,
-        -- not the render library). The surface library is what the
-        -- base's DrawHUD uses successfully for 2D drawing.
-        -- The render library (render.DrawScreenQuadEx) is not appearing
-        -- on the RT, possibly due to projection matrix issues.
-        cam.Start2D()
-            -- Layer 1: weapon-specific scope_c reticle (if set)
-            local reticleMat = GetReticleMaterial(wep)
-            if reticleMat and not reticleMat:IsError() then
-                surface.SetDrawColor(255, 255, 255, 255)
-                surface.SetMaterial(reticleMat)
-                surface.DrawTexturedRect(0, 0, size, size)
-            end
-
-            -- Layer 2: gmod/scope (GMod crossbow scope — always available)
-            local uhReticle = Material("gmod/scope")
-            if uhReticle and not uhReticle:IsError() then
-                surface.SetDrawColor(255, 255, 255, 255)
-                surface.SetMaterial(uhReticle)
-                surface.DrawTexturedRect(0, 0, size, size)
-            end
-
-            -- Layer 3: Scout sniper lens texture
-            local scoutLens = Material("models/weapons/v_models/sniper_scout/lens")
-            if scoutLens and not scoutLens:IsError() then
-                surface.SetDrawColor(255, 255, 255, 255)
-                surface.SetMaterial(scoutLens)
-                surface.DrawTexturedRect(0, 0, size, size)
-            end
-
-            -- DEBUG: Draw a simple colored rect to confirm 2D drawing
-            -- works at all on the RT. If this appears, the issue is
-            -- with the reticle textures. If it doesn't, the issue is
-            -- with the 2D rendering context itself.
-            if GetConVar("cuh_rt_scope_debug"):GetBool() then
-                surface.SetDrawColor(255, 0, 0, 128)  -- semi-transparent red
-                surface.DrawRect(size/2 - 50, size/2 - 50, 100, 100)
-            end
-        cam.End2D()
 
         render.PopRenderTarget()
         render.SetViewPort(0, 0, ScrW(), ScrH())

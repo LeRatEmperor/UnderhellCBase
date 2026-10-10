@@ -173,10 +173,29 @@ function ATTACHMENT:Attach(wep)
                     --      DrawModel again (this time it draws normally,
                     --      WITH our sub-material)
                     --   6. Our RenderOverride restores itself for next frame
+                    -- Set TWO sub-materials: lens (RT) + reticle (scope_c texture)
+                    -- The reticle renders ABOVE the RT lens on the scope model
+                    local reticleIdx = nil
+                    if mats and #mats > 0 then
+                        for i = 1, #mats do
+                            if (i - 1) ~= lensIdx then
+                                reticleIdx = i - 1
+                                break
+                            end
+                        end
+                    end
+                    if not reticleIdx then reticleIdx = 0 end
+                    w._rtScopeReticleIdx = reticleIdx
+
                     csModel.RenderOverride = function(self)
-                        -- Set the sub-material RIGHT BEFORE drawing
+                        -- Set the RT on the lens material
                         if w._rtScopeMatName then
                             self:SetSubMaterial(w._rtScopeSubMatIndex or 0, "!" .. w._rtScopeMatName)
+                        end
+
+                        -- Set the reticle texture on the OTHER material index
+                        if w.ScopeReticle then
+                            self:SetSubMaterial(w._rtScopeReticleIdx or 0, w.ScopeReticle)
                         end
 
                         -- Temporarily remove RenderOverride so DrawModel

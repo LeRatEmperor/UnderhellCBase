@@ -156,9 +156,25 @@ function ATTACHMENT:Attach(wep)
                     end
 
                     -- Install RenderOverride on the csModel.
+                    -- Set TWO sub-materials: lens (RT) + reticle (scope_c texture)
+                    local reticleIdx = nil
+                    if mats and #mats > 0 then
+                        for i = 1, #mats do
+                            if (i - 1) ~= lensIdx then
+                                reticleIdx = i - 1
+                                break
+                            end
+                        end
+                    end
+                    if not reticleIdx then reticleIdx = 0 end
+                    w._rtScopeReticleIdx = reticleIdx
+
                     csModel.RenderOverride = function(self)
                         if w._rtScopeMatName then
                             self:SetSubMaterial(w._rtScopeSubMatIndex or 0, "!" .. w._rtScopeMatName)
+                        end
+                        if w.ScopeReticle then
+                            self:SetSubMaterial(w._rtScopeReticleIdx or 0, w.ScopeReticle)
                         end
                         local savedOverride = self.RenderOverride
                         self.RenderOverride = nil

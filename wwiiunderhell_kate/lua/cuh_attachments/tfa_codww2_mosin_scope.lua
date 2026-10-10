@@ -163,24 +163,36 @@ function ATTACHMENT:Attach(wep)
                     -- AFTER DrawVElements calls SetModel (which resets submats),
                     -- but BEFORE the actual draw.
                     --
-                    -- How it works:
-                    --   1. DrawVElements calls model:SetModel(elem.model)
-                    --      -> resets all sub-materials
-                    --   2. DrawVElements calls model:DrawModel()
-                    --   3. DrawModel sees RenderOverride is set, calls it
-                    --   4. Our RenderOverride calls SetSubMaterial (sets our RT mat)
-                    --   5. Our RenderOverride temporarily nils itself, calls
-                    --      DrawModel again (this time it draws normally,
-                    --      WITH our sub-material)
-                    --   6. Our RenderOverride restores itself for next frame
+                    -- We set TWO sub-materials:
+                    --   1. The LENS material (index = lensIdx) -> our RT material
+                    --   2. The RETICLE material (the OTHER index) -> scope_c texture
+                    --
+                    -- The reticle is a texture on the scope model that renders
+                    -- ABOVE the RT lens (same approach as the Scout sniper).
+                    -- It is NOT composited into the RT.
+                    local reticleIdx = nil
+                    if mats and #mats > 0 then
+                        for i = 1, #mats do
+                            if (i - 1) ~= lensIdx then
+                                reticleIdx = i - 1
+                                break
+                            end
+                        end
+                    end
+                    -- Default reticle to index 0 if lens is at 1
+                    if not reticleIdx then reticleIdx = 0 end
+                    w._rtScopeReticleIdx = reticleIdx
+
                     csModel.RenderOverride = function(self)
-                        -- Set the sub-material RIGHT BEFORE drawing
+                        -- Set the RT on the lens material
                         if w._rtScopeMatName then
-                            -- CRITICAL: CreateMaterial names MUST be prefixed with "!"
-                            -- when used with SetSubMaterial. Without "!", GMod looks
-                            -- for a .vmt file on disk (which doesn't exist) and the
-                            -- override silently fails.
                             self:SetSubMaterial(w._rtScopeSubMatIndex or 0, "!" .. w._rtScopeMatName)
+                        end
+
+                        -- Set the reticle texture on the OTHER material index
+                        -- The scope_c texture is the reticle that renders above the RT
+                        if w.ScopeReticle then
+                            self:SetSubMaterial(w._rtScopeReticleIdx or 0, w.ScopeReticle)
                         end
 
                         -- Temporarily remove RenderOverride so DrawModel
