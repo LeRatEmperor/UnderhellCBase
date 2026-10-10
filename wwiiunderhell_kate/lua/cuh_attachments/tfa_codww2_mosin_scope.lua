@@ -149,7 +149,11 @@ function ATTACHMENT:Attach(wep)
                     csModel.RenderOverride = function(self)
                         -- Set the sub-material RIGHT BEFORE drawing
                         if w._rtScopeMatName then
-                            self:SetSubMaterial(w._rtScopeSubMatIndex or 0, w._rtScopeMatName)
+                            -- CRITICAL: CreateMaterial names MUST be prefixed with "!"
+                            -- when used with SetSubMaterial. Without "!", GMod looks
+                            -- for a .vmt file on disk (which doesn't exist) and the
+                            -- override silently fails.
+                            self:SetSubMaterial(w._rtScopeSubMatIndex or 0, "!" .. w._rtScopeMatName)
                         end
 
                         -- Temporarily remove RenderOverride so DrawModel
