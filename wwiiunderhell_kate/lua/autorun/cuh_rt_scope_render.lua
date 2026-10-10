@@ -194,29 +194,33 @@ hook.Add("RenderScene", "CUH_RTScope_RenderScene", function(origin, angles, fov)
         -- ============================================================
         -- COMPOSITE RETICLE INTO THE RT (baked into lens texture)
         -- ============================================================
-        -- Simple approach: render.SetMaterial + render.DrawScreenQuadEx
-        -- No render.OverrideBlend (the signature is complex and was
-        -- causing errors). The depth buffer is cleared above so the
-        -- draws should appear on top of the 3D scene.
-        local reticleMat = GetReticleMaterial(wep)
-        if reticleMat and not reticleMat:IsError() then
-            render.SetMaterial(reticleMat)
-            render.DrawScreenQuadEx(0, 0, size, size)
-        end
+        -- Use cam.Start2D to set up the 2D projection matrix (required
+        -- for render.DrawScreenQuadEx to know the coordinate space),
+        -- then use render.SetMaterial + render.DrawScreenQuadEx to draw.
+        -- cam.Start2D is "almost always used with a render target from
+        -- the render library" per the glua skill reference.
+        cam.Start2D()
+            -- Layer 1: weapon-specific scope_c reticle (if set)
+            local reticleMat = GetReticleMaterial(wep)
+            if reticleMat and not reticleMat:IsError() then
+                render.SetMaterial(reticleMat)
+                render.DrawScreenQuadEx(0, 0, size, size)
+            end
 
-        -- Layer 2: gmod/scope
-        local uhReticle = Material("gmod/scope")
-        if uhReticle and not uhReticle:IsError() then
-            render.SetMaterial(uhReticle)
-            render.DrawScreenQuadEx(0, 0, size, size)
-        end
+            -- Layer 2: gmod/scope (GMod crossbow scope — always available)
+            local uhReticle = Material("gmod/scope")
+            if uhReticle and not uhReticle:IsError() then
+                render.SetMaterial(uhReticle)
+                render.DrawScreenQuadEx(0, 0, size, size)
+            end
 
-        -- Layer 3: Scout sniper lens texture
-        local scoutLens = Material("models/weapons/v_models/sniper_scout/lens")
-        if scoutLens and not scoutLens:IsError() then
-            render.SetMaterial(scoutLens)
-            render.DrawScreenQuadEx(0, 0, size, size)
-        end
+            -- Layer 3: Scout sniper lens texture
+            local scoutLens = Material("models/weapons/v_models/sniper_scout/lens")
+            if scoutLens and not scoutLens:IsError() then
+                render.SetMaterial(scoutLens)
+                render.DrawScreenQuadEx(0, 0, size, size)
+            end
+        cam.End2D()
 
         render.PopRenderTarget()
         render.SetViewPort(0, 0, ScrW(), ScrH())
