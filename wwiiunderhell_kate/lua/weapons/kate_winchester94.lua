@@ -75,6 +75,9 @@ SWEP.Primary.ReloadTime = 0.5
 -- Ironsights (from TFA source)
 SWEP.IronSightsPos = Vector(-3.9, -2, 1.2)
 SWEP.IronSightsAng = Vector(0.2, 0, 0)
+-- Reticle texture for RT scope (from TFA source scope_c.vtf)
+SWEP.ScopeReticle = "models/weapons/tfa_codww2/winchester94/scope_c"
+
 -- ACOG ironsight position (from TFA source)
 SWEP.IronSightsPos_ACOG = Vector(-3.04, -4.5, 0.045)
 SWEP.IronSightsAng_ACOG = Vector(0, 0, 0)

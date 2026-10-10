@@ -73,6 +73,9 @@ SWEP.IronSightsPos = Vector(-3.9, -4, 0.82)
 SWEP.IronSightsPos_7X = Vector(-3.896, -3, 0.325)
 SWEP.IronSightsAng_7X = Vector(0, 0, 0)
 SWEP.IronSightsAng = Vector(0, 0, 0)
+-- Reticle texture for RT scope (from TFA source scope_c.vtf)
+SWEP.ScopeReticle = "models/weapons/tfa_codww2/springfield/scope_c"
+
 -- ACOG ironsight position (from TFA source)
 SWEP.IronSightsPos_ACOG = Vector(-2.865, -3, 0.149)
 SWEP.IronSightsAng_ACOG = Vector(0, 0, 0)

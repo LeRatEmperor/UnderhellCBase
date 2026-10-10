@@ -23,11 +23,14 @@ local RETICLE_CANDIDATES = {
 }
 
 local function GetReticleMaterial(wep)
-    -- Allow weapon to override the reticle path
-    if wep.ScopeReticle and Material(wep.ScopeReticle):IsError() == false then
-        return Material(wep.ScopeReticle)
+    -- Use the weapon's ScopeReticle path if set (per-weapon scope_c texture)
+    if wep.ScopeReticle then
+        local mat = Material(wep.ScopeReticle)
+        if mat and not mat:IsError() then
+            return mat
+        end
     end
-    -- Default: gmod/scope (crosshair reticle)
+    -- Fallback: gmod/scope (GMod default crossbow scope)
     return Material("gmod/scope")
 end
 
@@ -178,28 +181,17 @@ hook.Add("RenderScene", "CUH_RTScope_RenderScene", function(origin, angles, fov)
         -- ============================================================
         -- COMPOSITE RETICLE INTO THE RT (baked into lens texture)
         -- ============================================================
-        -- The reticle is drawn INTO the RT texture so it appears baked
-        -- into the scope lens when the 3D weapon model renders.
-        -- This matches the Scout sniper approach: the lens material
-        -- shows the zoomed 3D scene WITH the reticle on top of it.
-        -- The area OUTSIDE the scope circle shows the normal game world.
-        cam.Start2D()
-            -- Draw the reticle texture on top of the 3D scene in the RT
-            local reticleMat = GetReticleMaterial(wep)
-            if reticleMat and not reticleMat:IsError() then
-                surface.SetDrawColor(255, 255, 255, 255)
-                surface.SetMaterial(reticleMat)
-                surface.DrawTexturedRect(0, 0, size, size)
-            end
-
-            -- Draw crosshair lines (thin, centered)
-            surface.SetDrawColor(0, 0, 0, 255)
-            local cx, cy = size / 2, size / 2
-            -- Horizontal line
-            surface.DrawRect(cx - size * 0.04, cy - 1, size * 0.08, 1)
-            -- Vertical line
-            surface.DrawRect(cx - 1, cy - size * 0.04, 1, size * 0.08)
-        cam.End2D()
+        -- Use render.SetMaterial + render.DrawScreenQuadEx (the render
+        -- library approach) instead of surface.* functions. The render
+        -- library is more reliable inside PushRenderTarget contexts.
+        -- This matches what the TFA TFA_COD_Scope C++ proxy does:
+        -- composite the weapon's scope_c reticle texture on top of the
+        -- zoomed 3D scene in the RT.
+        local reticleMat = GetReticleMaterial(wep)
+        if reticleMat and not reticleMat:IsError() then
+            render.SetMaterial(reticleMat)
+            render.DrawScreenQuadEx(0, 0, size, size)
+        end
 
         render.PopRenderTarget()
         render.SetViewPort(0, 0, ScrW(), ScrH())
