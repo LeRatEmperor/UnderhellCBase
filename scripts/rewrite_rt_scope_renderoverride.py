@@ -1,30 +1,82 @@
-if not ATTACHMENT then ATTACHMENT = {} end
+#!/usr/bin/env python3
+"""
+Rewrite RT scope attachment files to use RenderOverride approach.
 
-ATTACHMENT.Name = "Mosin Scope"
-ATTACHMENT.ShortName = "SCOPE"
-ATTACHMENT.Icon = "entities/tfa_codww2_scope.png"
-ATTACHMENT.Description = {
-    Color(255, 255, 255), "Mosin Scope",
-    Color(255, 100, 100), "+25% Zoom time",
+WHY PREVIOUS APPROACHES FAILED:
+  1. SetSubMaterial in CustomThink:
+     - DrawVElements calls model:SetModel(elem.model) every frame
+       BEFORE model:DrawModel()
+     - SetModel resets all sub-material overrides
+     - So our SetSubMaterial (called in Think, before rendering) was wiped
+
+  2. Material Shadowing (CreateMaterial with VMT name):
+     - CreateMaterial with the same name as the TFA lens VMT did NOT
+       remove the TFA_COD_Scope proxy
+     - The proxy still runs every frame, resetting $basetexture to
+       vgui/scope_lens (overwriting our SetTexture call)
+     - Confirmed by dump: basetexture was vgui/scope_lens, not gmod/scope
+
+NEW APPROACH (RenderOverride):
+  - Create a UNIQUE material name (no conflict with VMTs, no proxy)
+  - In CustomThink, set csModel.RenderOverride to a function that:
+      1. Calls SetSubMaterial with our RT material
+      2. Temporarily nils RenderOverride
+      3. Calls DrawModel (which now draws normally, WITH our sub-material)
+      4. Restores RenderOverride
+  - This injects SetSubMaterial at the EXACT right moment: AFTER
+    DrawVElements' SetModel call, but BEFORE the actual draw.
+
+LENS MATERIAL INDEX:
+  The dump showed TWO lens candidates:
+    [0] mtl_rus_nagant_optics_02
+    [1] mtl_generic_optic_ads_lens  <-- THIS is the actual lens
+  The TFA COD scope system uses "mtl_generic_optic_ads_lens" as the
+  glass lens material. We now target index 1 (or search for it by name).
+"""
+
+import os
+
+ATTACHMENTS_DIR = "/home/z/my-project/wwiiunderhell_kate/lua/cuh_attachments"
+
+FILES = {
+    "tfa_codww2_mosin_scope.lua":      ("scope_default", 7, 15, "Mosin Scope"),
+    "tfa_codww2_arisaka_scope.lua":    ("scope_default", 7, 15, "Arisaka Scope"),
+    "tfa_codww2_springfield_scope.lua":("scope_default", 7, 15, "Springfield Scope"),
+    "tfa_codww2_kar98k_scope.lua":     ("scope_default", 7, 15, "Kar98k Scope"),
+    "tfa_codww2_enfield_scope.lua":    ("scope_default", 7, 15, "Enfield Scope"),
+    "tfa_codww2_scope.lua":            ("scope_default", 7, 15, "7x Scope"),
+    "tfa_codww2_4x.lua":               ("scope_acog",   15, 25, "4x ACOG"),
 }
 
-ATTACHMENT.WeaponTable = {
-    ["VElements"] = {
-        ["scope_default"] = { ["active"] = true },
-    },
-    ["WElements"] = {
-        ["scope_default"] = { ["active"] = true },
-    },
-    ["ScopeFov"] = 7,
-    ["ZoomFov"] = 15,
+
+def make_file(velem_name, scope_fov, zoom_fov, display_name):
+    return f'''if not ATTACHMENT then ATTACHMENT = {{}} end
+
+ATTACHMENT.Name = "{display_name}"
+ATTACHMENT.ShortName = "SCOPE"
+ATTACHMENT.Icon = "entities/tfa_codww2_scope.png"
+ATTACHMENT.Description = {{
+    Color(255, 255, 255), "{display_name}",
+    Color(255, 100, 100), "+25% Zoom time",
+}}
+
+ATTACHMENT.WeaponTable = {{
+    ["VElements"] = {{
+        ["{velem_name}"] = {{ ["active"] = true }},
+    }},
+    ["WElements"] = {{
+        ["{velem_name}"] = {{ ["active"] = true }},
+    }},
+    ["ScopeFov"] = {scope_fov},
+    ["ZoomFov"] = {zoom_fov},
     ["Sensitivity"] = 0.2,
     ["IronSightsPos"] = function(wep, val) return wep.IronSightsPos_7X or wep.IronSightsPos_ACOG or val end,
     ["IronSightsAng"] = function(wep, val) return wep.IronSightsAng_7X or wep.IronSightsAng_ACOG or val end,
-}
+}}
 
 function ATTACHMENT:Attach(wep)
-    wep.ScopeFov = 7
-    wep.ZoomFov = 15
+    wep.ScopeFov = {scope_fov}
+    wep.ZoomFov = {zoom_fov}
     wep.ScopeDisabled = false
     wep.Sensitivity = 0.2
     wep.Use2DScope = false
@@ -33,7 +85,7 @@ function ATTACHMENT:Attach(wep)
         -- Initialize RenderTarget
         if not wep.RenderTarget then
             local scale = ScrH() / 1080
-            local quality = { 256, 512, 768, 1080 }
+            local quality = {{ 256, 512, 768, 1080 }}
             local num = math.Clamp(GetConVar("uh_rt_quality"):GetInt(), 1, 4)
             wep.RT_Size = quality[num] * scale
             wep.RenderTarget = GetRenderTarget("CustomUH_ScopeRT_" .. wep:EntIndex(), wep.RT_Size, wep.RT_Size, false)
@@ -43,14 +95,14 @@ function ATTACHMENT:Attach(wep)
         -- so no TFA proxy can touch it). UnlitGeneric has no proxy support,
         -- so SetTexture sticks permanently.
         local matName = "kate_rt_scope_" .. wep:EntIndex()
-        local mat = CreateMaterial(matName, "UnlitGeneric", {
+        local mat = CreateMaterial(matName, "UnlitGeneric", {{
             ["$basetexture"] = "gmod/scope",
             ["$model"] = "1",
             ["$translucent"] = "1",
-        })
+        }})
         wep.ScopeTexture = mat
         wep._rtScopeMatName = matName
-        wep._rtScopeVElement = "scope_default"
+        wep._rtScopeVElement = "{velem_name}"
         wep._rtScopeSubMatIndex = nil  -- found in CustomThink
         wep._rtScopeOverrideSet = false  -- RenderOverride not yet installed
 
@@ -210,3 +262,22 @@ function ATTACHMENT:Detach(wep)
 end
 
 -- CUH base handles registration
+'''
+
+
+def main():
+    print(f"Rewriting {len(FILES)} RT scope attachment files (RenderOverride approach)...")
+    for fname, (velem, sfov, zfov, disp) in FILES.items():
+        path = os.path.join(ATTACHMENTS_DIR, fname)
+        if not os.path.exists(path):
+            print(f"  MISSING: {fname}")
+            continue
+        content = make_file(velem, sfov, zfov, disp)
+        with open(path, "w", encoding="utf-8") as f:
+            f.write(content)
+        print(f"  REWROTE: {fname}")
+    print(f"\nDone.")
+
+
+if __name__ == "__main__":
+    main()
