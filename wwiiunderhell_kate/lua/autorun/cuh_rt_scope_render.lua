@@ -2,39 +2,34 @@
 -- ============================================================
 -- RT Scope rendering for CUH weapons.
 --
--- PROBLEM #1:
---   The base (weapon_uh_base_gun.lua, line ~1241) has a RenderScene
---   hook that renders the scope view into the RenderTarget and sets
---   it as the basetexture of wep.ScopeTexture.  BUT the hook guard is:
---       string.find(wep.Base or "", "weapon_uh_base")
---   which matches "weapon_uh_base_gun" but NOT "weapon_cuh_base_gun"
---   (the substring "weapon_uh_base" is not in "weapon_cuh_base_gun").
---   So for ALL CUH-derived weapons, the base's RT pipeline is skipped.
---
--- PROBLEM #2:
---   The SetSubMaterial approach in the attachment files doesn't work
---   because DrawVElements calls model:SetModel(elem.model) every frame
---   BEFORE model:DrawModel().  SetModel resets all sub-material
---   overrides, so our SetSubMaterial (called in CustomThink before
---   rendering) is wiped out before the lens is drawn.
---
--- SOLUTION:
---   Use MATERIAL SHADOWING instead of SetSubMaterial.  We find the
---   actual lens material path from the csModel, then call
---   CreateMaterial with that EXACT name.  This creates a new material
---   that SHADOWS the VMT — the engine finds our material instead of
---   the VMT when looking up by name.  Since our material has no proxy
---   (no TFA_COD_Scope proxy), SetTexture("$basetexture", RT) sticks.
---
---   We still need a RenderScene hook to render the scope view into the
---   RT and to set the basetexture every frame (same as the base does
---   for UH weapons).
+-- Handles:
+--   1. Rendering the scope view into the RenderTarget
+--   2. Compositing the reticle/overlay on top of the RT
+--   3. Hiding the viewmodel (and VElements) during the RT render pass
+--      so long barrels / suppressors don't clip into the scope view
 -- ============================================================
 
 if SERVER then return end
 
 -- Use the GMod default scope material as the "not zooming" lens texture.
 local DEFAULT_LENS_MAT = Material("gmod/scope")
+
+-- Reticle overlay materials per scope type.
+-- The WWII TFA scopes use scope_overlay materials. We try a list of
+-- common paths and fall back to gmod/scope if none exist.
+local RETICLE_CANDIDATES = {
+    "gmod/scope",           -- GMod default crossbow scope (always exists)
+    "scope/rifle",           -- common L4D/CS scope overlay
+}
+
+local function GetReticleMaterial(wep)
+    -- Allow weapon to override the reticle path
+    if wep.ScopeReticle and Material(wep.ScopeReticle):IsError() == false then
+        return Material(wep.ScopeReticle)
+    end
+    -- Default: gmod/scope (crosshair reticle)
+    return Material("gmod/scope")
+end
 
 -- Debug convar
 CreateClientConVar("cuh_rt_scope_debug", "0", true, false,
@@ -43,35 +38,8 @@ CreateClientConVar("cuh_rt_scope_debug", "0", true, false,
 local _dbgCounter = 0
 
 -- ============================================================
--- Find the lens material path on the scope VElement csModel.
--- Returns: (materialPath, materialIndex) or (nil, nil)
--- ============================================================
-local function FindLensMaterial(wep)
-    if not wep.ViewModelElements then return nil, nil end
-    if not wep._rtScopeVElement then return nil, nil end
-    local elem = wep.ViewModelElements[wep._rtScopeVElement]
-    if not elem or not IsValid(elem._csModel) then return nil, nil end
-    local csModel = elem._csModel
-
-    local mats = csModel:GetMaterials()
-    if not mats or #mats == 0 then return nil, nil end
-
-    -- Try to find by name first
-    for i = 1, #mats do
-        local mn = string.lower(tostring(mats[i]))
-        if string.find(mn, "lens") or string.find(mn, "optic") or string.find(mn, "scope") then
-            return mats[i], i - 1  -- 0-based index
-        end
-    end
-
-    -- Fallback: return all materials so we can log them for debugging
-    return nil, nil, mats
-end
-
--- ============================================================
 -- Console command: cuh_rt_scope_dump
 -- Dumps all RT scope state and all materials on the csModel.
--- Run this while holding a scoped CUH weapon.
 -- ============================================================
 concommand.Add("cuh_rt_scope_dump", function()
     local ply = LocalPlayer()
@@ -101,7 +69,6 @@ concommand.Add("cuh_rt_scope_dump", function()
         print("Zooming:          " .. tostring(wep:GetUHBool("Zooming")))
     end
 
-    -- ScopeTexture basetexture
     if wep.ScopeTexture then
         local tex = wep.ScopeTexture:GetTexture("$basetexture")
         print("\nScopeTexture basetexture: " .. tostring(tex))
@@ -110,7 +77,6 @@ concommand.Add("cuh_rt_scope_dump", function()
         end
     end
 
-    -- VElement csModel materials
     if wep.ViewModelElements and wep._rtScopeVElement then
         local elem = wep.ViewModelElements[wep._rtScopeVElement]
         print("\n-- VElement: " .. wep._rtScopeVElement .. " --")
@@ -134,7 +100,6 @@ concommand.Add("cuh_rt_scope_dump", function()
                 print("  (no materials returned)")
             end
 
-            -- Current sub-material at target index
             if wep._rtScopeSubMatIndex then
                 local subMat = csModel:GetSubMaterial(wep._rtScopeSubMatIndex)
                 print(string.format("\n  Current subMat[%d]: %s", wep._rtScopeSubMatIndex, tostring(subMat)))
@@ -148,8 +113,8 @@ concommand.Add("cuh_rt_scope_dump", function()
 end)
 
 -- ============================================================
--- RenderScene hook: render the scope view into the RT and set
--- it as the basetexture of the scope material.
+-- RenderScene hook: render the scope view into the RT, composite
+-- the reticle overlay, and set the RT as the basetexture.
 -- ============================================================
 hook.Add("RenderScene", "CUH_RTScope_RenderScene", function(origin, angles, fov)
     local ply = LocalPlayer()
@@ -186,13 +151,71 @@ hook.Add("RenderScene", "CUH_RTScope_RenderScene", function(origin, angles, fov)
         local ang = ply:EyeAngles()
         local pos = ply:EyePos()
 
+        -- CRITICAL: Hide all VElement ClientsideModels during the RT pass.
+        -- Even though they have SetNoDraw(true), DrawVElements may be
+        -- called from a hook that fires during render.RenderView.
+        -- We temporarily set them to no-draw and restore after.
+        -- Also, the engine viewmodel is hidden via drawviewmodel=false.
+        local savedNoDraw = {}
+        if wep.ViewModelElements then
+            for name, elem in pairs(wep.ViewModelElements) do
+                if IsValid(elem._csModel) then
+                    savedNoDraw[name] = elem._csModel:GetNoDraw()
+                    elem._csModel:SetNoDraw(true)
+                end
+            end
+        end
+
         render.RenderView({
             x = 0, y = 0, w = size, h = size,
             origin = pos, angles = ang,
             drawviewmodel = false, drawhud = false,
             dopostprocess = false,
             fov = wep.ScopeFov or 8,
+            -- Increase near clip plane to prevent viewmodel geometry
+            -- (long barrels, suppressors, front sights) from clipping
+            -- into the scope view. Default znear is ~1; setting it to
+            -- a higher value pushes the near plane forward, clipping
+            -- any geometry between the camera and this distance.
+            znear = 4,
         })
+
+        -- Restore VElement no-draw state
+        if wep.ViewModelElements then
+            for name, elem in pairs(wep.ViewModelElements) do
+                if IsValid(elem._csModel) and savedNoDraw[name] ~= nil then
+                    elem._csModel:SetNoDraw(savedNoDraw[name])
+                end
+            end
+        end
+
+        -- ============================================================
+        -- COMPOSITE RETICLE / OVERLAY ON TOP OF THE RT
+        -- ============================================================
+        -- After the 3D scene is rendered into the RT, draw the scope
+        -- reticle overlay on top using a 2D render context.
+        -- This ensures the reticle appears baked into the lens texture.
+        cam.Start2D()
+            local reticleMat = GetReticleMaterial(wep)
+            if reticleMat and not reticleMat:IsError() then
+                surface.SetDrawColor(255, 255, 255, 255)
+                surface.SetMaterial(reticleMat)
+                surface.DrawTexturedRect(0, 0, size, size)
+            end
+
+            -- Draw a subtle vignette / black border around the scope lens
+            -- to simulate the scope tube edge. This darkens the corners
+            -- and creates the classic "scope circle" effect.
+            surface.SetDrawColor(0, 0, 0, 255)
+            -- We draw 4 black rectangles around a center circle.
+            -- For a square RT, the circle inscribed has diameter = size.
+            -- Left/right bars:
+            surface.DrawRect(0, 0, size * 0.15, size)
+            surface.DrawRect(size * 0.85, 0, size * 0.15, size)
+            -- Top/bottom bars:
+            surface.DrawRect(size * 0.15, 0, size * 0.70, size * 0.15)
+            surface.DrawRect(size * 0.15, size * 0.85, size * 0.70, size * 0.15)
+        cam.End2D()
 
         render.PopRenderTarget()
         wep.ScopeTexture:SetTexture("$basetexture", wep.RenderTarget)
