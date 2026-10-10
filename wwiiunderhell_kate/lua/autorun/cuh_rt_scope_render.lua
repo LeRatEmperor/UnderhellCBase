@@ -160,9 +160,6 @@ hook.Add("RenderScene", "CUH_RTScope_RenderScene", function(origin, angles, fov)
     if isZooming then
         local size = wep.RT_Size or 512
 
-        -- ============================================================
-        -- STEP 1: Render the 3D scene into the RT
-        -- ============================================================
         render.PushRenderTarget(wep.RenderTarget, 0, 0, size, size)
 
         local ang = ply:EyeAngles()
@@ -172,6 +169,10 @@ hook.Add("RenderScene", "CUH_RTScope_RenderScene", function(origin, angles, fov)
         -- per-instance) skips drawing during the RT render pass.
         wep._rtScopeSuppressVElem = true
 
+        -- Render ONLY the 3D scene into the RT.
+        -- The reticle is on $texture2 of the Unlittwotexture material,
+        -- NOT composited into the RT. This is the approach that worked
+        -- (reticle was visible, just needed brightness adjustment).
         render.RenderView({
             x = 0, y = 0, w = size, h = size,
             origin = pos, angles = ang,
@@ -182,26 +183,6 @@ hook.Add("RenderScene", "CUH_RTScope_RenderScene", function(origin, angles, fov)
         })
 
         wep._rtScopeSuppressVElem = false
-
-        -- Pop the RT — render.RenderView leaves the RT state messy,
-        -- so we pop and do a clean push for the reticle compositing.
-        render.PopRenderTarget()
-
-        -- ============================================================
-        -- STEP 2: Composite the reticle onto the RT (clean push)
-        -- ============================================================
-        render.PushRenderTarget(wep.RenderTarget, 0, 0, size, size)
-        render.ClearDepth()
-
-        cam.Start2D()
-            -- Draw the reticle overlay texture
-            local reticleMat = GetReticleMaterial(wep)
-            if reticleMat and not reticleMat:IsError() then
-                surface.SetDrawColor(255, 255, 255, 255)
-                surface.SetMaterial(reticleMat)
-                surface.DrawTexturedRect(0, 0, size, size)
-            end
-        cam.End2D()
 
         render.PopRenderTarget()
         render.SetViewPort(0, 0, ScrW(), ScrH())
