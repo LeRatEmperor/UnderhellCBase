@@ -960,6 +960,14 @@ if CLIENT then
         if not IsCustomUHWeapon(wep) then return end
         if not wep.ScopeTexture then return end
         if wep:GetUHBool("Zooming") and not wep.ScopeDisabled then
+            if not wep.RenderTarget then
+                local scale = ScrH() / 1080
+                local quality = { 256, 512, 768, 1080 }
+                local num = math.Clamp(GetConVar("uh_rt_quality"):GetInt(), 1, 4)
+                wep.RT_Size = quality[num] * scale
+                wep.RenderTarget = GetRenderTarget("CustomUH_ScopeRT_" .. wep:EntIndex(), wep.RT_Size, wep.RT_Size, false)
+            end
+            if not wep.RenderTarget then return end
             local size = wep.RT_Size or 512
             render.PushRenderTarget(wep.RenderTarget, 0, 0, size, size)
             local ang = LocalPlayer():EyeAngles()
@@ -972,6 +980,28 @@ if CLIENT then
             })
             render.PopRenderTarget()
             wep.ScopeTexture:SetTexture("$basetexture", wep.RenderTarget)
+
+            -- Deep debug: check basetexture after SetTexture
+            if not wep._rtDbgCt then wep._rtDbgCt = 0 end
+            wep._rtDbgCt = wep._rtDbgCt + 1
+            if wep._rtDbgCt >= 60 then
+                wep._rtDbgCt = 0
+                local bt = wep.ScopeTexture:GetTexture("$basetexture")
+                print("[RT-DBG] AFTER SetTexture(RT): basetexture=" .. tostring(bt))
+                -- Check VElement materials
+                if wep.ViewModelElements then
+                    for name, elem in pairs(wep.ViewModelElements) do
+                        if (name == "scope_default" or name == "scope_acog") and elem.active and IsValid(elem._csModel) then
+                            local mc = elem._csModel:NumMaterials()
+                            print("[RT-DBG] VElement '" .. name .. "' _csModel materials: " .. mc)
+                            for i = 0, mc - 1 do
+                                local m = elem._csModel:GetMaterial(i)
+                                print("[RT-DBG]   [" .. i .. "] " .. tostring(m))
+                            end
+                        end
+                    end
+                end
+            end
         else
             if wep.ScopeTexture then
                 wep.ScopeTexture:SetTexture("$basetexture", devzoom:GetTexture("$basetexture"))
