@@ -194,31 +194,43 @@ hook.Add("RenderScene", "CUH_RTScope_RenderScene", function(origin, angles, fov)
         -- ============================================================
         -- COMPOSITE RETICLE INTO THE RT (baked into lens texture)
         -- ============================================================
-        -- Use cam.Start2D to set up the 2D projection matrix (required
-        -- for render.DrawScreenQuadEx to know the coordinate space),
-        -- then use render.SetMaterial + render.DrawScreenQuadEx to draw.
-        -- cam.Start2D is "almost always used with a render target from
-        -- the render library" per the glua skill reference.
+        -- Use cam.Start2D + surface.* functions (the surface library,
+        -- not the render library). The surface library is what the
+        -- base's DrawHUD uses successfully for 2D drawing.
+        -- The render library (render.DrawScreenQuadEx) is not appearing
+        -- on the RT, possibly due to projection matrix issues.
         cam.Start2D()
             -- Layer 1: weapon-specific scope_c reticle (if set)
             local reticleMat = GetReticleMaterial(wep)
             if reticleMat and not reticleMat:IsError() then
-                render.SetMaterial(reticleMat)
-                render.DrawScreenQuadEx(0, 0, size, size)
+                surface.SetDrawColor(255, 255, 255, 255)
+                surface.SetMaterial(reticleMat)
+                surface.DrawTexturedRect(0, 0, size, size)
             end
 
             -- Layer 2: gmod/scope (GMod crossbow scope — always available)
             local uhReticle = Material("gmod/scope")
             if uhReticle and not uhReticle:IsError() then
-                render.SetMaterial(uhReticle)
-                render.DrawScreenQuadEx(0, 0, size, size)
+                surface.SetDrawColor(255, 255, 255, 255)
+                surface.SetMaterial(uhReticle)
+                surface.DrawTexturedRect(0, 0, size, size)
             end
 
             -- Layer 3: Scout sniper lens texture
             local scoutLens = Material("models/weapons/v_models/sniper_scout/lens")
             if scoutLens and not scoutLens:IsError() then
-                render.SetMaterial(scoutLens)
-                render.DrawScreenQuadEx(0, 0, size, size)
+                surface.SetDrawColor(255, 255, 255, 255)
+                surface.SetMaterial(scoutLens)
+                surface.DrawTexturedRect(0, 0, size, size)
+            end
+
+            -- DEBUG: Draw a simple colored rect to confirm 2D drawing
+            -- works at all on the RT. If this appears, the issue is
+            -- with the reticle textures. If it doesn't, the issue is
+            -- with the 2D rendering context itself.
+            if GetConVar("cuh_rt_scope_debug"):GetBool() then
+                surface.SetDrawColor(255, 0, 0, 128)  -- semi-transparent red
+                surface.DrawRect(size/2 - 50, size/2 - 50, 100, 100)
             end
         cam.End2D()
 
