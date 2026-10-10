@@ -36,8 +36,7 @@ SWEP.ZoomFov = 20
 -- Fire modes: Semi-Auto AND Full-Auto (toggle with E + Right-Click)
 SWEP.FireModes = {
     { name = "Semi-Auto" },
-    { name = "Full-Auto" },
-}
+    { name = "Full-Auto" } }
 
 -- Primary stats (from TFA source)
 SWEP.Primary.Sound          = Sound("TFA_CODWW2_STG44.Lyr1")
@@ -140,8 +139,7 @@ SWEP.Animations = {
     ["sprint_out"]   = "sprint_out",
     -- Custom (from TFA SWEP.Animations table)
     ["melee_bayonet"]   = "melee_bayonet",
-    ["reload_grenade"]  = "reload_grenade",
-}
+    ["reload_grenade"]  = "reload_grenade" }
 
 -- ============================================================
 -- ANIMSOUNDS (ported 1:1 from TFA EventTable, time = N/30 → seconds)
@@ -152,87 +150,65 @@ SWEP.Animations = {
 -- ============================================================
 SWEP.AnimSounds = {
     ["draw_first"] = {
-        { time = 0.5000, sound = "TFA_CODWW2_STG44.Charge" },
-    },
+        { time = 0.5000, sound = "TFA_CODWW2_STG44.Charge" } },
     ["draw"] = {
-        { time = 0.0333, sound = "TFA_CODWW2_RIFLE.Raise" },
-    },
+        { time = 0.0333, sound = "TFA_CODWW2_RIFLE.Raise" } },
     ["holster"] = {
-        { time = 0.0667, sound = "TFA_CODWW2_RIFLE.Holster" },
-    },
+        { time = 0.0667, sound = "TFA_CODWW2_RIFLE.Holster" } },
     ["reload"] = {
         { time = 0.5000, sound = "TFA_CODWW2_STG44.TacMagOut" },
-        { time = 1.6667, sound = "TFA_CODWW2_STG44.TacMagIn" },
-    },
+        { time = 1.6667, sound = "TFA_CODWW2_STG44.TacMagIn" } },
     ["reload_empty"] = {
         { time = 0.5000, sound = "TFA_CODWW2_STG44.MagOut" },
         { time = 1.6667, sound = "TFA_CODWW2_STG44.MagIn" },
-        { time = 2.3333, sound = "TFA_CODWW2_STG44.Charge" },
-    },
+        { time = 2.3333, sound = "TFA_CODWW2_STG44.Charge" } },
     ["inspect"] = {
         { time = 0.0333, sound = "TFA_CODWW2_STG44.Inspect1" },
         { time = 0.6667, sound = "TFA_CODWW2_STG44.Inspect1b" },
-        { time = 1.6667, sound = "TFA_CODWW2_STG44.Inspect2" },
-    },
+        { time = 1.6667, sound = "TFA_CODWW2_STG44.Inspect2" } },
     ["inspect_empty"] = {
         { time = 0.0333, sound = "TFA_CODWW2_STG44.Inspect1" },
         { time = 0.6667, sound = "TFA_CODWW2_STG44.Inspect1b" },
-        { time = 1.6667, sound = "TFA_CODWW2_STG44.Inspect2" },
-    },
+        { time = 1.6667, sound = "TFA_CODWW2_STG44.Inspect2" } },
     ["inspect_epic"] = {
         { time = 0.0333, sound = "TFA_CODWW2_STG44.EpicInspect1" },
-        { time = 2.0000, sound = "TFA_CODWW2_STG44.EpicInspect2" },
-    },
+        { time = 2.0000, sound = "TFA_CODWW2_STG44.EpicInspect2" } },
     ["reload_ext"] = {
         { time = 0.5000, sound = "TFA_CODWW2_STG44.TacMagOut" },
-        { time = 1.6667, sound = "TFA_CODWW2_STG44.TacMagIn" },
-    },
+        { time = 1.6667, sound = "TFA_CODWW2_STG44.TacMagIn" } },
     ["reload_ext_empty"] = {
         { time = 0.5000, sound = "TFA_CODWW2_STG44.MagOut" },
         { time = 1.6667, sound = "TFA_CODWW2_STG44.MagIn" },
-        { time = 2.3333, sound = "TFA_CODWW2_STG44.Charge" },
-    },
+        { time = 2.3333, sound = "TFA_CODWW2_STG44.Charge" } },
     --[Grenade Launcher]--
     ["draw_grenade"] = {
-        { time = 0.0333, sound = "TFA_CODWW2_RIFLE.Raise" },
-    },
+        { time = 0.0333, sound = "TFA_CODWW2_RIFLE.Raise" } },
     ["draw_grenade_empty"] = {
-        { time = 0.0333, sound = "TFA_CODWW2_RIFLE.Raise" },
-    },
+        { time = 0.0333, sound = "TFA_CODWW2_RIFLE.Raise" } },
     ["holster_grenade"] = {
-        { time = 0.0667, sound = "TFA_CODWW2_RIFLE.Holster" },
-    },
+        { time = 0.0667, sound = "TFA_CODWW2_RIFLE.Holster" } },
     ["holster_grenade_empty"] = {
-        { time = 0.0667, sound = "TFA_CODWW2_RIFLE.Holster" },
-    },
+        { time = 0.0667, sound = "TFA_CODWW2_RIFLE.Holster" } },
     ["grenade_in"] = {
         { time = 0.0333, sound = "TFA_CODWW2_RFLGRND.Foley" },
-        { time = 0.8333, sound = "TFA_CODWW2_RFLGRND.On" },
-    },
+        { time = 0.8333, sound = "TFA_CODWW2_RFLGRND.On" } },
     ["grenade_in_empty"] = {
-        { time = 0.0333, sound = "TFA_CODWW2_SML.Raise" },
-    },
+        { time = 0.0333, sound = "TFA_CODWW2_SML.Raise" } },
     ["grenade_out"] = {
-        { time = 0.6667, sound = "TFA_CODWW2_RFLGRND.Off" },
-    },
+        { time = 0.6667, sound = "TFA_CODWW2_RFLGRND.Off" } },
     ["grenade_out_empty"] = {
-        { time = 0.0333, sound = "TFA_CODWW2_SML.Holster" },
-    },
+        { time = 0.0333, sound = "TFA_CODWW2_SML.Holster" } },
     ["reload_grenade"] = {
         { time = 0.0333, sound = "TFA_CODWW2_RFLGRND.Foley" },
-        { time = 0.8333, sound = "TFA_CODWW2_RFLGRND.On" },
-    },
+        { time = 0.8333, sound = "TFA_CODWW2_RFLGRND.On" } },
     ["inspect_grenade"] = {
         { time = 0.0333, sound = "TFA_CODWW2_STG44.Inspect1" },
         { time = 1.6667, sound = "TFA_CODWW2_STG44.Inspect1b" },
-        { time = 3.8333, sound = "TFA_CODWW2_STG44.Inspect2" },
-    },
+        { time = 3.8333, sound = "TFA_CODWW2_STG44.Inspect2" } },
     ["inspect_grenade_empty"] = {
         { time = 0.0333, sound = "TFA_CODWW2_STG44.Inspect1" },
         { time = 1.6667, sound = "TFA_CODWW2_STG44.Inspect1b" },
-        { time = 3.8333, sound = "TFA_CODWW2_STG44.Inspect2" },
-    },
-}
+        { time = 3.8333, sound = "TFA_CODWW2_STG44.Inspect2" } } }
 
 -- ============================================================
 -- SMART MUZZLE / SHELL AUTO-DETECT
@@ -435,93 +411,79 @@ SWEP.ViewModelElements = {
         bone = "tag_weapon", pos = Vector(0, 0, 0), ang = Angle(0, 0, 0),
         scale = Vector(1, 1, 1), material = "", skin = 0,
         bodygroups = {}, bonemerge = true,
-        active = false,
-    },
+        active = false },
     ["scope_acog"] = {
         type = "Model", model = "models/weapons/tfa_codww2/stg44/c_stg44_4x.mdl",
         bone = "tag_weapon", pos = Vector(0, 0, 0), ang = Angle(0, 0, 0),
         scale = Vector(1, 1, 1), material = "", skin = 0,
         bodygroups = {}, bonemerge = true,
-        active = false,
-    },
+        active = false },
     ["lens_sight"] = {
         type = "Model", model = "models/weapons/tfa_codww2/attachments/sights/c_lens_sight.mdl",
         bone = "tag_weapon", pos = Vector(0, 0, 0), ang = Angle(0, 0, 0),
         scale = Vector(1, 1, 1), material = "", skin = 0,
         bodygroups = {}, bonemerge = true,
-        active = false,
-    },
+        active = false },
     ["clip_default"] = {
         type = "Model", model = "models/weapons/tfa_codww2/stg44/c_stg44_clip.mdl",
         bone = "tag_clip", pos = Vector(0, 0, 0), ang = Angle(0, 0, 0),
         scale = Vector(1, 1, 1), material = "", skin = 0,
         bodygroups = {}, bonemerge = true,
-        active = true,
-    },
+        active = true },
     ["ext_clip"] = {
         type = "Model", model = "models/weapons/tfa_codww2/stg44/c_stg44_clip_ext.mdl",
         bone = "tag_clip", pos = Vector(0, 0, 0), ang = Angle(0, 0, 0),
         scale = Vector(1, 1, 1), material = "", skin = 0,
         bodygroups = {}, bonemerge = true,
-        active = false,
-    },
+        active = false },
     ["receiver_default"] = {
         type = "Model", model = "models/weapons/tfa_codww2/stg44/c_stg44_receiver.mdl",
         bone = "tag_weapon", pos = Vector(0, 0, 0), ang = Angle(0, 0, 0),
         scale = Vector(1, 1, 1), material = "", skin = 0,
         bodygroups = {}, bonemerge = true,
-        active = true,
-    },
+        active = true },
     ["barrel_default"] = {
         type = "Model", model = "models/weapons/tfa_codww2/stg44/c_stg44_barrel.mdl",
         bone = "tag_weapon", pos = Vector(0, 0, 0), ang = Angle(0, 0, 0),
         scale = Vector(1, 1, 1), material = "", skin = 0,
         bodygroups = {}, bonemerge = true,
-        active = true,
-    },
+        active = true },
     ["charm_default"] = {
         type = "Model", model = "models/weapons/tfa_codww2/stg44/c_stg44_charm.mdl",
         bone = "tag_weapon", pos = Vector(0, 0, 0), ang = Angle(0, 0, 0),
         scale = Vector(1, 1, 1), material = "", skin = 0,
         bodygroups = {}, bonemerge = true,
-        active = true,
-    },
+        active = true },
     ["sight_default"] = {
         type = "Model", model = "models/weapons/tfa_codww2/stg44/c_stg44_sight.mdl",
         bone = "tag_weapon", pos = Vector(0, 0, 0), ang = Angle(0, 0, 0),
         scale = Vector(1, 1, 1), material = "", skin = 0,
         bodygroups = {}, bonemerge = true,
-        active = true,
-    },
+        active = true },
     ["rail_sights"] = {
         type = "Model", model = "models/weapons/tfa_codww2/stg44/c_stg44_folded_sight.mdl",
         bone = "tag_weapon", pos = Vector(0, 0, 0), ang = Angle(0, 0, 0),
         scale = Vector(1, 1, 1), material = "", skin = 0,
         bodygroups = {}, bonemerge = true,
-        active = false,
-    },
+        active = false },
     ["stock_default"] = {
         type = "Model", model = "models/weapons/tfa_codww2/stg44/c_stg44_stock.mdl",
         bone = "tag_weapon", pos = Vector(0, 0, 0), ang = Angle(0, 0, 0),
         scale = Vector(1, 1, 1), material = "", skin = 0,
         bodygroups = {}, bonemerge = true,
-        active = true,
-    },
+        active = true },
     ["grenade_rail"] = {
         type = "Model", model = "models/weapons/tfa_codww2/attachments/ger_rifle_grenade/c_rifle_grenade.mdl",
         bone = "tag_weapon", pos = Vector(0, 0, 0), ang = Angle(0, 0, 0),
         scale = Vector(1, 1, 1), material = "", skin = 0,
         bodygroups = {}, bonemerge = true,
-        active = false,
-    },
+        active = false },
     ["bayonet"] = {
         type = "Model", model = "models/weapons/tfa_codww2/attachments/bayonet/c_ger_bayonet.mdl",
         bone = "tag_weapon", pos = Vector(0, 0, 0), ang = Angle(0, 0, 0),
         scale = Vector(1, 1, 1), material = "", skin = 0,
         bodygroups = {}, bonemerge = true,
-        active = false,
-    },
-}
+        active = false } }
 
 SWEP.WorldModelElements = {
     ["clip_default"] = {
@@ -529,72 +491,61 @@ SWEP.WorldModelElements = {
         bone = "tag_clip", pos = Vector(0, 0, 0), ang = Angle(0, 0, 0),
         scale = Vector(1, 1, 1), material = "", skin = 0,
         bodygroups = {}, bonemerge = true,
-        active = true,
-    },
+        active = true },
     ["ext_clip"] = {
         type = "Model", model = "models/weapons/tfa_codww2/stg44/w_stg44_clip_ext.mdl",
         bone = "tag_clip", pos = Vector(0, 0, 0), ang = Angle(0, 0, 0),
         scale = Vector(1, 1, 1), material = "", skin = 0,
         bodygroups = {}, bonemerge = true,
-        active = false,
-    },
+        active = false },
     ["receiver_default"] = {
         type = "Model", model = "models/weapons/tfa_codww2/stg44/w_stg44_receiver.mdl",
         bone = "tag_weapon", pos = Vector(0, 0, 0), ang = Angle(0, 0, 0),
         scale = Vector(1, 1, 1), material = "", skin = 0,
         bodygroups = {}, bonemerge = true,
-        active = true,
-    },
+        active = true },
     ["barrel_default"] = {
         type = "Model", model = "models/weapons/tfa_codww2/stg44/w_stg44_barrel.mdl",
         bone = "tag_weapon", pos = Vector(0, 0, 0), ang = Angle(0, 0, 0),
         scale = Vector(1, 1, 1), material = "", skin = 0,
         bodygroups = {}, bonemerge = true,
-        active = true,
-    },
+        active = true },
     ["sight_default"] = {
         type = "Model", model = "models/weapons/tfa_codww2/stg44/w_stg44_sight.mdl",
         bone = "tag_weapon", pos = Vector(0, 0, 0), ang = Angle(0, 0, 0),
         scale = Vector(1, 1, 1), material = "", skin = 0,
         bodygroups = {}, bonemerge = true,
-        active = true,
-    },
+        active = true },
     ["stock_default"] = {
         type = "Model", model = "models/weapons/tfa_codww2/stg44/w_stg44_stock.mdl",
         bone = "tag_weapon", pos = Vector(0, 0, 0), ang = Angle(0, 0, 0),
         scale = Vector(1, 1, 1), material = "", skin = 0,
         bodygroups = {}, bonemerge = true,
-        active = true,
-    },
+        active = true },
     ["sight_nydar"] = {
         type = "Model", model = "models/weapons/tfa_codww2/stg44/w_stg44_reflex.mdl",
         bone = "tag_weapon", pos = Vector(0, 0, 0), ang = Angle(0, 0, 0),
         scale = Vector(1, 1, 1), material = "", skin = 0,
         bodygroups = {}, bonemerge = true,
-        active = false,
-    },
+        active = false },
     ["scope_acog"] = {
         type = "Model", model = "models/weapons/tfa_codww2/stg44/w_stg44_4x.mdl",
         bone = "tag_weapon", pos = Vector(0, 0, 0), ang = Angle(0, 0, 0),
         scale = Vector(1, 1, 1), material = "", skin = 0,
         bodygroups = {}, bonemerge = true,
-        active = false,
-    },
+        active = false },
     ["grenade_rail"] = {
         type = "Model", model = "models/weapons/tfa_codww2/attachments/ger_rifle_grenade/w_rifle_grenade.mdl",
         bone = "tag_weapon", pos = Vector(0, 0, 0), ang = Angle(0, 0, 0),
         scale = Vector(1, 1, 1), material = "", skin = 0,
         bodygroups = {}, bonemerge = true,
-        active = false,
-    },
+        active = false },
     ["bayonet"] = {
         type = "Model", model = "models/weapons/tfa_codww2/attachments/bayonet/w_ger_bayonet.mdl",
         bone = "tag_weapon", pos = Vector(0, 0, 0), ang = Angle(0, 0, 0),
         scale = Vector(1, 1, 1), material = "", skin = 0,
         bodygroups = {}, bonemerge = true,
-        active = false,
-    },
-}
+        active = false } }
 
 -- ============================================================
 -- ATTACHMENTS (from TFA SWEP.Attachments, CUH format with default=0)
@@ -603,8 +554,7 @@ SWEP.WorldModelElements = {
 SWEP.Attachments = {
     [2] = { name = "Slot 2", atts = { "tfa_codww2_lens_sight", "tfa_codww2_nydar", "tfa_codww2_4x" }, default = 0 },
     [3] = { name = "Slot 3", atts = { "tfa_codww2_xmag_noani" }, default = 0 },
-    [4] = { name = "Slot 4", atts = { "tfa_codww2_bayonet", "tfa_codww2_rifle_grenade_ger" }, default = 0 },
+    [4] = { name = "Slot 4", atts = { "tfa_codww2_bayonet" }, default = 0 },
     [5] = { name = "Slot 5", atts = { "tfa_codww2_rifling", "tfa_codww2_steadyaim" }, default = 0 },
     [6] = { name = "Slot 6", atts = { "tfa_codww2_stock", "tfa_codww2_quickdraw", "tfa_codww2_grip" }, default = 0 },
-    [7] = { name = "Slot 7", atts = { "tfa_codww2_highcal", "tfa_codww2_rapidfire", "tfa_codww2_fmj" }, default = 0 },
-}
+    [7] = { name = "Slot 7", atts = { "tfa_codww2_highcal", "tfa_codww2_rapidfire", "tfa_codww2_fmj" }, default = 0 } }

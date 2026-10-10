@@ -328,50 +328,44 @@ end
 -- ============================================================
 
 -- ============================================================
--- PROJECTILE FIRING (reference: weapon_uh_heav_rpg.lua pattern)
+-- PROJECTILE FIRING — spawns sent_mgl_grenade (same as ShootGrenade in CUH base)
 -- ============================================================
--- Spawns ent_kate_projectile with weapon-specific config.
--- Pattern matches the RPG reference: ents.Create → SetPos → Spawn → ApplyForceCenter
-SWEP.ProjectileModel = "models/weapons/w_ammo_missile.mdl"
-SWEP.ProjectileForce = 3000
-SWEP.ProjectileIsBolt = false
-SWEP.ProjectileDamage = 800
-SWEP.ProjectileRadius = 512
-SWEP.ProjectileExplosionSound = "TFA_CODWW2_MUSTANG.Boom"
-SWEP.ProjectileTrailSound = ""
+-- Pattern copied 1:1 from the working MGL reference (weapon_uh_heav_mgl.lua
+-- → ShootGrenade in weapon_custom_uh_base_gun.lua). The sent_mgl_grenade entity
+-- (lua/entities/sent_mgl_grenade/) already has:
+--   - Model: models/items/ar2_grenade.mdl
+--   - Physics: SOLID_VPHYSICS / MOVETYPE_VPHYSICS, mass=6.5, gravity ON
+--   - PhysicsCollide() triggers Explosion()
+--   - Explosion() does HelicopterMegaBomb + Explosion FX, BlastDamage(280, 185),
+--     ScreenShake, and ambient/explosions/explode_N.wav
+-- Used by Mustang Sally (PaP 1911) — small grenade lobbed like a pistol shot.
+-- The weapon only needs to spawn the entity, set Owner, and apply initial force.
+SWEP.ProjectileForce = 10000   -- matches MGL reference (sent_mgl_grenade has no self-thrust)
 
 function SWEP:FireProjectile()
     if not SERVER then return end
 
-    local ent = ents.Create("ent_kate_projectile")
-    if not IsValid(ent) then return end
-
     local owner = self.Owner
     local aim = owner:GetAimVector()
-    local pos = owner:EyePos() + aim * 30 - owner:GetUp() * 10 +
+    local pos = owner:EyePos() + aim * 30 + owner:GetUp() * -10 +
         (self:GetUHBool("Zooming") and Vector(0, 0, 0) or owner:GetRight() * 5)
 
-    -- Set position and angles BEFORE Spawn
+    local ent = ents.Create("sent_mgl_grenade")
+    if not IsValid(ent) then return end
+
+    -- Set position + angles BEFORE Spawn() (entity reads them in Initialize)
     ent:SetPos(pos)
-    ent:SetAngles(owner:EyeAngles())
+    ent:SetAngles(owner:GetAngles())
 
-    -- CRITICAL: set ALL config fields BEFORE Spawn() so Initialize()
-    -- can read them. If set after Spawn, the physics hull is initialized
-    -- with the wrong model and PhysicsCollide never fires.
-    ent.ProjectileModel = self.ProjectileModel
-    ent.IsBolt = self.ProjectileIsBolt
-    ent.Damage = self.ProjectileDamage
-    ent.DamageRadius = self.ProjectileRadius
-    ent.ExplodeOnImpact = not self.ProjectileIsBolt
-    ent.ExplosionSound = self.ProjectileExplosionSound
-    ent.TrailSound = self.ProjectileTrailSound
-
-    -- NOW spawn — Initialize() will read the correct fields
+    -- Spawn the entity — Initialize() sets model, physics, mass, collision group
     ent:Spawn()
     ent:Activate()
+
+    -- Assign Owner AFTER Spawn() (matches ShootGrenade reference, which uses
+    -- ent:SetOwner() — sent_mgl_grenade reads self.Owner at explosion time)
     ent:SetOwner(owner)
 
-    -- Apply force (same pattern as RPG reference)
+    -- Apply initial impulse (grenade has no self-thrust — must be lobbed)
     local phys = ent:GetPhysicsObject()
     if IsValid(phys) then
         phys:ApplyForceCenter(aim * self.ProjectileForce)

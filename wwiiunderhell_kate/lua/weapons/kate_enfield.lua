@@ -69,6 +69,11 @@ SWEP.PumpDelay = 0.4
 
 -- Ironsights (from TFA source)
 SWEP.IronSightsPos = Vector(-4.4, -4, 1.4)
+-- Scope-specific ironsight positions (from TFA source)
+SWEP.IronSightsPos_7X = Vector(-4.385, -3, 0.495)
+SWEP.IronSightsAng_7X = Vector(0, 0, 0)
+SWEP.IronSightsPos_ACOG = Vector(-3.19, -5, 0.91)
+SWEP.IronSightsAng_ACOG = Vector(0, 0, 0)
 SWEP.IronSightsAng = Vector(0, 0, 0)
 SWEP.IronSightTime = 0.4
 SWEP.SwayPosition = 2.0
@@ -509,6 +514,7 @@ SWEP.WorldModelElements = {
 -- Note: TFA source starts at index [2] (no [1] slot) — preserved.
 -- ============================================================
 SWEP.Attachments = {
-    [2] = { name = "Slot 2", atts = { "tfa_codww2_xmag", "tfa_codww2_ballistic" }, default = 0 },
+        [1] = { name = "Optic", atts = { "tfa_codww2_enfield_scope", "tfa_codww2_4x" }, default = 0 },
+[2] = { name = "Slot 2", atts = { "tfa_codww2_xmag", "tfa_codww2_ballistic" }, default = 0 },
     [3] = { name = "Slot 3", atts = { "tfa_codww2_rapidfire_sg", "tfa_codww2_fmj" }, default = 0 },
 }

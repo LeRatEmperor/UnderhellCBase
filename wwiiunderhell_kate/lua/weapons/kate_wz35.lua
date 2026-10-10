@@ -69,6 +69,11 @@ SWEP.PumpDelay = 0.4
 
 -- Ironsights (from TFA source)
 SWEP.IronSightsPos = Vector(-4.4, -1, 1.33)
+-- Scope-specific ironsight positions (from TFA source)
+SWEP.IronSightsPos_7X = Vector(-4.395, -4.75, 0.123)
+SWEP.IronSightsAng_7X = Vector(0, 0, 0)
+SWEP.IronSightsPos_ACOG = Vector(-3.115, -6, 0.741)
+SWEP.IronSightsAng_ACOG = Vector(0, 0, 0)
 SWEP.IronSightsAng = Vector(0.1, 0, 0)
 SWEP.IronSightTime = 0.4
 SWEP.SwayPosition = 2.0

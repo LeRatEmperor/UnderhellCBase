@@ -336,50 +336,43 @@ end
 -- ============================================================
 
 -- ============================================================
--- PROJECTILE FIRING (reference: weapon_uh_heav_rpg.lua pattern)
+-- PROJECTILE FIRING — spawns sent_rpg_rocket (same as weapon_uh_heav_rpg)
 -- ============================================================
--- Spawns ent_kate_projectile with weapon-specific config.
--- Pattern matches the RPG reference: ents.Create → SetPos → Spawn → ApplyForceCenter
-SWEP.ProjectileModel = "models/weapons/w_ammo_missile.mdl"
-SWEP.ProjectileForce = 5000
-SWEP.ProjectileIsBolt = false
-SWEP.ProjectileDamage = 300
-SWEP.ProjectileRadius = 256
-SWEP.ProjectileExplosionSound = "TFA_CODWW2_BAZOOKA.Boom"
-SWEP.ProjectileTrailSound = "TFA_CODWW2_BAZOOKA.Loop"
+-- Pattern copied 1:1 from the working RPG reference (weapon_uh_heav_rpg.lua).
+-- Used by FireBurstRound() — called 3 times per burst with BurstDelay between
+-- each round. The sent_rpg_rocket entity (lua/entities/sent_rpg_rocket/) has:
+--   - Model: models/weapons/w_rockete_launch.mdl
+--   - Physics: SOLID_VPHYSICS / MOVETYPE_VPHYSICS, mass=1, gravity OFF
+--   - PhysicsUpdate applies continuous forward thrust (forward * 1000/frame)
+--   - Explosion() does HelicopterMegaBomb + Explosion FX, BlastDamage(280, 185),
+--     ScreenShake, and ambient/explosions/explode_N.wav
+-- The weapon only needs to spawn the entity, set Owner, and apply initial force.
+-- NOTE: ent.Owner is assigned AFTER Spawn() (matches RPG reference exactly).
+SWEP.ProjectileForce = 1000   -- matches RPG reference (sent_rpg_rocket also self-thrusts)
 
 function SWEP:FireProjectile()
     if not SERVER then return end
-
-    local ent = ents.Create("ent_kate_projectile")
-    if not IsValid(ent) then return end
 
     local owner = self.Owner
     local aim = owner:GetAimVector()
     local pos = owner:EyePos() + aim * 30 - owner:GetUp() * 10 +
         (self:GetUHBool("Zooming") and Vector(0, 0, 0) or owner:GetRight() * 5)
 
-    -- Set position and angles BEFORE Spawn
+    local ent = ents.Create("sent_rpg_rocket")
+    if not IsValid(ent) then return end
+
+    -- Set position + angles BEFORE Spawn() (entity reads them in Initialize)
     ent:SetPos(pos)
-    ent:SetAngles(owner:EyeAngles())
+    ent:SetAngles(owner:GetAngles())
 
-    -- CRITICAL: set ALL config fields BEFORE Spawn() so Initialize()
-    -- can read them. If set after Spawn, the physics hull is initialized
-    -- with the wrong model and PhysicsCollide never fires.
-    ent.ProjectileModel = self.ProjectileModel
-    ent.IsBolt = self.ProjectileIsBolt
-    ent.Damage = self.ProjectileDamage
-    ent.DamageRadius = self.ProjectileRadius
-    ent.ExplodeOnImpact = not self.ProjectileIsBolt
-    ent.ExplosionSound = self.ProjectileExplosionSound
-    ent.TrailSound = self.ProjectileTrailSound
-
-    -- NOW spawn — Initialize() will read the correct fields
+    -- Spawn the entity — Initialize() sets model, physics, mass, gravity OFF
     ent:Spawn()
     ent:Activate()
-    ent:SetOwner(owner)
 
-    -- Apply force (same pattern as RPG reference)
+    -- Assign Owner AFTER Spawn() (matches RPG reference)
+    ent.Owner = owner
+
+    -- Apply initial impulse — entity also self-thrusts via PhysicsUpdate
     local phys = ent:GetPhysicsObject()
     if IsValid(phys) then
         phys:ApplyForceCenter(aim * self.ProjectileForce)
