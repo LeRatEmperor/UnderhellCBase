@@ -194,44 +194,28 @@ hook.Add("RenderScene", "CUH_RTScope_RenderScene", function(origin, angles, fov)
         -- ============================================================
         -- COMPOSITE RETICLE INTO THE RT (baked into lens texture)
         -- ============================================================
-        -- Use render.OverrideBlend to force the reticle to draw on top
-        -- regardless of alpha/depth state. BLEND_ONE / BLEND_ONE with
-        -- BLENDFUNC_ADD = additive blending (reticle adds to the scene).
-        -- This is the most reliable way to composite onto an RT.
+        -- Simple approach: render.SetMaterial + render.DrawScreenQuadEx
+        -- No render.OverrideBlend (the signature is complex and was
+        -- causing errors). The depth buffer is cleared above so the
+        -- draws should appear on top of the 3D scene.
         local reticleMat = GetReticleMaterial(wep)
         if reticleMat and not reticleMat:IsError() then
             render.SetMaterial(reticleMat)
-            -- Force additive blending: Source*1 + Dest*1
-            render.OverrideBlend(true,
-                BLEND_ONE, BLEND_ONE, BLENDFUNC_ADD,
-                true,
-                BLEND_ONE, BLEND_ONE, BLENDFUNC_ADD)
             render.DrawScreenQuadEx(0, 0, size, size)
-            render.OverrideBlend(false)
         end
 
         -- Layer 2: gmod/scope
         local uhReticle = Material("gmod/scope")
         if uhReticle and not uhReticle:IsError() then
             render.SetMaterial(uhReticle)
-            render.OverrideBlend(true,
-                BLEND_ONE, BLEND_ONE, BLENDFUNC_ADD,
-                true,
-                BLEND_ONE, BLEND_ONE, BLENDFUNC_ADD)
             render.DrawScreenQuadEx(0, 0, size, size)
-            render.OverrideBlend(false)
         end
 
         -- Layer 3: Scout sniper lens texture
         local scoutLens = Material("models/weapons/v_models/sniper_scout/lens")
         if scoutLens and not scoutLens:IsError() then
             render.SetMaterial(scoutLens)
-            render.OverrideBlend(true,
-                BLEND_ONE, BLEND_ONE, BLENDFUNC_ADD,
-                true,
-                BLEND_ONE, BLEND_ONE, BLENDFUNC_ADD)
             render.DrawScreenQuadEx(0, 0, size, size)
-            render.OverrideBlend(false)
         end
 
         render.PopRenderTarget()
