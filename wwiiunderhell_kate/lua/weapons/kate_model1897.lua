@@ -76,6 +76,9 @@ SWEP.Primary.ReloadTime = 0.7     -- per-shell insertion time (template default)
 -- Ironsights (from TFA source)
 SWEP.IronSightsPos = Vector(-3.345, -2, 1.3)
 SWEP.IronSightsAng = Vector(0.6, 0, 0)
+-- NYDAR ironsight position (from TFA source)
+SWEP.IronSightsPos_NYDAR = Vector(-3.345, -2, 0.915)
+SWEP.IronSightsAng_NYDAR = Vector(0, 0, 0)
 SWEP.IronSightTime = 0.3
 SWEP.SwayPosition = 2.0
 SWEP.AlternativePos = Vector(0, 0, 0)

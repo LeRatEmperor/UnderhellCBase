@@ -30,9 +30,9 @@ ATTACHMENT.WeaponTable = {
     ["ScopeFov"] = 30,
     ["ZoomFov"] = 40,
     ["Sensitivity"] = 0.5,
-    -- Use the per-weapon Lens ironsight offset if available
-    ["IronSightsPos"] = function(wep, val) return wep.IronSightsPos_Lens or val end,
-    ["IronSightsAng"] = function(wep, val) return wep.IronSightsAng_Lens or val end,
+    -- Use the per-weapon Lens ironsight offset if available (from TFA source)
+    ["IronSightsPos"] = function(wep, val) return wep.IronSightsPos_LENS or val end,
+    ["IronSightsAng"] = function(wep, val) return wep.IronSightsAng_LENS or val end,
 }
 
 function ATTACHMENT:Attach(wep)

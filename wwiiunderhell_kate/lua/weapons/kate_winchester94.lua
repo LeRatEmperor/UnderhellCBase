@@ -75,6 +75,9 @@ SWEP.Primary.ReloadTime = 0.5
 -- Ironsights (from TFA source)
 SWEP.IronSightsPos = Vector(-3.9, -2, 1.2)
 SWEP.IronSightsAng = Vector(0.2, 0, 0)
+-- ACOG ironsight position (from TFA source)
+SWEP.IronSightsPos_ACOG = Vector(-3.04, -4.5, 0.045)
+SWEP.IronSightsAng_ACOG = Vector(0, 0, 0)
 SWEP.IronSightTime = 0.3
 SWEP.SwayPosition = 2.0
 SWEP.AlternativePos = Vector(0, 0, 0)

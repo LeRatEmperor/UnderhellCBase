@@ -72,9 +72,10 @@ SWEP.IronSightsPos = Vector(-4.4, -4, 1.4)
 -- Scope-specific ironsight positions (from TFA source)
 SWEP.IronSightsPos_7X = Vector(-4.385, -3, 0.495)
 SWEP.IronSightsAng_7X = Vector(0, 0, 0)
+SWEP.IronSightsAng = Vector(0, 0, 0)
+-- ACOG ironsight position (from TFA source)
 SWEP.IronSightsPos_ACOG = Vector(-3.19, -5, 0.91)
 SWEP.IronSightsAng_ACOG = Vector(0, 0, 0)
-SWEP.IronSightsAng = Vector(0, 0, 0)
 SWEP.IronSightTime = 0.4
 SWEP.SwayPosition = 2.0
 SWEP.AlternativePos = Vector(0, 0, 0)
