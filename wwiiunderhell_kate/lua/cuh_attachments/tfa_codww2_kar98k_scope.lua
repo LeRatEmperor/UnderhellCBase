@@ -30,20 +30,6 @@ function ATTACHMENT:Attach(wep)
     wep.Use2DScope = false
 
     if CLIENT then
-        -- Create a custom RT material with NO VMT = NO proxy block.
-        -- The TFA_COD_Scope proxy in the WWII VMTs resets $basetexture
-        -- every frame. Our custom material has no proxy, so SetTexture sticks.
-        local matName = "kate_rt_scope_" .. wep:EntIndex()
-        local mat = CreateMaterial(matName, "UnlitGeneric", {
-            ["$basetexture"] = "gmod/scope",
-            ["$model"] = "1",
-            ["$translucent"] = "1",
-        })
-        wep.ScopeTexture = mat
-        wep._rtScopeMatName = matName
-        wep._rtScopeVElement = "scope_default"
-        wep._rtScopeSubMatIndex = nil  -- will be found on first Think
-
         -- Initialize RenderTarget
         if not wep.RenderTarget then
             local scale = ScrH() / 1080
@@ -53,68 +39,96 @@ function ATTACHMENT:Attach(wep)
             wep.RenderTarget = GetRenderTarget("CustomUH_ScopeRT_" .. wep:EntIndex(), wep.RT_Size, wep.RT_Size, false)
         end
 
-        -- CustomThink re-applies SetSubMaterial EVERY FRAME.
-        -- This is necessary because ApplyAttachments Stage 6 destroys
-        -- and rebuilds the ClientsideModels AFTER Attach() runs, so
-        -- any SetSubMaterial called in Attach() is lost. By applying
-        -- it every frame in CustomThink, the override persists.
-        -- CRITICAL: only hook CustomThink ONCE per weapon.
-        -- The OLD code re-saved prev think into wep._rtScopePrevThink every
-        -- Attach() call, but the closure body read w._rtScopePrevThink at
-        -- *call time*. After a second Attach() (which happens routinely —
-        -- ApplyAttachments re-runs on every attachment change, weapon switch,
-        -- SWEP:Initialize), the field pointed back at our own closure →
-        -- infinite recursion → stack overflow.
-        -- Fix: capture prevThink as a LOCAL upvalue, and gate with _rtScopeHooked.
+        -- Create a placeholder ScopeTexture material. This will be REPLACED
+        -- by the shadow material once we find the lens VMT path (in CustomThink).
+        -- The RenderScene hook checks wep.ScopeTexture to decide whether to
+        -- render the RT, so we need it set immediately.
+        local matName = "kate_rt_scope_" .. wep:EntIndex()
+        local mat = CreateMaterial(matName, "UnlitGeneric", {
+            ["$basetexture"] = "gmod/scope",
+            ["$model"] = "1",
+            ["$translucent"] = "1",
+        })
+        wep.ScopeTexture = mat
+        wep._rtScopeMatName = matName
+        wep._rtScopeVElement = "scope_default"
+        wep._rtScopeShadowCreated = false  -- will be set true once shadow material is created
+        wep._rtScopeShadowPath = nil       -- the lens VMT path we shadowed
+
+        -- Hook CustomThink to find the lens material and create the shadow.
+        -- This must run AFTER InitVElements creates the csModel, so we do it
+        -- in Think (not in Attach, because Attach runs before InitVElements).
+        --
+        -- CRITICAL: only hook once per weapon (idempotent via _rtScopeHooked).
+        -- Capture prevThink as LOCAL upvalue to prevent recursion.
         if not wep._rtScopeHooked then
             wep._rtScopeHooked = true
             local prevThink = wep.CustomThink
             wep._rtScopePrevThink = prevThink
 
             wep.CustomThink = function(w, ct)
-                -- Re-entry guard: if we're already inside this closure
-                -- (e.g. due to stale state from a previous Lua refresh),
-                -- bail out immediately to prevent any recursion.
+                -- Re-entry guard
                 if w._rtScopeInThink then return end
                 w._rtScopeInThink = true
 
-                -- Run previous CustomThink via the LOCAL upvalue.
-                -- NEVER call ourselves (recursion guard): if prevThink
-                -- happens to be the same function as w.CustomThink,
-                -- skip the call.
+                -- Run previous CustomThink
                 if prevThink and prevThink ~= w.CustomThink then
                     prevThink(w, ct)
                 end
 
-                if not w._rtScopeMatName then
-                    w._rtScopeInThink = nil
-                    return
-                end
-                if not w.ViewModelElements then w._rtScopeInThink = nil return end
-                local elem = w.ViewModelElements[w._rtScopeVElement]
-                if not elem or not IsValid(elem._csModel) then w._rtScopeInThink = nil return end
-                local csModel = elem._csModel
+                -- Try to find the lens material and create the shadow
+                if not w._rtScopeShadowCreated then
+                    if not w.ViewModelElements then w._rtScopeInThink = nil return end
+                    local elem = w.ViewModelElements[w._rtScopeVElement]
+                    if not elem or not IsValid(elem._csModel) then w._rtScopeInThink = nil return end
+                    local csModel = elem._csModel
 
-                -- Find the lens sub-material index (only once, then cache it)
-                if not w._rtScopeSubMatIndex then
                     local mats = csModel:GetMaterials()
-                    if mats then
-                        for i = 1, #mats do
-                            local mn = string.lower(tostring(mats[i]))
-                            if string.find(mn, "lens") or string.find(mn, "optic") or string.find(mn, "scope") then
-                                w._rtScopeSubMatIndex = i - 1  -- 0-based
-                                break
+                    if not mats or #mats == 0 then w._rtScopeInThink = nil return end
+
+                    -- Find the lens material by name
+                    local lensPath = nil
+                    for i = 1, #mats do
+                        local mn = string.lower(tostring(mats[i]))
+                        if string.find(mn, "lens") or string.find(mn, "optic") or string.find(mn, "scope") then
+                            lensPath = mats[i]
+                            break
+                        end
+                    end
+
+                    -- Fallback: use material at index 0
+                    if not lensPath then
+                        lensPath = mats[1]
+                    end
+
+                    if lensPath then
+                        w._rtScopeShadowPath = lensPath
+                        -- CreateMaterial with the EXACT same name as the lens VMT.
+                        -- This shadows the VMT: the engine finds our material
+                        -- instead of the VMT when looking up by name.
+                        -- Our material has NO proxy, so SetTexture sticks.
+                        local shadowMat = CreateMaterial(lensPath, "UnlitGeneric", {
+                            ["$basetexture"] = "gmod/scope",
+                            ["$model"] = "1",
+                            ["$translucent"] = "1",
+                        })
+                        -- Point ScopeTexture to the shadow material so the
+                        -- RenderScene hook updates THIS material's basetexture.
+                        w.ScopeTexture = shadowMat
+                        w._rtScopeMatName = lensPath
+                        w._rtScopeShadowCreated = true
+                        w._rtScopeSubMatIndex = 0  -- for debug logging compat
+
+                        if GetConVar("cuh_rt_scope_debug"):GetBool() then
+                            print("[CUH RT] Shadow material created: " .. lensPath)
+                            print("[CUH RT] Materials on csModel:")
+                            for i = 1, #mats do
+                                print(string.format("  [%d] %s", i - 1, tostring(mats[i])))
                             end
                         end
                     end
-                    -- If not found by name, try index 0 (first material is often the lens)
-                    if not w._rtScopeSubMatIndex then
-                        w._rtScopeSubMatIndex = 0
-                    end
                 end
 
-                -- Apply the sub-material override EVERY FRAME
-                csModel:SetSubMaterial(w._rtScopeSubMatIndex, w._rtScopeMatName)
                 w._rtScopeInThink = nil
             end
         end
@@ -130,16 +144,6 @@ function ATTACHMENT:Detach(wep)
     wep.Use2DScope = false
 
     if CLIENT then
-        -- Restore the original sub-material
-        if wep._rtScopeSubMatIndex and wep._rtScopeVElement then
-            if wep.ViewModelElements and wep.ViewModelElements[wep._rtScopeVElement] then
-                local elem = wep.ViewModelElements[wep._rtScopeVElement]
-                if IsValid(elem._csModel) then
-                    elem._csModel:SetSubMaterial(wep._rtScopeSubMatIndex, "")
-                end
-            end
-        end
-
         -- Restore previous CustomThink
         if wep._rtScopePrevThink then
             wep.CustomThink = wep._rtScopePrevThink
@@ -151,7 +155,9 @@ function ATTACHMENT:Detach(wep)
         wep._rtScopeMatName = nil
         wep._rtScopeVElement = nil
         wep._rtScopeSubMatIndex = nil
-        wep._rtScopeHooked = nil  -- allow a future Attach() to re-hook
+        wep._rtScopeHooked = nil
+        wep._rtScopeShadowCreated = nil
+        wep._rtScopeShadowPath = nil
     end
 end
 

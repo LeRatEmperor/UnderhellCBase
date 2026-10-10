@@ -1,30 +1,74 @@
-if not ATTACHMENT then ATTACHMENT = {} end
+#!/usr/bin/env python3
+"""
+Rewrite the RT scope attachment files to use MATERIAL SHADOWING
+instead of SetSubMaterial.
 
-ATTACHMENT.Name = "7x Scope"
-ATTACHMENT.ShortName = "SCOPE"
-ATTACHMENT.Icon = "entities/tfa_codww2_scope.png"
-ATTACHMENT.Description = {
-    Color(255, 255, 255), "7x Scope",
-    Color(255, 100, 100), "+25% Zoom time",
+OLD APPROACH (broken):
+  - CreateMaterial with a unique name (e.g. "kate_rt_scope_35")
+  - SetSubMaterial on the csModel every frame to use our material
+  - PROBLEM: DrawVElements calls model:SetModel(elem.model) every
+    frame BEFORE model:DrawModel(). SetModel resets all sub-material
+    overrides, so our SetSubMaterial is wiped out before the lens
+    is drawn.
+
+NEW APPROACH (material shadowing):
+  - In CustomThink, find the actual lens material path from
+    csModel:GetMaterials()
+  - Call CreateMaterial(lensPath, "UnlitGeneric", {...}) with the
+    EXACT same name as the lens VMT. This creates a material that
+    SHADOWS the VMT — the engine finds our material instead of the
+    VMT when looking up by name.
+  - Since our material has NO proxy (no TFA_COD_Scope proxy),
+    SetTexture("$basetexture", RT) sticks permanently.
+  - No SetSubMaterial needed — the model naturally uses the shadowed
+    material because it has the same name.
+  - The RenderScene hook (in cuh_rt_scope_render.lua) calls
+    SetTexture every frame to update the basetexture to the RT.
+"""
+
+import os
+
+ATTACHMENTS_DIR = "/home/z/my-project/wwiiunderhell_kate/lua/cuh_attachments"
+
+FILES = {
+    "tfa_codww2_mosin_scope.lua":      "scope_default",
+    "tfa_codww2_arisaka_scope.lua":    "scope_default",
+    "tfa_codww2_springfield_scope.lua":"scope_default",
+    "tfa_codww2_kar98k_scope.lua":     "scope_default",
+    "tfa_codww2_enfield_scope.lua":    "scope_default",
+    "tfa_codww2_scope.lua":            "scope_default",
+    "tfa_codww2_4x.lua":               "scope_acog",
 }
 
-ATTACHMENT.WeaponTable = {
-    ["VElements"] = {
-        ["scope_default"] = { ["active"] = true },
-    },
-    ["WElements"] = {
-        ["scope_default"] = { ["active"] = true },
-    },
-    ["ScopeFov"] = 7,
-    ["ZoomFov"] = 15,
+
+def make_file(velem_name, scope_fov, zoom_fov, display_name):
+    return f'''if not ATTACHMENT then ATTACHMENT = {{}} end
+
+ATTACHMENT.Name = "{display_name}"
+ATTACHMENT.ShortName = "SCOPE"
+ATTACHMENT.Icon = "entities/tfa_codww2_scope.png"
+ATTACHMENT.Description = {{
+    Color(255, 255, 255), "{display_name}",
+    Color(255, 100, 100), "+25% Zoom time",
+}}
+
+ATTACHMENT.WeaponTable = {{
+    ["VElements"] = {{
+        ["{velem_name}"] = {{ ["active"] = true }},
+    }},
+    ["WElements"] = {{
+        ["{velem_name}"] = {{ ["active"] = true }},
+    }},
+    ["ScopeFov"] = {scope_fov},
+    ["ZoomFov"] = {zoom_fov},
     ["Sensitivity"] = 0.2,
     ["IronSightsPos"] = function(wep, val) return wep.IronSightsPos_7X or wep.IronSightsPos_ACOG or val end,
     ["IronSightsAng"] = function(wep, val) return wep.IronSightsAng_7X or wep.IronSightsAng_ACOG or val end,
-}
+}}
 
 function ATTACHMENT:Attach(wep)
-    wep.ScopeFov = 7
-    wep.ZoomFov = 15
+    wep.ScopeFov = {scope_fov}
+    wep.ZoomFov = {zoom_fov}
     wep.ScopeDisabled = false
     wep.Sensitivity = 0.2
     wep.Use2DScope = false
@@ -33,7 +77,7 @@ function ATTACHMENT:Attach(wep)
         -- Initialize RenderTarget
         if not wep.RenderTarget then
             local scale = ScrH() / 1080
-            local quality = { 256, 512, 768, 1080 }
+            local quality = {{ 256, 512, 768, 1080 }}
             local num = math.Clamp(GetConVar("uh_rt_quality"):GetInt(), 1, 4)
             wep.RT_Size = quality[num] * scale
             wep.RenderTarget = GetRenderTarget("CustomUH_ScopeRT_" .. wep:EntIndex(), wep.RT_Size, wep.RT_Size, false)
@@ -44,14 +88,14 @@ function ATTACHMENT:Attach(wep)
         -- The RenderScene hook checks wep.ScopeTexture to decide whether to
         -- render the RT, so we need it set immediately.
         local matName = "kate_rt_scope_" .. wep:EntIndex()
-        local mat = CreateMaterial(matName, "UnlitGeneric", {
+        local mat = CreateMaterial(matName, "UnlitGeneric", {{
             ["$basetexture"] = "gmod/scope",
             ["$model"] = "1",
             ["$translucent"] = "1",
-        })
+        }})
         wep.ScopeTexture = mat
         wep._rtScopeMatName = matName
-        wep._rtScopeVElement = "scope_default"
+        wep._rtScopeVElement = "{velem_name}"
         wep._rtScopeShadowCreated = false  -- will be set true once shadow material is created
         wep._rtScopeShadowPath = nil       -- the lens VMT path we shadowed
 
@@ -107,11 +151,11 @@ function ATTACHMENT:Attach(wep)
                         -- This shadows the VMT: the engine finds our material
                         -- instead of the VMT when looking up by name.
                         -- Our material has NO proxy, so SetTexture sticks.
-                        local shadowMat = CreateMaterial(lensPath, "UnlitGeneric", {
+                        local shadowMat = CreateMaterial(lensPath, "UnlitGeneric", {{
                             ["$basetexture"] = "gmod/scope",
                             ["$model"] = "1",
                             ["$translucent"] = "1",
-                        })
+                        }})
                         -- Point ScopeTexture to the shadow material so the
                         -- RenderScene hook updates THIS material's basetexture.
                         w.ScopeTexture = shadowMat
@@ -162,3 +206,39 @@ function ATTACHMENT:Detach(wep)
 end
 
 -- CUH base handles registration
+'''
+
+
+def main():
+    print(f"Rewriting {len(FILES)} RT scope attachment files...")
+    for fname, velem in FILES.items():
+        path = os.path.join(ATTACHMENTS_DIR, fname)
+        if not os.path.exists(path):
+            print(f"  MISSING: {fname}")
+            continue
+
+        # Determine FOV values
+        if "4x" in fname:
+            scope_fov, zoom_fov, display = 15, 25, "4x ACOG"
+        elif "mosin" in fname:
+            scope_fov, zoom_fov, display = 7, 15, "Mosin Scope"
+        elif "arisaka" in fname:
+            scope_fov, zoom_fov, display = 7, 15, "Arisaka Scope"
+        elif "springfield" in fname:
+            scope_fov, zoom_fov, display = 7, 15, "Springfield Scope"
+        elif "kar98k" in fname:
+            scope_fov, zoom_fov, display = 7, 15, "Kar98k Scope"
+        elif "enfield" in fname:
+            scope_fov, zoom_fov, display = 7, 15, "Enfield Scope"
+        else:
+            scope_fov, zoom_fov, display = 7, 15, "7x Scope"
+
+        content = make_file(velem, scope_fov, zoom_fov, display)
+        with open(path, "w", encoding="utf-8") as f:
+            f.write(content)
+        print(f"  REWROTE: {fname} (velem={velem})")
+    print(f"\nDone.")
+
+
+if __name__ == "__main__":
+    main()
