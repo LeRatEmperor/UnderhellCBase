@@ -1,0 +1,8 @@
+"UnlitGeneric"
+{
+    $basetexture "reflex/reflex_dot"
+    $translucent "1"
+    $vertexalpha "1"
+    $vertexcolor "1"
+    $additive "1"
+}
