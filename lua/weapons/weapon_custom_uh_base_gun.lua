@@ -1053,8 +1053,8 @@ function SWEP:DoDrawCrosshair(x, y)
     local reloadTarget = reloading and 0 or 1
     self._chReloadAlpha = math.Approach(self._chReloadAlpha or 1, reloadTarget, FrameTime() * 8)
 
-    -- Calculate visibility alpha
-    local a = (1 - self._chADS) * 100 * blend * self._chReloadAlpha
+    -- Calculate visibility alpha (fades during ADS and reload)
+    local a = (1 - self._chADS * 0.7) * 100 * blend * self._chReloadAlpha
     if a <= 0 then return true end
 
     -- Check convar
@@ -1111,11 +1111,18 @@ function SWEP:DoDrawCrosshair(x, y)
     if inAir then moveSpread = moveSpread + 3 end
 
     -- Shot kick (decays over CH_KickTime)
+    -- Use a fixed kick amount in screen units so it's always visible
     local since = now - (self._lastRecoilTime or 0)
     local kick = math.Clamp(1 - since / CH_KickTime, 0, 1)
-    kick = kick * kick
+    kick = kick * kick  -- quadratic decay for smoother feel
+    -- Kick adds a fixed amount to the gap (in ScreenScale units)
+    local kickGap = kick * ScreenScale(8)  -- 8 ScreenScale units of kick
 
-    local target = scale * (spread + moveSpread + math.max(baseSpread, 0.5) * CH_Kick * kick)
+    local target = scale * (spread + moveSpread) + kickGap
+
+    -- ADS convergence: as ADS progresses (0..1), gap shrinks toward 0
+    -- The prongs converge to the center point
+    target = target * (1 - self._chADS)
 
     -- Smooth interpolation (opens fast, closes smooth)
     local ft = FrameTime()
@@ -1125,7 +1132,7 @@ function SWEP:DoDrawCrosshair(x, y)
     else
         self._chGap = Lerp(math.min(ft * CH_Smooth, 1), self._chGap, target)
     end
-    local gap_size = math.max(self._chGap, dot_size)
+    local gap_size = math.max(self._chGap, 0)  -- allow gap to reach 0 (converged)
 
     -- Walk bob (figure of eight)
     local speed = vel / math.max(walkSpeed * 2.5, 1)
@@ -1135,23 +1142,30 @@ function SWEP:DoDrawCrosshair(x, y)
     x = x + math.sin(self._chBobPhase) * bob
     y = y + math.abs(math.cos(self._chBobPhase)) * bob * 0.6
 
-    -- Draw center dot
-    ch_shadowrect(x - (dot_size / 2), y - (dot_size / 2), dot_size, dot_size, col)
+    -- Draw center dot (hide when fully converged during ADS)
+    if self._chADS < 0.95 then
+        ch_shadowrect(x - (dot_size / 2), y - (dot_size / 2), dot_size, dot_size, col)
+    end
 
     -- Draw crosshair lines or circle
     local pellets = (self.Primary and self.Primary.NumberofShots) or 1
     if self.CrosshairCircle or pellets > 1 then
         local shadow = CH_Shadow
         shadow.a = a * 100 / 150
-        surface.DrawCircle(x, y, gap_size, col)
-        surface.DrawCircle(x, y, gap_size - 1, col)
-        surface.DrawCircle(x, y, gap_size + 1, shadow)
-        surface.DrawCircle(x, y, gap_size - 2, shadow)
+        if gap_size > 1 then
+            surface.DrawCircle(x, y, gap_size, col)
+            surface.DrawCircle(x, y, gap_size - 1, col)
+            surface.DrawCircle(x, y, gap_size + 1, shadow)
+            surface.DrawCircle(x, y, gap_size - 2, shadow)
+        end
     elseif baseSpread > 0 then
-        ch_shadowrect(x - (dot_size / 2), y + (dot_size / 4) + gap_size, dot_size, line_size, col)
-        ch_shadowrect(x - (dot_size / 2), y - (dot_size / 4) - gap_size - line_size, dot_size, line_size, col)
-        ch_shadowrect(x + gap_size, y - (dot_size / 2), line_size, dot_size, col)
-        ch_shadowrect(x - gap_size - line_size, y - (dot_size / 2), line_size, dot_size, col)
+        -- Only draw prongs if there's a visible gap (or converging)
+        if gap_size > 0 then
+            ch_shadowrect(x - (dot_size / 2), y + (dot_size / 4) + gap_size, dot_size, line_size, col)
+            ch_shadowrect(x - (dot_size / 2), y - (dot_size / 4) - gap_size - line_size, dot_size, line_size, col)
+            ch_shadowrect(x + gap_size, y - (dot_size / 2), line_size, dot_size, col)
+            ch_shadowrect(x - gap_size - line_size, y - (dot_size / 2), line_size, dot_size, col)
+        end
     end
 
     return true
