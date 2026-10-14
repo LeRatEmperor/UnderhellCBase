@@ -50,48 +50,54 @@ end
 function ATTACHMENT:Attach(wep)
     if not CLIENT then return end
 
-    -- Override DrawHUD to draw the reflex dot when zooming
-    wep._cuhPrevDrawHUD = wep.DrawHUD
     wep._cuhReflexActive = true
 
-    wep.DrawHUD = function(self)
-        -- Draw base HUD (crosshair, ammo, etc.) first
-        -- Skip base DrawHUD when zoomed to hide the crosshair behind the dot
-        if not self:GetUHBool("Zooming") then
-            if self._cuhPrevDrawHUD then
-                self._cuhPrevDrawHUD(self)
+    -- CRITICAL: Only hook DrawHUD ONCE per weapon.
+    -- The OLD code re-saved prev into wep._cuhPrevDrawHUD every Attach()
+    -- call, but the closure body read self._cuhPrevDrawHUD at CALL TIME.
+    -- After a second Attach() (which happens routinely — ApplyAttachments
+    -- re-runs on every attachment change), the field pointed back at our
+    -- own closure → infinite recursion → stack overflow.
+    -- Fix: capture prevDrawHUD as a LOCAL upvalue + gate with _cuhReflexHooked.
+    if not wep._cuhReflexHooked then
+        wep._cuhReflexHooked = true
+        local prevDrawHUD = wep.DrawHUD
+        wep._cuhPrevDrawHUD = prevDrawHUD
+
+        wep.DrawHUD = function(self)
+            -- Run previous DrawHUD via the LOCAL upvalue.
+            -- NEVER call ourselves (recursion guard).
+            if prevDrawHUD and prevDrawHUD ~= self.DrawHUD then
+                prevDrawHUD(self)
             end
-            return
+
+            -- Draw the reflex dot when zooming
+            if not self:GetUHBool("Zooming") then return end
+
+            local delay = 0.1
+            local fadeTime = 0.1
+            local dotSize = 128
+
+            local aimTime = self._cuhZoomStartTime or 0
+            if CurTime() < (aimTime + delay) then return end
+
+            local alpha = 255
+            if CurTime() < (aimTime + delay + fadeTime) then
+                alpha = math.Clamp((CurTime() - aimTime - delay) / fadeTime * 255, 0, 255)
+            end
+
+            surface.SetMaterial(RedDotMaterial)
+            surface.SetDrawColor(255, 0, 0, alpha)
+            surface.DrawTexturedRect(
+                (ScrW() / 2) - (dotSize / 2),
+                (ScrH() / 2) - (dotSize / 2),
+                dotSize,
+                dotSize
+            )
         end
-
-        -- Still call base for ammo display etc.
-        if self._cuhPrevDrawHUD then
-            self._cuhPrevDrawHUD(self)
-        end
-
-        local delay = 0.1
-        local fadeTime = 0.1
-        local dotSize = 128
-
-        local aimTime = self._cuhZoomStartTime or 0
-        if CurTime() < (aimTime + delay) then return end
-
-        local alpha = 255
-        if CurTime() < (aimTime + delay + fadeTime) then
-            alpha = math.Clamp((CurTime() - aimTime - delay) / fadeTime * 255, 0, 255)
-        end
-
-        surface.SetMaterial(RedDotMaterial)
-        surface.SetDrawColor(255, 0, 0, alpha)
-        surface.DrawTexturedRect(
-            (ScrW() / 2) - (dotSize / 2),
-            (ScrH() / 2) - (dotSize / 2),
-            dotSize,
-            dotSize
-        )
     end
 
-    -- Track zoom start time via a Think hook (per-weapon)
+    -- Track zoom start time via a Think hook (per-weapon, idempotent)
     if not wep._cuhReflexThinkHooked then
         wep._cuhReflexThinkHooked = true
         local prevThink = wep.Think
@@ -103,8 +109,8 @@ function ATTACHMENT:Attach(wep)
             end
             self._cuhWasZooming = isZooming
 
-            -- Call previous Think
-            if prevThink then
+            -- Call previous Think via LOCAL upvalue (recursion guard)
+            if prevThink and prevThink ~= self.Think then
                 return prevThink(self, ...)
             end
         end
@@ -130,6 +136,7 @@ function ATTACHMENT:Detach(wep)
     end
 
     wep._cuhReflexActive = nil
+    wep._cuhReflexHooked = nil
     wep._cuhZoomStartTime = nil
     wep._cuhWasZooming = nil
 end
