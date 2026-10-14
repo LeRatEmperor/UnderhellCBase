@@ -867,6 +867,32 @@ function SWEP:FireAnimationEvent(pos, ang, event, options)
 end
 
 -- ============================================================
+-- HandleRunning override — block sprint during reload
+-- ============================================================
+-- The parent base's HandleRunning doesn't check if the weapon is
+-- reloading before entering sprint. This causes shotgun shell-by-shell
+-- reload animations to fight with sprint animations (rapid start/stop).
+-- Fix: if reloading, don't enter sprint — wait for reload to complete.
+local origHandleRunning = SWEP.HandleRunning
+function SWEP:HandleRunning(ct)
+    if self.GetUHBool and self:GetUHBool("Reloading") then
+        -- If already running, exit sprint (but don't start a new one)
+        if self:GetUHBool("Running") then
+            self:SetUHBool("Running", false)
+            -- Play the exit-sprint animation
+            local act = ACT_VM_LOWERED_TO_IDLE
+            if self.HasSilencer and self:GetNWBool("Silenced") then
+                act = ACT_VM_IDLE_SILENCED
+            end
+            self:SendWeaponAnim(act)
+        end
+        return  -- Don't enter sprint while reloading
+    end
+    -- Not reloading — call the parent's HandleRunning
+    origHandleRunning(self, ct)
+end
+
+-- ============================================================
 -- Think
 -- ============================================================
 function SWEP:Think()
