@@ -484,6 +484,10 @@ end
 function SWEP:PostShoot()
     -- Track last shot time for crosshair kick calculation (MCV-style)
     self._lastRecoilTime = CurTime()
+    -- Debug: verify PostShoot is called
+    if GetConVar("cuh_rt_scope_debug") and GetConVar("cuh_rt_scope_debug"):GetBool() then
+        print("[CUH CH] PostShoot called! _lastRecoilTime = " .. tostring(self._lastRecoilTime))
+    end
 end
 
 -- ============================================================
@@ -1053,8 +1057,9 @@ function SWEP:DoDrawCrosshair(x, y)
     local reloadTarget = reloading and 0 or 1
     self._chReloadAlpha = math.Approach(self._chReloadAlpha or 1, reloadTarget, FrameTime() * 8)
 
-    -- Calculate visibility alpha (fades during ADS and reload)
-    local a = (1 - self._chADS * 0.7) * 100 * blend * self._chReloadAlpha
+    -- Calculate visibility alpha (fully fades during ADS and reload)
+    -- During ADS: alpha goes to 0 as _chADS goes to 1 (fully invisible when converged)
+    local a = (1 - self._chADS) * 100 * blend * self._chReloadAlpha
     if a <= 0 then return true end
 
     -- Check convar
@@ -1117,6 +1122,14 @@ function SWEP:DoDrawCrosshair(x, y)
     kick = kick * kick  -- quadratic decay for smoother feel
     -- Kick adds a fixed amount to the gap (in ScreenScale units)
     local kickGap = kick * ScreenScale(8)  -- 8 ScreenScale units of kick
+
+    -- Debug: print kick values
+    if GetConVar("cuh_rt_scope_debug") and GetConVar("cuh_rt_scope_debug"):GetBool() then
+        if kick > 0.01 then
+            print(string.format("[CUH CH] kick=%.3f kickGap=%.1f since=%.3f lastRecoil=%s",
+                kick, kickGap, since, tostring(self._lastRecoilTime or "nil")))
+        end
+    end
 
     local target = scale * (spread + moveSpread) + kickGap
 
