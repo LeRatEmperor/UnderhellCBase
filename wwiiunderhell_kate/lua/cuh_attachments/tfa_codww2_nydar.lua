@@ -54,13 +54,31 @@ function ATTACHMENT:Attach(wep)
     wep._reflexActive = true
 
     -- Install DrawHUD override ONCE (checks _reflexActive before drawing).
-    -- Uses self.BaseClass.DrawHUD(self) like the Drakon — no capture, no recursion.
+    -- Uses the CLASS table's DrawHUD (not BaseClass, which is weapon_custom_uh_base
+    -- and doesn't have DrawHUD). We access it via the weapon's base class chain.
     if not wep._reflexDrawHooked then
         wep._reflexDrawHooked = true
 
+        -- Get the DrawHUD from the class table (weapon_custom_uh_base_gun)
+        -- by walking the inheritance chain. This is the ORIGINAL DrawHUD
+        -- before our override, so calling it won't recurse.
+        local classDrawHUD = nil
+        local cur = getmetatable(wep)
+        while cur do
+            if cur.DrawHUD and cur.DrawHUD ~= wep.DrawHUD then
+                classDrawHUD = cur.DrawHUD
+                break
+            end
+            cur = cur.BaseClass
+        end
+        -- Fallback: if we can't find it, use a noop
+        if not classDrawHUD then
+            classDrawHUD = function() end
+        end
+
         wep.DrawHUD = function(self)
-            -- Always call base HUD first
-            self.BaseClass.DrawHUD(self)
+            -- Always call the original DrawHUD first
+            classDrawHUD(self)
 
             -- Only draw the reflex dot if the Nydar is actively equipped
             if not self._reflexActive then return end

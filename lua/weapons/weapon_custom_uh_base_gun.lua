@@ -484,10 +484,6 @@ end
 function SWEP:PostShoot()
     -- Track last shot time for crosshair kick calculation (MCV-style)
     self._lastRecoilTime = CurTime()
-    -- Debug: verify PostShoot is called
-    if GetConVar("cuh_rt_scope_debug") and GetConVar("cuh_rt_scope_debug"):GetBool() then
-        print("[CUH CH] PostShoot called! _lastRecoilTime = " .. tostring(self._lastRecoilTime))
-    end
 end
 
 -- ============================================================
@@ -1115,21 +1111,17 @@ function SWEP:DoDrawCrosshair(x, y)
     local moveSpread = moveRatio * 2
     if inAir then moveSpread = moveSpread + 3 end
 
-    -- Shot kick (decays over CH_KickTime)
-    -- Use a fixed kick amount in screen units so it's always visible
-    local since = now - (self._lastRecoilTime or 0)
+    -- Shot kick — detect via view punch angle changes (client-side, reliable)
+    -- This avoids prediction issues with _lastRecoilTime
+    local punchAng = IsValid(owner) and owner:GetViewPunchAngles() or Angle(0, 0, 0)
+    local punchMag = math.abs(punchAng.p) + math.abs(punchAng.y) + math.abs(punchAng.r)
+    if punchMag > 0.1 then
+        self._chLastPunch = CurTime()
+    end
+    local since = now - (self._chLastPunch or 0)
     local kick = math.Clamp(1 - since / CH_KickTime, 0, 1)
     kick = kick * kick  -- quadratic decay for smoother feel
-    -- Kick adds a fixed amount to the gap (in ScreenScale units)
-    local kickGap = kick * ScreenScale(8)  -- 8 ScreenScale units of kick
-
-    -- Debug: print kick values
-    if GetConVar("cuh_rt_scope_debug") and GetConVar("cuh_rt_scope_debug"):GetBool() then
-        if kick > 0.01 then
-            print(string.format("[CUH CH] kick=%.3f kickGap=%.1f since=%.3f lastRecoil=%s",
-                kick, kickGap, since, tostring(self._lastRecoilTime or "nil")))
-        end
-    end
+    local kickGap = kick * ScreenScale(12)  -- 12 ScreenScale units of kick
 
     local target = scale * (spread + moveSpread) + kickGap
 
