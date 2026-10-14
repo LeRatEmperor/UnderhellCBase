@@ -1129,11 +1129,11 @@ function SWEP:DoDrawCrosshair(x, y)
     -- The prongs converge to the center point
     target = target * (1 - self._chADS)
 
-    -- Smooth interpolation (opens fast, closes smooth)
+    -- Snap open instantly, close smoothly (feels like MCV full-auto)
     local ft = FrameTime()
     if self._chGap == nil then self._chGap = target end
     if target > self._chGap then
-        self._chGap = Lerp(math.min(ft * CH_Smooth * 3, 1), self._chGap, target)
+        self._chGap = target  -- SNAP to max instantly (no smoothing on kick)
     else
         self._chGap = Lerp(math.min(ft * CH_Smooth, 1), self._chGap, target)
     end
