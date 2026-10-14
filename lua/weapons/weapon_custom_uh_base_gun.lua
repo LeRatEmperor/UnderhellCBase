@@ -873,7 +873,6 @@ end
 -- reloading before entering sprint. This causes shotgun shell-by-shell
 -- reload animations to fight with sprint animations (rapid start/stop).
 -- Fix: if reloading, don't enter sprint — wait for reload to complete.
-local origHandleRunning = SWEP.HandleRunning
 function SWEP:HandleRunning(ct)
     if self.GetUHBool and self:GetUHBool("Reloading") then
         -- If already running, exit sprint (but don't start a new one)
@@ -888,8 +887,10 @@ function SWEP:HandleRunning(ct)
         end
         return  -- Don't enter sprint while reloading
     end
-    -- Not reloading — call the parent's HandleRunning
-    origHandleRunning(self, ct)
+    -- Not reloading — call the parent's HandleRunning via BaseClass
+    if BaseClass.HandleRunning then
+        BaseClass.HandleRunning(self, ct)
+    end
 end
 
 -- ============================================================
