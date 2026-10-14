@@ -1042,13 +1042,13 @@ function SWEP:DoDrawCrosshair(x, y)
     local blend = ch_ease((now - (self._chDeployTime or now)) / CH_DeployTime)
 
     -- Track ADS progress (smooth 0..1)
-    local zooming = self:GetUHBool and self:GetUHBool("Zooming") or false
+    local zooming = self.GetUHBool and self:GetUHBool("Zooming") or false
     if self.ScopeDisabled then zooming = false end
     local adsTarget = zooming and 1 or 0
     self._chADS = math.Approach(self._chADS or 0, adsTarget, FrameTime() * 8)
 
     -- Track reload fade
-    local reloading = self:GetUHBool and self:GetUHBool("Reloading") or false
+    local reloading = self.GetUHBool and self:GetUHBool("Reloading") or false
     local reloadTarget = reloading and 0 or 1
     self._chReloadAlpha = math.Approach(self._chReloadAlpha or 1, reloadTarget, FrameTime() * 8)
 
