@@ -991,6 +991,7 @@ function SWEP:AdjustMouseSensitivity()
 end
 
 
+if CLIENT then
 -- ============================================================
 -- MCV-STYLE DYNAMIC CROSSHAIR
 -- Ported from Military Conflict Vietnam (lua/mcv/weapon_common/cl_hud.lua)
@@ -1155,6 +1156,8 @@ function SWEP:DoDrawCrosshair(x, y)
 
     return true
 end
+
+end -- end if CLIENT (MCV crosshair block)
 
 -- ============================================================
 -- DrawHUD
