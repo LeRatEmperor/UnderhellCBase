@@ -196,21 +196,53 @@ hook.Add("RenderScene", "CUH_RTScope_RenderScene", function(origin, angles, fov)
 end)
 
 -- ============================================================
--- Fix: Purge Sensitivity BEFORE ApplyAttachments (not after)
+-- Fix: Cache Sensitivity origin so RestoreStat can restore it
 -- ============================================================
--- ROOT CAUSE (confirmed by Lua simulation):
---   1. Sensitivity is NOT in the topLevel stat cache list
---   2. RestoreStat checks 'if origin ~= nil' and SKIPS nil origins
---   3. When scope is deselected, RestoreStat does nothing (origin is nil)
---   4. The stale 0.2 persists in both _statCache and self.Sensitivity
---   5. ScopeTexture also persists (Detach is never called by the base)
+-- Sensitivity is NOT in the topLevel stat cache list, so
+-- _statOrigins["Sensitivity"] is never set by InitStatCache.
+-- When a scope attachment sets Sensitivity via SetStat, the origin
+-- is lost. RestoreStat can't restore it, so the stale value persists.
 --
--- FIX: Purge Sensitivity BEFORE calling the original ApplyAttachments.
--- This way:
---   1. We clear Sensitivity (cache + field + ScopeTexture)
---   2. The original ApplyAttachments runs
---   3. If a scope IS equipped, its WeaponTable re-sets Sensitivity via SetStat
---   4. If no scope is equipped, Sensitivity stays nil (correct!)
+-- This hook caches the origin ONCE per weapon, before any attachment
+-- is applied. This way RestoreStat can restore the original (nil) value.
+hook.Add("Think", "CUH_CacheSensitivityOrigin", function()
+    local ply = LocalPlayer()
+    if not IsValid(ply) then return end
+    local wep = ply:GetActiveWeapon()
+    if not IsValid(wep) then return end
+    if not wep.IsCUHWeapon then return end
+
+    -- Wait for InitStatCache to run (creates _statOrigins)
+    if not wep._statOrigins then return end
+
+    -- Only cache once per weapon
+    if wep._cuhSensOriginCached then return end
+
+    -- Check if any scope attachment is currently equipped.
+    -- If so, DON'T cache — the scope's 0.2 is not the origin.
+    -- We need to cache the ORIGINAL value (before any scope).
+    -- If Sensitivity is already set (scope equipped), we can't
+    -- know the original — skip and try again when the weapon
+    -- is freshly deployed.
+    if wep.Sensitivity ~= nil then
+        -- A scope is already equipped. We can't cache the origin.
+        -- Mark as cached anyway to stop checking (we'll handle this
+        -- via the ApplyAttachments override below).
+        wep._cuhSensOriginCached = true
+        return
+    end
+
+    -- Cache the origin (nil = no scope, normal sensitivity)
+    wep._statOrigins["Sensitivity"] = wep.Sensitivity  -- nil
+    wep._cuhSensOriginCached = true
+end)
+
+-- ============================================================
+-- Fix: Purge Sensitivity after ApplyAttachments when no scope equipped
+-- ============================================================
+-- Since Detach is never called, we need to clear Sensitivity ourselves
+-- when no scope attachment is equipped. Override ApplyAttachments
+-- per-instance to add a post-apply cleanup step.
 hook.Add("Think", "CUH_PatchApplyAttachments", function()
     local ply = LocalPlayer()
     if not IsValid(ply) then return end
@@ -225,21 +257,22 @@ hook.Add("Think", "CUH_PatchApplyAttachments", function()
 
     local origApply = wep.ApplyAttachments
     wep.ApplyAttachments = function(self)
-        -- PURGE scope state BEFORE calling the original ApplyAttachments.
-        -- This ensures the stale Sensitivity is cleared.
-        -- If a scope is equipped, its WeaponTable will re-set these via SetStat.
-        if self._statCache then
-            self._statCache["Sensitivity"] = nil
-        end
-        if self._statOrigins then
-            self._statOrigins["Sensitivity"] = nil
-        end
-        self.Sensitivity = nil
-        self.ScopeTexture = nil
-        self.ScopeFov = nil
-
         -- Call the original ApplyAttachments
         origApply(self)
+
+        -- Post-apply: check if any scope attachment is equipped
+        -- by checking if ScopeTexture is set (scope attachments
+        -- set ScopeTexture in their Attach function)
+        if not self.ScopeTexture then
+            -- No scope equipped — purge Sensitivity from cache + field
+            if self._statCache then
+                self._statCache["Sensitivity"] = nil
+            end
+            if self._statOrigins then
+                self._statOrigins["Sensitivity"] = nil
+            end
+            self.Sensitivity = nil
+        end
     end
 end)
 
