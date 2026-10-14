@@ -271,17 +271,11 @@ hook.Add("Think", "CUH_PatchApplyAttachments", function()
         self.ScopeTexture = nil
         self.ScopeFov = nil
 
-        -- Also purge the Nydar reflex sight's DrawHUD/Think overrides.
-        -- Detach is never called by the base, so the DrawHUD override
-        -- persists when switching from Nydar to another attachment.
-        -- Setting to nil makes the weapon fall back to the class table.
-        if self._reflexThinkInstalled then
-            self.DrawHUD = nil
-            self.Think = nil
-            self._zoomStartTime = nil
-            self._wasZooming = nil
-            self._reflexThinkInstalled = nil
-        end
+        -- Also purge the Nydar reflex sight's active toggle.
+        -- Detach is never called by the base, so _reflexActive stays true
+        -- when switching from Nydar to another attachment. The Nydar's
+        -- Attach() will set it back to true if re-equipped.
+        self._reflexActive = false
 
         -- Call the original ApplyAttachments
         origApply(self)

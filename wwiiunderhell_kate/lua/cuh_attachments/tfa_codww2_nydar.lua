@@ -50,64 +50,71 @@ end
 function ATTACHMENT:Attach(wep)
     if not CLIENT then return end
 
-    -- Override DrawHUD — calls self.BaseClass.DrawHUD(self) directly
-    -- (same as the Drakon reference). No prev capture, no recursion.
-    wep.DrawHUD = function(self)
-        if not self:GetUHBool("Zooming") then
+    -- Set the toggle ON — the DrawHUD override checks this flag
+    wep._reflexActive = true
+
+    -- Install DrawHUD override ONCE (checks _reflexActive before drawing).
+    -- Uses self.BaseClass.DrawHUD(self) like the Drakon — no capture, no recursion.
+    if not wep._reflexDrawHooked then
+        wep._reflexDrawHooked = true
+
+        wep.DrawHUD = function(self)
+            -- Always call base HUD first
             self.BaseClass.DrawHUD(self)
-            return
+
+            -- Only draw the reflex dot if the Nydar is actively equipped
+            if not self._reflexActive then return end
+            if not self:GetUHBool("Zooming") then return end
+
+            local delay = 0.1
+            local fadeTime = 0.1
+            local dotSize = 128
+
+            local aimTime = self._zoomStartTime or 0
+            if CurTime() < (aimTime + delay) then return end
+
+            local alpha = 255
+            if CurTime() < (aimTime + delay + fadeTime) then
+                alpha = math.Clamp((CurTime() - aimTime - delay) / fadeTime * 255, 0, 255)
+            end
+
+            surface.SetMaterial(RedDotMaterial)
+            surface.SetDrawColor(255, 0, 0, alpha)
+            surface.DrawTexturedRect(
+                (ScrW() / 2) - (dotSize / 2),
+                (ScrH() / 2) - (dotSize / 2),
+                dotSize,
+                dotSize
+            )
         end
-
-        self.BaseClass.DrawHUD(self)
-
-        local delay = 0.1
-        local fadeTime = 0.1
-        local dotSize = 128
-
-        local aimTime = self._zoomStartTime or 0
-        if CurTime() < (aimTime + delay) then return end
-
-        local alpha = 255
-        if CurTime() < (aimTime + delay + fadeTime) then
-            alpha = math.Clamp((CurTime() - aimTime - delay) / fadeTime * 255, 0, 255)
-        end
-
-        surface.SetMaterial(RedDotMaterial)
-        surface.SetDrawColor(255, 0, 0, alpha)
-        surface.DrawTexturedRect(
-            (ScrW() / 2) - (dotSize / 2),
-            (ScrH() / 2) - (dotSize / 2),
-            dotSize,
-            dotSize
-        )
     end
 
-    -- Track zoom start time via Think (same as Drakon)
-    wep._reflexThinkInstalled = true
-    local prevThink = wep.Think
-    wep.Think = function(self, ...)
-        local isZooming = self:GetUHBool("Zooming")
-        if isZooming and not self._wasZooming then
-            self._zoomStartTime = CurTime()
-        end
-        self._wasZooming = isZooming
+    -- Install Think override ONCE (tracks zoom start time)
+    if not wep._reflexThinkHooked then
+        wep._reflexThinkHooked = true
+        local prevThink = wep.Think
+        wep.Think = function(self, ...)
+            if self._reflexActive then
+                local isZooming = self:GetUHBool("Zooming")
+                if isZooming and not self._wasZooming then
+                    self._zoomStartTime = CurTime()
+                end
+                self._wasZooming = isZooming
+            end
 
-        if prevThink then
-            return prevThink(self, ...)
+            if prevThink and prevThink ~= self.Think then
+                return prevThink(self, ...)
+            end
         end
     end
 end
 
 function ATTACHMENT:Detach(wep)
     if not CLIENT then return end
-
-    -- Restore by nil'ing the instance override — weapon falls back to
-    -- the class table's DrawHUD/Think.
-    wep.DrawHUD = nil
-    wep.Think = nil
+    -- Turn the toggle OFF — DrawHUD will skip the reflex dot
+    wep._reflexActive = false
     wep._zoomStartTime = nil
     wep._wasZooming = nil
-    wep._reflexThinkInstalled = nil
 end
 
 -- TFA attachment registration removed (CUH base handles this)
