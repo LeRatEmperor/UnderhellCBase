@@ -258,15 +258,16 @@ hook.Add("Think", "CUH_PatchApplyAttachments", function()
     local origApply = wep.ApplyAttachments
     wep.ApplyAttachments = function(self)
         -- PURGE scope state BEFORE calling the original ApplyAttachments.
-        -- This ensures the stale Sensitivity is cleared.
-        -- If a scope is equipped, its WeaponTable will re-set these via SetStat.
+        -- Set Sensitivity to 0.8 (normal ironsights sensitivity) when
+        -- deselecting RT scopes. If a scope is re-equipped, its
+        -- WeaponTable will override this via SetStat.
         if self._statCache then
-            self._statCache["Sensitivity"] = nil
+            self._statCache["Sensitivity"] = 0.8
         end
         if self._statOrigins then
-            self._statOrigins["Sensitivity"] = nil
+            self._statOrigins["Sensitivity"] = 0.8
         end
-        self.Sensitivity = nil
+        self.Sensitivity = 0.8
         self.ScopeTexture = nil
         self.ScopeFov = nil
 

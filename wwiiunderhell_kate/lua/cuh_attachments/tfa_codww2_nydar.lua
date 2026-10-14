@@ -28,7 +28,7 @@ ATTACHMENT.WeaponTable = {
 }
 
 -- ============================================================
--- REFLEX DOT RENDERING (ported from BO3 Drakon reference)
+-- REFLEX DOT RENDERING (ported 1:1 from BO3 Drakon reference)
 -- ============================================================
 -- Uses the Underhell HUD rendering system to draw the reflex dot
 -- texture on screen when aiming, with a delay to account for the
@@ -39,10 +39,10 @@ ATTACHMENT.WeaponTable = {
 local RedDotMaterial
 
 if CLIENT then
-    RedDotMaterial = CreateMaterial("CUH_ReflexDotReticle", "UnlitGeneric", {
+    RedDotMaterial = CreateMaterial("UH_ReflexDotReticle", "UnlitGeneric", {
         ["$basetexture"] = "reflex/reflex_dot",
         ["$vertexcolor"] = 1,
-        ["vertexalpha"] = 1,
+        ["$vertexalpha"] = 1,
         ["$additive"] = 1,
     })
 end
@@ -50,95 +50,64 @@ end
 function ATTACHMENT:Attach(wep)
     if not CLIENT then return end
 
-    wep._cuhReflexActive = true
-
-    -- CRITICAL: Only hook DrawHUD ONCE per weapon.
-    -- The OLD code re-saved prev into wep._cuhPrevDrawHUD every Attach()
-    -- call, but the closure body read self._cuhPrevDrawHUD at CALL TIME.
-    -- After a second Attach() (which happens routinely — ApplyAttachments
-    -- re-runs on every attachment change), the field pointed back at our
-    -- own closure → infinite recursion → stack overflow.
-    -- Fix: capture prevDrawHUD as a LOCAL upvalue + gate with _cuhReflexHooked.
-    if not wep._cuhReflexHooked then
-        wep._cuhReflexHooked = true
-        local prevDrawHUD = wep.DrawHUD
-        wep._cuhPrevDrawHUD = prevDrawHUD
-
-        wep.DrawHUD = function(self)
-            -- Run previous DrawHUD via the LOCAL upvalue.
-            -- NEVER call ourselves (recursion guard).
-            if prevDrawHUD and prevDrawHUD ~= self.DrawHUD then
-                prevDrawHUD(self)
-            end
-
-            -- Draw the reflex dot when zooming
-            if not self:GetUHBool("Zooming") then return end
-
-            local delay = 0.1
-            local fadeTime = 0.1
-            local dotSize = 128
-
-            local aimTime = self._cuhZoomStartTime or 0
-            if CurTime() < (aimTime + delay) then return end
-
-            local alpha = 255
-            if CurTime() < (aimTime + delay + fadeTime) then
-                alpha = math.Clamp((CurTime() - aimTime - delay) / fadeTime * 255, 0, 255)
-            end
-
-            surface.SetMaterial(RedDotMaterial)
-            surface.SetDrawColor(255, 0, 0, alpha)
-            surface.DrawTexturedRect(
-                (ScrW() / 2) - (dotSize / 2),
-                (ScrH() / 2) - (dotSize / 2),
-                dotSize,
-                dotSize
-            )
+    -- Override DrawHUD — calls self.BaseClass.DrawHUD(self) directly
+    -- (same as the Drakon reference). No prev capture, no recursion.
+    wep.DrawHUD = function(self)
+        if not self:GetUHBool("Zooming") then
+            self.BaseClass.DrawHUD(self)
+            return
         end
+
+        self.BaseClass.DrawHUD(self)
+
+        local delay = 0.1
+        local fadeTime = 0.1
+        local dotSize = 128
+
+        local aimTime = self._zoomStartTime or 0
+        if CurTime() < (aimTime + delay) then return end
+
+        local alpha = 255
+        if CurTime() < (aimTime + delay + fadeTime) then
+            alpha = math.Clamp((CurTime() - aimTime - delay) / fadeTime * 255, 0, 255)
+        end
+
+        surface.SetMaterial(RedDotMaterial)
+        surface.SetDrawColor(255, 0, 0, alpha)
+        surface.DrawTexturedRect(
+            (ScrW() / 2) - (dotSize / 2),
+            (ScrH() / 2) - (dotSize / 2),
+            dotSize,
+            dotSize
+        )
     end
 
-    -- Track zoom start time via a Think hook (per-weapon, idempotent)
-    if not wep._cuhReflexThinkHooked then
-        wep._cuhReflexThinkHooked = true
-        local prevThink = wep.Think
-        wep.Think = function(self, ...)
-            -- Track zoom transitions
-            local isZooming = self:GetUHBool("Zooming")
-            if isZooming and not self._cuhWasZooming then
-                self._cuhZoomStartTime = CurTime()
-            end
-            self._cuhWasZooming = isZooming
+    -- Track zoom start time via Think (same as Drakon)
+    wep._reflexThinkInstalled = true
+    local prevThink = wep.Think
+    wep.Think = function(self, ...)
+        local isZooming = self:GetUHBool("Zooming")
+        if isZooming and not self._wasZooming then
+            self._zoomStartTime = CurTime()
+        end
+        self._wasZooming = isZooming
 
-            -- Call previous Think via LOCAL upvalue (recursion guard)
-            if prevThink and prevThink ~= self.Think then
-                return prevThink(self, ...)
-            end
+        if prevThink then
+            return prevThink(self, ...)
         end
     end
 end
 
--- ============================================================
--- DETACH: Restore original DrawHUD and Think
--- ============================================================
--- Note: Detach is never called by the base (ApplyAttachments calls
--- RestoreStat + Attach for the new selection). So the cleanup is
--- handled by the ApplyAttachments override in cuh_rt_scope_render.lua
--- which purges scope state before re-applying.
--- However, we also provide a Detach for manual cleanup.
-
 function ATTACHMENT:Detach(wep)
     if not CLIENT then return end
 
-    -- Restore original DrawHUD
-    if wep._cuhPrevDrawHUD then
-        wep.DrawHUD = wep._cuhPrevDrawHUD
-        wep._cuhPrevDrawHUD = nil
-    end
-
-    wep._cuhReflexActive = nil
-    wep._cuhReflexHooked = nil
-    wep._cuhZoomStartTime = nil
-    wep._cuhWasZooming = nil
+    -- Restore by nil'ing the instance override — weapon falls back to
+    -- the class table's DrawHUD/Think.
+    wep.DrawHUD = nil
+    wep.Think = nil
+    wep._zoomStartTime = nil
+    wep._wasZooming = nil
+    wep._reflexThinkInstalled = nil
 end
 
 -- TFA attachment registration removed (CUH base handles this)
