@@ -257,22 +257,21 @@ hook.Add("Think", "CUH_PatchApplyAttachments", function()
 
     local origApply = wep.ApplyAttachments
     wep.ApplyAttachments = function(self)
+        -- PURGE scope state BEFORE calling the original ApplyAttachments.
+        -- This ensures the stale Sensitivity is cleared.
+        -- If a scope is equipped, its WeaponTable will re-set these via SetStat.
+        if self._statCache then
+            self._statCache["Sensitivity"] = nil
+        end
+        if self._statOrigins then
+            self._statOrigins["Sensitivity"] = nil
+        end
+        self.Sensitivity = nil
+        self.ScopeTexture = nil
+        self.ScopeFov = nil
+
         -- Call the original ApplyAttachments
         origApply(self)
-
-        -- Post-apply: check if any scope attachment is equipped
-        -- by checking if ScopeTexture is set (scope attachments
-        -- set ScopeTexture in their Attach function)
-        if not self.ScopeTexture then
-            -- No scope equipped — purge Sensitivity from cache + field
-            if self._statCache then
-                self._statCache["Sensitivity"] = nil
-            end
-            if self._statOrigins then
-                self._statOrigins["Sensitivity"] = nil
-            end
-            self.Sensitivity = nil
-        end
     end
 end)
 
