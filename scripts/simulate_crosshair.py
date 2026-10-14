@@ -188,7 +188,7 @@ nil_guard_checks = [
     ('self._chBobPhase', 'self._chBobPhase or 0'),
     ('self._chDeployTime', 'self._chDeployTime or now'),
     ('self._chLastFrame', 'self._chLastFrame == nil'),
-    ('self._chLastPunch', 'self._lastRecoilTime or 0'),
+    ('self._chKickTime', 'self._chKickTime or 0'),
 ]
 for field, guard in nil_guard_checks:
     if guard in src:

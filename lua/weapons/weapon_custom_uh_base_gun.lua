@@ -1111,9 +1111,20 @@ function SWEP:DoDrawCrosshair(x, y)
     local moveSpread = moveRatio * 2
     if inAir then moveSpread = moveSpread + 3 end
 
-    -- Shot kick (decays over CH_KickTime)
-    -- Uses _lastRecoilTime set by PostShoot (called on both server and client)
-    local since = now - (self._lastRecoilTime or 0)
+    -- Shot kick — detect via NextPrimaryFire (networked, works on client)
+    -- When a weapon fires, it sets NextPrimaryFire = CurTime() + delay.
+    -- If CurTime() is very close to when NextPrimaryFire was SET (not when
+    -- it expires), the weapon was just fired. We detect the transition:
+    -- the frame NextPrimaryFire INCREASES, a shot was fired.
+    local nextFire = self:GetNextPrimaryFire()
+    if nextFire > (self._chLastNextFire or 0) then
+        -- NextPrimaryFire increased — a shot was fired this frame
+        self._chKickTime = now
+    end
+    self._chLastNextFire = nextFire
+
+    -- Kick decays from the moment of the shot
+    local since = now - (self._chKickTime or 0)
     local kick = math.Clamp(1 - since / CH_KickTime, 0, 1)
     kick = kick * kick  -- quadratic decay for smoother feel
     local kickGap = kick * ScreenScale(12)  -- 12 ScreenScale units of kick

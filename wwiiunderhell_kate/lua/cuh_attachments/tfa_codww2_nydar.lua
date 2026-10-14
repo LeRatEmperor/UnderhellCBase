@@ -57,6 +57,11 @@ if CLIENT then
         -- Only draw when zooming
         if not wep.GetUHBool or not wep:GetUHBool("Zooming") then return end
 
+        -- Debug: verify the hook is running with _reflexActive = true
+        if GetConVar("cuh_rt_scope_debug") and GetConVar("cuh_rt_scope_debug"):GetBool() then
+            print("[CUH REFLEX] HUDPaint drawing dot — _reflexActive=" .. tostring(wep._reflexActive))
+        end
+
         -- Track zoom start time for delay
         local isZooming = wep:GetUHBool("Zooming")
         if isZooming and not wep._wasZooming then

@@ -276,6 +276,12 @@ hook.Add("Think", "CUH_PatchApplyAttachments", function()
         -- when switching from Nydar to another attachment. The Nydar's
         -- Attach() will set it back to true if re-equipped.
         self._reflexActive = false
+        self._reflexWasActive = false  -- extra safety
+
+        -- Debug: verify purge
+        if GetConVar("cuh_rt_scope_debug") and GetConVar("cuh_rt_scope_debug"):GetBool() then
+            print("[CUH] ApplyAttachments purge: _reflexActive = " .. tostring(self._reflexActive))
+        end
 
         -- Call the original ApplyAttachments
         origApply(self)
