@@ -1111,14 +1111,9 @@ function SWEP:DoDrawCrosshair(x, y)
     local moveSpread = moveRatio * 2
     if inAir then moveSpread = moveSpread + 3 end
 
-    -- Shot kick — detect via view punch angle changes (client-side, reliable)
-    -- This avoids prediction issues with _lastRecoilTime
-    local punchAng = IsValid(owner) and owner:GetViewPunchAngles() or Angle(0, 0, 0)
-    local punchMag = math.abs(punchAng.p) + math.abs(punchAng.y) + math.abs(punchAng.r)
-    if punchMag > 0.1 then
-        self._chLastPunch = CurTime()
-    end
-    local since = now - (self._chLastPunch or 0)
+    -- Shot kick (decays over CH_KickTime)
+    -- Uses _lastRecoilTime set by PostShoot (called on both server and client)
+    local since = now - (self._lastRecoilTime or 0)
     local kick = math.Clamp(1 - since / CH_KickTime, 0, 1)
     kick = kick * kick  -- quadratic decay for smoother feel
     local kickGap = kick * ScreenScale(12)  -- 12 ScreenScale units of kick
@@ -1126,18 +1121,17 @@ function SWEP:DoDrawCrosshair(x, y)
     local target = scale * (spread + moveSpread) + kickGap
 
     -- ADS convergence: as ADS progresses (0..1), gap shrinks toward 0
-    -- The prongs converge to the center point
     target = target * (1 - self._chADS)
 
-    -- Snap open instantly, close smoothly (feels like MCV full-auto)
+    -- Smooth interpolation (opens 3x faster than closes, like MCV)
     local ft = FrameTime()
     if self._chGap == nil then self._chGap = target end
     if target > self._chGap then
-        self._chGap = target  -- SNAP to max instantly (no smoothing on kick)
+        self._chGap = Lerp(math.min(ft * CH_Smooth * 3, 1), self._chGap, target)
     else
         self._chGap = Lerp(math.min(ft * CH_Smooth, 1), self._chGap, target)
     end
-    local gap_size = math.max(self._chGap, 0)  -- allow gap to reach 0 (converged)
+    local gap_size = math.max(self._chGap, 0)
 
     -- Walk bob (figure of eight)
     local speed = vel / math.max(walkSpeed * 2.5, 1)
