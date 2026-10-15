@@ -252,17 +252,29 @@ function SWEP:MeleeAttack()
 
     self._meleeActive = true
     self:ClearAnimSounds()
-    self:EasySendWeaponAnim("melee", ACT_VM_MELEE)
 
-    local vm = IsValid(self.Owner) and self.Owner:GetViewModel() or nil
-    local animDuration = IsValid(vm) and vm:SequenceDuration() or 0.5
-    self._meleeHitTime = ct + (self.Primary.HurtTime or 0.15)
+    -- Play the melee animation from the Animations table
+    -- Look up "melee" key, fall back to "shoot", then ACT_VM_MELEE
+    local animKey = "melee"
+    if self.Animations and self.Animations[animKey] then
+        self:EasySendWeaponAnim(animKey, ACT_VM_MELEE)
+    elseif self.Animations and self.Animations["shoot"] then
+        self:EasySendWeaponAnim("shoot", ACT_VM_PRIMARYATTACK)
+    else
+        self:SendWeaponAnim(ACT_VM_MELEE)
+    end
+
+    -- Use Primary.Delay for timing (not animation duration — that can be 0
+    -- if the sequence isn't found, causing EndMelee to fire immediately)
+    local delay = self.Primary.Delay or 0.6
+    local hurtTime = self.Primary.HurtTime or 0.15
+    self._meleeHitTime = ct + hurtTime
     self._meleeHitDone = false
-    self._meleeEndTime = ct + animDuration
-    self._nextMelee = ct + (self.Primary.Delay or 0.6)
-    self:SetNextPrimaryFire(ct + animDuration)
-    self:SetNextSecondaryFire(ct + animDuration)
-    self.NextReload = ct + animDuration
+    self._meleeEndTime = ct + delay
+    self._nextMelee = ct + delay
+    self:SetNextPrimaryFire(ct + delay)
+    self:SetNextSecondaryFire(ct + delay)
+    self.NextReload = ct + delay
 
     local seqIdx = self.Owner:SelectWeightedSequence(ACT_GMOD_GESTURE_MELEE_SHOVE_2HAND)
     if seqIdx and seqIdx >= 0 then
