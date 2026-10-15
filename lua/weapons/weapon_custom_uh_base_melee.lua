@@ -132,11 +132,19 @@ function SWEP:HandleRunning(ct)
     local dist = self.Owner:GetVelocity():LengthSqr()
     if self.Owner:KeyDown(IN_SPEED) and dist > self.Owner:GetWalkSpeed()^2 then
         -- Enter sprint — set Running bool (NO animation, let Kate weapon handle it)
-        self:SetUHBool("Running", true)
+        if not self:GetUHBool("Running") then
+            self:SetUHBool("Running", true)
+            if GetConVar("cuh_rt_scope_debug") and GetConVar("cuh_rt_scope_debug"):GetBool() then
+                print("[CUH MELEE] Running=true (sprint entered)")
+            end
+        end
         self:SetUHBool("Zooming", false)
     elseif self:GetUHBool("Running") then
         -- Exit sprint — set Running false (NO animation, let Kate weapon handle it)
         self:SetUHBool("Running", false)
+        if GetConVar("cuh_rt_scope_debug") and GetConVar("cuh_rt_scope_debug"):GetBool() then
+            print("[CUH MELEE] Running=false (sprint exited)")
+        end
     end
 end
 
