@@ -451,7 +451,7 @@ function SWEP:Movement(pos, ang, ct, ft, iftp)
     if self.AnimatedSprint and isRunning then
         self._sprintFade = Lerp(ft8, self._sprintFade or 1, 0)
     else
-        self._sprintFade = Lerp(ft * 5, self._sprintFade or 0, 1)
+        self._sprintFade = Lerp(ft * 5, self._sprintFade or 1, 1)
     end
     local bob_fade = bob * (self._sprintFade or 1)
 

@@ -102,6 +102,8 @@ function SWEP:Initialize()
     util.PrecacheModel(self.WorldModel)
     self:SetWeaponHoldType(self.HoldType)
     self:SetHoldType(self.HoldType)
+    -- Initialize bob dampener to 1 (full bob) so it doesn't start at 0
+    self._sprintFade = 1
     self:SetNWInt("FireMode", 1)
 end
 
@@ -303,23 +305,53 @@ function SWEP:DoMeleeTrace()
         mins = Vector(-10,-10,-10), maxs = Vector(10,10,10),
     })
     if tr.Hit then
-        if IsValid(tr.Entity) and SERVER then
-            local dmg = DamageInfo()
-            dmg:SetDamage(math.random(self.Primary.MinDamage or 50, self.Primary.MaxDamage or 50))
-            dmg:SetAttacker(ply)
-            dmg:SetInflictor(self)
-            dmg:SetDamageForce(aim * (self.Primary.Force or 300))
-            dmg:SetDamagePosition(tr.HitPos)
-            dmg:SetDamageType(self.Primary.DamageType or DMG_CLUB)
-            tr.Entity:TakeDamageInfo(dmg)
-        end
-        if SERVER then util.ScreenShake(tr.HitPos, 3, 0.1, 0.3, 32) end
-        local hitSnd = self.Primary.HitSound
-        if istable(hitSnd) then hitSnd = hitSnd[math.random(1, #hitSnd)] end
-        if hitSnd and hitSnd ~= "" then
-            self:EmitSound(hitSnd, 75, 100, 1, CHAN_USER_BASE)
+        if IsValid(tr.Entity) then
+            -- Hit an entity (player, NPC, prop)
+            if SERVER then
+                local dmg = DamageInfo()
+                dmg:SetDamage(math.random(self.Primary.MinDamage or 50, self.Primary.MaxDamage or 50))
+                dmg:SetAttacker(ply)
+                dmg:SetInflictor(self)
+                dmg:SetDamageForce(aim * (self.Primary.Force or 300))
+                dmg:SetDamagePosition(tr.HitPos)
+                dmg:SetDamageType(self.Primary.DamageType or DMG_CLUB)
+                tr.Entity:TakeDamageInfo(dmg)
+            end
+            if SERVER then util.ScreenShake(tr.HitPos, 3, 0.1, 0.3, 32) end
+
+            -- Hit entity sound (flesh/hit sound)
+            local hitSnd = self.Primary.HitSound
+            if istable(hitSnd) then hitSnd = hitSnd[math.random(1, #hitSnd)] end
+            if hitSnd and hitSnd ~= "" then
+                self:EmitSound(hitSnd, 75, 100, 1, CHAN_USER_BASE)
+            end
+
+            -- Blood impact effect for entities
+            local ed = EffectData()
+            ed:SetOrigin(tr.HitPos)
+            util.Effect("BloodImpact", ed, true, true)
+        else
+            -- Hit the world (map geometry, not an entity)
+            if SERVER then util.ScreenShake(tr.HitPos, 2, 0.1, 0.2, 32) end
+
+            -- World hit sound
+            local worldSnd = self.Primary.HitWorldSound
+            if istable(worldSnd) then worldSnd = worldSnd[math.random(1, #worldSnd)] end
+            if worldSnd and worldSnd ~= "" then
+                self:EmitSound(worldSnd, 75, 100, 1, CHAN_USER_BASE)
+            end
+
+            -- World impact effect based on material type
+            local mat = tr.MatType
+            if mat == MAT_CONCRETE or mat == MAT_METAL or mat == MAT_VENT or mat == MAT_TILE or mat == MAT_GRATE then
+                local fx = EffectData()
+                fx:SetOrigin(tr.HitPos)
+                fx:SetScale(1)
+                util.Effect("uh_hitworld", fx)
+            end
         end
     else
+        -- Missed — play swing miss sound (HitWorldSound doubles as miss sound)
         local missSnd = self.Primary.HitWorldSound
         if istable(missSnd) then missSnd = missSnd[math.random(1, #missSnd)] end
         if missSnd and missSnd ~= "" then
