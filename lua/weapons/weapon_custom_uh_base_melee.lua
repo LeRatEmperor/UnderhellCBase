@@ -1,13 +1,14 @@
 -- weapon_custom_uh_base_melee.lua
 -- Deep-cleaned Underhell melee base for the Customized edition.
--- v1.1
+-- v2.0 — Complete rewrite
 --
--- Key changes from original:
---   * FIXED: SwingSound/HitSound/HitWorldSound now randomized per-swing (was file-load)
---   * FIXED: type(trace.Entity)=="NextBot" → trace.Entity.IsNextBot
---   * FIXED: Prediction gates standardized (server runs for MP broadcast)
---   * Added hooks: PreSwing, PostHit(trace, dmg), GetSwingAnim
---   * IsValid checks added
+-- Key systems:
+--   * MeleeAttack/DoMeleeTrace/EndMelee state machine (for Kate weapons)
+--   * Simple PrimaryAttack with timer-based hit (for basic melee)
+--   * HandleRunning override (sets Running bool, does NOT play animations)
+--   * DrawWorldModel override (attaches world model to hand bone)
+--   * World hit sounds with fallback chain (HitWorldSound -> HitSound -> SwingSound)
+--   * Impact effects for entities and world geometry
 
 AddCSLuaFile()
 
@@ -34,7 +35,7 @@ SWEP.DrawCrosshair = false
 SWEP.DrawAmmo   = false
 SWEP.ViewModelFlip = false
 
--- FIXED: sounds are now templates, randomized per-swing in PrimaryAttack
+-- Melee stats (overridden by derived weapons)
 SWEP.Primary.SwingSound    = "weapons/axe/axe_swing1.wav"
 SWEP.Primary.HitSound      = {"weapons/axe/axe_hitbod1.wav", "weapons/axe/axe_hitbod2.wav", "weapons/axe/axe_hitbod3.wav"}
 SWEP.Primary.HitWorldSound  = {"weapons/axe/axe_hitworld1.wav", "weapons/axe/axe_hitworld2.wav"}
@@ -48,7 +49,7 @@ SWEP.Primary.ClipSize       = -1
 SWEP.Primary.DefaultClip    = -1
 SWEP.Primary.Automatic      = true
 SWEP.Primary.Ammo           = ""
-SWEP.Primary.Anim           = ACT_VM_MISSCENTER
+SWEP.Primary.Anim           = ACT_VM_MISSLEFT
 SWEP.Primary.DamageType     = DMG_SLASH
 
 SWEP.Secondary.ClipSize    = -1
@@ -68,20 +69,19 @@ SWEP.Inspection = {
     { pos = Vector(6.4, -14.825, -1.05), ang = Angle(47.076, 46.24, 45.243) },
 }
 
+SWEP.MeleeRange = 64  -- default melee range
+
 -- ============================================================
--- Hooks for derived melee weapons (NEW)
+-- Hooks for derived melee weapons
 -- ============================================================
 function SWEP:PreSwing()
-    -- Override in derived weapons to customize per-swing behavior
 end
 
 function SWEP:PostHit(trace, dmginfo)
-    -- Override in derived weapons to add post-hit effects
 end
 
 function SWEP:GetSwingAnim()
-    -- Override to return a custom activity
-    return self.Primary.Anim
+    return self.Primary.Anim or ACT_VM_MISSLEFT
 end
 
 -- ============================================================
@@ -89,8 +89,6 @@ end
 -- ============================================================
 function SWEP:Initialize()
     BaseClass.Initialize(self)
-    -- FIXED: don't precache with random suffix — precache the template sounds
-    -- The actual randomization happens per-swing in PrimaryAttack
     if isstring(self.Primary.SwingSound) then util.PrecacheSound(self.Primary.SwingSound) end
     if istable(self.Primary.HitSound) then
         for _, snd in ipairs(self.Primary.HitSound) do util.PrecacheSound(snd) end
@@ -102,13 +100,48 @@ function SWEP:Initialize()
     util.PrecacheModel(self.WorldModel)
     self:SetWeaponHoldType(self.HoldType)
     self:SetHoldType(self.HoldType)
-    -- Initialize bob dampener to 1 (full bob) so it doesn't start at 0
     self._sprintFade = 1
     self:SetNWInt("FireMode", 1)
 end
 
 -- ============================================================
--- Think — lightweight (melee doesn't use gun's Think)
+-- HandleRunning override — sets Running bool ONLY (no animations)
+-- ============================================================
+-- The parent's HandleRunning sets the Running bool AND plays sprint
+-- animations via SendWeaponAnim(ACT_VM_IDLE_TO_LOWERED). But the Kate
+-- melee weapons have their own HandleSprintingAnimations() that uses
+-- EasySendWeaponAnim("sprint_in") with the Animations table.
+-- If both run, they conflict (wrong animation + animation fighting).
+--
+-- This override sets the Running bool (needed for _sprintFade in the
+-- Movement function) but does NOT play any animations. The Kate
+-- weapons' HandleSprintingAnimations() handles the animation part.
+function SWEP:HandleRunning(ct)
+    if not IsValid(self.Owner) then return end
+    if self:GetNWBool("FirstDrawPlaying") then return end
+    if not GetConVar("uh_sv_running"):GetBool() then return end
+    if self:GetNWInt("FireMode") == 0 then return end
+
+    -- Update hold type
+    if self:GetUHBool("Running") or self:GetNWInt("FireMode") == 0 then
+        self:SetHoldType(self.PassiveAnim)
+    else
+        self:SetHoldType(self.HoldType)
+    end
+
+    local dist = self.Owner:GetVelocity():LengthSqr()
+    if self.Owner:KeyDown(IN_SPEED) and dist > self.Owner:GetWalkSpeed()^2 then
+        -- Enter sprint — set Running bool (NO animation, let Kate weapon handle it)
+        self:SetUHBool("Running", true)
+        self:SetUHBool("Zooming", false)
+    elseif self:GetUHBool("Running") then
+        -- Exit sprint — set Running false (NO animation, let Kate weapon handle it)
+        self:SetUHBool("Running", false)
+    end
+end
+
+-- ============================================================
+-- Think
 -- ============================================================
 function SWEP:Think()
     if not IsValid(self.Owner) then return end
@@ -118,11 +151,7 @@ function SWEP:Think()
         self:HandleBones(vm, ct)
         self:HandleHands(vm)
     end
-    -- Don't call HandleRunning here — the Kate melee weapons have their own
-    -- HandleSprintingAnimations() that uses EasySendWeaponAnim with the
-    -- Animations table. HandleRunning uses SendWeaponAnim with ACT_* which
-    -- doesn't look up the Animations table, so they conflict.
-    -- The Kate weapons call HandleSprintingAnimations() in their Think.
+    self:HandleRunning(ct)
     if self.CustomThink then self:CustomThink(ct) end
 end
 
@@ -131,13 +160,12 @@ function SWEP:Reload()
 end
 
 -- ============================================================
--- PrimaryAttack — melee swing
+-- PrimaryAttack — simple timer-based melee (for basic melee weapons)
 -- ============================================================
 function SWEP:PrimaryAttack()
     if not IsValid(self.Owner) then return end
     if self:GetNWFloat("DeployTime") > CurTime() then return end
 
-    -- Hook: pre-swing
     self:PreSwing()
 
     self.Owner:SetAnimation(PLAYER_ATTACK1)
@@ -150,14 +178,12 @@ function SWEP:PrimaryAttack()
     local sp = game.SinglePlayer()
     local iftp = IsFirstTimePredicted()
 
-    -- FIXED: standardized prediction gate (server runs for MP broadcast)
     if (sp and SERVER) or (not sp and (SERVER or (CLIENT and iftp))) then
         if GetConVar("uh_sv_voices"):GetBool() then
             self.Owner:EmitSound("uh/voice/melee/melee" .. math.random(1,8) .. ".wav", 100, math.random(80, 110), 1, CHAN_USER_BASE)
         end
     end
 
-    -- FIXED: randomize sound per-swing (was randomized at file load)
     local swingSnd = self.Primary.SwingSound
     if istable(swingSnd) then swingSnd = swingSnd[math.random(1, #swingSnd)] end
     self:EmitSound(swingSnd, 100, math.random(90, 110), 1, CHAN_WEAPON)
@@ -168,146 +194,27 @@ function SWEP:PrimaryAttack()
         timer.Simple(self.Primary.HurtTime, function()
             if not IsValid(self) or not IsValid(self.Owner) then return end
             if self.Owner:GetActiveWeapon() != self then return end
-
-            local pos = self.Owner:GetShootPos()
-            local aim = self.Owner:GetAimVector() * 64
-
-            local tr = {}
-            tr.start = pos
-            tr.endpos = pos + aim
-            tr.filter = self.Owner
-            tr.mask = MASK_SHOT_HULL
-            tr.mins = Vector(-16, -16, -16)
-            tr.maxs = Vector(16, 16, 16)
-
-            local trace = util.TraceHull(tr)
-
-            if trace.Hit then
-                if IsValid(trace.Entity) then
-                    if SERVER then
-                        local dmg = DamageInfo()
-                        dmg:SetAttacker(self.Owner)
-                        dmg:SetInflictor(self)
-                        dmg:SetDamage(math.random(self.Primary.MinDamage, self.Primary.MaxDamage))
-                        dmg:SetDamageForce(self.Owner:GetAimVector() * self.Primary.Force)
-                        dmg:SetDamagePosition(trace.HitPos)
-                        dmg:SetDamageType(self.Primary.DamageType)
-                        trace.Entity:TakeDamageInfo(dmg)
-
-                        -- Hook: post-hit
-                        self:PostHit(trace, dmg)
-                    end
-
-                    -- FIXED: type()=="NextBot" → IsNextBot
-                    if sp or (CLIENT and iftp) then
-                        if trace.Entity:IsNPC() or trace.Entity:IsPlayer() or trace.Entity.IsNextBot then
-                            -- FIXED: randomize per-hit
-                            local hitSnd = self.Primary.HitSound
-                            if istable(hitSnd) then hitSnd = hitSnd[math.random(1, #hitSnd)] end
-                            if hitSnd then
-                                self:EmitSound(hitSnd, 100, math.random(100, 120), 1, CHAN_WEAPON)
-                            end
-                            local ed = EffectData()
-                            ed:SetOrigin(trace.HitPos)
-                            util.Effect("BloodImpact", ed, true, true)
-                        else
-                            local hitWorldSnd = self.Primary.HitWorldSound
-                            if istable(hitWorldSnd) then hitWorldSnd = hitWorldSnd[math.random(1, #hitWorldSnd)] end
-                            if hitWorldSnd then
-                                self:EmitSound(hitWorldSnd, 100, math.random(100, 120), 1, CHAN_WEAPON)
-                            end
-                        end
-                    end
-                elseif sp or (CLIENT and iftp) then
-                    local hitWorldSnd = self.Primary.HitWorldSound
-                    if istable(hitWorldSnd) then hitWorldSnd = hitWorldSnd[math.random(1, #hitWorldSnd)] end
-                    if hitWorldSnd then
-                        self:EmitSound(hitWorldSnd, 100, math.random(100, 120), 1, CHAN_WEAPON)
-                    end
-                    local mat = trace.MatType
-                    if mat == MAT_CONCRETE or mat == MAT_METAL or mat == MAT_VENT or mat == MAT_TILE or mat == MAT_GRATE then
-                        local fx = EffectData()
-                        fx:SetOrigin(trace.HitPos)
-                        fx:SetScale(1)
-                        util.Effect("uh_hitworld", fx)
-                    end
-                end
-            end
+            self:DoMeleeHit()
         end)
     end
 end
 
-function SWEP:SecondaryAttack()
-    return false
-end
-
 -- ============================================================
--- Kate melee system — MeleeAttack / DoMeleeTrace / EndMelee
+-- DoMeleeHit — shared hit logic (used by both PrimaryAttack and DoMeleeTrace)
 -- ============================================================
--- These are used by Kate WWII melee weapons (kate_trenchknife, etc.)
--- which have their own PrimaryAttack that calls self:MeleeAttack().
--- The melee base's PrimaryAttack is simpler (timer-based), but the
--- Kate weapons use a state-machine approach with hit delay timing.
-
-function SWEP:MeleeAttack()
-    local ct = CurTime()
-    if not (game.SinglePlayer() or IsFirstTimePredicted()) then return end
-
-    self:SetUHBool("Zooming", false)
-    if self:GetUHBool("Running") then self:SetUHBool("Running", false) end
-
-    self._meleeActive = true
-    self:ClearAnimSounds()
-
-    -- Play the melee animation from the Animations table
-    -- Look up "melee" key, fall back to "shoot", then ACT_VM_MELEE
-    local animKey = "melee"
-    if self.Animations and self.Animations[animKey] then
-        self:EasySendWeaponAnim(animKey, ACT_VM_MISSLEFT)
-    elseif self.Animations and self.Animations["shoot"] then
-        self:EasySendWeaponAnim("shoot", ACT_VM_PRIMARYATTACK)
-    else
-        self:SendWeaponAnim(ACT_VM_MISSLEFT)
-    end
-
-    -- Use Primary.Delay for timing (not animation duration — that can be 0
-    -- if the sequence isn't found, causing EndMelee to fire immediately)
-    local delay = self.Primary.Delay or 0.6
-    local hurtTime = self.Primary.HurtTime or 0.15
-    self._meleeHitTime = ct + hurtTime
-    self._meleeHitDone = false
-    self._meleeEndTime = ct + delay
-    self._nextMelee = ct + delay
-    self:SetNextPrimaryFire(ct + delay)
-    self:SetNextSecondaryFire(ct + delay)
-    self.NextReload = ct + delay
-
-    -- 3rd person player attack animation (plays on the player's body)
-    self.Owner:SetAnimation(PLAYER_ATTACK1)
-
-    local seqIdx = self.Owner:SelectWeightedSequence(ACT_GMOD_GESTURE_MELEE_SHOVE_2HAND)
-    if seqIdx and seqIdx >= 0 then
-        self.Owner:AddVCDSequenceToGestureSlot(GESTURE_SLOT_ATTACK_AND_RELOAD, seqIdx, 0, true)
-    end
-
-    local snd = self.Primary.SwingSound
-    if istable(snd) then snd = snd[math.random(1, #snd)] end
-    if snd and snd ~= "" then
-        self:EmitSound(snd, 75, 100, 1, CHAN_USER_BASE)
-    end
-end
-
-function SWEP:DoMeleeTrace()
+function SWEP:DoMeleeHit()
     local ply = self.Owner
     if not IsValid(ply) then return end
     local pos = ply:GetShootPos()
     local aim = ply:GetAimVector()
     local range = self.MeleeRange or 64
+
     local tr = util.TraceHull({
         start = pos, endpos = pos + aim * range,
         filter = ply, mask = MASK_SHOT_HULL,
-        mins = Vector(-10,-10,-10), maxs = Vector(10,10,10),
+        mins = Vector(-16, -16, -16), maxs = Vector(16, 16, 16),
     })
+
     if tr.Hit then
         if IsValid(tr.Entity) then
             -- Hit an entity (player, NPC, prop)
@@ -320,35 +227,35 @@ function SWEP:DoMeleeTrace()
                 dmg:SetDamagePosition(tr.HitPos)
                 dmg:SetDamageType(self.Primary.DamageType or DMG_CLUB)
                 tr.Entity:TakeDamageInfo(dmg)
+                self:PostHit(tr, dmg)
             end
             if SERVER then util.ScreenShake(tr.HitPos, 3, 0.1, 0.3, 32) end
 
-            -- Hit entity sound (flesh/hit sound)
+            -- Hit entity sound
             local hitSnd = self.Primary.HitSound
             if istable(hitSnd) then hitSnd = hitSnd[math.random(1, #hitSnd)] end
             if hitSnd and hitSnd ~= "" then
-                self:EmitSound(hitSnd, 75, 100, 1, CHAN_USER_BASE)
+                self:EmitSound(hitSnd, 100, math.random(100, 120), 1, CHAN_WEAPON)
             end
 
-            -- Blood impact effect for entities
+            -- Blood impact effect
             local ed = EffectData()
             ed:SetOrigin(tr.HitPos)
             util.Effect("BloodImpact", ed, true, true)
         else
-            -- Hit the world (map geometry, not an entity)
+            -- Hit the world (map geometry)
             if SERVER then util.ScreenShake(tr.HitPos, 2, 0.1, 0.2, 32) end
 
-            -- World hit sound: use HitWorldSound if set, otherwise HitSound,
-            -- otherwise SwingSound as a last resort
+            -- World hit sound: HitWorldSound -> HitSound -> SwingSound
             local worldSnd = self.Primary.HitWorldSound
             if not worldSnd then worldSnd = self.Primary.HitSound end
             if not worldSnd then worldSnd = self.Primary.SwingSound end
             if istable(worldSnd) then worldSnd = worldSnd[math.random(1, #worldSnd)] end
             if worldSnd and worldSnd ~= "" then
-                self:EmitSound(worldSnd, 75, 100, 1, CHAN_USER_BASE)
+                self:EmitSound(worldSnd, 100, math.random(100, 120), 1, CHAN_WEAPON)
             end
 
-            -- World impact effect based on material type
+            -- World impact effect
             local mat = tr.MatType
             if mat == MAT_CONCRETE or mat == MAT_METAL or mat == MAT_VENT or mat == MAT_TILE or mat == MAT_GRATE then
                 local fx = EffectData()
@@ -362,10 +269,68 @@ function SWEP:DoMeleeTrace()
         local missSnd = self.Primary.SwingSound
         if istable(missSnd) then missSnd = missSnd[math.random(1, #missSnd)] end
         if missSnd and missSnd ~= "" then
-            self:EmitSound(missSnd, 65, 100, 1, CHAN_USER_BASE)
+            self:EmitSound(missSnd, 100, math.random(90, 110), 1, CHAN_WEAPON)
         end
     end
-    ply:ViewPunch(self.Primary.Recoil or Angle(-3,0,0))
+end
+
+function SWEP:SecondaryAttack()
+    return false
+end
+
+-- ============================================================
+-- Kate melee state machine — MeleeAttack / DoMeleeTrace / EndMelee
+-- ============================================================
+-- Used by Kate WWII melee weapons which override PrimaryAttack and call
+-- self:MeleeAttack(). This provides the state machine with hit delay.
+
+function SWEP:MeleeAttack()
+    local ct = CurTime()
+    if not (game.SinglePlayer() or IsFirstTimePredicted()) then return end
+
+    self:SetUHBool("Zooming", false)
+    if self:GetUHBool("Running") then self:SetUHBool("Running", false) end
+
+    self._meleeActive = true
+    self:ClearAnimSounds()
+
+    -- Play melee animation from Animations table
+    local animKey = "melee"
+    if self.Animations and self.Animations[animKey] then
+        self:EasySendWeaponAnim(animKey, ACT_VM_MISSLEFT)
+    elseif self.Animations and self.Animations["shoot"] then
+        self:EasySendWeaponAnim("shoot", ACT_VM_PRIMARYATTACK)
+    else
+        self:SendWeaponAnim(ACT_VM_MISSLEFT)
+    end
+
+    local delay = self.Primary.Delay or 0.6
+    local hurtTime = self.Primary.HurtTime or 0.15
+    self._meleeHitTime = ct + hurtTime
+    self._meleeHitDone = false
+    self._meleeEndTime = ct + delay
+    self._nextMelee = ct + delay
+    self:SetNextPrimaryFire(ct + delay)
+    self:SetNextSecondaryFire(ct + delay)
+    self.NextReload = ct + delay
+
+    -- 3rd person player attack animation
+    self.Owner:SetAnimation(PLAYER_ATTACK1)
+    local seqIdx = self.Owner:SelectWeightedSequence(ACT_GMOD_GESTURE_MELEE_SHOVE_2HAND)
+    if seqIdx and seqIdx >= 0 then
+        self.Owner:AddVCDSequenceToGestureSlot(GESTURE_SLOT_ATTACK_AND_RELOAD, seqIdx, 0, true)
+    end
+
+    local snd = self.Primary.SwingSound
+    if istable(snd) then snd = snd[math.random(1, #snd)] end
+    if snd and snd ~= "" then
+        self:EmitSound(snd, 75, 100, 1, CHAN_USER_BASE)
+    end
+end
+
+function SWEP:DoMeleeTrace()
+    -- Just call DoMeleeHit (shared hit logic)
+    self:DoMeleeHit()
 end
 
 function SWEP:EndMelee()
@@ -376,18 +341,12 @@ function SWEP:EndMelee()
 end
 
 -- ============================================================
--- DrawWorldModel — attach world model to player's hand bone
+-- DrawWorldModel — attach to player's hand bone
 -- ============================================================
--- Positions the world model at the player's right hand bone using
--- WorldModelOffset and WorldModelAngle. This is needed because the
--- melee base doesn't inherit from weapon_cuh_base_gun (which has
--- its own DrawWorldModel with this logic).
-
 if CLIENT then
     function SWEP:DrawWorldModel()
         local owner = self:GetOwner()
 
-        -- Create the world model ClientsideModel lazily
         if not IsValid(self._wmClientModel) then
             self._wmClientModel = ClientsideModel(self.WorldModel, RENDERGROUP_OPAQUE)
             if IsValid(self._wmClientModel) then
@@ -396,7 +355,6 @@ if CLIENT then
         end
 
         if IsValid(owner) then
-            -- Position at the player's right hand bone
             local boneid = owner:LookupBone("ValveBiped.Bip01_R_Hand")
             if boneid then
                 local matrix = owner:GetBoneMatrix(boneid)
@@ -410,7 +368,6 @@ if CLIENT then
                         self._wmClientModel:SetAngles(newAng)
                         self._wmClientModel:SetupBones()
 
-                        -- Update the model in case it was changed
                         if self._wmClientModel:GetModel() ~= self.WorldModel then
                             self._wmClientModel:SetModel(self.WorldModel)
                         end
@@ -422,7 +379,6 @@ if CLIENT then
             end
         end
 
-        -- Fallback: draw at weapon position (no owner or bone not found)
         if IsValid(self._wmClientModel) then
             self._wmClientModel:SetPos(self:GetPos())
             self._wmClientModel:SetAngles(self:GetAngles())
