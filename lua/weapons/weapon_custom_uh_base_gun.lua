@@ -1025,7 +1025,7 @@ if CLIENT then
 -- ============================================================
 -- Features:
 --   * Spread-following gap (widens with movement, jumping, firing)
---   * Shot kick (gap kicks open on fire, decays over 0.15s)
+--   * Shot kick (gap kicks open on fire, decays over CH_KickTime)
 --   * Asymmetric interpolation (opens 3x faster than closes)
 --   * Walk bob (figure-of-eight, speed-scaled)
 --   * View-punch following (stays on actual aim point)
@@ -1034,8 +1034,8 @@ if CLIENT then
 --   * Deploy/holster blend (slides in on weapon switch)
 --   * Shadow outline for visibility on any background
 --   * Shotgun circle mode (for multi-pellet weapons)
+--   * Shares color with the 3D2D HUD (uh_hud_r/g/b convars)
 
-local CH_Color = Color(255, 255, 255, 100)
 local CH_Shadow = Color(0, 0, 0, 0)
 local CH_White = Color(255, 255, 255, 255)
 local CH_Smooth = 12        -- gap follows target at 12/sec (closing)
@@ -1091,7 +1091,14 @@ function SWEP:DoDrawCrosshair(x, y)
     -- Suppress during 2D scope
     if self.Use2DScope and zooming then return true end
 
-    local col = CH_Color
+    -- Use the same color as the 3D2D HUD (uh_hud_r/g/b convars)
+    -- so the crosshair and HUD share the same customizable color
+    local col = Color(
+        GetConVar("uh_hud_r"):GetInt(),
+        GetConVar("uh_hud_g"):GetInt(),
+        GetConVar("uh_hud_b"):GetInt(),
+        a
+    )
     col.a = a
 
     -- Follow view punch (crosshair stays on actual aim point)
@@ -1223,6 +1230,9 @@ if CLIENT then
         if self:GetNWFloat("DeployTime") > CurTime() then return end
 
         local col = Color(GetConVar("uh_hud_r"):GetInt(), GetConVar("uh_hud_g"):GetInt(), GetConVar("uh_hud_b"):GetInt())
+        -- Apply slight transparency for parity with the crosshair and clarity against bright colors
+        local hudAlpha = 200  -- ~78% opacity (crosshair uses ~100/255 = 39%)
+        col.a = hudAlpha
         local pos = {x = ScrW()/2, y = ScrH()/2}
         local movement = LocalPlayer():GetVelocity():Length() / 10
         if movement > 80 then movement = 80 end
@@ -1288,38 +1298,38 @@ if CLIENT then
         local y = pos.y
         local pr = math.Clamp(clip / self.Primary.ClipSize, 0, 1)
 
-        draw.SimpleText(cliptext, "UH_AmmoLarge", x - 4, y + 1, Color(0,0,0), TEXT_ALIGN_LEFT)
-        draw.SimpleText(cliptext, "UH_AmmoLarge", x - 5, y, Color(255*(1-pr) + col.r*pr, col.g*pr, col.b*pr), TEXT_ALIGN_LEFT)
+        draw.SimpleText(cliptext, "UH_AmmoLarge", x - 4, y + 1, Color(0,0,0,hudAlpha), TEXT_ALIGN_LEFT)
+        draw.SimpleText(cliptext, "UH_AmmoLarge", x - 5, y, Color(255*(1-pr) + col.r*pr, col.g*pr, col.b*pr, hudAlpha), TEXT_ALIGN_LEFT)
 
         y = y + 24
 
         if self:GetNWFloat("ReloadEndTime") > CurTime() or h_reload > 0 then
             local p = math.Clamp(1-(self:GetNWFloat("ReloadEndTime")-CurTime())/math.max(self:GetNWFloat("ReloadTime"), 0.001), 0, 1)
             draw.RoundedBox(0, x - 2, y + 1, 1, 14, Color(0,0,0,255*h_reload))
-            draw.RoundedBox(0, x - 3, y, 1, 14, Color(col.r,col.g,col.b,255*h_reload))
+            draw.RoundedBox(0, x - 3, y, 1, 14, Color(col.r,col.g,col.b,hudAlpha*h_reload))
             draw.RoundedBox(0, x - 5 + textsize, y + 1, 1, 14, Color(0,0,0,255*h_reload))
-            draw.RoundedBox(0, x - 6 + textsize, y, 1, 14, Color(col.r,col.g,col.b,255*h_reload))
+            draw.RoundedBox(0, x - 6 + textsize, y, 1, 14, Color(col.r,col.g,col.b,hudAlpha*h_reload))
             draw.RoundedBox(0, x + 1, y + 3, textsize*p-8, 10, Color(0,0,0,255*h_reload))
-            draw.RoundedBox(0, x, y + 2, textsize*p-8, 10, Color(255*(1-p) + col.r*p, col.g*p, col.b*p, 255*h_reload))
+            draw.RoundedBox(0, x, y + 2, textsize*p-8, 10, Color(255*(1-p) + col.r*p, col.g*p, col.b*p, hudAlpha*h_reload))
         end
 
         y = y + h_reload*14 - 2
 
         if ammocount > 0 then
-            draw.SimpleText(ammotext, "UH_AmmoSmall", x - 4, y + 1, Color(0,0,0), TEXT_ALIGN_LEFT)
-            draw.SimpleText(ammotext, "UH_AmmoSmall", x - 5, y, Color(col.r,col.g,col.b), TEXT_ALIGN_LEFT)
+            draw.SimpleText(ammotext, "UH_AmmoSmall", x - 4, y + 1, Color(0,0,0,hudAlpha), TEXT_ALIGN_LEFT)
+            draw.SimpleText(ammotext, "UH_AmmoSmall", x - 5, y, Color(col.r,col.g,col.b,hudAlpha), TEXT_ALIGN_LEFT)
             y = y + 15
         end
 
-        draw.SimpleText(typetext, "UH_AmmoSmall", x - 4, y + 1, Color(0,0,0), TEXT_ALIGN_LEFT)
-        draw.SimpleText(typetext, "UH_AmmoSmall", x - 5, y, Color(col.r,col.g,col.b), TEXT_ALIGN_LEFT)
+        draw.SimpleText(typetext, "UH_AmmoSmall", x - 4, y + 1, Color(0,0,0,hudAlpha), TEXT_ALIGN_LEFT)
+        draw.SimpleText(typetext, "UH_AmmoSmall", x - 5, y, Color(col.r,col.g,col.b,hudAlpha), TEXT_ALIGN_LEFT)
         y = y + 15
 
         local mode = self:GetNWInt("FireMode")
         if mode == 0 or self.FireModes[mode] then
             local name = self.FireModes[mode] and self.FireModes[mode].name or "Safe"
-            draw.SimpleText(name, "UH_AmmoSmall", x - 4, y + 1, Color(0,0,0), TEXT_ALIGN_LEFT)
-            draw.SimpleText(name, "UH_AmmoSmall", x - 5, y, Color(col.r,col.g,col.b), TEXT_ALIGN_LEFT)
+            draw.SimpleText(name, "UH_AmmoSmall", x - 4, y + 1, Color(0,0,0,hudAlpha), TEXT_ALIGN_LEFT)
+            draw.SimpleText(name, "UH_AmmoSmall", x - 5, y, Color(col.r,col.g,col.b,hudAlpha), TEXT_ALIGN_LEFT)
         end
 
         if GetConVar("uh_sv_grenades"):GetBool() then
