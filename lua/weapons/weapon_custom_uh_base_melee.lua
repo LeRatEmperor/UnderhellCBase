@@ -257,11 +257,11 @@ function SWEP:MeleeAttack()
     -- Look up "melee" key, fall back to "shoot", then ACT_VM_MELEE
     local animKey = "melee"
     if self.Animations and self.Animations[animKey] then
-        self:EasySendWeaponAnim(animKey, ACT_VM_MELEE)
+        self:EasySendWeaponAnim(animKey, ACT_VM_MISSLEFT)
     elseif self.Animations and self.Animations["shoot"] then
         self:EasySendWeaponAnim("shoot", ACT_VM_PRIMARYATTACK)
     else
-        self:SendWeaponAnim(ACT_VM_MELEE)
+        self:SendWeaponAnim(ACT_VM_MISSLEFT)
     end
 
     -- Use Primary.Delay for timing (not animation duration — that can be 0
@@ -275,6 +275,9 @@ function SWEP:MeleeAttack()
     self:SetNextPrimaryFire(ct + delay)
     self:SetNextSecondaryFire(ct + delay)
     self.NextReload = ct + delay
+
+    -- 3rd person player attack animation (plays on the player's body)
+    self.Owner:SetAnimation(PLAYER_ATTACK1)
 
     local seqIdx = self.Owner:SelectWeightedSequence(ACT_GMOD_GESTURE_MELEE_SHOVE_2HAND)
     if seqIdx and seqIdx >= 0 then
@@ -331,6 +334,65 @@ function SWEP:EndMelee()
     self._meleeHitTime = nil
     self._meleeHitDone = nil
     self._meleeEndTime = nil
+end
+
+-- ============================================================
+-- DrawWorldModel — attach world model to player's hand bone
+-- ============================================================
+-- Positions the world model at the player's right hand bone using
+-- WorldModelOffset and WorldModelAngle. This is needed because the
+-- melee base doesn't inherit from weapon_cuh_base_gun (which has
+-- its own DrawWorldModel with this logic).
+
+if CLIENT then
+    function SWEP:DrawWorldModel()
+        local owner = self:GetOwner()
+
+        -- Create the world model ClientsideModel lazily
+        if not IsValid(self._wmClientModel) then
+            self._wmClientModel = ClientsideModel(self.WorldModel, RENDERGROUP_OPAQUE)
+            if IsValid(self._wmClientModel) then
+                self._wmClientModel:SetNoDraw(true)
+            end
+        end
+
+        if IsValid(owner) then
+            -- Position at the player's right hand bone
+            local boneid = owner:LookupBone("ValveBiped.Bip01_R_Hand")
+            if boneid then
+                local matrix = owner:GetBoneMatrix(boneid)
+                if matrix then
+                    local offsetVec = self.WorldModelOffset or Vector(0, -2, -1)
+                    local offsetAng = self.WorldModelAngle or Angle(180, 90, 0)
+                    local newPos, newAng = LocalToWorld(offsetVec, offsetAng, matrix:GetTranslation(), matrix:GetAngles())
+
+                    if IsValid(self._wmClientModel) then
+                        self._wmClientModel:SetPos(newPos)
+                        self._wmClientModel:SetAngles(newAng)
+                        self._wmClientModel:SetupBones()
+
+                        -- Update the model in case it was changed
+                        if self._wmClientModel:GetModel() ~= self.WorldModel then
+                            self._wmClientModel:SetModel(self.WorldModel)
+                        end
+
+                        self._wmClientModel:DrawModel()
+                        return
+                    end
+                end
+            end
+        end
+
+        -- Fallback: draw at weapon position (no owner or bone not found)
+        if IsValid(self._wmClientModel) then
+            self._wmClientModel:SetPos(self:GetPos())
+            self._wmClientModel:SetAngles(self:GetAngles())
+            self._wmClientModel:SetupBones()
+            self._wmClientModel:DrawModel()
+        else
+            self:DrawModel()
+        end
+    end
 end
 
 -- ============================================================
