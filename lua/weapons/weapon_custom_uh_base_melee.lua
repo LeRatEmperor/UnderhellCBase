@@ -236,6 +236,92 @@ function SWEP:SecondaryAttack()
 end
 
 -- ============================================================
+-- Kate melee system — MeleeAttack / DoMeleeTrace / EndMelee
+-- ============================================================
+-- These are used by Kate WWII melee weapons (kate_trenchknife, etc.)
+-- which have their own PrimaryAttack that calls self:MeleeAttack().
+-- The melee base's PrimaryAttack is simpler (timer-based), but the
+-- Kate weapons use a state-machine approach with hit delay timing.
+
+function SWEP:MeleeAttack()
+    local ct = CurTime()
+    if not (game.SinglePlayer() or IsFirstTimePredicted()) then return end
+
+    self:SetUHBool("Zooming", false)
+    if self:GetUHBool("Running") then self:SetUHBool("Running", false) end
+
+    self._meleeActive = true
+    self:ClearAnimSounds()
+    self:EasySendWeaponAnim("melee", ACT_VM_MELEE)
+
+    local vm = IsValid(self.Owner) and self.Owner:GetViewModel() or nil
+    local animDuration = IsValid(vm) and vm:SequenceDuration() or 0.5
+    self._meleeHitTime = ct + (self.Primary.HurtTime or 0.15)
+    self._meleeHitDone = false
+    self._meleeEndTime = ct + animDuration
+    self._nextMelee = ct + (self.Primary.Delay or 0.6)
+    self:SetNextPrimaryFire(ct + animDuration)
+    self:SetNextSecondaryFire(ct + animDuration)
+    self.NextReload = ct + animDuration
+
+    local seqIdx = self.Owner:SelectWeightedSequence(ACT_GMOD_GESTURE_MELEE_SHOVE_2HAND)
+    if seqIdx and seqIdx >= 0 then
+        self.Owner:AddVCDSequenceToGestureSlot(GESTURE_SLOT_ATTACK_AND_RELOAD, seqIdx, 0, true)
+    end
+
+    local snd = self.Primary.SwingSound
+    if istable(snd) then snd = snd[math.random(1, #snd)] end
+    if snd and snd ~= "" then
+        self:EmitSound(snd, 75, 100, 1, CHAN_USER_BASE)
+    end
+end
+
+function SWEP:DoMeleeTrace()
+    local ply = self.Owner
+    if not IsValid(ply) then return end
+    local pos = ply:GetShootPos()
+    local aim = ply:GetAimVector()
+    local range = self.MeleeRange or 64
+    local tr = util.TraceHull({
+        start = pos, endpos = pos + aim * range,
+        filter = ply, mask = MASK_SHOT_HULL,
+        mins = Vector(-10,-10,-10), maxs = Vector(10,10,10),
+    })
+    if tr.Hit then
+        if IsValid(tr.Entity) and SERVER then
+            local dmg = DamageInfo()
+            dmg:SetDamage(math.random(self.Primary.MinDamage or 50, self.Primary.MaxDamage or 50))
+            dmg:SetAttacker(ply)
+            dmg:SetInflictor(self)
+            dmg:SetDamageForce(aim * (self.Primary.Force or 300))
+            dmg:SetDamagePosition(tr.HitPos)
+            dmg:SetDamageType(self.Primary.DamageType or DMG_CLUB)
+            tr.Entity:TakeDamageInfo(dmg)
+        end
+        if SERVER then util.ScreenShake(tr.HitPos, 3, 0.1, 0.3, 32) end
+        local hitSnd = self.Primary.HitSound
+        if istable(hitSnd) then hitSnd = hitSnd[math.random(1, #hitSnd)] end
+        if hitSnd and hitSnd ~= "" then
+            self:EmitSound(hitSnd, 75, 100, 1, CHAN_USER_BASE)
+        end
+    else
+        local missSnd = self.Primary.HitWorldSound
+        if istable(missSnd) then missSnd = missSnd[math.random(1, #missSnd)] end
+        if missSnd and missSnd ~= "" then
+            self:EmitSound(missSnd, 65, 100, 1, CHAN_USER_BASE)
+        end
+    end
+    ply:ViewPunch(self.Primary.Recoil or Angle(-3,0,0))
+end
+
+function SWEP:EndMelee()
+    self._meleeActive = false
+    self._meleeHitTime = nil
+    self._meleeHitDone = nil
+    self._meleeEndTime = nil
+end
+
+-- ============================================================
 -- DrawHUD — minimal (just grenades counter)
 -- ============================================================
 if CLIENT then
