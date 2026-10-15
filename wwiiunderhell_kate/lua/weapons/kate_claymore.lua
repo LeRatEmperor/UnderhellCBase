@@ -6,8 +6,8 @@
 
 AddCSLuaFile()
 
-DEFINE_BASECLASS("weapon_cuh_base_gun")
-SWEP.Base = "weapon_cuh_base_gun"
+DEFINE_BASECLASS("weapon_custom_uh_base_melee")
+SWEP.Base = "weapon_custom_uh_base_melee"
 
 SWEP.PrintName   = "Claymore"
 SWEP.Category    = "Kate WWII"
@@ -38,7 +38,7 @@ SWEP.FireModes = {
 }
 
 -- Primary stats (from TFA source — Primary.Attacks[1])
-SWEP.Primary.Sound          = Sound("TFA_CODWW2_SWORD.Swing")
+SWEP.Primary.SwingSound    = Sound("TFA_CODWW2_SWORD.Swing")
 SWEP.Primary.SilSound       = Sound("")
 SWEP.Primary.ClipSize       = -1
 SWEP.Primary.Ammo           = "none"
@@ -89,16 +89,14 @@ SWEP.MuzzleFlashLightColor = Vector(255, 200, 100)
 SWEP.MuzzleFlashLightSize = 128
 
 -- Melee stats (from TFA Primary.Attacks[1])
-SWEP.MeleeDamage    = 1000
+SWEP.Primary.MinDamage      = 1000
+SWEP.Primary.MaxDamage      = 1000
 SWEP.MeleeRange     = 70                        -- = TFA Primary.Attacks[1].len
-SWEP.MeleeDelay     = 1.2                       -- = TFA Primary.Attacks[1].end
-SWEP.MeleeForce     = 200
-SWEP.MeleeHitDelay  = 0.1667                    -- = TFA Primary.Attacks[1].delay (5/30)
-SWEP.MeleeViewPunch = Angle(4, 3, 0)             -- = TFA Primary.Attacks[1].viewpunch
-SWEP.MeleeSound     = "TFA_CODWW2_SWORD.Swing"
-SWEP.MeleeHitSound  = {"TFA_CODWW2_SWORD.Stab"}
-SWEP.MeleeMissSound = ""
-SWEP.MeleeInterruptReload = true
+SWEP.Primary.Delay          = 1.2                       -- = TFA Primary.Attacks[1].end
+SWEP.Primary.Force          = 200
+SWEP.Primary.HurtTime       = 0.1667                    -- = TFA Primary.Attacks[1].delay (5/30)
+SWEP.Primary.Recoil         = Angle(4, 3, 0)             -- = TFA Primary.Attacks[1].viewpunch
+SWEP.Primary.HitSound  = {"TFA_CODWW2_SWORD.Stab"}
 
 SWEP.NoShell   = true
 SWEP.ShellHeat = 0.8
@@ -304,6 +302,3 @@ function SWEP:Deploy()
     return true
 end
 
-SWEP.ViewModelElements = {}
-SWEP.WorldModelElements = {}
-SWEP.Attachments = {}

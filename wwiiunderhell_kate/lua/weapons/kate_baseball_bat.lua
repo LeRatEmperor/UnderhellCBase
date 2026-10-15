@@ -6,8 +6,8 @@
 
 AddCSLuaFile()
 
-DEFINE_BASECLASS("weapon_cuh_base_gun")
-SWEP.Base = "weapon_cuh_base_gun"
+DEFINE_BASECLASS("weapon_custom_uh_base_melee")
+SWEP.Base = "weapon_custom_uh_base_melee"
 
 SWEP.PrintName   = "Baseball Bat"
 SWEP.Category    = "Kate WWII"
@@ -38,7 +38,7 @@ SWEP.FireModes = {
 }
 
 -- Primary stats (from TFA source — Primary.Attacks[1])
-SWEP.Primary.Sound          = Sound("TFA_CODWW2_BAT.Swing")
+SWEP.Primary.SwingSound    = Sound("TFA_CODWW2_BAT.Swing")
 SWEP.Primary.SilSound       = Sound("")
 SWEP.Primary.ClipSize       = -1              -- melee: infinite (no magazine)
 SWEP.Primary.Ammo           = "none"          -- melee: no ammo
@@ -92,16 +92,14 @@ SWEP.MuzzleFlashLightColor = Vector(255, 200, 100)
 SWEP.MuzzleFlashLightSize = 128
 
 -- Melee stats (from TFA Primary.Attacks[1])
-SWEP.MeleeDamage    = 650                       -- = TFA Primary.Attacks[1].dmg
+SWEP.Primary.MinDamage      = 650
+SWEP.Primary.MaxDamage      = 650                       -- = TFA Primary.Attacks[1].dmg
 SWEP.MeleeRange     = 60                        -- = TFA Primary.Attacks[1].len
-SWEP.MeleeDelay     = 1.2                       -- = TFA Primary.Attacks[1].end (swing speed)
-SWEP.MeleeForce     = 200
-SWEP.MeleeHitDelay  = 0.1667                    -- = TFA Primary.Attacks[1].delay (5/30)
-SWEP.MeleeViewPunch = Angle(0, 0, 0)            -- = TFA Primary.Attacks[1].viewpunch
-SWEP.MeleeSound     = "TFA_CODWW2_BAT.Swing"    -- = TFA Primary.Sound
-SWEP.MeleeHitSound  = {"TFA_CODWW2_BAT.Stab"}   -- = TFA Primary.Sound_HitFlesh (stab/hit)
-SWEP.MeleeMissSound = ""
-SWEP.MeleeInterruptReload = true
+SWEP.Primary.Delay          = 1.2                       -- = TFA Primary.Attacks[1].end (swing speed)
+SWEP.Primary.Force          = 200
+SWEP.Primary.HurtTime       = 0.1667                    -- = TFA Primary.Attacks[1].delay (5/30)
+SWEP.Primary.Recoil         = Angle(0, 0, 0)            -- = TFA Primary.Attacks[1].viewpunch
+SWEP.Primary.HitSound  = {"TFA_CODWW2_BAT.Stab"}   -- = TFA Primary.Sound_HitFlesh (stab/hit)
 
 -- Shell ejection (melee — no shell)
 SWEP.NoShell   = true
@@ -334,10 +332,7 @@ end
 -- ============================================================
 -- VELEMENTS / WELEMENTS (melee weapons use the model directly)
 -- ============================================================
-SWEP.ViewModelElements = {}
-SWEP.WorldModelElements = {}
 
 -- ============================================================
 -- ATTACHMENTS (melee weapons have no attachments)
 -- ============================================================
-SWEP.Attachments = {}
