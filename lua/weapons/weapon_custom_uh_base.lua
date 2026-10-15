@@ -444,13 +444,24 @@ function SWEP:Movement(pos, ang, ct, ft, iftp)
     pos = pos + ang:Up()*(self._viewBobP or 0)
     pos = pos + ang:Right()*(self._viewBobY or 0)
 
-    if bob ~= 0 and not (self.AnimatedSprint and isRunning) then
-        pos = pos + ang:Right()*(self._bobLerp or 0)*(isRunning and 1 or 0.6)*bob
-        pos = pos + ang:Up()*(self._bobAbs or 0)*2*(isZooming and -0.45 or 0.65)*(isRunning and 1 or 0.8)*bob
-        pos.z = pos.z + (self._velOffset or Vector(0,0,0)).z*bob
-        ang:RotateAroundAxis(ang:Up(),      -(self._bobSmooth or 0)*(self._runDir or 0)*10*bob)
-        ang:RotateAroundAxis(ang:Right(),   -(self._bobSmooth or 0)*(self._runDir or 0)*1.2*bob)
-        ang:RotateAroundAxis(ang:Forward(),  (self._bobSmooth or 0)*3*bob)
+    -- COSINE Viewmodel Bob (with sprint fade)
+    -- When AnimatedSprint is on, smoothly fade the bob out during sprint
+    -- and fade it back in when sprint ends. Prevents the "jump" that
+    -- occurs when the bob is hard-disabled/enabled.
+    if self.AnimatedSprint and isRunning then
+        self._sprintFade = Lerp(ft8, self._sprintFade or 1, 0)
+    else
+        self._sprintFade = Lerp(ft * 5, self._sprintFade or 0, 1)
+    end
+    local bob_fade = bob * (self._sprintFade or 1)
+
+    if bob_fade ~= 0 then
+        pos = pos + ang:Right()*(self._bobLerp or 0)*(isRunning and 1 or 0.6)*bob_fade
+        pos = pos + ang:Up()*(self._bobAbs or 0)*2*(isZooming and -0.45 or 0.65)*(isRunning and 1 or 0.8)*bob_fade
+        pos.z = pos.z + (self._velOffset or Vector(0,0,0)).z*bob_fade
+        ang:RotateAroundAxis(ang:Up(),      -(self._bobSmooth or 0)*(self._runDir or 0)*10*bob_fade)
+        ang:RotateAroundAxis(ang:Right(),   -(self._bobSmooth or 0)*(self._runDir or 0)*1.2*bob_fade)
+        ang:RotateAroundAxis(ang:Forward(),  (self._bobSmooth or 0)*3*bob_fade)
     end
 
     if idle ~= 0 then
