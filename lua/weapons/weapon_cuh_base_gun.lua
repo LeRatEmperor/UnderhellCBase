@@ -68,6 +68,25 @@ function SWEP:GetEffectiveAttachment(slot)
 end
 
 -- ============================================================
+-- IsAttachmentEquipped — check if a specific attachment is equipped
+-- ============================================================
+-- Used by attachment animation functions to detect other attachments.
+-- Example: tac knife reload checks if extended mags are also equipped.
+function SWEP:IsAttachmentEquipped(attId)
+    if not self.Attachments then return false end
+    for slot = 1, #self.Attachments do
+        local slotData = self.Attachments[slot]
+        if slotData and slotData.atts then
+            local sel = self:GetEffectiveAttachment(slot)
+            if sel and sel > 0 and slotData.atts[sel] == attId then
+                return true
+            end
+        end
+    end
+    return false
+end
+
+-- ============================================================
 -- STAT CACHE SYSTEM
 -- ============================================================
 -- Tracks original weapon values so attachments can modify them
