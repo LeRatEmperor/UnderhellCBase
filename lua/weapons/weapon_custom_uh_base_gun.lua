@@ -1192,8 +1192,32 @@ function SWEP:DoDrawCrosshair(x, y)
     end
 
     -- Draw crosshair lines or circle
+    -- SWEP.CrosshairType: 1 = prong, 2 = circle, 3 = off
+    -- If not set, fall back to pellet counting (shotguns = circle, others = prong)
     local pellets = (self.Primary and self.Primary.NumberofShots) or 1
-    if self.CrosshairCircle or pellets > 1 then
+    local useCircle = false
+    local useProng = false
+
+    if self.CrosshairType then
+        if self.CrosshairType == 1 then
+            useProng = true
+        elseif self.CrosshairType == 2 then
+            useCircle = true
+        elseif self.CrosshairType == 3 then
+            -- Off — draw nothing (dot already hidden if ADS)
+            useProng = false
+            useCircle = false
+        end
+    else
+        -- Fallback: pellet counting
+        if self.CrosshairCircle or pellets > 1 then
+            useCircle = true
+        else
+            useProng = true
+        end
+    end
+
+    if useCircle then
         local shadow = CH_Shadow
         shadow.a = a * 100 / 150
         if gap_size > 1 then
@@ -1202,8 +1226,7 @@ function SWEP:DoDrawCrosshair(x, y)
             surface.DrawCircle(x, y, gap_size + 1, shadow)
             surface.DrawCircle(x, y, gap_size - 2, shadow)
         end
-    elseif baseSpread > 0 then
-        -- Only draw prongs if there's a visible gap (or converging)
+    elseif useProng and baseSpread > 0 then
         if gap_size > 0 then
             ch_shadowrect(x - (dot_size / 2), y + (dot_size / 4) + gap_size, dot_size, line_size, col)
             ch_shadowrect(x - (dot_size / 2), y - (dot_size / 4) - gap_size - line_size, dot_size, line_size, col)
