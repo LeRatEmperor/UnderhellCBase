@@ -118,7 +118,11 @@ function SWEP:Think()
         self:HandleBones(vm, ct)
         self:HandleHands(vm)
     end
-    self:HandleRunning(ct)
+    -- Don't call HandleRunning here — the Kate melee weapons have their own
+    -- HandleSprintingAnimations() that uses EasySendWeaponAnim with the
+    -- Animations table. HandleRunning uses SendWeaponAnim with ACT_* which
+    -- doesn't look up the Animations table, so they conflict.
+    -- The Kate weapons call HandleSprintingAnimations() in their Think.
     if self.CustomThink then self:CustomThink(ct) end
 end
 
@@ -334,8 +338,11 @@ function SWEP:DoMeleeTrace()
             -- Hit the world (map geometry, not an entity)
             if SERVER then util.ScreenShake(tr.HitPos, 2, 0.1, 0.2, 32) end
 
-            -- World hit sound
+            -- World hit sound: use HitWorldSound if set, otherwise HitSound,
+            -- otherwise SwingSound as a last resort
             local worldSnd = self.Primary.HitWorldSound
+            if not worldSnd then worldSnd = self.Primary.HitSound end
+            if not worldSnd then worldSnd = self.Primary.SwingSound end
             if istable(worldSnd) then worldSnd = worldSnd[math.random(1, #worldSnd)] end
             if worldSnd and worldSnd ~= "" then
                 self:EmitSound(worldSnd, 75, 100, 1, CHAN_USER_BASE)
@@ -351,8 +358,8 @@ function SWEP:DoMeleeTrace()
             end
         end
     else
-        -- Missed — play swing miss sound (HitWorldSound doubles as miss sound)
-        local missSnd = self.Primary.HitWorldSound
+        -- Missed — play swing sound
+        local missSnd = self.Primary.SwingSound
         if istable(missSnd) then missSnd = missSnd[math.random(1, #missSnd)] end
         if missSnd and missSnd ~= "" then
             self:EmitSound(missSnd, 65, 100, 1, CHAN_USER_BASE)
