@@ -50,7 +50,7 @@ SWEP.Primary.Automatic      = false
 SWEP.Primary.TakeAmmo       = 1
 SWEP.Primary.Force          = 1
 SWEP.Primary.Spread         = .067
-SWEP.Primary.Delay          = 0.200000    -- 300 RPM
+SWEP.Primary.Delay          = 0.600000    -- pump-action cycle (fire + pump)
 SWEP.Primary.NumberofShots  = 8
 SWEP.Primary.MinRecoil      = -1.5
 SWEP.Primary.MaxRecoil      = -1.5
@@ -69,6 +69,11 @@ SWEP.TwoHanded              = true
 SWEP.ReloadSpeed            = 1
 SWEP.Chambering             = false
 SWEP.AnimatedSprint         = true
+
+-- Pump-action shotgun config
+SWEP.IsPump    = true
+SWEP.PumpDelay = 0.200       -- pump animation starts 0.2s after fire
+SWEP.Shotgun   = true
 
 -- Ironsights
 SWEP.IronSightsPos = Vector(-3.214, -3, -0.84)
@@ -221,6 +226,34 @@ function SWEP:ShootAnimation()
         return ACT_VM_PRIMARYATTACK_1
     end
     return ACT_VM_PRIMARYATTACK
+end
+
+-- ============================================================
+-- PUMP-ACTION RECHAMBER (PostShoot override)
+-- ============================================================
+-- After firing, plays the pump/rechamber animation (ACT_VM_PULLBACK_HIGH
+-- for hipfire, ACT_VM_PULLBACK_LOW for ADS) after a short delay.
+-- Primary.Delay (0.6s) is set high enough that the next shot can't
+-- fire until the pump animation has completed — so the pump can
+-- never be cancelled by the next trigger pull.
+function SWEP:PostShoot()
+    if not self.IsPump then return end
+    local ct = CurTime()
+    local pumpDelay = self.PumpDelay or 0.2
+    -- Ensure next fire is at least pumpDelay away so the pump
+    -- animation has time to start before the next shot.
+    self:SetNextPrimaryFire(math.max(self:GetNextPrimaryFire(), ct + pumpDelay))
+    self:SetNextSecondaryFire(math.max(self:GetNextSecondaryFire(), ct + pumpDelay))
+    timer.Simple(pumpDelay, function()
+        if not IsValid(self) or not IsValid(self.Owner)
+           or not IsValid(self.Owner:GetActiveWeapon())
+           or self.Owner:GetActiveWeapon() ~= self then return end
+        if self:GetUHBool("Reloading") then return end
+        local isADS = self:GetUHBool("Zooming")
+        local animKey = isADS and "rechamber_ads" or "rechamber"
+        local fallbackAct = isADS and ACT_VM_PULLBACK_LOW or ACT_VM_PULLBACK_HIGH
+        self:EasySendWeaponAnim(animKey, fallbackAct)
+    end)
 end
 
 -- ============================================================
