@@ -15,6 +15,7 @@ SWEP.SubCategory = "Assault Rifles"
 SWEP.Slot = 2
 SWEP.Spawnable = true
 SWEP.Customizable = false
+SWEP.MeleeEnabled = false
 
 -- Appearance
 SWEP.UseHands = true
@@ -108,7 +109,6 @@ SWEP.MeleeInterruptReload = true
 -- Shell ejection
 SWEP.NoShell   = false
 SWEP.ShellHeat = 0.5
-SWEP.Shell     = "models/weapons/shell_556.mdl"
 SWEP.ShellDelay = 0
 
 -- World model positioning
@@ -135,8 +135,8 @@ SWEP.Animations = {
     ["reload"]       = "ACT_VM_RELOAD",
     ["reload_empty"] = "ACT_VM_RELOAD_EMPTY",
     ["sprint_in"]    = "sprint_in",
-    ["sprint_out"]   = "sprint_loop",
-    ["sprint_idle"]  = "sprint_out",
+    ["sprint_out"]   = "sprint_out",
+    ["sprint_idle"]  = "sprint_loop",
 }
 
 -- ============================================================
@@ -264,7 +264,7 @@ end
 -- ============================================================
 function SWEP:PrimaryAttack()
     if self._meleeActive then return end
-    if self.Owner:KeyDown(IN_USE) then
+    if self.MeleeEnabled ~= false and self.Owner:KeyDown(IN_USE) then
         local ct = CurTime()
         if ct < (self._nextMelee or 0) then return end
         if self:GetUHBool("Reloading") then return end

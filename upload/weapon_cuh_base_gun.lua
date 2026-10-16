@@ -31,6 +31,12 @@ SWEP.AdminSpawnable = false
 -- SetAttachment) opened the CUH menu.
 SWEP.IsCUHWeapon = true
 
+-- Customization toggle: set SWEP.Customizable = false on weapons that
+-- don't have attachments. When false, ApplyAttachments is a no-op
+-- (skips the entire attachment pipeline) and the CUH menu won't open.
+SWEP.Customizable = true  -- default: true (WWII Kate weapons)
+SWEP.MeleeEnabled = true  -- default: true (melee bash via E+M1)
+
 -- ============================================================
 -- DEFAULT ATTACHMENT SYSTEM
 -- ============================================================
@@ -731,12 +737,9 @@ end
 -- ============================================================
 
 function SWEP:ApplyAttachments()
-    print("[CUH-DBG] >>> ApplyAttachments CALLED  realm=" .. (SERVER and "SERVER" or "CLIENT")
-        .. "  wep=" .. tostring(self) .. "  class=" .. tostring(self.GetClass and self:GetClass() or "?"))
-    if not self.Attachments then
-        print("[CUH-DBG]   ABORT: self.Attachments is nil")
-        return
-    end
+    -- Skip the entire attachment pipeline for non-customizable weapons
+    if self.Customizable == false then return end
+    if not self.Attachments then return end
     if not self._statOrigins then self:InitStatCache() end
 
     print("[CUH-DBG]   CustomUH.Attachments count = " .. tostring(CustomUH and CustomUH.Attachments and table.Count(CustomUH.Attachments) or "nil"))

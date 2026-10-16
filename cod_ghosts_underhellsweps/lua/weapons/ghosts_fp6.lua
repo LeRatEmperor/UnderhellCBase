@@ -1,6 +1,8 @@
 -- ============================================================
 -- FP6 — Ported from TFA Ghosts to CUH base
 -- Source: nz_ghosts_fp6
+-- Special: Multi-stage reload (5 different reload animations
+--   based on shells remaining)
 -- ============================================================
 
 AddCSLuaFile()
@@ -15,6 +17,7 @@ SWEP.SubCategory = "Shotguns"
 SWEP.Slot = 3
 SWEP.Spawnable = true
 SWEP.Customizable = false
+SWEP.MeleeEnabled = false
 
 -- Appearance
 SWEP.UseHands = true
@@ -48,7 +51,7 @@ SWEP.Primary.MaxDamage      = 80.0
 SWEP.Primary.Automatic      = false
 SWEP.Primary.TakeAmmo       = 1
 SWEP.Primary.Force          = 1
-SWEP.Primary.Spread         = .065
+SWEP.Primary.Spread         = 0.065
 SWEP.Primary.Delay          = 0.240000    -- 250 RPM
 SWEP.Primary.NumberofShots  = 8
 SWEP.Primary.MinRecoil      = -1.2
@@ -58,7 +61,7 @@ SWEP.Primary.KickDown       = 1.2
 SWEP.Primary.KickHorizontal = 0.35
 SWEP.Primary.SpreadMultiplierMax = 1.0
 SWEP.Primary.SpreadIncrement    = 0.0
-SWEP.Primary.SpreadRecovery     = 6.0
+SWEP.Primary.SpreadRecovery     = 4.0
 SWEP.TwoHanded              = true
 SWEP.ReloadSpeed            = 1
 SWEP.Chambering             = false
@@ -93,22 +96,9 @@ SWEP.MuzzleFlashParticle = "muzzleflash_6"
 SWEP.MuzzleFlashLightColor = Vector(255, 200, 100)
 SWEP.MuzzleFlashLightSize = 128
 
--- Melee bash
-SWEP.MeleeDamage    = 50
-SWEP.MeleeRange     = 64
-SWEP.MeleeDelay     = 0.6
-SWEP.MeleeForce     = 300
-SWEP.MeleeHitDelay  = 0.15
-SWEP.MeleeViewPunch = Angle(-5, 0, 0)
-SWEP.MeleeSound     = "Weapons_Ghosts_LARGE.Generic"
-SWEP.MeleeHitSound  = {"Weapons_Ghosts_LARGE.Generic"}
-SWEP.MeleeMissSound = ""
-SWEP.MeleeInterruptReload = true
-
--- Shell ejection
-SWEP.NoShell   = false
+-- Shell ejection (shotgun shells built into the model, no eject)
+SWEP.NoShell   = true
 SWEP.ShellHeat = 0.8
-SWEP.Shell     = "models/weapons/shell_12g.mdl"
 SWEP.ShellDelay = 0
 
 -- World model positioning
@@ -132,15 +122,19 @@ SWEP.Animations = {
     ["melee_empty"]  = "melee_empty",
     ["inspect"]      = "inspect",
     ["inspect_empty"] = "inspect_empty",
-    ["reload"]       = "ACT_VM_RELOAD",
-    ["reload_empty"] = "ACT_VM_RELOAD_EMPTY",
+    ["reload"]       = "ACT_VM_RELOAD_EMPTY",   -- full 5-round reload (empty)
+    ["reload_1"]     = "ACT_VM_RELOAD",          -- 1 shell (4 remaining)
+    ["reload_2"]     = "ACT_RELOAD_LOW",          -- 2 shells (3 remaining)
+    ["reload_3"]     = "ACT_VM_RELOAD2",          -- 3 shells (2 remaining)
+    ["reload_4"]     = "ACT_VM_RELOAD_SILENCED",   -- 4 shells (1 remaining)
     ["sprint_in"]    = "sprint_in",
-    ["sprint_out"]   = "sprint_loop",
-    ["sprint_idle"]  = "sprint_out",
+    ["sprint_out"]   = "sprint_out",
+    ["sprint_idle"]  = "sprint_loop",
 }
 
 -- ============================================================
--- ANIMSOUNDS (time = N/30 -> seconds)
+-- ANIMSOUNDS (ported from TFA EventTable, time = N/30 -> seconds)
+-- Includes pump/chamber sounds and shell insertion sounds.
 -- ============================================================
 SWEP.AnimSounds = {
     ["deploy"] = {
@@ -161,12 +155,20 @@ SWEP.AnimSounds = {
         { time = 1.4333, sound = "Weapons_Ghosts_FP6.Chamber" },
         { time = 1.8667, sound = "Weapons_Ghosts_FP6.End" },
     },
+    ["reload_1"] = {
+        { time = 0.0000, sound = "Weapons_Ghosts_FP6.Lift" },
+        { time = 0.7000, sound = "Weapons_Ghosts_FP6.Insert" },
+        { time = 1.4333, sound = "Weapons_Ghosts_FP6.Chamber" },
+        { time = 1.8667, sound = "Weapons_Ghosts_FP6.End" },
+    },
     ["reload_2"] = {
         { time = 0.0000, sound = "Weapons_Ghosts_FP6.Lift" },
         { time = 0.7000, sound = "Weapons_Ghosts_FP6.Insert" },
         { time = 1.2333, sound = "Weapons_Ghosts_FP6.Insert" },
         { time = 1.9000, sound = "Weapons_Ghosts_FP6.Chamber" },
         { time = 2.3667, sound = "Weapons_Ghosts_FP6.End" },
+    },
+    ["reload_3"] = {
         { time = 0.0000, sound = "Weapons_Ghosts_FP6.Lift" },
         { time = 0.7000, sound = "Weapons_Ghosts_FP6.Insert" },
         { time = 1.2333, sound = "Weapons_Ghosts_FP6.Insert" },
@@ -174,17 +176,7 @@ SWEP.AnimSounds = {
         { time = 2.4000, sound = "Weapons_Ghosts_FP6.Chamber" },
         { time = 2.8667, sound = "Weapons_Ghosts_FP6.End" },
     },
-    ["reload_empty"] = {
-        { time = 0.0000, sound = "Weapons_Ghosts_FP6.Lift" },
-        { time = 0.7000, sound = "Weapons_Ghosts_FP6.Insert" },
-        { time = 1.2333, sound = "Weapons_Ghosts_FP6.Insert" },
-        { time = 1.7667, sound = "Weapons_Ghosts_FP6.Insert" },
-        { time = 2.3000, sound = "Weapons_Ghosts_FP6.Insert" },
-        { time = 2.8333, sound = "Weapons_Ghosts_FP6.Insert" },
-        { time = 3.3333, sound = "Weapons_Ghosts_FP6.Chamber" },
-        { time = 3.8667, sound = "Weapons_Ghosts_FP6.End" },
-    },
-    ["reload_sil"] = {
+    ["reload_4"] = {
         { time = 0.0000, sound = "Weapons_Ghosts_FP6.Lift" },
         { time = 0.7000, sound = "Weapons_Ghosts_FP6.Insert" },
         { time = 1.2333, sound = "Weapons_Ghosts_FP6.Insert" },
@@ -194,6 +186,92 @@ SWEP.AnimSounds = {
         { time = 3.4333, sound = "Weapons_Ghosts_FP6.End" },
     },
 }
+
+-- ============================================================
+-- MULTI-STAGE RELOAD SYSTEM
+-- ============================================================
+-- The FP6 has 5 different reload animations based on how many
+-- shells remain in the magazine:
+--   0 shells (empty) → reload   (ACT_VM_RELOAD_EMPTY) — full 5-round reload
+--   1 shell         → reload_4 (ACT_VM_RELOAD_SILENCED) — 4 shells inserted
+--   2 shells         → reload_3 (ACT_VM_RELOAD2) — 3 shells inserted
+--   3 shells         → reload_2 (ACT_RELOAD_LOW) — 2 shells inserted
+--   4 shells         → reload_1 (ACT_VM_RELOAD) — 1 shell inserted
+--
+-- The reload animation timing (from TFA StatusLengthOverride):
+--   reload_1 (1 shell):  21/30 = 0.7000s
+--   reload_2 (2 shells): 37/30 = 1.2333s
+--   reload_3 (3 shells): 53/30 = 1.7667s
+--   reload_4 (4 shells): 69/30 = 2.3000s
+--   reload   (5 shells): 2.85s
+--
+-- Ammo management: shells are inserted at specific times during
+-- the animation. The base reload system sets Clip1 to full after
+-- the animation ends, but we need to insert shells one at a time
+-- to match the animation.
+
+-- Reload timing table (seconds for each reload stage)
+SWEP.FP6_ReloadTimes = {
+    [0] = 2.85,     -- full empty reload (5 shells)
+    [1] = 2.3000,   -- 4 shells to insert
+    [2] = 1.7667,   -- 3 shells to insert
+    [3] = 1.2333,   -- 2 shells to insert
+    [4] = 0.7000,   -- 1 shell to insert
+}
+
+function SWEP:Reload()
+    if self:GetUHBool("Reloading") then return end
+    if self:GetUHBool("Running") then return end
+    if self:GetNWFloat("DeployTime") > CurTime() then return end
+
+    local clip = self:Clip1()
+    if clip >= self.Primary.ClipSize then return end
+
+    -- Determine which reload animation to play
+    local reloadKey
+    if clip == 0 then
+        reloadKey = "reload"       -- full empty reload
+    elseif clip == 1 then
+        reloadKey = "reload_4"     -- 4 shells to insert
+    elseif clip == 2 then
+        reloadKey = "reload_3"     -- 3 shells to insert
+    elseif clip == 3 then
+        reloadKey = "reload_2"     -- 2 shells to insert
+    elseif clip == 4 then
+        reloadKey = "reload_1"     -- 1 shell to insert
+    else
+        reloadKey = "reload_1"     -- fallback
+    end
+
+    -- Play the reload animation
+    self:EasySendWeaponAnim(reloadKey, ACT_VM_RELOAD)
+
+    local vm = IsValid(self.Owner) and self.Owner:GetViewModel() or nil
+    local animDuration = IsValid(vm) and vm:SequenceDuration() or self.FP6_ReloadTimes[clip] or 2.0
+
+    -- Set reload state
+    self:SetUHBool("Reloading", true)
+    self:SetUHBool("Zooming", false)
+    self:SetNWFloat("ReloadTime", animDuration)
+    self:SetNWFloat("ReloadEndTime", CurTime() + animDuration)
+    self._reloadEndTime = CurTime() + animDuration
+    self._reloadFinished = false
+
+    -- Ammo management: set clip to full at the end of the animation
+    -- The base's _FinishReload handles this, but we need to make sure
+    -- the right amount of ammo is removed from reserve.
+    local shellsToInsert = self.Primary.ClipSize - clip
+    local owner = self:GetOwner()
+    if IsValid(owner) and SERVER then
+        local ammoType = self.Primary.Ammo
+        local reserve = owner:GetAmmoCount(ammoType)
+        local actualInsert = math.min(shellsToInsert, reserve)
+        -- Remove ammo from reserve immediately
+        owner:RemoveAmmo(actualInsert, ammoType)
+        -- Set clip to the new value
+        self:SetClip1(clip + actualInsert)
+    end
+end
 
 -- ============================================================
 -- SMART MUZZLE / SHELL AUTO-DETECT
@@ -299,15 +377,6 @@ end
 -- ============================================================
 function SWEP:PrimaryAttack()
     if self._meleeActive then return end
-    if self.Owner:KeyDown(IN_USE) then
-        local ct = CurTime()
-        if ct < (self._nextMelee or 0) then return end
-        if self:GetUHBool("Reloading") then return end
-        if self:GetNWFloat("DeployTime") > ct then return end
-        if self:GetNWInt("FireMode") == 0 then return end
-        if SERVER or IsFirstTimePredicted() then self:MeleeAttack() end
-        return
-    end
     BaseClass.PrimaryAttack(self)
 end
 
@@ -316,15 +385,13 @@ function SWEP:SecondaryAttack()
     return BaseClass.SecondaryAttack(self)
 end
 
-function SWEP:Reload()
-    return BaseClass.Reload(self)
-end
-
 -- ============================================================
 -- THINK
 -- ============================================================
 function SWEP:Think()
     local ct = CurTime()
+
+    -- Melee state (not used since MeleeEnabled = false, but keep for safety)
     if self._meleeActive and not self._meleeHitDone and self._meleeHitTime and ct >= self._meleeHitTime then
         self._meleeHitDone = true
         if SERVER or IsFirstTimePredicted() then self:DoMeleeTrace() end
@@ -332,6 +399,7 @@ function SWEP:Think()
     if self._meleeActive and self._meleeEndTime and ct >= self._meleeEndTime then
         self:EndMelee()
     end
+
     BaseClass.Think(self)
     if not IsValid(self.Owner) then return end
     self:HandleSprintingAnimations()
