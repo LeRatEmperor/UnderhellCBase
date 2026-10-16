@@ -236,3 +236,51 @@ Stage Summary:
 - Save/load should work (PlayerSwitchWeapon replaces nonexistent WeaponDeployed)
 - Deploy should work (return true instead of false)
 - Attachments should materialize on deploy (ApplyAttachments called from Deploy via timer)
+
+---
+Task ID: 6 (User Feedback Round 6 — Customization Toggle, FP6 Reload, Tac 12 Looped Reload, ACT_VM_PRIMARYATTACK)
+Agent: Super Z (main)
+Task: Apply 6 fixes from user feedback:
+  1. Customization toggle (Customizable=false) — menu still opens on C
+  2. FP6 full 5-round reload sound schedule (replace timings)
+  3. FP6 ammo refill at (animDuration - 0.1)s, not at start
+  4. Lower FP6 ViewModelFOV to 60
+  5. Replace "fire" sequence with ACT_VM_PRIMARYATTACK / ACT_VM_PRIMARYATTACK_1 (ADS) — applies to all 25 weapons
+  6. Convert Tac 12 to KRM-262-style looped shotgun reload (start -> loop -> finish)
+
+Work Log:
+- Added `if wep.Customizable == false then return end` guard in cl_cuh_ui.lua OpenMenu() — both in /home/z/my-project/lua/autorun/cl_cuh_ui.lua and /home/z/my-project/download/custom_uh_base/lua/autorun/cl_cuh_ui.lua
+- Wrote scripts/apply_fire_anim_fix.py to apply fix #5 to all 25 weapons:
+  - Removed `["shoot"] = "fire"` and `["iron_fire"] = "fire_ads"` from SWEP.Animations
+  - Replaced ShootAnimation() override to return ACT_VM_PRIMARYATTACK (hipfire) or ACT_VM_PRIMARYATTACK_1 (ADS)
+  - Lets the base class fall through to SelectWeightedSequence on the activity
+  - All 25 files updated successfully
+- FP6 (ghosts_fp6.lua) specific fixes:
+  - ViewModelFOV: 70 -> 60
+  - ["reload"] AnimSounds replaced with 8-entry schedule (Lift, 5x Insert, Chamber, End) — last sound at 3.8667s
+  - FP6_ReloadTimes[0]: 2.85 -> 4.0 (matches new sound schedule)
+  - Safety floor: if reloadKey=="reload" and animDuration < 4.0, force 4.0
+  - Removed immediate ammo addition (was: owner:RemoveAmmo + SetClip1 at reload start)
+  - Added timer.Simple at (animDuration - 0.1)s that adds ammo if reload still active
+  - Uses _fp6_ammoAdded guard to prevent double-fire; base class _FinishReload becomes a no-op
+- Tac 12 (ghosts_tac12.lua) looped shotgun reload conversion:
+  - Added Primary.ReloadTime = 13/30 (TFA LoopedReloadInsertTime)
+  - Added Primary.ShellSound = "Weapons_Ghosts_TAC.Insert"
+  - Replaced Animations["reload"]/["reload_empty"] with ["start_reload"]/["reload_loop"]/["after_reload"]
+  - Renamed AnimSounds keys to start_reload / reload_loop / after_reload (kept TFA-ported timings)
+  - Removed the unused ["reload_2"] AnimSounds entry
+  - Reload() now fully self-contained: plays start_reload, sets _tac12_nextShell = ct + startDur
+  - Added ReloadShotgun(ct) method: handles stop conditions (clip full / no reserve / fire pressed) and per-shell insertion via timer
+  - Think() now calls ReloadShotgun(ct) BEFORE BaseClass.Think so the base doesn't try to _FinishReload on us
+  - Sets _reloadFinished = true at reload start to suppress base-class ammo refill
+  - Holster() clears _tac12_nextShell and _tac12_reloading to prevent post-holster timer fires
+- Wrote scripts/verify_syntax.py: uses lupa LuaRuntime + load() to compile-check all 27 Lua files
+  - Handles GMod LuaJIT-isms: `continue` keyword, `&&`/`||`/`!=` operators
+  - All 27 files pass (25 ghost weapons + weapon_cuh_base_gun + cl_cuh_ui)
+
+Stage Summary:
+- Customizable toggle: opens menu only if Customizable ~= false; affects all 25 ghost weapons
+- All 25 weapons now use ACT_VM_PRIMARYATTACK / ACT_VM_PRIMARYATTACK_1 instead of "fire"/"fire_ads" sequence names
+- FP6 full 5-round reload: 8 sounds properly timed (last at 3.8667s); ammo added 0.1s before anim end; FOV 60
+- Tac 12: full KRM-262-style looped reload (start -> loop per shell -> finish); interrupts on fire/clip-full/no-reserve
+- All 27 Lua files pass syntax verification (no parse errors)

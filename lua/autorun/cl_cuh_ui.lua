@@ -55,6 +55,12 @@ local function OpenMenu()
     -- SetAttachment. Use the Base-chain walk instead.
     if not IsCUHWeapon(wep) then return end
 
+    -- Respect the Customizable toggle: weapons that explicitly set
+    -- SWEP.Customizable = false opt out of the attachment menu entirely.
+    -- This is how ported COD:Ghosts weapons (which have no attachments)
+    -- suppress the C-key menu without needing to break their inheritance.
+    if wep.Customizable == false then return end
+
     -- Toggle if already open
     if IsValid(menuPanel) then
         menuPanel:Remove()

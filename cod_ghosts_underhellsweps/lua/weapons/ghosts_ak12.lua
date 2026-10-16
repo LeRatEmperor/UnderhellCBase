@@ -119,10 +119,8 @@ SWEP.WorldModelAngle  = Angle(8, 180, 180)
 -- ANIMATIONS
 -- ============================================================
 SWEP.Animations = {
-    ["shoot"]        = "fire",
     ["shoot_last"]   = "fire_last",
     ["fire_ads"]     = "fire_ads",
-    ["iron_fire"]    = "fire_ads",
     ["idle"]         = "idle",
     ["idle_empty"]   = "idle_empty",
     ["deploy"]       = "draw",
@@ -198,11 +196,11 @@ end
 -- SHOOT ANIMATION SELECTION
 -- ============================================================
 function SWEP:ShootAnimation()
-    if self:GetUHBool("Zooming") and self.Animations and self.Animations["iron_fire"] then
-        return "iron_fire"
-    end
-    if self.Animations and self.Animations["shoot"] then
-        return "shoot"
+    -- Use the model's primary-attack ACT directly (rather than the
+    -- "fire" sequence name). ACT_VM_PRIMARYATTACK_1 is the ADS variant
+    -- that the model maps to the aimed-fire sequence.
+    if self:GetUHBool("Zooming") then
+        return ACT_VM_PRIMARYATTACK_1
     end
     return ACT_VM_PRIMARYATTACK
 end

@@ -60,6 +60,11 @@ SWEP.Primary.KickHorizontal = 0.35
 SWEP.Primary.SpreadMultiplierMax = 1.0
 SWEP.Primary.SpreadIncrement    = 0.0
 SWEP.Primary.SpreadRecovery     = 6.0
+-- Shotgun looped-reload settings (mirrors KRM-262 pattern):
+--   ReloadTime  = seconds between shell insertions (TFA LoopedReloadInsertTime = 13/30)
+--   ShellSound   = sound emitted on each per-shell loop iteration
+SWEP.Primary.ReloadTime     = 13 / 30   -- ~0.4333s per shell
+SWEP.Primary.ShellSound     = Sound("Weapons_Ghosts_TAC.Insert")
 SWEP.TwoHanded              = true
 SWEP.ReloadSpeed            = 1
 SWEP.Chambering             = false
@@ -119,10 +124,8 @@ SWEP.WorldModelAngle  = Angle(10, 180, 180)
 -- ANIMATIONS
 -- ============================================================
 SWEP.Animations = {
-    ["shoot"]        = "fire",
     ["shoot_last"]   = "fire_last",
     ["fire_ads"]     = "fire_ads",
-    ["iron_fire"]    = "fire_ads",
     ["idle"]         = "idle",
     ["idle_empty"]   = "idle_empty",
     ["deploy"]       = "draw",
@@ -132,8 +135,10 @@ SWEP.Animations = {
     ["melee_empty"]  = "melee_empty",
     ["inspect"]      = "inspect",
     ["inspect_empty"] = "inspect_empty",
-    ["reload"]       = "ACT_VM_RELOAD",
-    ["reload_empty"] = "ACT_VM_RELOAD_EMPTY",
+    -- Looped shotgun reload: start -> loop -> finish (KRM-262 pattern)
+    ["start_reload"]  = "ACT_SHOTGUN_RELOAD_START",   -- plays once at reload start
+    ["reload_loop"]   = "ACT_VM_RELOAD",               -- loops once per shell
+    ["after_reload"]  = "ACT_SHOTGUN_RELOAD_FINISH",   -- plays once at reload end
     ["sprint_in"]    = "sprint_in",
     ["sprint_out"]   = "sprint_out",
     ["sprint_idle"]  = "sprint_loop",
@@ -143,14 +148,21 @@ SWEP.Animations = {
 -- ANIMSOUNDS (time = N/30 -> seconds)
 -- ============================================================
 SWEP.AnimSounds = {
-    ["act_shotgun_reload_finish"] = {
+    -- Looped shotgun reload sounds (ported from TFA EventTable):
+    --   start_reload  : Lift at 3/30=0.1s, Insert at 35/30=1.1667s
+    --   reload_loop   : Insert at 7/30=0.2333s (per shell)
+    --   after_reload  : Grab at 5/30=0.1667s, Chamber at 13/30=0.4333s, End at 28/30=0.9333s
+    ["start_reload"] = {
+        { time = 0.1000, sound = "Weapons_Ghosts_TAC.Lift" },
+        { time = 1.1667, sound = "Weapons_Ghosts_TAC.Insert" },
+    },
+    ["reload_loop"] = {
+        { time = 0.2333, sound = "Weapons_Ghosts_TAC.Insert" },
+    },
+    ["after_reload"] = {
         { time = 0.1667, sound = "Weapons_Ghosts_TAC.Grab" },
         { time = 0.4333, sound = "Weapons_Ghosts_TAC.Chamber" },
         { time = 0.9333, sound = "Weapons_Ghosts_TAC.End" },
-    },
-    ["act_shotgun_reload_start"] = {
-        { time = 0.1000, sound = "Weapons_Ghosts_TAC.Lift" },
-        { time = 1.1667, sound = "Weapons_Ghosts_TAC.Insert" },
     },
     ["deploy"] = {
         { time = 0.1000, sound = "Weapons_Ghosts_MEDIUM.Generic" },
@@ -163,21 +175,6 @@ SWEP.AnimSounds = {
     },
     ["rechamber_ads"] = {
         { time = 0.0000, sound = "Weapons_Ghosts_TAC.Chamber" },
-    },
-    ["reload"] = {
-        { time = 0.2333, sound = "Weapons_Ghosts_TAC.Insert" },
-    },
-    ["reload_2"] = {
-        { time = 0.1000, sound = "Weapons_Ghosts_TAC.Insert" },
-        { time = 0.3000, sound = "iw4.ranger.insert" },
-        { time = 0.5000, sound = "TFA_RENAISSANCE.SAWEDOFF.SHELL_IN" },
-        { time = 0.9000, sound = "iw4.1887.insert" },
-        { time = 1.1000, sound = "TFA_UGX.Spas_Insert" },
-        { time = 1.3000, sound = "TFA_REN.M1887_Insert" },
-        { time = 1.5000, sound = "Weapons_Ghosts_FP6.Insert" },
-        { time = 1.7000, sound = "TFA_BO2.G_SHOTGUN.LOAD" },
-        { time = 1.9000, sound = "TFA_T7C.Ray_Magin" },
-        { time = 0.7000, sound = "ambient/alarms/train_horn2.wav" },
     },
 }
 
@@ -217,11 +214,11 @@ end
 -- SHOOT ANIMATION SELECTION
 -- ============================================================
 function SWEP:ShootAnimation()
-    if self:GetUHBool("Zooming") and self.Animations and self.Animations["iron_fire"] then
-        return "iron_fire"
-    end
-    if self.Animations and self.Animations["shoot"] then
-        return "shoot"
+    -- Use the model's primary-attack ACT directly (rather than the
+    -- "fire" sequence name). ACT_VM_PRIMARYATTACK_1 is the ADS variant
+    -- that the model maps to the aimed-fire sequence.
+    if self:GetUHBool("Zooming") then
+        return ACT_VM_PRIMARYATTACK_1
     end
     return ACT_VM_PRIMARYATTACK
 end
@@ -302,8 +299,148 @@ function SWEP:SecondaryAttack()
     return BaseClass.SecondaryAttack(self)
 end
 
+-- ============================================================
+-- LOOPED SHOTGUN RELOAD (KRM-262 pattern)
+-- ============================================================
+-- Fully self-contained — does NOT call BaseClass.Reload.
+-- The base class's cycle-based ReloadShotgun doesn't work with
+-- these models, so we override both Reload() and ReloadShotgun()
+-- to use a timer-based approach.
+--
+-- Flow:
+--   1. Reload() plays start_reload (ACT_SHOTGUN_RELOAD_START) once.
+--   2. When start_reload finishes, the first shell is inserted
+--      (ShotgunStartAnimShell = true semantics).
+--   3. ReloadShotgun() runs every Think while reloading:
+--        - If clip is full, no reserve, or fire pressed -> play
+--          after_reload (ACT_SHOTGUN_RELOAD_FINISH) and stop.
+--        - Otherwise, every Primary.ReloadTime seconds, play
+--          reload_loop (ACT_VM_RELOAD) and insert one shell.
 function SWEP:Reload()
-    return BaseClass.Reload(self)
+    if self._meleeActive then return end
+
+    -- Block reload while holding E (USE) so inspect (E+R) doesn't cancel
+    if self.Owner:KeyDown(IN_USE) then return end
+
+    local ct = CurTime()
+
+    -- Don't reload if already reloading, sprinting, or blocked
+    if self.NextReload >= ct then return end
+    if self:GetUHBool("Reloading") then return end
+    if self:GetUHBool("Running") then return end
+    if self.Owner:GetNWFloat("UH_GrenadeTime", 0) > ct then return end
+    if self:GetNWFloat("DeployTime", 0) > ct then return end
+
+    -- Don't reload if clip is full or no reserve ammo
+    if self:Clip1() >= self.Primary.ClipSize then return end
+    if self.Owner:GetAmmoCount(self:GetPrimaryAmmoType()) <= 0 then return end
+
+    -- Ensure fire mode is active
+    if self:GetNWInt("FireMode") == 0 then self:SetNWInt("FireMode", 1) end
+
+    -- Play third-person reload animation
+    if SERVER then
+        self.Owner:SetAnimation(PLAYER_RELOAD)
+    end
+    self.NextReload = ct + 0.5
+
+    -- Call PreReload (hook for subclasses)
+    self:PreReload()
+
+    -- Play the start reload animation
+    self:EasySendWeaponAnim("start_reload", ACT_SHOTGUN_RELOAD_START)
+
+    -- Get the duration of the start_reload animation
+    local vm = self.Owner:GetViewModel()
+    local startDur = IsValid(vm) and vm:SequenceDuration() or 1.2
+
+    -- Timer-based shell insertion: first shell lands when start_reload finishes
+    local shellInterval = self.Primary.ReloadTime or 0.4333
+    self._tac12_nextShell = ct + startDur
+    self.reloaddelay = self._tac12_nextShell
+
+    -- Block firing during reload start
+    self:SetNextPrimaryFire(ct + startDur + 0.1)
+    self:SetNextSecondaryFire(ct + startDur + 0.1)
+    self.NextReload = ct + startDur + 0.1
+
+    -- Set reload state
+    self:SetUHBool("Reloading", true)
+    self:SetUHBool("Zooming", false)
+
+    -- HUD reload timer (shows progress bar)
+    local num = math.min(self.Primary.ClipSize - self:Clip1(), self.Owner:GetAmmoCount(self:GetPrimaryAmmoType()))
+    local amount = num * shellInterval
+    self:SetNWFloat("ReloadTime", amount)
+    self:SetNWFloat("ReloadEndTime", ct + startDur + amount)
+
+    -- Prevent the base class's _FinishReload from double-filling the clip;
+    -- we manage ammo ourselves inside ReloadShotgun().
+    self._reloadFinished = true
+    self._tac12_reloading = true
+end
+
+-- ============================================================
+-- RELOAD SHOTGUN (timer-based, called every Think while reloading)
+-- ============================================================
+function SWEP:ReloadShotgun(ct)
+    if not self:GetUHBool("Reloading") then return end
+
+    -- ==========================================
+    -- STOP CONDITIONS: clip full, no reserve, or fire pressed
+    -- ==========================================
+    if self:Clip1() >= self.Primary.ClipSize
+        or self.Owner:GetAmmoCount(self:GetPrimaryAmmoType()) <= 0
+        or self.Owner:KeyPressed(IN_ATTACK) then
+
+        self:ClearAnimSounds()
+
+        -- Play the finish animation
+        self:EasySendWeaponAnim("after_reload", ACT_SHOTGUN_RELOAD_FINISH)
+
+        local vm = self.Owner:GetViewModel()
+        local endDur = IsValid(vm) and vm:SequenceDuration() or 1.0
+
+        self:SetUHBool("Reloading", false)
+        self:SetNWFloat("ReloadTime", 0)
+        self:SetNWFloat("ReloadEndTime", 0)
+        self:SetNextPrimaryFire(ct + endDur)
+        self:SetNextSecondaryFire(ct + endDur)
+        self.NextReload = ct + endDur
+
+        self._tac12_nextShell = nil
+        self._tac12_reloading = nil
+        self.reloaddelay = nil
+
+        self:PostReload()
+        return
+    end
+
+    -- ==========================================
+    -- TIMER-BASED SHELL INSERTION
+    -- ==========================================
+    if self._tac12_nextShell and ct >= self._tac12_nextShell then
+        local shellInterval = self.Primary.ReloadTime or 0.4333
+
+        -- Schedule the next shell insertion
+        self._tac12_nextShell = ct + shellInterval
+
+        -- Play the per-shell reload animation
+        self:EasySendWeaponAnim("reload_loop", ACT_VM_RELOAD)
+
+        -- Play the shell insertion sound (if set)
+        if self.Primary.ShellSound then
+            if (game.SinglePlayer() and SERVER) or (CLIENT and IsFirstTimePredicted()) then
+                self.Owner:EmitSound(self.Primary.ShellSound, 75, 100, 1, CHAN_USER_BASE)
+            end
+        end
+
+        -- Insert shell (server-authoritative)
+        if SERVER then
+            self:SetClip1(self:Clip1() + 1)
+            self.Owner:RemoveAmmo(1, self.Primary.Ammo, false)
+        end
+    end
 end
 
 -- ============================================================
@@ -318,6 +455,15 @@ function SWEP:Think()
     if self._meleeActive and self._meleeEndTime and ct >= self._meleeEndTime then
         self:EndMelee()
     end
+
+    -- ==========================================
+    -- LOOPED SHOTGUN RELOAD — must run BEFORE BaseClass.Think
+    -- so the base class doesn't try to _FinishReload on us.
+    -- ==========================================
+    if self._tac12_reloading and self:GetUHBool("Reloading") then
+        self:ReloadShotgun(ct)
+    end
+
     BaseClass.Think(self)
     if not IsValid(self.Owner) then return end
     self:HandleSprintingAnimations()
@@ -332,6 +478,9 @@ function SWEP:Holster(wep)
     self._justExitedSprint = false
     self.wasZooming = false
     self.wasRunning = false
+    -- Cancel any in-progress looped reload so timers don't fire post-holster
+    self._tac12_nextShell = nil
+    self._tac12_reloading = nil
     return BaseClass.Holster(self, wep)
 end
 

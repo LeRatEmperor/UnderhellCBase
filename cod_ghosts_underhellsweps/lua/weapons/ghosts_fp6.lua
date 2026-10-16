@@ -22,7 +22,7 @@ SWEP.MeleeEnabled = false
 -- Appearance
 SWEP.UseHands = true
 SWEP.ViewModelFlip = false
-SWEP.ViewModelFOV = 70
+SWEP.ViewModelFOV = 60
 SWEP.ViewModel  = "models/weapons/iw6/fp6/c_fp6.mdl"
 SWEP.WorldModel = "models/weapons/iw6/fp6/world/w_fp6.mdl"
 SWEP.LoweredPos = Vector(0, 0, 0)
@@ -109,10 +109,8 @@ SWEP.WorldModelAngle  = Angle(10, 180, 180)
 -- ANIMATIONS
 -- ============================================================
 SWEP.Animations = {
-    ["shoot"]        = "fire",
     ["shoot_last"]   = "fire_last",
     ["fire_ads"]     = "fire_ads",
-    ["iron_fire"]    = "fire_ads",
     ["idle"]         = "idle",
     ["idle_empty"]   = "idle_empty",
     ["deploy"]       = "draw",
@@ -152,8 +150,12 @@ SWEP.AnimSounds = {
     ["reload"] = {
         { time = 0.0000, sound = "Weapons_Ghosts_FP6.Lift" },
         { time = 0.7000, sound = "Weapons_Ghosts_FP6.Insert" },
-        { time = 1.4333, sound = "Weapons_Ghosts_FP6.Chamber" },
-        { time = 1.8667, sound = "Weapons_Ghosts_FP6.End" },
+        { time = 1.2333, sound = "Weapons_Ghosts_FP6.Insert" },
+        { time = 1.7667, sound = "Weapons_Ghosts_FP6.Insert" },
+        { time = 2.3000, sound = "Weapons_Ghosts_FP6.Insert" },
+        { time = 2.8333, sound = "Weapons_Ghosts_FP6.Insert" },
+        { time = 3.3333, sound = "Weapons_Ghosts_FP6.Chamber" },
+        { time = 3.8667, sound = "Weapons_Ghosts_FP6.End" },
     },
     ["reload_1"] = {
         { time = 0.0000, sound = "Weapons_Ghosts_FP6.Lift" },
@@ -211,8 +213,10 @@ SWEP.AnimSounds = {
 -- to match the animation.
 
 -- Reload timing table (seconds for each reload stage)
+-- The full empty reload (5 shells) runs ~4.0s based on the sound
+-- schedule (last sound "End" fires at 3.8667s).
 SWEP.FP6_ReloadTimes = {
-    [0] = 2.85,     -- full empty reload (5 shells)
+    [0] = 4.0000,    -- full empty reload (5 shells)
     [1] = 2.3000,   -- 4 shells to insert
     [2] = 1.7667,   -- 3 shells to insert
     [3] = 1.2333,   -- 2 shells to insert
@@ -248,6 +252,10 @@ function SWEP:Reload()
 
     local vm = IsValid(self.Owner) and self.Owner:GetViewModel() or nil
     local animDuration = IsValid(vm) and vm:SequenceDuration() or self.FP6_ReloadTimes[clip] or 2.0
+    -- Safety: never shorter than the longest sound schedule entry
+    if reloadKey == "reload" and animDuration < 4.0 then
+        animDuration = 4.0
+    end
 
     -- Set reload state
     self:SetUHBool("Reloading", true)
@@ -256,21 +264,32 @@ function SWEP:Reload()
     self:SetNWFloat("ReloadEndTime", CurTime() + animDuration)
     self._reloadEndTime = CurTime() + animDuration
     self._reloadFinished = false
+    self._fp6_ammoAdded = false
 
-    -- Ammo management: set clip to full at the end of the animation
-    -- The base's _FinishReload handles this, but we need to make sure
-    -- the right amount of ammo is removed from reserve.
-    local shellsToInsert = self.Primary.ClipSize - clip
-    local owner = self:GetOwner()
-    if IsValid(owner) and SERVER then
-        local ammoType = self.Primary.Ammo
-        local reserve = owner:GetAmmoCount(ammoType)
-        local actualInsert = math.min(shellsToInsert, reserve)
-        -- Remove ammo from reserve immediately
-        owner:RemoveAmmo(actualInsert, ammoType)
-        -- Set clip to the new value
-        self:SetClip1(clip + actualInsert)
-    end
+    -- Ammo management: shells are added 0.1s BEFORE the animation ends.
+    -- This avoids the "ammo instantly appears at reload start" look
+    -- while guaranteeing that even a last-millisecond sprint cancel
+    -- can't strip the ammo away (the 0.1s buffer absorbs Think jitter).
+    local ammoTime = math.max(0.05, animDuration - 0.1)
+    local clipStart = clip
+    local shellsToInsert = self.Primary.ClipSize - clipStart
+    timer.Simple(ammoTime, function()
+        if not IsValid(self) then return end
+        if not IsValid(self.Owner) then return end
+        if self.Owner:GetActiveWeapon() ~= self then return end
+        if not self:GetUHBool("Reloading") then return end
+        if self._fp6_ammoAdded then return end
+        self._fp6_ammoAdded = true
+
+        if SERVER then
+            local owner = self:GetOwner()
+            local ammoType = self.Primary.Ammo
+            local reserve = owner:GetAmmoCount(ammoType)
+            local actualInsert = math.min(shellsToInsert, reserve)
+            owner:RemoveAmmo(actualInsert, ammoType)
+            self:SetClip1(clipStart + actualInsert)
+        end
+    end)
 end
 
 -- ============================================================
@@ -309,11 +328,11 @@ end
 -- SHOOT ANIMATION SELECTION
 -- ============================================================
 function SWEP:ShootAnimation()
-    if self:GetUHBool("Zooming") and self.Animations and self.Animations["iron_fire"] then
-        return "iron_fire"
-    end
-    if self.Animations and self.Animations["shoot"] then
-        return "shoot"
+    -- Use the model's primary-attack ACT directly (rather than the
+    -- "fire" sequence name). ACT_VM_PRIMARYATTACK_1 is the ADS variant
+    -- that the model maps to the aimed-fire sequence.
+    if self:GetUHBool("Zooming") then
+        return ACT_VM_PRIMARYATTACK_1
     end
     return ACT_VM_PRIMARYATTACK
 end
