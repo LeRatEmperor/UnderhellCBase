@@ -22,6 +22,7 @@ from lupa import LuaRuntime
 WEAPONS_DIR = "/home/z/my-project/cod_ghosts_underhellsweps/lua/weapons"
 BASE_DIR    = "/home/z/my-project/lua/weapons"
 AUTORUN_DIR = "/home/z/my-project/lua/autorun"
+DL_BASE_DIR = "/home/z/my-project/download/custom_uh_base/lua/weapons"
 
 
 def check_file(filepath: str) -> tuple:
@@ -86,8 +87,12 @@ def main():
         files += sorted(glob.glob(os.path.join(WEAPONS_DIR, "ghosts_*.lua")))
     if os.path.isdir(BASE_DIR):
         files += [os.path.join(BASE_DIR, "weapon_cuh_base_gun.lua")]
+        files += [os.path.join(BASE_DIR, "weapon_custom_uh_base.lua")]
+        files += [os.path.join(BASE_DIR, "weapon_custom_uh_base_gun.lua")]
     if os.path.isdir(AUTORUN_DIR):
         files += [os.path.join(AUTORUN_DIR, "cl_cuh_ui.lua")]
+    if os.path.isdir(DL_BASE_DIR):
+        files += [os.path.join(DL_BASE_DIR, "weapon_custom_uh_base.lua")]
 
     if not files:
         print("No files to check.", file=sys.stderr)

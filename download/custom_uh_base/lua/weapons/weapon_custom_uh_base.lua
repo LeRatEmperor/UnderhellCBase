@@ -192,6 +192,64 @@ function SWEP:GetViewModelPosition(pos, ang)
     if self.IronSightsPos and self.IronSightsAng then
         pos, ang = self:Sights(pos, ang, ft, iftp)
     end
+    -- Alternative pos/ang — a "rest" pose applied when not sprinting,
+    -- not aiming, and not in safe mode. Used to give weapons a slight
+    -- angle/offset from the default viewmodel pose (e.g. lower the gun
+    -- a bit, or tilt it for a more natural carry position).
+    pos, ang = self:Alternative(pos, ang, ft, iftp)
+    return pos, ang
+end
+
+-- ============================================================
+-- Alternative — alternative "rest" position/angle offset
+-- ============================================================
+-- Applies SWEP.AlternativePos / SWEP.AlternativeAng as a smoothly-
+-- interpolated offset when the weapon is in its "rest" state (not
+-- sprinting, not aiming, not in safe mode). The offset is blended out
+-- to zero whenever the weapon enters one of those states, so it never
+-- fights with ironsights or sprint animations.
+--
+-- Per-weapon tunables:
+--   SWEP.AlternativePos  — Vector(x, y, z) offset in viewmodel space
+--   SWEP.AlternativeAng — Angle(p, y, r) rotation in viewmodel space
+--                          (or Vector for parity with LoweredAng)
+function SWEP:Alternative(pos, ang, ft, iftp)
+    -- Skip entirely if neither field is set (or both are zero-default).
+    if not self.AlternativePos and not self.AlternativeAng then return pos, ang end
+
+    -- Target factor: 1 when in rest state, 0 when busy (sprint/zoom/safe).
+    local targetAlt = 1
+    if self:GetUHBool("Running") or self:GetUHBool("Zooming") then
+        targetAlt = 0
+    elseif self.GetNWInt and self:GetNWInt("FireMode") == 0 then
+        targetAlt = 0
+    end
+
+    -- Smoothly interpolate the factor (only on first-time-predicted
+    -- frames to avoid jitter in multiplayer prediction).
+    if iftp then
+        self._altFactor = Lerp(math.Clamp(ft * 10, 0, 1), self._altFactor or 0, targetAlt)
+    end
+
+    -- If the factor is effectively zero, skip the math (perf).
+    if self._altFactor and self._altFactor > 0.01 then
+        local ap = self.AlternativePos or vector_origin
+        local aa = self.AlternativeAng or angle_zero
+        local f = self._altFactor
+        pos = pos + ang:Right() * ap.x * f
+            + ang:Forward() * ap.y * f
+            + ang:Up() * ap.z * f
+        local ap_p, ap_y, ap_r = 0, 0, 0
+        if isangle(aa) then
+            ap_p, ap_y, ap_r = aa.p, aa.y, aa.r
+        elseif isvector(aa) then
+            ap_p, ap_y, ap_r = aa.x, aa.y, aa.z
+        end
+        ang:RotateAroundAxis(ang:Right(),    ap_p * f)
+        ang:RotateAroundAxis(ang:Up(),       ap_y * f)
+        ang:RotateAroundAxis(ang:Forward(),  ap_r * f)
+    end
+
     return pos, ang
 end
 
