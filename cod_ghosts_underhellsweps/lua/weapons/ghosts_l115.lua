@@ -416,23 +416,10 @@ function SWEP:Initialize()
             ["$color2"]      = "[1 1 1]",
         })
         self._rtScopeMatName = matName
+        self._rtScopeLensFound = nil  -- will be found lazily
+        self._rtScopeLensIdx = nil
     end
     BaseClass.Initialize(self)
-end
-
--- ============================================================
--- PREDRAWVIEWMODEL — apply RT scope submaterial to VM lens
--- ============================================================
--- The base class clears all submaterials in PreDrawViewModel, then
--- applies HideMaterials. We call BaseClass.PreDrawViewModel first,
--- then apply the RT scope material to the lens material index.
-function SWEP:PreDrawViewModel()
-    BaseClass.PreDrawViewModel(self)
-    if not self.ScopeTexture then return end
-    if not self._rtScopeLensIdx then return end
-    local vm = IsValid(self.Owner) and self.Owner:GetViewModel() or nil
-    if not IsValid(vm) then return end
-    vm:SetSubMaterial(self._rtScopeLensIdx, "!" .. self._rtScopeMatName)
 end
 
 -- ============================================================

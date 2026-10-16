@@ -196,6 +196,54 @@ hook.Add("RenderScene", "CUH_RTScope_RenderScene", function(origin, angles, fov)
 end)
 
 -- ============================================================
+-- PreDrawViewModel hook: apply RT scope submaterial to VM lens
+-- ============================================================
+-- This hook fires AFTER CustomUH_CleanupSubMaterials (which clears
+-- all VM submaterials every frame). By adding it here (in a separate
+-- file that loads after the base), it fires later in the hook chain
+-- and re-applies the RT scope material to the VM's lens submaterial.
+--
+-- This is needed for weapons where the scope is built into the VM
+-- (no separate VElement/csModel) — e.g. the COD:Ghosts L115 and USR.
+-- For weapons with scope VElements (WWII Kar98k etc.), the attachment
+-- installs a RenderOverride on the csModel instead, which doesn't
+-- need this hook.
+hook.Add("PreDrawViewModel", "CUH_RTScope_ApplyVMSubMat", function(vm, ply, wep)
+    if not IsValid(wep) then return end
+    if not wep.IsCUHWeapon then return end
+    if not wep.ScopeTexture then return end
+    if not wep._rtScopeMatName then return end
+    if not wep._rtScopeLensIdx then return end
+
+    -- Find the lens index lazily if not yet found.
+    -- (The weapon's Think() may have already done this, but we also
+    --  do it here as a fallback in case Think hasn't run yet.)
+    if not wep._rtScopeLensFound then
+        if IsValid(vm) then
+            local mats = vm:GetMaterials()
+            if mats and #mats > 0 then
+                local lensIdx = nil
+                for i = 1, #mats do
+                    local mn = string.lower(tostring(mats[i]))
+                    if string.find(mn, "lens") or string.find(mn, "scope")
+                       or string.find(mn, "optic") then
+                        lensIdx = i - 1
+                        break
+                    end
+                end
+                if not lensIdx then lensIdx = 0 end
+                wep._rtScopeLensIdx = lensIdx
+                wep._rtScopeLensFound = true
+            end
+        end
+    end
+
+    if wep._rtScopeLensIdx then
+        vm:SetSubMaterial(wep._rtScopeLensIdx, "!" .. wep._rtScopeMatName)
+    end
+end)
+
+-- ============================================================
 -- Fix: Cache Sensitivity origin so RestoreStat can restore it
 -- ============================================================
 -- Sensitivity is NOT in the topLevel stat cache list, so
