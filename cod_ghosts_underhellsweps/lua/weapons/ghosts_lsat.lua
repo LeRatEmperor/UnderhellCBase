@@ -7,8 +7,6 @@ SWEP.Spawnable = true
 SWEP.AdminSpawnable = true
 SWEP.UseHands = true
 SWEP.AnimatedSprint = true
-SWEP.Manufacturer = "Textron Systems"
-SWEP.Type_Displayed = "5.56x45mm LSAT Caseless Ammunition"
 SWEP.Author	= "Goanna, Fox, Mav"
 SWEP.Slot = 3
 SWEP.PrintName = "LSAT"
@@ -51,20 +49,13 @@ SWEP.FiresUnderwater = true
 
 --[Spread Related]--
 SWEP.Primary.Spread		= .055
-SWEP.Primary.IronAccuracy = .025
-SWEP.IronRecoilMultiplier = 0.575
 
 SWEP.Primary.KickHorizontal			= 0.15
 SWEP.Primary.MinRecoil = -0.2
-SWEP.Primary.MaxRecoil = -0.3SWEP.Primary.StaticRecoilFactor = 0.35
+SWEP.Primary.MaxRecoil = -0.3
 
-SWEP.Primary.SpreadMultiplierMax = 1.8
-SWEP.Primary.SpreadIncrement = 0.2
-SWEP.Primary.SpreadRecovery = 2.5
 
 --[Iron Sights]--
-SWEP.IronBobMult = 0.065
-SWEP.IronBobMultWalk = 0.065
 SWEP.data.ironsights = 1 --Enable Ironsights
 SWEP.ZoomFov = 15
 SWEP.IronSightsPos = Vector(-3.35, -2.7, 0.65)
@@ -72,19 +63,11 @@ SWEP.IronSightsAng = Vector(0, 0, -0.4)
 SWEP.IronSightTime = 0.35
 
 --[Shells]--
-SWEP.LuaShellEject = false
-SWEP.LuaShellEffect = "ShellEject"
-SWEP.LuaShellEjectDelay = 0
 
 --[Misc]--
-SWEP.InspectPos = Vector(2, -1, -1)
-SWEP.InspectAng = Vector(10, 10, 0)
-SWEP.MoveSpeed = 0.9
-SWEP.IronSightsMoveSpeed  = SWEP.MoveSpeed * 0.8
 
 --[NZombies]--
 SWEP.NZPaPName = "Jetpack Joyride"
-SWEP.NZHeadShotMultiplier = 3
 SWEP.Primary.MaxAmmo = SWEP.Primary.DefaultClip
 function SWEP:NZMaxAmmo()
 
@@ -164,7 +147,6 @@ SWEP.EventTable = {
 
 --[Shit]--
 
-SWEP.ViewModelBoneMods = {
         ["bullet0_jnt"] = {scale = Vector(1, 1, 1), pos = Vector(0, 0, 0), angle = Angle(0, 0, 0)},
         ["bullet1_jnt"] = {scale = Vector(1, 1, 1), pos = Vector(0, 0, 0), angle = Angle(0, 0, 0)},
         ["bullet2_jnt"] = {scale = Vector(1, 1, 1), pos = Vector(0, 0, 0), angle = Angle(0, 0, 0)},

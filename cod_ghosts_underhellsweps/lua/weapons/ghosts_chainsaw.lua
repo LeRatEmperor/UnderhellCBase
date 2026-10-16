@@ -9,7 +9,6 @@ SWEP.Spawnable = TFA_BASE_VERSION and TFA_BASE_VERSION >= 4.74
 SWEP.AdminSpawnable = true
 SWEP.UseHands = true
 SWEP.AnimatedSprint = true
-SWEP.Manufacturer = "Auto-Ordnance Company"
 SWEP.Author = "Wavy"
 SWEP.Slot = 2
 SWEP.PrintName = "Chain SAW"
@@ -23,12 +22,7 @@ SWEP.WorldModelOffset = Vector(23.0, 1.0, -5.5)
 SWEP.WorldModelAngle = Angle(0.0, 180.0, 190.0)
 SWEP.WorldModelScale = 1.0
 SWEP.HoldType = "crossbow"
-SWEP.CameraAttachmentOffsets = {}
-SWEP.CameraAttachmentScale = 1
 SWEP.MuzzleAttachment = "1"
-SWEP.VMPos = Vector(-2.5, 0, 0)
-SWEP.VMAng = Angle(0, 0, -5)
-SWEP.VMPos_Additive = false
 
 
 
@@ -37,15 +31,11 @@ SWEP.Primary.Sound = "TFA_GHOSTS.CHAINSAW.FIRE"
 SWEP.Primary.Ammo = "ar2"
 SWEP.Primary.Automatic = true
 SWEP.Primary.Delay = 0.070012  -- 857 RPM
-SWEP.Primary.RPM_Semi = nil
-SWEP.Primary.RPM_Burst = nil
 SWEP.Primary.MinDamage = 100
 SWEP.Primary.MaxDamage = 100
 SWEP.Primary.NumberofShots = 1
-SWEP.Primary.AmmoConsumption = 1
 SWEP.Primary.ClipSize = 80
 SWEP.Primary.DefaultClip = SWEP.Primary.ClipSize * 5
-SWEP.Primary.DryFireDelay = 0.35
 SWEP.FiresUnderwater = true
 
 --[Firemode]--
@@ -86,41 +76,25 @@ SWEP.Primary.RangeFalloffLUT = {
 
 --[Spread Related]--
 SWEP.Primary.Spread		  = .03
-SWEP.Primary.IronAccuracy = .01
-SWEP.IronRecoilMultiplier = 0.8
 
 SWEP.Primary.KickHorizontal		= 0.05
 SWEP.Primary.MinRecoil = -0.1
-SWEP.Primary.MaxRecoil = -0.25SWEP.Primary.StaticRecoilFactor = 0.5
+SWEP.Primary.MaxRecoil = -0.25
 
-SWEP.Primary.SpreadMultiplierMax = 2
-SWEP.Primary.SpreadIncrement = 1
-SWEP.Primary.SpreadRecovery = 6
 
 
 --[Iron Sights]--
-SWEP.IronBobMult 	 = 0.065
-SWEP.IronBobMultWalk = 0.065
 SWEP.ZoomFov = 10
 SWEP.IronSightsPos = Vector(-4, -1.5, 0.60)
 SWEP.IronSightsAng = Angle(0.1, 0.075, 0)
 SWEP.IronSightTime = 0.4
 
 --[Shells]--
-SWEP.LuaShellEject = true
-SWEP.LuaShellEffect = "RifleShellEject"
---SWEP.LuaShellSound = 
-SWEP.LuaShellScale = 0.5
-SWEP.LuaShellEjectDelay = 0
 SWEP.ShellAttachment = "2"
 SWEP.EjectionSmokeEnabled = true
 
 --[Misc]--
 --SWEP.AmmoTypeStrings = {ar2 = ".45 ACP"}
-SWEP.InspectPos = Vector(6, -4.946, 2.2)
-SWEP.InspectAng = Vector(10.8, 43.2, 20.399)
-SWEP.MoveSpeed = 0.9
-SWEP.IronSightsMoveSpeed = 0.8
 SWEP.SafetyPos = Vector(0, -2, 0)
 SWEP.SafetyAng = Vector(-19, 21, -21)
 SWEP.TracerCount = 3
@@ -131,7 +105,6 @@ SWEP.DInv2_GridSizeY = 3
 
 --[NZombies]--
 SWEP.NZPaPName = "Sergeant Bubba"
-SWEP.NZHeadShotMultiplier = 3.5
 SWEP.Primary.MaxAmmo = 560
 SWEP.Secondary.MaxAmmo 	= 10
 SWEP.Secondary.ClipSize = -1
@@ -164,7 +137,6 @@ self.Ispackapunched = true
 self.Primary.Damage = self.Primary.DamagePAP
 self.Primary.ClipSize = 125
 self.Primary.MaxAmmo = 750
-self.Primary.IronAccuracy = .005
 self.Secondary.MaxAmmo = 20
 self.Secondary.Damage = 1500
 self.MuzzleFlashEffect = "muz_pap"

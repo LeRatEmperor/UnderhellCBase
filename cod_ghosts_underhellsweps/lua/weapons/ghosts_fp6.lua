@@ -7,8 +7,6 @@ SWEP.Spawnable = true
 SWEP.AdminSpawnable = true
 SWEP.UseHands = true
 SWEP.AnimatedSprint = true
-SWEP.Manufacturer = "Heckler & Koch"
-SWEP.Type_Displayed = "12-gauge"
 SWEP.Author				= "Goanna, Fox, Mav"
 SWEP.Slot = 3
 SWEP.PrintName = "FP6"
@@ -30,8 +28,6 @@ SWEP.MuzzleFlashType = "particle"
 SWEP.Shell = "models/weapons/shell_556.mdl"
 SWEP.ShellHeat = 0.5
 SWEP.ShellDelay = 0
-SWEP.VMPos = Vector(0,-3,-.25)
-SWEP.VMAng = Vector(0,0,0)
 
 
 
@@ -40,7 +36,6 @@ SWEP.Primary.Sound = "Weapons_Ghosts_FP6.Fire"
 SWEP.Primary.Ammo = "buckshot"
 SWEP.Primary.Automatic = false
 SWEP.Primary.Delay = 0.240000  -- 250 RPM
-SWEP.Primary.RPM_Displayed = 89
 SWEP.Primary.MinDamage = 80
 SWEP.Primary.MaxDamage = 80
 SWEP.Primary.NumberofShots = 8
@@ -50,20 +45,13 @@ SWEP.FiresUnderwater = true
 
 --[Spread Related]--
 SWEP.Primary.Spread		= .065	
-SWEP.Primary.IronAccuracy = .065
-SWEP.IronRecoilMultiplier = 0.8
 
 SWEP.Primary.KickHorizontal			= 0.35
 SWEP.Primary.MinRecoil = -1.2
-SWEP.Primary.MaxRecoil = -1.2SWEP.Primary.StaticRecoilFactor = 0.6
+SWEP.Primary.MaxRecoil = -1.2
 
-SWEP.Primary.SpreadMultiplierMax = 4
-SWEP.Primary.SpreadIncrement = 0
-SWEP.Primary.SpreadRecovery = 4
 
 --[Iron Sights]--
-SWEP.IronBobMult = 0.065
-SWEP.IronBobMultWalk = 0.065
 SWEP.data.ironsights = 1 --Enable Ironsights
 SWEP.ZoomFov = 15
 SWEP.IronSightsPos = Vector(-3.825, -2, 1)
@@ -71,19 +59,11 @@ SWEP.IronSightsAng = Vector(0, 0, 0)
 SWEP.IronSightTime = 0.3
 
 --[Shells]--
-SWEP.LuaShellEject = false
-SWEP.LuaShellEffect = "ShotgunShellEject"
-SWEP.LuaShellEjectDelay = 0
 
 --[Misc]--
-SWEP.InspectPos = Vector(2, -1, -1)
-SWEP.InspectAng = Vector(10, 10, 0)
-SWEP.MoveSpeed = 1
-SWEP.IronSightsMoveSpeed  = SWEP.MoveSpeed * 0.8
 
 --[NZombies]--
 SWEP.NZPaPName = "FireyPussy650000"
-SWEP.NZHeadShotMultiplier = 1.8
 SWEP.Primary.MaxAmmo = SWEP.Primary.DefaultClip
 function SWEP:NZMaxAmmo()
 
@@ -121,7 +101,6 @@ end
 
 
 
-SWEP.PumpAction = { -- Pump/bolt animations
     ["value"] = ACT_VM_PULLBACK_HIGH, -- Number for act, String/Number for sequence
 	["value_empty"] = ACT_VM_PULLBACK_HIGH,
     ["value_is"] = ACT_VM_PULLBACK_LOW, -- ADS pump

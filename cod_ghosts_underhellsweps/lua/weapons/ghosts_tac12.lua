@@ -8,8 +8,6 @@ SWEP.Spawnable = true
 SWEP.AdminSpawnable = true
 SWEP.UseHands = true
 SWEP.AnimatedSprint = true
-SWEP.Manufacturer = "UTAS"
-SWEP.Type_Displayed = "12-gauge"
 SWEP.Author				= "Goanna, Fox, Mav"
 SWEP.Slot = 3
 SWEP.PrintName = "Tac 12"
@@ -41,7 +39,6 @@ SWEP.Primary.Sound = "Weapons_Ghosts_TAC.Fire"
 SWEP.Primary.Ammo = "buckshot"
 SWEP.Primary.Automatic = false
 SWEP.Primary.Delay = 0.200000  -- 300 RPM
-SWEP.Primary.RPM_Displayed = 85
 SWEP.Primary.MinDamage = 55
 SWEP.Primary.MaxDamage = 55
 SWEP.Primary.NumberofShots = 8
@@ -51,29 +48,18 @@ SWEP.FiresUnderwater = true
 
 --[Spread Related]--
 SWEP.Primary.Spread		= .067
-SWEP.Primary.IronAccuracy = .067
-SWEP.IronRecoilMultiplier = 0.8
 
 SWEP.Primary.KickHorizontal			= 0.35
 SWEP.Primary.MinRecoil = -1.5
-SWEP.Primary.MaxRecoil = -1.5SWEP.Primary.StaticRecoilFactor = 0.6
+SWEP.Primary.MaxRecoil = -1.5
 
-SWEP.Primary.SpreadMultiplierMax = 3.8
-SWEP.Primary.SpreadIncrement = 0
-SWEP.Primary.SpreadRecovery = 4
 
 --[Shotgun Code]--
-SWEP.Shotgun = true --Enable shotgun style reloading.
-SWEP.ShotgunEmptyAnim = false --Enable emtpy reloads on shotguns?
-SWEP.ShotgunEmptyAnim_Shell = false --Enable insertion of a shell directly into the chamber on empty reload?
-SWEP.ShotgunStartAnimShell = true --shotgun start anim inserts shell
 SWEP.LoopedReloadInsertAmount = 1 -- How much rounds to insert on each reload cycle
 SWEP.LoopedReloadInsertTime = 13 / 30
 
 
 --[Iron Sights]--
-SWEP.IronBobMult = 0.065
-SWEP.IronBobMultWalk = 0.065
 SWEP.data.ironsights = 1 --Enable Ironsights
 SWEP.ZoomFov = 15
 SWEP.IronSightsPos = Vector(-3.214, -3, -0.84)
@@ -81,18 +67,11 @@ SWEP.IronSightsAng = Vector(0.5, 0, 0)
 SWEP.IronSightTime = 0.3
 
 --[Shells]--
-SWEP.LuaShellEject = false
-SWEP.LuaShellEffect = "ShotgunShellEject"
 
 --[Misc]--
-SWEP.InspectPos = Vector(2, -1, -1)
-SWEP.InspectAng = Vector(10, 10, 0)
-SWEP.MoveSpeed = 1
-SWEP.IronSightsMoveSpeed  = SWEP.MoveSpeed * 0.8
 
 --[NZombies]--
 SWEP.NZPaPName = "Special Edition Gold Sauce"
-SWEP.NZHeadShotMultiplier = 1.8
 SWEP.Primary.MaxAmmo = SWEP.Primary.DefaultClip
 function SWEP:NZMaxAmmo()
 
@@ -151,7 +130,6 @@ function SWEP:PreDrawViewModel(vm)
 end
 
 --[Tables]--
-SWEP.PumpAction = { -- Pump/bolt animations
     ["value"] = ACT_VM_PULLBACK_HIGH, -- Number for act, String/Number for sequence
 	["value_empty"] = ACT_VM_PULLBACK_HIGH,
     ["value_is"] = ACT_VM_PULLBACK_LOW, -- ADS pump

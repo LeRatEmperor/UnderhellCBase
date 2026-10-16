@@ -9,7 +9,6 @@ SWEP.Spawnable = TFA_BASE_VERSION and TFA_BASE_VERSION >= 4.74
 SWEP.AdminSpawnable = true
 SWEP.UseHands = true
 SWEP.AnimatedSprint = true
-SWEP.Manufacturer = "Auto-Ordnance Company"
 SWEP.Type = "Rocket Launcher"
 SWEP.Author = "Wavy"
 SWEP.Slot = 2
@@ -25,30 +24,20 @@ SWEP.WorldModelOffset = Vector(14.0, 1.0, -5.5)
 SWEP.WorldModelAngle = Angle(180.0, 0.0, -9.0)
 SWEP.WorldModelScale = 1.0
 SWEP.HoldType = "rpg"
-SWEP.CameraAttachmentOffsets = {}
-SWEP.CameraAttachmentScale = 1
 SWEP.MuzzleAttachment = "1"
-SWEP.VMPos = Vector(0.4, -4, 0)
-SWEP.VMAng = Vector(0, 0, 0)
-SWEP.VMPos_Additive = true
 
 
 
 --[Gun Related]--
 SWEP.Primary.Sound = "TFA_GHOSTS.PANZERFAUST.FIRE"
-SWEP.Primary.SoundLyr1 = "TFA_BO2_MS.PapFlux"
 SWEP.Primary.Ammo = "RPG_Round"
 SWEP.Primary.Automatic = false
 SWEP.Primary.Delay = 0.300000  -- 200 RPM
-SWEP.Primary.RPM_Semi = nil
-SWEP.Primary.RPM_Burst = nil
 SWEP.Primary.MinDamage = 1000
 SWEP.Primary.MaxDamage = 1000
 SWEP.Primary.NumberofShots = 1
-SWEP.Primary.AmmoConsumption = 1
 SWEP.Primary.ClipSize = 1
 SWEP.Primary.DefaultClip = SWEP.Primary.ClipSize * 5
-SWEP.Primary.DryFireDelay = 0.35
 SWEP.FiresUnderwater = true
 --SWEP.Primary.Projectile = "nz_wpn_missile" --Entity to shoot
 SWEP.Primary.ProjectileVelocity = 3000 --Entity to shoot's velocity
@@ -75,35 +64,23 @@ SWEP.LowAmmoSoundThreshold = 0.2 --0.33
 
 --[Spread Related]--
 SWEP.Primary.Spread		= .001	-- Define from-the-hip accuracy 1 is terrible, .0001 is exact)
-SWEP.Primary.IronAccuracy = .001 -- Ironsight accuracy, should be the same for shotguns
 SWEP.Primary.KickUp				= 0.5	-- Maximum up recoil (rise)
 SWEP.Primary.KickDown			= 0.5		-- Maximum down recoil (skeet)
 SWEP.Primary.KickHorizontal		= 0.3		-- Maximum up recoil (stock)
 
 --[Iron Sights]--
-SWEP.IronBobMult 	 = 0.065
-SWEP.IronBobMultWalk = 0.065
 SWEP.ZoomFov = 15
 SWEP.IronSightsPos = Vector(-1, -5, 1.5)
 SWEP.IronSightsAng = Angle(3.6, -24.9, 37)
 SWEP.IronSightTime = 0.5
 
 --[Shells]--
---SWEP.LuaShellEject = true
-SWEP.LuaShellEffect = "ShotgunShellEject"
-SWEP.LuaShellSound = 
-SWEP.LuaShellScale = 0.5
---SWEP.LuaShellEjectDelay = 0.3
 SWEP.ShellAttachment = "2"
 SWEP.EjectionSmokeEnabled = false
 SWEP.MuzzleFlashEffect = "tfa_muzzleflash_silenced"
 
 --[Misc]--
 --SWEP.AmmoTypeStrings = {buckshot = ".45 ACP"}
-SWEP.InspectPos = Vector(10, -3, 0)
-SWEP.InspectAng = Vector(7, 30.5, 14.1)
-SWEP.MoveSpeed = 0.85
-SWEP.IronSightsMoveSpeed = 0.4
 SWEP.SafetyPos = Vector(0, -2, 0)
 SWEP.SafetyAng = Vector(-19, 21, -21)
 SWEP.TracerCount = 3

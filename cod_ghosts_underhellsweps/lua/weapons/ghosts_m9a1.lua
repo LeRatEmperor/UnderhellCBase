@@ -7,8 +7,6 @@ SWEP.Spawnable = true
 SWEP.AdminSpawnable = true
 SWEP.UseHands = true
 SWEP.AnimatedSprint = true
-SWEP.Manufacturer = "Beretta"
-SWEP.Type_Displayed = "9x19mm Parabellum"
 SWEP.Author	= "Goanna, Fox, Mav"
 SWEP.Slot = 1
 SWEP.PrintName = "M9A1"
@@ -51,20 +49,13 @@ SWEP.FiresUnderwater = true
 
 --[Spread Related]--
 SWEP.Primary.Spread		= .0175
-SWEP.Primary.IronAccuracy = .01
-SWEP.IronRecoilMultiplier = 0.65
 
 SWEP.Primary.KickHorizontal			= 0.2
 SWEP.Primary.MinRecoil = -0.3
-SWEP.Primary.MaxRecoil = -0.35SWEP.Primary.StaticRecoilFactor = 0.4
+SWEP.Primary.MaxRecoil = -0.35
 
-SWEP.Primary.SpreadMultiplierMax = 3
-SWEP.Primary.SpreadIncrement = 0.6
-SWEP.Primary.SpreadRecovery = 3.5
 
 --[Iron Sights]--
-SWEP.IronBobMult = 0.065
-SWEP.IronBobMultWalk = 0.065
 SWEP.data.ironsights = 1 --Enable Ironsights
 SWEP.ZoomFov = 0
 SWEP.IronSightsPos = Vector(-2.99, -1, 1.57)
@@ -72,18 +63,10 @@ SWEP.IronSightsAng = Vector(-1.4, 0, 0)
 SWEP.IronSightTime = 0.2
 
 --[Shells]--
-SWEP.LuaShellEject = true
-SWEP.LuaShellEffect = "ShellEject"
-SWEP.LuaShellEjectDelay = 0
 
 --[Misc]--
-SWEP.InspectPos = Vector(2, -1, -1)
-SWEP.InspectAng = Vector(10, 10, 0)
-SWEP.MoveSpeed = 1
-SWEP.IronSightsMoveSpeed  = SWEP.MoveSpeed * 0.8
 SWEP.FlashlightAttachment = 1
 
-SWEP.NZHeadShotMultiplier = 2.5
 SWEP.Primary.MaxAmmo = SWEP.Primary.DefaultClip
 function SWEP:NZMaxAmmo()
 
@@ -103,7 +86,6 @@ self.Primary.Spread				= 0
 self.Primary.ClipSize 			= 15
 self.Primary.RPM 				= 200
 self.Primary.Spread 			= .001
-self.Primary.IronAccuracy 		= .001
 self.Primary.Projectile         = "mustangsally_proj"
 self.Primary.ProjectileVelocity = 6000
 self.Primary.MaxAmmo 			= self.Primary.ClipSize * 6

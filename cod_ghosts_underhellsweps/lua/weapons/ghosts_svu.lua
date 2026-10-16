@@ -8,8 +8,6 @@ SWEP.Spawnable = true
 SWEP.AdminSpawnable = true
 SWEP.UseHands = true
 SWEP.AnimatedSprint = true
-SWEP.Manufacturer = "KBP Instrument Design Bureau"
-SWEP.Type_Displayed = "7.62×54mmR"
 SWEP.Author				= "Goanna, Fox, Mav"
 SWEP.Slot = 3
 SWEP.PrintName = "SVU"
@@ -49,20 +47,13 @@ SWEP.FiresUnderwater = true
 
 --[Spread Related]--
 SWEP.Primary.Spread		= .025
-SWEP.Primary.IronAccuracy = .004
-SWEP.IronRecoilMultiplier = 0.55
 
 SWEP.Primary.KickHorizontal			= 0.15
 SWEP.Primary.MinRecoil = -0.35
-SWEP.Primary.MaxRecoil = -0.6SWEP.Primary.StaticRecoilFactor = 0.65
+SWEP.Primary.MaxRecoil = -0.6
 
-SWEP.Primary.SpreadMultiplierMax = 2
-SWEP.Primary.SpreadIncrement = 0.5
-SWEP.Primary.SpreadRecovery = 4
 
 --[Iron Sights]--
-SWEP.IronBobMult = 0.065
-SWEP.IronBobMultWalk = 0.065
 SWEP.data.ironsights = 1 --Enable Ironsights
 SWEP.ZoomFov = 25
 SWEP.IronSightsPos = Vector(-2.961, -3, 2.16)
@@ -70,20 +61,14 @@ SWEP.IronSightsAng = Vector(0, 0, 0)
 SWEP.IronSightTime = 0.3
 
 --[Shells]--
-SWEP.LuaShellEject = true
-SWEP.LuaShellEffect = "RifleShellEject"
 SWEP.ShellAttachment = "0"
-SWEP.LuaShellEjectDelay = 0
 
 --[Misc]--
 SWEP.InspectionPos = Vector(20, 30, 1.041)
 SWEP.InspectionAng = Vector(40, 90, 40)
-SWEP.MoveSpeed = 0.95
-SWEP.IronSightsMoveSpeed  = SWEP.MoveSpeed * 0.8
 
 --[NZombies]--
 SWEP.NZPaPName = "SteVen Universe"
-SWEP.NZHeadShotMultiplier = 2.5
 SWEP.Primary.MaxAmmo = SWEP.Primary.DefaultClip
 function SWEP:NZMaxAmmo()
 

@@ -9,7 +9,6 @@ SWEP.Spawnable = TFA_BASE_VERSION and TFA_BASE_VERSION >= 4.74
 SWEP.AdminSpawnable = true
 SWEP.UseHands = true
 SWEP.AnimatedSprint = true
-SWEP.Manufacturer = "Auto-Ordnance Company"
 SWEP.Author = "Wavy"
 SWEP.Slot = 2
 SWEP.PrintName = "MTS-225"
@@ -24,12 +23,7 @@ SWEP.WorldModelOffset = Vector(14.0, 1.0, -5.5)
 SWEP.WorldModelAngle = Angle(0.0, 180.0, 195.0)
 SWEP.WorldModelScale = 1.0
 SWEP.HoldType = "ar2"
-SWEP.CameraAttachmentOffsets = {}
-SWEP.CameraAttachmentScale = 1
 SWEP.MuzzleAttachment = "1"
-SWEP.VMPos = Vector(-1, -0.5, 0)
-SWEP.VMAng = Angle(0, 0, -5)
-SWEP.VMPos_Additive = false
 
 
 
@@ -38,15 +32,11 @@ SWEP.Primary.Sound = "TFA_GHOSTS.MTS225.FIRE"
 SWEP.Primary.Ammo = "buckshot"
 SWEP.Primary.Automatic = false
 SWEP.Primary.Delay = 0.240000  -- 250 RPM
-SWEP.Primary.RPM_Semi = nil
-SWEP.Primary.RPM_Burst = nil
 SWEP.Primary.MinDamage = 100
 SWEP.Primary.MaxDamage = 100
 SWEP.Primary.NumberofShots = 8
-SWEP.Primary.AmmoConsumption = 1
 SWEP.Primary.ClipSize = 5
 SWEP.Primary.DefaultClip = SWEP.Primary.ClipSize * 5
-SWEP.Primary.DryFireDelay = 0.35
 SWEP.FiresUnderwater = true
 
 --[Firemode]--
@@ -87,41 +77,25 @@ SWEP.Primary.RangeFalloffLUT = {
 
 --[Spread Related]--
 SWEP.Primary.Spread		  = .045
-SWEP.Primary.IronAccuracy = .045
-SWEP.IronRecoilMultiplier = 0.8
 
 SWEP.Primary.KickHorizontal		= 0.5
 SWEP.Primary.MinRecoil = -0.5
-SWEP.Primary.MaxRecoil = -0.5SWEP.Primary.StaticRecoilFactor = 0.5
+SWEP.Primary.MaxRecoil = -0.5
 
-SWEP.Primary.SpreadMultiplierMax = 2
-SWEP.Primary.SpreadIncrement = 2
-SWEP.Primary.SpreadRecovery = 5
 
 
 --[Iron Sights]--
-SWEP.IronBobMult 	 = 0.065
-SWEP.IronBobMultWalk = 0.065
 SWEP.ZoomFov = 20
 SWEP.IronSightsPos = Vector(-5, -2, 0.95)
 SWEP.IronSightsAng = Angle(0.1, 0.03, 0)
 SWEP.IronSightTime = 0.25
 
 --[Shells]--
-SWEP.LuaShellEject = false
-SWEP.LuaShellEffect = "ShotgunShellEject"
---SWEP.LuaShellSound = 
-SWEP.LuaShellScale = 0.5
-SWEP.LuaShellEjectDelay = 0
 SWEP.ShellAttachment = "2"
 SWEP.EjectionSmokeEnabled = true
 
 --[Misc]--
 --SWEP.AmmoTypeStrings = {ar2 = ".45 ACP"}
-SWEP.InspectPos = Vector(6, -4.946, 2.2)
-SWEP.InspectAng = Vector(10.8, 43.2, 20.399)
-SWEP.MoveSpeed = 1.0
-SWEP.IronSightsMoveSpeed = 0.5
 SWEP.SafetyPos = Vector(0, -2, 0)
 SWEP.SafetyAng = Vector(-19, 21, -21)
 SWEP.TracerCount = 3
@@ -132,7 +106,6 @@ SWEP.DInv2_GridSizeY = 3
 
 --[NZombies]--
 SWEP.NZPaPName = "Engine-115"
-SWEP.NZHeadShotMultiplier = 2
 SWEP.Primary.MaxAmmo = 60
 function SWEP:NZMaxAmmo()
 
@@ -150,7 +123,6 @@ function SWEP:OnPaP()
 self.Ispackapunched = true
 self.Primary.Damage = self.Primary.DamagePAP
 self.Primary.Spread = .02
-self.Primary.IronAccuracy = .02
 self.Primary.NumShots = 10
 self.Primary.MaxAmmo = 100
 self.Primary.Force = 9800

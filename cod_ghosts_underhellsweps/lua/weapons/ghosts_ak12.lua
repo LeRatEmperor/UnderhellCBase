@@ -8,8 +8,6 @@ SWEP.Spawnable = true
 SWEP.AdminSpawnable = true
 SWEP.UseHands = true
 SWEP.AnimatedSprint = true
-SWEP.Manufacturer = "Kalashnikov Concern"
-SWEP.Type_Displayed = "7.62x39mm"
 SWEP.Author				= "Goanna, Fox, Mav"
 SWEP.Slot = 2
 SWEP.PrintName = "AK-12"
@@ -31,8 +29,6 @@ SWEP.MuzzleFlashType = "particle"
 SWEP.Shell = "models/weapons/shell_556.mdl"
 SWEP.ShellHeat = 0.5
 SWEP.ShellDelay = 0
-SWEP.VMPos = Vector(0,0,0.5)
-SWEP.VMAng = Vector(0,0,0)
 
 
 
@@ -59,21 +55,14 @@ SWEP.FiresUnderwater = true
 
 --[Spread Related]--
 SWEP.Primary.Spread		  = .03
-SWEP.Primary.IronAccuracy = .005
-SWEP.IronRecoilMultiplier = 0.75
 
 SWEP.Primary.KickHorizontal		= 0.05
 SWEP.Primary.MinRecoil = -0.1
-SWEP.Primary.MaxRecoil = -0.2SWEP.Primary.StaticRecoilFactor = 0.5
+SWEP.Primary.MaxRecoil = -0.2
 
-SWEP.Primary.SpreadMultiplierMax = 2
-SWEP.Primary.SpreadIncrement = 1
-SWEP.Primary.SpreadRecovery = 6
 
 
 --[Iron Sights]--
-SWEP.IronBobMult = 0.065
-SWEP.IronBobMultWalk = 0.065
 SWEP.data.ironsights = 1 --Enable Ironsights
 SWEP.ZoomFov = 15
 SWEP.IronSightsPos = Vector(-2.425, -2, 1.09)
@@ -81,19 +70,11 @@ SWEP.IronSightsAng = Vector(0, 0, 0)
 SWEP.IronSightTime = 0.3
 
 --[Shells]--
-SWEP.LuaShellEject = true
-SWEP.LuaShellEffect = "RifleShellEject"
-SWEP.LuaShellEjectDelay = 0
 
 --[Misc]--
-SWEP.InspectPos = Vector(2, -1, -1)
-SWEP.InspectAng = Vector(10, 10, 0)
-SWEP.MoveSpeed = 1
-SWEP.IronSightsMoveSpeed  = SWEP.MoveSpeed * 0.8
 
 --[nZ FUCLKKKK]
 SWEP.NZPaPName = "ALWAYS KILLING"
-SWEP.NZHeadShotMultiplier = 2.5
 SWEP.Primary.MaxAmmo = SWEP.Primary.DefaultClip
 function SWEP:NZMaxAmmo()
 
@@ -162,7 +143,6 @@ SWEP.EventTable = {
 
 --[Shit]--
 
-SWEP.ViewModelBoneMods = {
     ["ValveBiped.Bip01_L_Finger21"] = { scale = Vector(1, 1, 1), pos = Vector(0, 0, 0), angle = Angle(0, 0, 90) }
 }
 SWEP.TwoHanded = true

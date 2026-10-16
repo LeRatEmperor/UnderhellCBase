@@ -8,8 +8,6 @@ SWEP.Spawnable = true
 SWEP.AdminSpawnable = true
 SWEP.UseHands = true
 SWEP.AnimatedSprint = true
-SWEP.Manufacturer = "FB 'Łucznik' Radom"
-SWEP.Type_Displayed = "5.56x45mm NATO"
 SWEP.Author				= "Goanna, Fox, Mav"
 SWEP.Slot = 2
 SWEP.PrintName = "MSBS"
@@ -28,9 +26,6 @@ SWEP.CameraReserve = false
 SWEP.CameraOffset = Angle(0, 0, 0)
 SWEP.MuzzleAttachment = "2"
 SWEP.MuzzleFlashType = "particle"
-SWEP.VMPos = Vector(0,-0.5,-2)
-SWEP.VMAng = Vector(0,0,0)
-SWEP.TPIKPos = Vector(-2, -4, 3)
 
 
 
@@ -54,20 +49,13 @@ SWEP.OnlyBurstFire = true
 
 --[Spread Related]--
 SWEP.Primary.Spread		= .02	
-SWEP.Primary.IronAccuracy = .0
-SWEP.IronRecoilMultiplier = 0.65
 
 SWEP.Primary.KickHorizontal			= 0.1
 SWEP.Primary.MinRecoil = -0.2
-SWEP.Primary.MaxRecoil = -0.3SWEP.Primary.StaticRecoilFactor = 0.4
+SWEP.Primary.MaxRecoil = -0.3
 
-SWEP.Primary.SpreadMultiplierMax = 3
-SWEP.Primary.SpreadIncrement = 0.55
-SWEP.Primary.SpreadRecovery = 4
 
 --[Iron Sights]--
-SWEP.IronBobMult = 0.065
-SWEP.IronBobMultWalk = 0.065
 SWEP.data.ironsights = 1 --Enable Ironsights
 SWEP.ZoomFov = 15
 SWEP.IronSightsPos = Vector(-3.105, -3.5, 0.95)
@@ -75,20 +63,12 @@ SWEP.IronSightsAng = Vector(0, 0, 0)
 SWEP.IronSightTime = 0.3
 
 --[Shells]--
-SWEP.LuaShellEject = true
-SWEP.LuaShellEffect = "ShellEject"
 SWEP.ShellAttachment  = "0"
-SWEP.LuaShellEjectDelay = 0
 
 --[Misc]--
-SWEP.InspectPos = Vector(2, -1, -1)
-SWEP.InspectAng = Vector(10, 10, 0)
-SWEP.MoveSpeed = 1
-SWEP.IronSightsMoveSpeed  = SWEP.MoveSpeed * 0.8
 
 --[NZombies]--
 SWEP.NZPaPName = "M4rtyr S41nt BULL Sh1t"
-SWEP.NZHeadShotMultiplier = 3
 SWEP.Primary.MaxAmmo = SWEP.Primary.DefaultClip
 function SWEP:NZMaxAmmo()
 

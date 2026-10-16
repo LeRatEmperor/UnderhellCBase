@@ -8,8 +8,6 @@ SWEP.Spawnable = true
 SWEP.AdminSpawnable = true
 SWEP.UseHands = true
 SWEP.AnimatedSprint = true
-SWEP.Manufacturer = "Metal Storm"
-SWEP.Type_Displayed = "12-gauge"
 SWEP.Author				= "Goanna, Fox, Mav"
 SWEP.Slot = 3
 SWEP.PrintName = "Bulldog"
@@ -31,7 +29,6 @@ SWEP.MuzzleFlashType = "particle"
 SWEP.Shell = "models/weapons/shell_556.mdl"
 SWEP.ShellHeat = 0.5
 SWEP.ShellDelay = 0
-SWEP.TPIKPos = Vector(-2, -3, 4)
 
 
 
@@ -49,20 +46,13 @@ SWEP.FiresUnderwater = true
 
 --[Spread Related]--
 SWEP.Primary.Spread		= .07
-SWEP.Primary.IronAccuracy = .07
-SWEP.IronRecoilMultiplier = 0.75
 
 SWEP.Primary.KickHorizontal			= 0.35
 SWEP.Primary.MinRecoil = -1.0
-SWEP.Primary.MaxRecoil = -1.0SWEP.Primary.StaticRecoilFactor = 0.7
+SWEP.Primary.MaxRecoil = -1.0
 
-SWEP.Primary.SpreadMultiplierMax = 1
-SWEP.Primary.SpreadIncrement = 0
-SWEP.Primary.SpreadRecovery = 4
 
 --[Iron Sights]--
-SWEP.IronBobMult = 0.065
-SWEP.IronBobMultWalk = 0.065
 SWEP.data.ironsights = 1 --Enable Ironsights
 SWEP.ZoomFov = 15
 SWEP.IronSightsPos = Vector(-4, -5, 0.959)
@@ -70,18 +60,10 @@ SWEP.IronSightsAng = Vector(0, 0, 0)
 SWEP.IronSightTime = 0.2
 
 --[Shells]--
-SWEP.LuaShellEject = false
-SWEP.LuaShellEffect = "ShotgunShellEject"
-SWEP.LuaShellEjectDelay = 0
 
 --[Misc]--
-SWEP.InspectPos = Vector(2, -1, -1)
-SWEP.InspectAng = Vector(10, 10, 0)
-SWEP.MoveSpeed = 1
-SWEP.IronSightsMoveSpeed  = SWEP.MoveSpeed * 0.8
 
 SWEP.NZPaPName = "MR. WORLDWIDE"
-SWEP.NZHeadShotMultiplier = 1.8
 SWEP.Primary.MaxAmmo = SWEP.Primary.DefaultClip
 function SWEP:NZMaxAmmo()
 

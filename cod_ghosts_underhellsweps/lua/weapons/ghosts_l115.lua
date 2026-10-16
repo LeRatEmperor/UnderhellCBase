@@ -7,8 +7,6 @@ SWEP.Spawnable = true
 SWEP.AdminSpawnable = true
 SWEP.UseHands = true
 SWEP.AnimatedSprint = true
-SWEP.Manufacturer = "Accuracy International"
-SWEP.Type_Displayed = ".338 Lapua Magnum"
 SWEP.Author				= "Goanna, Fox, Mav"
 SWEP.Slot = 4
 SWEP.PrintName = "L115"
@@ -30,7 +28,6 @@ SWEP.MuzzleFlashType = "particle"
 SWEP.Shell = "models/weapons/shell_556.mdl"
 SWEP.ShellHeat = 0.5
 SWEP.ShellDelay = 0
-SWEP.TPIKPos = Vector(-2, -4, 4)
 
 
 
@@ -43,7 +40,6 @@ SWEP.Primary.SoundEchoTable = {
 SWEP.Primary.Ammo = "SniperPenetratedRound"
 SWEP.Primary.Automatic = false
 SWEP.Primary.Delay = 0.100000  -- 600 RPM
-SWEP.Primary.RPM_Displayed = 40
 SWEP.Primary.MinDamage = 950
 SWEP.Primary.MaxDamage = 950
 SWEP.Primary.NumberofShots = 1
@@ -53,20 +49,13 @@ SWEP.FiresUnderwater = true
 
 --[Spread Related]--
 SWEP.Primary.Spread		= .075	
-SWEP.Primary.IronAccuracy = .00001
-SWEP.IronRecoilMultiplier = 0.8
 
 SWEP.Primary.KickHorizontal			= 0.3
 SWEP.Primary.MinRecoil = -0.7
-SWEP.Primary.MaxRecoil = -1.0SWEP.Primary.StaticRecoilFactor = 0.6
+SWEP.Primary.MaxRecoil = -1.0
 
-SWEP.Primary.SpreadMultiplierMax = 4
-SWEP.Primary.SpreadIncrement = 0
-SWEP.Primary.SpreadRecovery = 4
 
 --[Iron Sights]--
-SWEP.IronBobMult = 0.065
-SWEP.IronBobMultWalk = 0.065
 SWEP.data.ironsights = 1 --Enable Ironsights
 SWEP.ZoomFov = 25
 SWEP.IronSightsPos = Vector(-5.473, -4, 0.69)
@@ -75,7 +64,6 @@ SWEP.IronSightTime = 0.4
 
 --[NZombies]--
 SWEP.NZPaPName = "Lm40-115"
-SWEP.NZHeadShotMultiplier = 4
 SWEP.Primary.MaxAmmo = SWEP.Primary.DefaultClip
 function SWEP:NZMaxAmmo()
 
@@ -108,20 +96,12 @@ function SWEP:PreDrawViewModel(vm)
 end
 
 --[Shells]--
-SWEP.LuaShellEject = false
-SWEP.LuaShellEffect = "RifleShellEject"
-SWEP.LuaShellEjectDelay = 0
 
 --[Misc]--
-SWEP.InspectPos = Vector(2, -1, -1)
-SWEP.InspectAng = Vector(10, 10, 0)
-SWEP.MoveSpeed = 0.9
-SWEP.IronSightsMoveSpeed  = SWEP.MoveSpeed * 0.8
 
 --[Tables]--
 
 
-SWEP.PumpAction = { -- Pump/bolt animations
     ["value"] = ACT_VM_PULLBACK_HIGH, -- Number for act, String/Number for sequence
     ["value_is"] = ACT_VM_PULLBACK_LOW, -- ADS pump
 }

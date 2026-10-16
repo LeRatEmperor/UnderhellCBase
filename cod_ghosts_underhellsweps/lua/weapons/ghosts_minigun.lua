@@ -25,12 +25,7 @@ SWEP.WorldModelOffset = Vector(4.0, 1.0, 0.0)
 SWEP.WorldModelAngle = Angle(0.0, 180.0, 180.0)
 SWEP.WorldModelScale = 1.0
 SWEP.HoldType = "crossbow"
-SWEP.CameraAttachmentOffsets = {}
-SWEP.CameraAttachmentScale = 1
 SWEP.MuzzleAttachment = "1"
-SWEP.VMPos = Vector(0, 1, 0)
-SWEP.VMAng = Vector(0, 0, 0)
-SWEP.VMPos_Additive = true
 
 
 
@@ -39,16 +34,11 @@ SWEP.Primary.Sound = "TFA_GHOSTS.MINIGUN.FIRE"
 SWEP.Primary.Ammo = "ar2"
 SWEP.Primary.Automatic = true
 SWEP.Primary.Delay = 0.050000  -- 1200 RPM
-SWEP.Primary.RPM_Semi = nil
-SWEP.Primary.RPM_Burst = nil
 SWEP.Primary.MinDamage = 150
 SWEP.Primary.MaxDamage = 150
 SWEP.Primary.NumberofShots = 1
-SWEP.Primary.AmmoConsumption = 1
 SWEP.Primary.ClipSize = 255
 SWEP.Primary.DefaultClip = 255
-SWEP.Primary.DryFireDelay = 0.35
-SWEP.Primary.Force = 0
 SWEP.FiresUnderwater = true
 
 --[Firemode]--
@@ -87,42 +77,27 @@ SWEP.Primary.RangeFalloffLUT = {
 
 --[Spread Related]--
 SWEP.Primary.Spread		  = .03
-SWEP.Primary.IronAccuracy = .03
-SWEP.IronRecoilMultiplier = 0.6
 
 SWEP.Primary.KickHorizontal		= 0.025
 SWEP.Primary.MinRecoil = -0.1
-SWEP.Primary.MaxRecoil = -0.1SWEP.Primary.StaticRecoilFactor	= 0.5
+SWEP.Primary.MaxRecoil = -0.1
 
-SWEP.Primary.SpreadMultiplierMax = 2
-SWEP.Primary.SpreadIncrement = 0
-SWEP.Primary.SpreadRecovery = 2
 
 
 --[Iron Sights]--
 
 --[Shells]--
-SWEP.LuaShellEject = true
-SWEP.LuaShellEffect = "RifleShellEject"
-SWEP.LuaShellModel = "models/tfa/rifleshell.mdl"
-SWEP.LuaShellScale = 0.5
-SWEP.LuaShellEjectDelay = 0
 SWEP.ShellAttachment = "0"
 SWEP.EjectionSmokeEnabled = true
 
 --[Misc]--
 SWEP.AmmoTypeStrings = {ar2 = "7.62x51mm"}
-SWEP.InspectPos = Vector(11, -2, -3)
-SWEP.InspectAng = Vector(24, 42, 16)
-SWEP.MoveSpeed = 0.8
-SWEP.IronSightsMoveSpeed = SWEP.MoveSpeed * 0.8
 SWEP.SafetyPos = Vector(-1, -2, -0.5)
 SWEP.SafetyAng = Vector(-15, 25, -20)
 SWEP.TracerCount = 3
 
 --[NZombies]--
 SWEP.NZPaPName = "Death Incinerator"
-SWEP.NZHeadShotMultiplier = 3
 SWEP.Primary.MaxAmmo = 255
 function SWEP:NZMaxAmmo()
 
@@ -186,7 +161,6 @@ SWEP.AnimSounds = {
 
 --[Shit]--
 
-SWEP.ViewModelBoneMods = {
 	["tag_barrel_spin"] = { scale = Vector(1, 1, 1), pos = Vector(0, 0, 0), angle = Angle(0, 0, 0) },
 }
 

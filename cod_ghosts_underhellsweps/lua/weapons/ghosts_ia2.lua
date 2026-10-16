@@ -8,8 +8,6 @@ SWEP.Spawnable = true
 SWEP.AdminSpawnable = true
 SWEP.UseHands = true
 SWEP.AnimatedSprint = true
-SWEP.Manufacturer = "IMBEL"
-SWEP.Type_Displayed = "7.62×51mm NATO"
 SWEP.Author				= "Goanna, Fox, Mav"
 SWEP.Slot = 3
 SWEP.PrintName = "IA-2"
@@ -52,20 +50,13 @@ SWEP.FiresUnderwater = true
 
 --[Spread Related]--
 SWEP.Primary.Spread		= .045	
-SWEP.Primary.IronAccuracy = .004
-SWEP.IronRecoilMultiplier = 0.55
 
 SWEP.Primary.KickHorizontal			= 0.2
 SWEP.Primary.MinRecoil = -0.2
-SWEP.Primary.MaxRecoil = -0.5SWEP.Primary.StaticRecoilFactor = 0.45
+SWEP.Primary.MaxRecoil = -0.5
 
-SWEP.Primary.SpreadMultiplierMax = 2
-SWEP.Primary.SpreadIncrement = 0.5
-SWEP.Primary.SpreadRecovery = 4
 
 --[Iron Sights]--
-SWEP.IronBobMult = 0.065
-SWEP.IronBobMultWalk = 0.065
 SWEP.data.ironsights = 1 --Enable Ironsights
 SWEP.ZoomFov = 25
 SWEP.IronSightsPos = Vector(-4.901, -2, 1.789)
@@ -73,19 +64,11 @@ SWEP.IronSightsAng = Vector(0, 0, 0)
 SWEP.IronSightTime = 0.3
 
 --[Shells]--
-SWEP.LuaShellEject = true
-SWEP.LuaShellEffect = "RifleShellEject"
-SWEP.LuaShellEjectDelay = 0
 
 --[Misc]--
-SWEP.InspectPos = Vector(2, -1, -1)
-SWEP.InspectAng = Vector(10, 10, 0)
-SWEP.MoveSpeed = 0.95
-SWEP.IronSightsMoveSpeed  = SWEP.MoveSpeed * 0.8
 
 --[NZombies]--
 SWEP.NZPaPName = "Ian Gallagher"
-SWEP.NZHeadShotMultiplier = 3.5
 SWEP.Primary.MaxAmmo = SWEP.Primary.DefaultClip
 function SWEP:NZMaxAmmo()
 

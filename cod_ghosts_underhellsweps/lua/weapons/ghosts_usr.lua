@@ -7,8 +7,6 @@ SWEP.Spawnable = true
 SWEP.AdminSpawnable = true
 SWEP.UseHands = true
 SWEP.AnimatedSprint = true
-SWEP.Manufacturer = "Remington Arms"
-SWEP.Type_Displayed = ".308 Winchester"
 SWEP.Author				= "Goanna, Fox, Mav"
 SWEP.Slot = 4
 SWEP.PrintName = "USR"
@@ -30,9 +28,6 @@ SWEP.MuzzleFlashType = "particle"
 SWEP.Shell = "models/weapons/shell_556.mdl"
 SWEP.ShellHeat = 0.5
 SWEP.ShellDelay = 0
-SWEP.VMPos = Vector(0,-4,-1)
-SWEP.VMAng = Vector(0,0,0)
-SWEP.TPIKPos = Vector(-4, -4, 3)
 
 
 
@@ -45,7 +40,6 @@ SWEP.Primary.SoundEchoTable = {
 SWEP.Primary.Ammo = "SniperPenetratedRound"
 SWEP.Primary.Automatic = false
 SWEP.Primary.Delay = 0.100000  -- 600 RPM
-SWEP.Primary.RPM_Displayed = 51
 SWEP.Primary.MinDamage = 800
 SWEP.Primary.MaxDamage = 800
 SWEP.Primary.NumberofShots = 1
@@ -55,20 +49,13 @@ SWEP.FiresUnderwater = true
 
 --[Spread Related]--
 SWEP.Primary.Spread		= .1	
-SWEP.Primary.IronAccuracy = .00001
-SWEP.IronRecoilMultiplier = 0.8
 
 SWEP.Primary.KickHorizontal			= 0.3
 SWEP.Primary.MinRecoil = -1.1
-SWEP.Primary.MaxRecoil = -1.1SWEP.Primary.StaticRecoilFactor = 0.6
+SWEP.Primary.MaxRecoil = -1.1
 
-SWEP.Primary.SpreadMultiplierMax = 4
-SWEP.Primary.SpreadIncrement = 0
-SWEP.Primary.SpreadRecovery = 4
 
 --[Iron Sights]--
-SWEP.IronBobMult = 0.065
-SWEP.IronBobMultWalk = 0.065
 SWEP.data.ironsights = 1 --Enable Ironsights
 SWEP.ZoomFov = 30
 SWEP.IronSightsPos = Vector(-4.736, -2, 0.803)
@@ -77,7 +64,6 @@ SWEP.IronSightTime = 0.45
 
 --[NZombies]--
 SWEP.NZPaPName = "USPS"
-SWEP.NZHeadShotMultiplier = 3
 SWEP.Primary.MaxAmmo = SWEP.Primary.DefaultClip
 function SWEP:NZMaxAmmo()
 
@@ -110,20 +96,12 @@ end
 
 
 --[Shells]--
-SWEP.LuaShellEject = false
-SWEP.LuaShellEffect = "RifleShellEject"
-SWEP.LuaShellEjectDelay = 0
 
 --[Misc]--
-SWEP.InspectPos = Vector(2, -1, -1)
-SWEP.InspectAng = Vector(10, 10, 0)
-SWEP.MoveSpeed = 0.95
-SWEP.IronSightsMoveSpeed  = SWEP.MoveSpeed * 0.8
 
 --[Tables]--
 
 
-SWEP.PumpAction = { -- Pump/bolt animations
     ["value"] = ACT_VM_PULLBACK_HIGH, -- Number for act, String/Number for sequence
 }
 

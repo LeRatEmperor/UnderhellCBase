@@ -7,8 +7,6 @@ SWEP.Spawnable = true
 SWEP.AdminSpawnable = true
 SWEP.UseHands = true
 SWEP.AnimatedSprint = true
-SWEP.Manufacturer = "General Dynamics Santa Bárbara Sistemas"
-SWEP.Type_Displayed = "5.56×45mm NATO"
 SWEP.Author				= "Goanna, Fox, Mav"
 SWEP.Slot = 3
 SWEP.PrintName = "Ameli"
@@ -53,20 +51,13 @@ SWEP.FiresUnderwater = false
 
 --[Spread Related]--
 SWEP.Primary.Spread		= .05
-SWEP.Primary.IronAccuracy = .0
-SWEP.IronRecoilMultiplier = 0.55
 
 SWEP.Primary.KickHorizontal			= 0.2
 SWEP.Primary.MinRecoil = -0.1
-SWEP.Primary.MaxRecoil = -0.3SWEP.Primary.StaticRecoilFactor = 0.27
+SWEP.Primary.MaxRecoil = -0.3
 
-SWEP.Primary.SpreadMultiplierMax = 2.2
-SWEP.Primary.SpreadIncrement = 0.22
-SWEP.Primary.SpreadRecovery = 2
 
 --[Iron Sights]--
-SWEP.IronBobMult = 0.065
-SWEP.IronBobMultWalk = 0.065
 SWEP.data.ironsights = 1 --Enable Ironsights
 SWEP.ZoomFov = 15
 SWEP.IronSightsPos = Vector(-3.12, -5, 0.2)
@@ -74,20 +65,12 @@ SWEP.IronSightsAng = Vector(0.5, 0, 0)
 SWEP.IronSightTime = 0.35
 
 --[Shells]--
-SWEP.LuaShellEject = true
-SWEP.LuaShellEffect = "RifleShellEject"
 SWEP.ShellAttachment  = "0"
-SWEP.LuaShellEjectDelay = 0
 
 --[Misc]--
-SWEP.InspectPos = Vector(2, -1, -1)
-SWEP.InspectAng = Vector(10, 10, 0)
-SWEP.MoveSpeed = 0.9
-SWEP.IronSightsMoveSpeed  = SWEP.MoveSpeed * 0.8
 
 --[NZombies]--
 SWEP.NZPaPName = "El Cuelebre"
-SWEP.NZHeadShotMultiplier = 3.5
 SWEP.Primary.MaxAmmo = SWEP.Primary.DefaultClip
 function SWEP:NZMaxAmmo()
 
@@ -173,7 +156,6 @@ SWEP.EventTable = {
 },
 }
 
-SWEP.ViewModelBoneMods = {
         ["bullet0_jnt"] = {scale = Vector(1, 1, 1), pos = Vector(0, 0, 0), angle = Angle(0, 0, 0)},
         ["bullet1_jnt"] = {scale = Vector(1, 1, 1), pos = Vector(0, 0, 0), angle = Angle(0, 0, 0)},
         ["bullet2_jnt"] = {scale = Vector(1, 1, 1), pos = Vector(0, 0, 0), angle = Angle(0, 0, 0)},

@@ -9,7 +9,6 @@ SWEP.Spawnable = TFA_BASE_VERSION and TFA_BASE_VERSION >= 4.74
 SWEP.AdminSpawnable = true
 SWEP.UseHands = true
 SWEP.AnimatedSprint = true
-SWEP.Manufacturer = "Auto-Ordnance Company"
 SWEP.Author = "Wavy"
 SWEP.Slot = 2
 SWEP.PrintName = "M27-IAR"
@@ -24,12 +23,7 @@ SWEP.WorldModelOffset = Vector(14.0, 1.0, -6.5)
 SWEP.WorldModelAngle = Angle(0.0, 180.0, 195.0)
 SWEP.WorldModelScale = 1.0
 SWEP.HoldType = "ar2"
-SWEP.CameraAttachmentOffsets = {}
-SWEP.CameraAttachmentScale = 1
 SWEP.MuzzleAttachment = "1"
-SWEP.VMPos = Vector(0, 0, 0)
-SWEP.VMAng = Angle(0, 0, -5)
-SWEP.VMPos_Additive = false
 
 
 
@@ -38,15 +32,11 @@ SWEP.Primary.Sound = "TFA_GHOSTS.M27_LMG.FIRE"
 SWEP.Primary.Ammo = "ar2"
 SWEP.Primary.Automatic = true
 SWEP.Primary.Delay = 0.080000  -- 750 RPM
-SWEP.Primary.RPM_Semi = nil
-SWEP.Primary.RPM_Burst = nil
 SWEP.Primary.MinDamage = 100
 SWEP.Primary.MaxDamage = 100
 SWEP.Primary.NumberofShots = 1
-SWEP.Primary.AmmoConsumption = 1
 SWEP.Primary.ClipSize = 100
 SWEP.Primary.DefaultClip = SWEP.Primary.ClipSize * 5
-SWEP.Primary.DryFireDelay = 0.35
 SWEP.FiresUnderwater = true
 
 --[Firemode]--
@@ -87,41 +77,25 @@ SWEP.Primary.RangeFalloffLUT = {
 
 --[Spread Related]--
 SWEP.Primary.Spread		  = .035
-SWEP.Primary.IronAccuracy = .008
-SWEP.IronRecoilMultiplier = 0.6
 
 SWEP.Primary.KickHorizontal		= 0.15
 SWEP.Primary.MinRecoil = -0.15
-SWEP.Primary.MaxRecoil = -0.25SWEP.Primary.StaticRecoilFactor = 0.5
+SWEP.Primary.MaxRecoil = -0.25
 
-SWEP.Primary.SpreadMultiplierMax = 2
-SWEP.Primary.SpreadIncrement = 1.0
-SWEP.Primary.SpreadRecovery = 5
 
 
 --[Iron Sights]--
-SWEP.IronBobMult 	 = 0.065
-SWEP.IronBobMultWalk = 0.065
 SWEP.ZoomFov = 20
 SWEP.IronSightsPos = Vector(-4.44, -4, 0.25)
 SWEP.IronSightsAng = Angle(0.1, 0, 0)
 SWEP.IronSightTime = 0.4
 
 --[Shells]--
-SWEP.LuaShellEject = true
-SWEP.LuaShellEffect = "RifleShellEject"
---SWEP.LuaShellSound = 
-SWEP.LuaShellScale = 0.5
-SWEP.LuaShellEjectDelay = 0
 SWEP.ShellAttachment = "2"
 SWEP.EjectionSmokeEnabled = true
 
 --[Misc]--
 --SWEP.AmmoTypeStrings = {ar2 = ".45 ACP"}
-SWEP.InspectPos = Vector(9, -2, -2)
-SWEP.InspectAng = Vector(10.8, 43.2, 20.399)
-SWEP.MoveSpeed = 0.9
-SWEP.IronSightsMoveSpeed = 0.4
 SWEP.SafetyPos = Vector(0, -2, 0)
 SWEP.SafetyAng = Vector(-19, 21, -21)
 SWEP.TracerCount = 3
@@ -132,7 +106,6 @@ SWEP.DInv2_GridSizeY = 3
 
 --[NZombies]--
 SWEP.NZPaPName = "Mystifier 2.0"
-SWEP.NZHeadShotMultiplier = 3
 SWEP.Primary.MaxAmmo = 400
 function SWEP:NZMaxAmmo()
 
