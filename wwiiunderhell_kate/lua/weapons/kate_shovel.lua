@@ -99,7 +99,8 @@ SWEP.Primary.Delay          = 1.0             -- = TFA Primary.Attacks[1].end (s
 SWEP.Primary.Force          = 200
 SWEP.Primary.HurtTime       = 0.2667           -- = TFA Primary.Attacks[1].delay
 SWEP.Primary.Recoil         = Angle(0, 0, 0)               -- = TFA Primary.Attacks[1].viewpunch
-SWEP.Primary.HitSound  = {"TFA_CODWW2_KNIFE.Stab"}            -- = TFA Primary.Sound_HitFlesh (stab/hit)
+SWEP.Primary.HitSound  = {"TFA_CODWW2_KNIFE.Stab"}
+SWEP.Primary.HitWorldSound  = Sound("TFA_CODWW2_KNIFE.Stab")            -- = TFA Primary.Sound_HitFlesh (stab/hit)
 
 -- Shell ejection (melee -- no shell)
 SWEP.NoShell   = true

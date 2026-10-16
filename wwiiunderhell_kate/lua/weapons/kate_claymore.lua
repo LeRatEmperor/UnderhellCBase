@@ -97,6 +97,7 @@ SWEP.Primary.Force          = 200
 SWEP.Primary.HurtTime       = 0.1667                    -- = TFA Primary.Attacks[1].delay (5/30)
 SWEP.Primary.Recoil         = Angle(4, 3, 0)             -- = TFA Primary.Attacks[1].viewpunch
 SWEP.Primary.HitSound  = {"TFA_CODWW2_SWORD.Stab"}
+SWEP.Primary.HitWorldSound  = Sound("TFA_CODWW2_SWORD.Stab")
 
 SWEP.NoShell   = true
 SWEP.ShellHeat = 0.8
