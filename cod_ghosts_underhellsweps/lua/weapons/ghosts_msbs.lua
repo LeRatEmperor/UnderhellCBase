@@ -35,8 +35,22 @@ SWEP.ZoomFov = 15
 
 -- Fire mode
 SWEP.FireModes = {
-    { name = "Full-Auto" },
+    {
+        name = "3-Round Burst",
+        shoot = function(ply, wep)
+            -- Don't start a new burst if one is in flight
+            if wep._burstRemaining and wep._burstRemaining > 0 then return true end
+            if not wep:CanPrimaryAttack() then return false end
+            wep._burstRemaining = wep.BurstCount
+            wep:FireBurstRound()
+            return true  -- tell base to skip its own bullet fire
+        end
+    },
 }
+
+-- Burst-fire configuration
+SWEP.BurstCount = 3        -- rounds per burst
+SWEP.BurstDelay = 0.075    -- seconds between each burst round
 
 -- Primary stats
 SWEP.Primary.Sound          = Sound("Weapons_Ghosts_MSBS.Fire")
@@ -46,11 +60,11 @@ SWEP.Primary.Ammo           = "ar2"
 SWEP.Primary.DefaultClip    = 180
 SWEP.Primary.MinDamage      = 80.0
 SWEP.Primary.MaxDamage      = 80.0
-SWEP.Primary.Automatic      = true
+SWEP.Primary.Automatic      = false   -- burst is triggered per pull, not held
 SWEP.Primary.TakeAmmo       = 1
 SWEP.Primary.Force          = 1
 SWEP.Primary.Spread         = .02
-SWEP.Primary.Delay          = 0.072029    -- 833 RPM
+SWEP.Primary.Delay          = 0.072029    -- base delay between burst rounds (833 RPM)
 SWEP.Primary.NumberofShots  = 1
 SWEP.Primary.MinRecoil      = -0.2
 SWEP.Primary.MaxRecoil      = -0.3
@@ -210,6 +224,71 @@ function SWEP:ShootAnimation()
 end
 
 -- ============================================================
+-- BURST FIRE LOGIC
+-- ============================================================
+-- Fires one round of the burst, decrements the counter, and schedules
+-- the next burst round (or the post-burst cooldown when finished).
+-- Called from FireModes[1].shoot for the first round, and from Think()
+-- for subsequent rounds (so the burst continues even if the player
+-- releases M1 mid-burst).
+function SWEP:FireBurstRound()
+    if not IsValid(self) or not IsValid(self.Owner) then return end
+    if not self:CanPrimaryAttack() then
+        self._burstRemaining = nil
+        return
+    end
+    local ct = CurTime()
+    local iftp = IsFirstTimePredicted()
+
+    -- Bullets
+    if SERVER or iftp then
+        local dmg = math.random(self.Primary.MinDamage, self.Primary.MaxDamage)
+        if self:GetNWBool("Silenced") then dmg = math.Round(dmg * 0.95) end
+        self:ShootBullets(self.Owner:GetShootPos(), self.Owner:GetAimVector(), dmg, self.Penetration or 2)
+    end
+
+    -- Recoil
+    local recoil = util.SharedRandom("uh_recoil", self.Primary.MinRecoil, self.Primary.MaxRecoil)
+        * (self:GetUHBool("Zooming") and 0.35 or 1)
+    if SERVER or (CLIENT and iftp) then
+        self:DoMuzzleFlash()
+        self:CreateSmoke(self:GetMuzzle(), self.Primary.Delay + 0.14)
+        if not self.NoShell then self:CreateShell(self.ShellDelay or 0, self.ShellHeat) end
+        self.Owner:SetEyeAngles(self.Owner:EyeAngles() + Angle(recoil, 0, 0))
+    end
+    self.Owner:ViewPunch(Angle(recoil, 0, 0))
+
+    -- Animation
+    local shootAnim = self:ShootAnimation()
+    if type(shootAnim) == "string" then
+        self:EasySendWeaponAnim(shootAnim, ACT_VM_PRIMARYATTACK)
+    else
+        self:SendWeaponAnim(ACT_VM_PRIMARYATTACK)
+    end
+    self.Owner:SetAnimation(PLAYER_ATTACK1)
+    self.Owner:MuzzleFlash()
+
+    local fireSound = self:GetShootSound()
+    self:EmitSound(fireSound, 110, 100, 1, CHAN_WEAPON)
+    self:TakePrimaryAmmo(self.Primary.TakeAmmo)
+    self.NextReload = CurTime() + 0.5
+
+    -- Burst timing
+    if SERVER or iftp then
+        self._burstRemaining = (self._burstRemaining or 0) - 1
+        if self._burstRemaining > 0 then
+            self._burstNextFire = ct + self.BurstDelay
+            self:SetNextPrimaryFire(ct + self.BurstDelay)
+        else
+            self._burstRemaining = nil
+            -- Post-burst cooldown: 3x the base delay before the next burst
+            self:SetNextPrimaryFire(ct + self.Primary.Delay * 3)
+            self:SetNextSecondaryFire(ct + self.Primary.Delay * 3)
+        end
+    end
+end
+
+-- ============================================================
 -- SPRINT / IDLE / INSPECT HANDLERS
 -- ============================================================
 function SWEP:HandleSprintingAnimations()
@@ -301,6 +380,14 @@ function SWEP:Think()
     if self._meleeActive and self._meleeEndTime and ct >= self._meleeEndTime then
         self:EndMelee()
     end
+
+    -- Continue burst rounds even if player released M1
+    if self._burstRemaining and self._burstRemaining > 0 then
+        if ct >= (self._burstNextFire or 0) then
+            self:FireBurstRound()
+        end
+    end
+
     BaseClass.Think(self)
     if not IsValid(self.Owner) then return end
     self:HandleSprintingAnimations()
@@ -312,6 +399,9 @@ end
 -- HOLSTER / DEPLOY
 -- ============================================================
 function SWEP:Holster(wep)
+    -- Cancel any in-flight burst so it doesn't continue after switch
+    self._burstRemaining = nil
+    self._burstNextFire = nil
     self._justExitedSprint = false
     self.wasZooming = false
     self.wasRunning = false
@@ -339,6 +429,8 @@ function SWEP:Deploy()
     self._meleeHitDone = nil
     self._meleeEndTime = nil
     self._nextMelee = nil
+    self._burstRemaining = nil
+    self._burstNextFire = nil
     self._justExitedSprint = false
     return true
 end
