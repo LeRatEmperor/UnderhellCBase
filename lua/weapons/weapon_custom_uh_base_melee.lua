@@ -228,7 +228,14 @@ function SWEP:DoMeleeHit()
             -- Hit an entity (player, NPC, prop)
             if SERVER then
                 local dmg = DamageInfo()
-                dmg:SetDamage(math.random(self.Primary.MinDamage or 50, self.Primary.MaxDamage or 50))
+                local minDmg = self.Primary.MinDamage or 50
+                local maxDmg = self.Primary.MaxDamage or 50
+                -- Secondary attack (right swing) does 2x damage
+                if self._meleeRightSwing then
+                    minDmg = minDmg * 2
+                    maxDmg = maxDmg * 2
+                end
+                dmg:SetDamage(math.random(minDmg, maxDmg))
                 dmg:SetAttacker(ply)
                 dmg:SetInflictor(self)
                 dmg:SetDamageForce(aim * (self.Primary.Force or 300))
@@ -283,7 +290,70 @@ function SWEP:DoMeleeHit()
 end
 
 function SWEP:SecondaryAttack()
-    return false
+    -- Secondary melee attack: right swing, 2x damage, shares cooldown with primary
+    if not IsValid(self.Owner) then return end
+    if self._meleeActive then return end
+    if self:GetNWFloat("DeployTime") > CurTime() then return end
+
+    local ct = CurTime()
+    if ct < (self._nextMelee or 0) then return end
+    if self:GetUHBool("Reloading") then return end
+    if self:GetNWInt("FireMode") == 0 then return end
+
+    -- Use the state machine (same as Kate PrimaryAttack but with right swing)
+    if SERVER or IsFirstTimePredicted() then
+        self:MeleeAttackRight()
+    end
+end
+
+-- ============================================================
+-- MeleeAttackRight — heavy right swing (2x damage)
+-- ============================================================
+function SWEP:MeleeAttackRight()
+    local ct = CurTime()
+    if not (game.SinglePlayer() or IsFirstTimePredicted()) then return end
+
+    self:SetUHBool("Zooming", false)
+    if self:GetUHBool("Running") then self:SetUHBool("Running", false) end
+
+    self._meleeActive = true
+    self._meleeRightSwing = true  -- flag for 2x damage in DoMeleeHit
+    self:ClearAnimSounds()
+
+    -- Play right swing animation
+    if self.Animations and self.Animations["melee"] then
+        -- Try "melee_right" key first, fall back to ACT_VM_MISSRIGHT
+        if self.Animations["melee_right"] then
+            self:EasySendWeaponAnim("melee_right", ACT_VM_MISSRIGHT)
+        else
+            self:EasySendWeaponAnim("melee", ACT_VM_MISSRIGHT)
+        end
+    else
+        self:SendWeaponAnim(ACT_VM_MISSRIGHT)
+    end
+
+    local delay = self.Primary.Delay or 0.6
+    local hurtTime = self.Primary.HurtTime or 0.15
+    self._meleeHitTime = ct + hurtTime
+    self._meleeHitDone = false
+    self._meleeEndTime = ct + delay
+    self._nextMelee = ct + delay
+    self:SetNextPrimaryFire(ct + delay)
+    self:SetNextSecondaryFire(ct + delay)
+    self.NextReload = ct + delay
+
+    -- 3rd person player attack animation
+    self.Owner:SetAnimation(PLAYER_ATTACK1)
+    local seqIdx = self.Owner:SelectWeightedSequence(ACT_GMOD_GESTURE_MELEE_SHOVE_2HAND)
+    if seqIdx and seqIdx >= 0 then
+        self.Owner:AddVCDSequenceToGestureSlot(GESTURE_SLOT_ATTACK_AND_RELOAD, seqIdx, 0, true)
+    end
+
+    local snd = self.Primary.SwingSound
+    if istable(snd) then snd = snd[math.random(1, #snd)] end
+    if snd and snd ~= "" then
+        self:EmitSound(snd, 75, 100, 1, CHAN_USER_BASE)
+    end
 end
 
 -- ============================================================
@@ -346,6 +416,7 @@ function SWEP:EndMelee()
     self._meleeHitTime = nil
     self._meleeHitDone = nil
     self._meleeEndTime = nil
+    self._meleeRightSwing = nil  -- clear 2x damage flag
 end
 
 -- ============================================================
