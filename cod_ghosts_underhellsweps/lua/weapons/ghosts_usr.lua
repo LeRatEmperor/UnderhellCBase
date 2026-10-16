@@ -50,7 +50,7 @@ SWEP.Primary.Automatic      = false
 SWEP.Primary.TakeAmmo       = 1
 SWEP.Primary.Force          = 1
 SWEP.Primary.Spread         = .1
-SWEP.Primary.Delay          = 0.100000    -- 600 RPM
+SWEP.Primary.Delay          = 1.200000    -- bolt-action cycle (fire + bolt)
 SWEP.Primary.NumberofShots  = 1
 SWEP.Primary.MinRecoil      = -1.1
 SWEP.Primary.MaxRecoil      = -1.1
@@ -64,6 +64,19 @@ SWEP.TwoHanded              = true
 SWEP.ReloadSpeed            = 1
 SWEP.Chambering             = false
 SWEP.AnimatedSprint         = true
+
+-- Bolt-action rechamber config
+SWEP.IsBoltAction = true
+SWEP.PumpDelay    = 0.500       -- bolt cycle starts this many seconds after fire
+
+-- RT scope config
+SWEP.ScopeFov      = 10
+SWEP.ZoomFov       = 15
+SWEP.ScopeReticle  = "gmod/scope"
+SWEP.Sensitivity   = 0.2
+SWEP.Use2DScope    = false
+SWEP.ScopeDisabled = false
+SWEP.ScopeBlur     = true
 
 -- Ironsights
 SWEP.IronSightsPos = Vector(-4.736, -2, 0.803)
@@ -121,6 +134,8 @@ SWEP.WorldModelAngle  = Angle(10, 180, 180)
 SWEP.Animations = {
     ["shoot_last"]   = "fire_last",
     ["fire_ads"]     = "fire_ads",
+    ["rechamber"]    = "rechamber",
+    ["rechamber_ads"] = "rechamber_ads",
     ["idle"]         = "idle",
     ["idle_empty"]   = "idle_empty",
     ["deploy"]       = "draw",
@@ -212,6 +227,28 @@ function SWEP:ShootAnimation()
 end
 
 -- ============================================================
+-- BOLT-ACTION RECHAMBER (PostShoot override)
+-- ============================================================
+-- After firing, locks fire for PumpDelay, then plays the bolt-cycle
+-- animation. Primary.Delay is set high enough (1.2s) that the next
+-- shot can't fire until the bolt cycle has completed.
+function SWEP:PostShoot()
+    if not self.IsBoltAction then return end
+    local ct = CurTime()
+    local pumpDelay = self.PumpDelay or 0.5
+    self:SetNextPrimaryFire(math.max(self:GetNextPrimaryFire(), ct + pumpDelay))
+    self:SetNextSecondaryFire(math.max(self:GetNextSecondaryFire(), ct + pumpDelay))
+    timer.Simple(pumpDelay, function()
+        if not IsValid(self) or not IsValid(self.Owner)
+           or not IsValid(self.Owner:GetActiveWeapon())
+           or self.Owner:GetActiveWeapon() ~= self then return end
+        if self:GetUHBool("Reloading") then return end
+        local animKey = self:GetUHBool("Zooming") and "rechamber_ads" or "rechamber"
+        self:EasySendWeaponAnim(animKey, ACT_VM_PULLBACK_HIGH)
+    end)
+end
+
+-- ============================================================
 -- SPRINT / IDLE / INSPECT HANDLERS
 -- ============================================================
 function SWEP:HandleSprintingAnimations()
@@ -266,6 +303,29 @@ function SWEP:HandleInspect()
 end
 
 -- ============================================================
+-- RECHAMBER GUARD (CanPrimaryAttack override)
+-- ============================================================
+-- Blocks fire during the bolt cycle so the rechamber animation
+-- can't be cancelled by the next trigger pull.
+function SWEP:CanPrimaryAttack()
+    if self:GetNWInt("FireMode") == 0 then return false end
+    if self:GetNWFloat("DeployTime") > CurTime() then return false end
+    if self:GetUHBool("Running") then return false end
+    if self:GetUHBool("Reloading") then return false end
+    if self.IsBoltAction and CurTime() < self:GetNextPrimaryFire() then
+        return false
+    end
+    if self:Clip1() <= 0 then
+        if not self:GetUHBool("Reloading") then
+            self:EmitSound("Weapon_SMG1.Empty", 75, 100, 1, CHAN_USER_BASE)
+        end
+        self:SetNextPrimaryFire(CurTime() + 0.4)
+        return false
+    end
+    return true
+end
+
+-- ============================================================
 -- ATTACK
 -- ============================================================
 function SWEP:PrimaryAttack()
@@ -305,9 +365,67 @@ function SWEP:Think()
     end
     BaseClass.Think(self)
     if not IsValid(self.Owner) then return end
+
+    -- Lazy-find the lens material index on the VM (client-side)
+    if CLIENT and not self._rtScopeLensFound then
+        local vm = IsValid(self.Owner) and self.Owner:GetViewModel() or nil
+        if IsValid(vm) then
+            local mats = vm:GetMaterials()
+            if mats and #mats > 0 then
+                local lensIdx = nil
+                for i = 1, #mats do
+                    local mn = string.lower(tostring(mats[i]))
+                    if string.find(mn, "lens") or string.find(mn, "scope")
+                       or string.find(mn, "optic") then
+                        lensIdx = i - 1
+                        break
+                    end
+                end
+                if not lensIdx then lensIdx = 0 end
+                self._rtScopeLensIdx = lensIdx
+                self._rtScopeLensFound = true
+            end
+        end
+    end
+
     self:HandleSprintingAnimations()
     self:HandleIdle()
     self:HandleInspect()
+end
+
+-- ============================================================
+-- INITIALIZE — create RT scope material (client-side)
+-- ============================================================
+function SWEP:Initialize()
+    if CLIENT then
+        local matName = "ghosts_usr_rt_" .. self:EntIndex()
+        local reticlePath = self.ScopeReticle or "gmod/scope"
+        self.ScopeTexture = CreateMaterial(matName, "Unlittwotexture", {
+            ["$basetexture"] = "gmod/scope",
+            ["$texture2"]    = reticlePath,
+            ["$model"]       = "1",
+            ["$selfillum"]   = "1",
+            ["$selfillumtint"] = "[1 1 1]",
+            ["$color2"]      = "[1 1 1]",
+        })
+        self._rtScopeMatName = matName
+    end
+    BaseClass.Initialize(self)
+end
+
+-- ============================================================
+-- PREDRAWVIEWMODEL — apply RT scope submaterial to VM lens
+-- ============================================================
+-- The base class clears all submaterials in PreDrawViewModel, then
+-- applies HideMaterials. We call BaseClass.PreDrawViewModel first,
+-- then apply the RT scope material to the lens material index.
+function SWEP:PreDrawViewModel()
+    BaseClass.PreDrawViewModel(self)
+    if not self.ScopeTexture then return end
+    if not self._rtScopeLensIdx then return end
+    local vm = IsValid(self.Owner) and self.Owner:GetViewModel() or nil
+    if not IsValid(vm) then return end
+    vm:SetSubMaterial(self._rtScopeLensIdx, "!" .. self._rtScopeMatName)
 end
 
 -- ============================================================
@@ -317,6 +435,9 @@ function SWEP:Holster(wep)
     self._justExitedSprint = false
     self.wasZooming = false
     self.wasRunning = false
+    -- Reset lens finding so it re-scans on next deploy
+    self._rtScopeLensFound = nil
+    self._rtScopeLensIdx = nil
     return BaseClass.Holster(self, wep)
 end
 
