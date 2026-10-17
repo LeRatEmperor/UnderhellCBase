@@ -1,0 +1,9 @@
+// 
+
+$declaresequence "idle"
+$declaresequence "draw"
+$declaresequence "fire"
+$declaresequence "shoot_empty"
+$declaresequence "reload"
+$declaresequence "reload_full"
+$declaresequence "fire_empty"
