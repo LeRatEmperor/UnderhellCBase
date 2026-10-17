@@ -21,3 +21,6 @@ tools/archives/
 tools/blender-4.2.0-linux-x64/
 tools/dotnet/
 tools/blender.tar.xz
+*.blend
+*.blend1
+repos/gmod-animations/
