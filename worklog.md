@@ -284,3 +284,47 @@ Stage Summary:
 - FP6 full 5-round reload: 8 sounds properly timed (last at 3.8667s); ammo added 0.1s before anim end; FOV 60
 - Tac 12: full KRM-262-style looped reload (start -> loop per shell -> finish); interrupts on fire/clip-full/no-reserve
 - All 27 Lua files pass syntax verification (no parse errors)
+
+---
+Task ID: tools-preserve
+Agent: main (Super Z)
+Task: Two requests: (1) bundle all compiled BF3 model files into a single Battlefield3/ folder for easy copy-over; (2) save studiomdl / crowbar / blender so they don't have to be rebuilt constantly or risk losing content.
+
+Work Log:
+- Audited filesystem layout: `/tmp/my-project/` is on tmpfs (2 GB cap, RAM-backed, wiped on session restart), while `/home/z/my-project/` is on the persistent rootfs.
+- Discovered the only tools actually at risk were Blender 4.2.0 binary tree (1.9 GB) + SourceIO Blender plugin (24 MB) — they were sitting in `/tmp/my-project/tools/`. The other tools were already on persistent storage:
+  - studiomdl: `/home/z/my-project/repos/source-sdk-2013/game/bin/studiomdl` (+ libtier0.so/libvstdlib.so in src/lib/public/linux64/) — persistent.
+  - Crowbar source + compiled DLL: `/home/z/my-project/tools/crowbar-src/Crowbar/bin/Debug/net8.0/Crowbar.dll` — persistent.
+  - dotnet SDK + runtime: `/home/z/my-project/tools/dotnet/` — persistent.
+- Created `/home/z/my-project/compile/Battlefield3/` and copied all 192 compiled model files (32 weapons × {mdl, vvd, dx80.vtx, dx90.vtx, sw.vtx, xbox.vtx}).
+- Persisted Blender: `mv /tmp/my-project/tools/blender-4.2.0-linux-x64/ /home/z/my-project/tools/`. Verified `blender --version` returns Blender 4.2.0.
+- Persisted SourceIO plugin: `mv /tmp/my-project/tools/SourceIO/ /home/z/my-project/tools/`. Verified `source_io/__init__.py` present.
+- Moved both backup archives to a new `/home/z/my-project/tools/archives/` subfolder:
+  - `blender-4.2.0.tar.xz` (336 MB)
+  - `SourceIO.zip` (5.7 MB)
+- Wrote `/home/z/my-project/tools/setup_tools.sh` — a sourced shell script that exports all four env vars (STUDIOMDL_BIN, DOTNET_ROOT, CROWBAR_DLL, BLENDER_BIN, BLENDER_USER_SCRIPTS) and defines four shell helpers:
+  - `studiomdl ARGS…` — wraps binary with proper LD_LIBRARY_PATH
+  - `crowbar-decompile MODEL.mdl [out]` — calls the existing pythonnet bridge script
+  - `blender ARGS…` — wraps binary with BLENDER_USER_SCRIPTS so SourceIO loads
+  - `setup_tools_status` — quick path check that prints OK/MISSING for every component
+- Wrote `/home/z/my-project/tools/README.md` documenting the full tool inventory, paths, and recovery procedure from backup archives.
+- Verified all three tools run from their persistent paths end-to-end:
+  - `studiomdl -?` → prints usage
+  - `dotnet --version` → 8.0.410
+  - `blender --version` → Blender 4.2.0
+  - Crowbar via pythonnet: `clr.AddReference('Crowbar'); from Crowbar import TheApp` → loads OK
+
+Stage Summary:
+- 192 compiled model files bundled into `/home/z/my-project/compile/Battlefield3/` (67 MB total) — ready for one-shot copy to the user's test mod.
+- All three external tools (studiomdl / Crowbar / Blender + SourceIO) now live under `/home/z/my-project/tools/` on the persistent rootfs. No rebuild needed on next session restart.
+- `source /home/z/my-project/tools/setup_tools.sh` exposes all four helper commands in any future shell session.
+- Backup archives (blender-4.2.0.tar.xz + SourceIO.zip) preserved under `tools/archives/` for emergency recovery.
+
+Artifacts:
+- New folder: /home/z/my-project/compile/Battlefield3/ (192 files, 67 MB)
+- Moved binary tree: /home/z/my-project/tools/blender-4.2.0-linux-x64/ (1.9 GB, 5375 files)
+- Moved plugin: /home/z/my-project/tools/SourceIO/ (24 MB)
+- Backup archives: /home/z/my-project/tools/archives/{blender-4.2.0.tar.xz, SourceIO.zip}
+- Setup script: /home/z/my-project/tools/setup_tools.sh (sourceable, defines 4 helpers)
+- README: /home/z/my-project/tools/README.md (full tool inventory + recovery procedure)
+- Dump script (reusable): /home/z/my-project/scripts/dump_compiled_to_battlefield3.sh

@@ -15,3 +15,9 @@ repos/tfa_wwii_original/
 repos/tfa_wwii_original/
 tool-results/
 source_repos/
+
+# Backup archives - too large for git, keep on disk only
+tools/archives/
+tools/blender-4.2.0-linux-x64/
+tools/dotnet/
+tools/blender.tar.xz
