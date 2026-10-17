@@ -476,3 +476,60 @@ Artifacts:
 - /home/z/my-project/scripts/fix_hand_bone_rotations.py (new)
 - /home/z/my-project/scripts/strip_v_hands_mesh.py (new)
 - GitHub commit: bc869425 (pushed)
+
+---
+Task ID: c-hands-pipeline-rewrite
+Agent: main (Super Z)
+Task: User reported c_hands fly away after animations + fingers still wrong. Cleared folders, researched deeply, built comprehensive guide, rewrote pipeline from scratch.
+
+Work Log:
+- Cleared /home/z/my-project/decompile/ and /home/z/my-project/compile/ (except Battlefield3)
+- Cloned fresh BF3 SWEPs repo: github.com/LeRatEmperor/tfa_at_bf3_weapons_pack_2261149305
+- Launched deep research subagent that produced /home/z/my-project/docs/C_HANDS_COMPLETE_GUIDE.md (90KB, 1719 lines)
+  - Covers: c_arms entity, c_arms_citizen.smd reference, $bonemerge, $definebone, bone hierarchy differences, "fly away" issue, conversion workflow, reference examples, common pitfalls, BF3-specific pipeline, diagnostic checklist
+  - Extracted canonical references from robotboy655/gmod-animations: c_arms_citizen.qc, c_arms_definebones.qci, c_medkit.qc
+- Decompiled all 32 BF3 weapons from fresh clone using scripts/decompile_all_bf3.py
+- Wrote /home/z/my-project/scripts/convert_bf3_to_c_hands.py (complete pipeline):
+  1. Rename BF3 bones to ValveBiped.Bip01_* (using full_pipeline.py's BONE_MAP)
+  2. Add Spine4 as root bone in SMDs (reparent L_Clavicle/R_Clavicle to it)
+  3. Replace hand bone POSITIONS and ROTATIONS in SMDs with c_arms_citizen's values
+  4. Re-bake animation keyframes to maintain world-space motion:
+     - new_pos = new_bind_pos + (keyframe_pos - old_bind_pos)
+     - new_rot = new_bind_rot * inverse(old_bind_rot) * keyframe_rot
+  5. REMOVE $definebone lines for hand bones (CRITICAL FIX - let SMD source define them)
+  6. Add $bonemerge for all 38 hand bones + Spine4
+  7. Strip v_hands/sleeve_diffuse mesh triangles from SMDs
+  8. Clean QC (remove v_hands material refs, hands cdmaterials, hands bodygroup)
+
+KEY DISCOVERY (the root cause of "fly away"):
+- studiomdl's g_bOverridePreDefinedBones=true causes SMD source values to OVERRIDE $definebone values
+- But the "rebuild local pose" code then computes wrong values when BOTH $definebone AND SMD source define the same bone
+- Result: all bones ended up at (0, 0, 0) with Spine4's rotation (broken)
+- FIX: Do NOT use $definebone for hand bones. Let the SMD source define them.
+- Only use $definebone for Spine4 (to ensure it exists)
+
+VERIFICATION (via direct binary parsing + Blender):
+- m416 binary: Spine4 at (0,0,0) rot (-79.75,-90,-90) - CORRECT
+- m416 binary: L_Clavicle at (2.03,1.00,1.94) rot (-73.71,168.62,91.48) - c_arms_citizen values
+- m416 binary: L_Hand at (20.49,-0.09,-0.04) rot (-93.57,-5.03,13.07) - RE-BAKED value (maintains world-space motion)
+- m416 binary: 39 bonemerge lines (38 hand bones + Spine4)
+- m416 binary: 69 bones (down from 83 - BF3 procedural bones removed)
+- m416 binary: NO v_hands/sleeve_diffuse material references
+- Blender: bone hierarchy correct (Spine4 -> L_Clavicle -> L_UpperArm -> L_Forearm -> L_Hand -> L_Finger0)
+- 32/32 weapons compiled successfully
+
+Stage Summary:
+- c_hands should now render at correct position (at weapon grip, not in front of camera)
+- c_hands should NOT fly away after animations (animation keyframes re-baked to new bind pose)
+- c_hands fingers should have correct rotations (matching c_arms_citizen's bind pose)
+- All 32 weapons have c_hands (bonemerge configured for all 38 hand bones + Spine4)
+- Old baked-in hand mesh completely stripped (no more missing textures)
+- compile/Battlefield3/ bundle refreshed with 192 files (32 weapons × 6 variants)
+- Comprehensive c_hands guide created for future reference
+
+Artifacts:
+- /home/z/my-project/scripts/convert_bf3_to_c_hands.py (main pipeline)
+- /home/z/my-project/scripts/decompile_all_bf3.py (decompile script)
+- /home/z/my-project/docs/C_HANDS_COMPLETE_GUIDE.md (90KB reference document)
+- /tmp/c_arms_extract/ (canonical c_arms_citizen reference files)
+- GitHub commit: 66b35bd6 (pushed)
