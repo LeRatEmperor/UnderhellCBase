@@ -374,3 +374,43 @@ Artifacts:
 - Blender verification: /home/z/my-project/scripts/blender_verify_c_arms.py
 - c_arms reference: /home/z/my-project/repos/gmod-animations/c_arms_citizen.smd
 - GitHub commit: aeec835a (pushed)
+
+---
+Task ID: revert-c-arms-retarget
+Agent: main (Super Z)
+Task: User reported c_hands broken: either no c_hands, jumbled mess in front of camera, or no animation during reload. Fix.
+
+Work Log:
+- Diagnosed root cause of c_arms retarget failure:
+  * My previous fix (commit aeec835a) changed bone POSITIONS to c_arms_citizen values, which moved Spine4 to world position (0, 3.34, 58.35) — putting the c_arms mesh 58 units in front of the camera ("jumbled mess in front of camera" issue)
+  * My previous fix STRIPPED hand bone keyframes from animation SMDs — this caused c_arms not to animate during reload (no bone transforms to follow)
+  * My previous fix ADDED Spine4 as root bone for Clavicles — this broke the existing BF3 bone hierarchy
+- Discovered a SECOND issue: 9 weapons (g18, m1911, m249, m82a3, m9, m93r, mp412, mp443, sv98) had NO $bonemerge lines because full_pipeline.py only added bonemerge when removing a hands bodygroup. These weapons never had a hands bodygroup, so c_arms couldn't attach ("no c_hands anymore" issue).
+- Wrote /home/z/my-project/scripts/revert_and_clean_qc.py which:
+  * Imports convert_weapon from full_pipeline.py
+  * Deletes compile/<weapon>/source/ folders and re-runs the original convert phase from decompile/ (preserves BF3 bone positions, animation keyframes, no Spine4, no BF3 procedural bone removal)
+  * Applies ONLY the QC cleanup: removes v_hands/sleeve_diffuse from $texturegroup, removes hands/ folder from $cdmaterials
+  * ADDS $bonemerge for ALL 38 hand bones for EVERY weapon (not just those that had a hands bodygroup)
+- Ran the revert script: 32/32 SUCCESS
+- Verified:
+  * m416 L_Clavicle bone def back to BF3 original: (3.49, 8.83, -9.98) rotation (0, 0.000057, 0)
+  * m416 animation SMD bone count: 372 (original — hand bone keyframes preserved)
+  * All 32 weapons have 38 bonemerge lines (was 0 for 9 weapons before)
+  * m416 binary has NO v_hands/sleeve_diffuse material references
+  * m416 binary has NO Spine4 bone (back to BF3 original)
+  * m416 binary has NO hands/ cdmaterials path
+- Recompiled all 32 weapons with studiomdl: 32/32 SUCCESS
+- Refreshed compile/Battlefield3/ bundle (192 files)
+- Pushed to GitHub (commit 70e465d6)
+
+Stage Summary:
+- c_hands should now render at the correct position (at the weapon's grip, not in front of the camera)
+- c_hands should animate during reload (hand bone keyframes preserved in animation SMDs)
+- All 32 weapons now have $bonemerge for all 38 hand bones (c_arms can attach to all weapons)
+- Old baked-in hand textures (v_hands, sleeve_diffuse) are no longer referenced in $texturegroup
+- Old baked-in hands bodygroup is still removed (no duplicate hand mesh)
+- The "bones rotated the wrong way" issue from the original report may persist (c_arms mesh might be slightly deformed because BF3 bone orientations don't exactly match c_arms_citizen's), but this is far better than the broken state from the previous commit
+
+Artifacts:
+- Revert script: /home/z/my-project/scripts/revert_and_clean_qc.py
+- GitHub commit: 70e465d6 (pushed)
