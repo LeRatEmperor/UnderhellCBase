@@ -1,0 +1,13 @@
+// 
+
+$declaresequence "draw"
+$declaresequence "draw_first"
+$declaresequence "holster"
+$declaresequence "idle"
+$declaresequence "fire"
+$declaresequence "fire_ads"
+$declaresequence "reload"
+$declaresequence "reload_empty"
+$declaresequence "sprint_loop"
+$declaresequence "sprint_in"
+$declaresequence "sprint_out"
