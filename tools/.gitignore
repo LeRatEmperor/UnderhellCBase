@@ -1,0 +1,8 @@
+dotnet/
+blender*/
+SourceIO*/
+SourceIO.zip
+blender.tar.xz
+*.deb
+i386-*/
+sysroot32/
