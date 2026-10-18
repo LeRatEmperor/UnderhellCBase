@@ -8,59 +8,125 @@ nodes
   4 "Mp7_Foregrip" -1
   5 "shell_ejection" -1
   6 "muzzle_flash" -1
-  7 "ValveBiped.Bip01_L_Clavicle" -1
-  8 "ValveBiped.Bip01_L_UpperArm" 7
-  9 "ValveBiped.Bip01_L_Forearm" 8
-  10 "ValveBiped.Bip01_L_Hand" 9
-  11 "ValveBiped.Bip01_L_Finger0" 10
-  12 "ValveBiped.Bip01_L_Finger01" 11
-  13 "ValveBiped.Bip01_L_Finger02" 12
-  14 "ValveBiped.Bip01_L_Finger1" 10
-  15 "ValveBiped.Bip01_L_Finger11" 14
-  16 "ValveBiped.Bip01_L_Finger12" 15
-  17 "ValveBiped.Bip01_L_Finger2" 10
-  18 "ValveBiped.Bip01_L_Finger21" 17
-  19 "ValveBiped.Bip01_L_Finger22" 18
-  20 "ValveBiped.Bip01_L_Finger3" 10
-  21 "ValveBiped.Bip01_L_Finger31" 20
-  22 "ValveBiped.Bip01_L_Finger32" 21
-  23 "ValveBiped.Bip01_L_Finger4" 10
-  24 "ValveBiped.Bip01_L_Finger41" 23
-  25 "ValveBiped.Bip01_L_Finger42" 24
-  26 "ValveBiped.Bip01_L_ForeTwist" 8
-  27 "ValveBiped.Bip01_L_ForeTwist1" 26
-  28 "ValveBiped.Bip01_L_ForeTwist2" 27
-  29 "ValveBiped.Bip01_L_ForeTwist3" 28
-  30 "ValveBiped.Bip01_L_ForeTwist4" 29
-  31 "ValveBiped.Bip01_L_ForeTwist5" 30
-  32 "ValveBiped.Bip01_R_Clavicle" -1
-  33 "ValveBiped.Bip01_R_UpperArm" 32
-  34 "ValveBiped.Bip01_R_Forearm" 33
-  35 "ValveBiped.Bip01_R_Hand" 34
-  36 "ValveBiped.Bip01_R_Finger0" 35
-  37 "ValveBiped.Bip01_R_Finger01" 36
-  38 "ValveBiped.Bip01_R_Finger02" 37
-  39 "ValveBiped.Bip01_R_Finger1" 35
-  40 "ValveBiped.Bip01_R_Finger11" 39
-  41 "ValveBiped.Bip01_R_Finger12" 40
-  42 "ValveBiped.Bip01_R_Finger2" 35
-  43 "ValveBiped.Bip01_R_Finger21" 42
-  44 "ValveBiped.Bip01_R_Finger22" 43
-  45 "ValveBiped.Bip01_R_Finger3" 35
-  46 "ValveBiped.Bip01_R_Finger31" 45
-  47 "ValveBiped.Bip01_R_Finger32" 46
-  48 "ValveBiped.Bip01_R_Finger4" 35
-  49 "ValveBiped.Bip01_R_Finger41" 48
-  50 "ValveBiped.Bip01_R_Finger42" 49
-  51 "ValveBiped.Bip01_R_ForeTwist" 33
-  52 "ValveBiped.Bip01_R_ForeTwist1" 51
-  53 "ValveBiped.Bip01_R_ForeTwist2" 52
-  54 "ValveBiped.Bip01_R_ForeTwist3" 53
-  55 "ValveBiped.Bip01_R_ForeTwist4" 54
-  56 "ValveBiped.Bip01_R_ForeTwist5" 55
+  7 "anim_ValveBiped.Bip01_L_Clavicle" -1
+  8 "anim_ValveBiped.Bip01_L_UpperArm" 7
+  9 "anim_ValveBiped.Bip01_L_Forearm" 8
+  10 "anim_ValveBiped.Bip01_L_Hand" 9
+  11 "anim_ValveBiped.Bip01_L_Finger0" 10
+  12 "anim_ValveBiped.Bip01_L_Finger01" 11
+  13 "anim_ValveBiped.Bip01_L_Finger02" 12
+  14 "anim_ValveBiped.Bip01_L_Finger1" 10
+  15 "anim_ValveBiped.Bip01_L_Finger11" 14
+  16 "anim_ValveBiped.Bip01_L_Finger12" 15
+  17 "anim_ValveBiped.Bip01_L_Finger2" 10
+  18 "anim_ValveBiped.Bip01_L_Finger21" 17
+  19 "anim_ValveBiped.Bip01_L_Finger22" 18
+  20 "anim_ValveBiped.Bip01_L_Finger3" 10
+  21 "anim_ValveBiped.Bip01_L_Finger31" 20
+  22 "anim_ValveBiped.Bip01_L_Finger32" 21
+  23 "anim_ValveBiped.Bip01_L_Finger4" 10
+  24 "anim_ValveBiped.Bip01_L_Finger41" 23
+  25 "anim_ValveBiped.Bip01_L_Finger42" 24
+  32 "anim_ValveBiped.Bip01_R_Clavicle" -1
+  33 "anim_ValveBiped.Bip01_R_UpperArm" 32
+  34 "anim_ValveBiped.Bip01_R_Forearm" 33
+  35 "anim_ValveBiped.Bip01_R_Hand" 34
+  36 "anim_ValveBiped.Bip01_R_Finger0" 35
+  37 "anim_ValveBiped.Bip01_R_Finger01" 36
+  38 "anim_ValveBiped.Bip01_R_Finger02" 37
+  39 "anim_ValveBiped.Bip01_R_Finger1" 35
+  40 "anim_ValveBiped.Bip01_R_Finger11" 39
+  41 "anim_ValveBiped.Bip01_R_Finger12" 40
+  42 "anim_ValveBiped.Bip01_R_Finger2" 35
+  43 "anim_ValveBiped.Bip01_R_Finger21" 42
+  44 "anim_ValveBiped.Bip01_R_Finger22" 43
+  45 "anim_ValveBiped.Bip01_R_Finger3" 35
+  46 "anim_ValveBiped.Bip01_R_Finger31" 45
+  47 "anim_ValveBiped.Bip01_R_Finger32" 46
+  48 "anim_ValveBiped.Bip01_R_Finger4" 35
+  49 "anim_ValveBiped.Bip01_R_Finger41" 48
+  50 "anim_ValveBiped.Bip01_R_Finger42" 49
+  51 "ValveBiped.Bip01_Spine4" -1
+  52 "ValveBiped.Bip01_L_Clavicle" 51
+  53 "ValveBiped.Bip01_L_UpperArm" 52
+  54 "ValveBiped.Bip01_L_Forearm" 53
+  55 "ValveBiped.Bip01_L_Hand" 54
+  56 "ValveBiped.Bip01_L_Finger0" 55
+  57 "ValveBiped.Bip01_L_Finger01" 56
+  58 "ValveBiped.Bip01_L_Finger02" 57
+  59 "ValveBiped.Bip01_L_Finger1" 55
+  60 "ValveBiped.Bip01_L_Finger11" 59
+  61 "ValveBiped.Bip01_L_Finger12" 60
+  62 "ValveBiped.Bip01_L_Finger2" 55
+  63 "ValveBiped.Bip01_L_Finger21" 62
+  64 "ValveBiped.Bip01_L_Finger22" 63
+  65 "ValveBiped.Bip01_L_Finger3" 55
+  66 "ValveBiped.Bip01_L_Finger31" 65
+  67 "ValveBiped.Bip01_L_Finger32" 66
+  68 "ValveBiped.Bip01_L_Finger4" 55
+  69 "ValveBiped.Bip01_L_Finger41" 68
+  70 "ValveBiped.Bip01_L_Finger42" 69
+  71 "ValveBiped.Bip01_R_Clavicle" 51
+  72 "ValveBiped.Bip01_R_UpperArm" 71
+  73 "ValveBiped.Bip01_R_Forearm" 72
+  74 "ValveBiped.Bip01_R_Hand" 73
+  75 "ValveBiped.Bip01_R_Finger0" 74
+  76 "ValveBiped.Bip01_R_Finger01" 75
+  77 "ValveBiped.Bip01_R_Finger02" 76
+  78 "ValveBiped.Bip01_R_Finger1" 74
+  79 "ValveBiped.Bip01_R_Finger11" 78
+  80 "ValveBiped.Bip01_R_Finger12" 79
+  81 "ValveBiped.Bip01_R_Finger2" 74
+  82 "ValveBiped.Bip01_R_Finger21" 81
+  83 "ValveBiped.Bip01_R_Finger22" 82
+  84 "ValveBiped.Bip01_R_Finger3" 74
+  85 "ValveBiped.Bip01_R_Finger31" 84
+  86 "ValveBiped.Bip01_R_Finger32" 85
+  87 "ValveBiped.Bip01_R_Finger4" 74
+  88 "ValveBiped.Bip01_R_Finger41" 87
+  89 "ValveBiped.Bip01_R_Finger42" 88
 end
 skeleton
   time 0
+  51 0.000000 0.000000 0.000000 -1.570799 -1.391900 -1.570795
+  52 0.422655 -0.727136 67.002932 1.576789 0.284157 -0.005568
+  53 0.880480 -65.310276 0.526738 -0.030893 -0.698664 1.629128
+  54 -8.884360 -56.490138 8.047335 0.019857 -0.698997 1.562992
+  55 -18.006931 -15.627589 -47.382807 -1.538479 -0.765394 -1.596340
+  56 0.088498 -48.720051 16.359026 -0.013921 -0.101347 1.435916
+  57 -11.592828 -45.526350 16.540106 -0.036584 -0.095551 1.447802
+  58 -21.218227 -40.877358 16.655260 -0.068153 -0.076344 1.607065
+  59 -19.586681 -23.643009 -41.103978 -0.782922 -1.449860 -2.081831
+  60 -27.537640 -15.619087 -39.397108 1.254203 -1.279473 1.813229
+  61 -32.128742 -2.046821 -38.343779 1.388256 -1.041481 1.236395
+  62 -23.452180 -18.986594 -42.780477 -0.960916 -1.429510 -2.255023
+  63 -31.137739 -4.042702 -41.078035 1.235809 -1.306187 1.289483
+  64 -30.769254 9.535294 -39.910939 1.375484 -1.095988 0.724061
+  65 -28.562227 -5.450169 -44.698840 -1.672535 -1.458736 -1.909595
+  66 -28.665431 10.149744 -43.169405 1.654186 -1.434016 0.522348
+  67 -22.070404 21.925989 -41.984254 1.591936 -1.003582 0.140119
+  68 -30.920001 0.066761 -44.441947 -1.568112 -1.485607 -2.433918
+  69 -29.595964 11.519557 -43.134142 1.570138 -1.216265 0.339598
+  70 -25.287681 19.970743 -42.450138 1.570391 -0.971966 0.039253
+  71 0.481883 -0.727104 -67.001333 -1.648612 -0.284975 -0.005563
+  72 0.880457 -65.304254 -0.530885 0.030899 0.698668 1.629129
+  73 -8.884470 -56.484150 -8.051506 -0.019852 0.699001 1.562993
+  74 -18.006912 -15.631841 47.376847 1.546728 0.765397 -1.596342
+  75 0.084280 -48.714925 -16.362057 0.020437 0.101388 1.435621
+  76 -11.595352 -45.520624 -16.543207 0.042781 0.094186 1.445814
+  77 -21.217227 -40.871861 -16.656722 0.073451 0.072871 1.604929
+  78 -19.587396 -23.646158 41.097434 0.790079 1.449857 -2.081821
+  79 -27.539357 -15.621821 39.390563 -1.247507 1.279478 1.813244
+  80 -32.131447 -2.048590 38.337233 -1.381769 1.041484 1.236398
+  81 -23.452903 -18.990160 42.774152 0.967792 1.429508 -2.255013
+  82 -31.140161 -4.045414 41.071712 -1.229402 1.306189 1.289479
+  83 -30.772575 9.533788 39.904618 -1.369225 1.095991 0.724061
+  84 -28.563071 -5.455016 44.693452 1.676643 1.458394 -1.909513
+  85 -28.668991 10.145627 43.164067 -1.657989 1.434292 0.514580
+  86 -22.075624 21.922522 41.978874 -1.592866 1.003933 0.135334
+  87 -30.921192 0.061774 44.436756 1.572622 1.485044 -2.432916
+  88 -29.599542 11.514994 43.129014 -1.571247 1.216877 0.335066
+  89 -25.292824 19.966279 42.444848 -1.571074 0.972606 0.035197
     0 1.312189 1.728190 0.482725 -3.141592 0.000000 0.000000
     1 1.312189 1.728192 0.482723 -3.141592 0.000000 0.000000
     2 1.312189 1.728192 0.482723 -3.141592 0.000000 0.000000
@@ -87,12 +153,6 @@ skeleton
     23 3.272117 0.110096 1.013747 -0.191565 -0.068209 0.392429
     24 0.753935 -0.000001 0.000000 0.000000 -0.000000 0.371369
     25 0.703493 0.000002 0.000000 0.000000 -0.000000 0.300062
-    26 9.961163 0.000000 0.000000 0.000121 0.000000 -0.012728
-    27 1.417177 0.000000 0.000000 0.000121 -0.000000 -0.000000
-    28 1.417180 -0.000000 0.000000 0.000121 0.000000 -0.000000
-    29 1.417174 0.000000 0.000001 0.000121 -0.000000 0.000000
-    30 1.417179 0.000000 0.000000 0.000121 0.000000 -0.000000
-    31 1.417177 -0.000000 0.000000 0.000121 0.000000 -0.000000
     32 -1.505977 2.670953 -6.827188 -3.140911 -0.000750 -3.141587
     33 5.853648 0.000000 0.000000 1.568917 0.001814 -1.564208
     34 9.961164 0.000001 0.000000 -0.000000 -0.000000 -0.012728
@@ -112,12 +172,6 @@ skeleton
     48 3.272116 0.110096 -1.013746 0.191565 0.068209 0.392429
     49 0.753936 0.000000 -0.000000 -0.000000 0.000000 0.371369
     50 0.703496 0.000004 0.000000 -0.000000 0.000000 0.300062
-    51 9.961164 0.000001 0.000000 -0.000121 -0.000000 -0.012728
-    52 1.417178 -0.000000 0.000000 -0.000121 -0.000000 0.000000
-    53 1.417179 0.000000 0.000000 -0.000121 -0.000000 0.000000
-    54 1.417178 0.000000 -0.000000 -0.000121 -0.000000 0.000000
-    55 1.417182 0.000000 -0.000000 -0.000121 -0.000000 0.000000
-    56 1.417176 0.000000 -0.000000 -0.000121 -0.000000 0.000000
 end
 triangles
 lens
