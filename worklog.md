@@ -771,3 +771,64 @@ Artifacts:
 - /home/z/my-project/repos/source-sdk-2013/src/utils/studiomdl/matsys.cpp (materialsystem fix)
 - /home/z/my-project/scripts/build_stub/ (filesystem_stdio.so stub generator)
 - /home/z/my-project/compile/Battlefield3/ (192 compiled .mdl files)
+
+---
+Task ID: c-hands-roll-bug-fix
+Agent: main (Super Z)
+Task: User reported 8 weapons lack c_hands (Famas, G36C, G3A3, L85A2, M416, MP412, SCAR-H, SV-98), and all weapons WITH c_hands have the roll bug. Fix both issues.
+
+Work Log:
+- Analyzed the user's directive document on ValveBiped bone alignment rules
+- The roll bug is caused by bone rotations in BF3 weapons not matching c_arms_citizen reference rotations
+  * BF3 L_Hand rotation: (-1.5920, 0.0481, 0.0674) rad ≈ (-91°, 3°, 4°)
+  * c_arms_citizen L_Hand rotation: (1.5732, -0.1066, 0.0442) rad ≈ (+90°, -6°, 3°)
+  * Difference: ~180° on X axis = the "roll bug"
+
+- Found the 8 "missing c_hands" weapons had TWO different issues:
+  1. sv98 and mp412: Missing L_Clavicle/L_UpperArm/L_Forearm bone chain entirely
+     - Only had L_Hand and R_Hand (no arm bones for c_arms to attach to)
+  2. famas, g36c, g3a3, l85a2, m416, scarh: Had all bones but Lua had UseHands=false
+     - GMod doesn't render c_hands when UseHands=false
+
+- Fixed issue 1: Wrote scripts/add_missing_arm_bones.py
+  - Adds Spine4, L_Clavicle, L_UpperArm, L_Forearm, R_Clavicle, R_UpperArm, R_Forearm
+  - Uses c_arms_citizen reference positions and rotations
+  - Reparents L_Hand/R_Hand to L_Forearm/R_Forearm
+  - Also updates QC $definebone to add the missing bones
+
+- Fixed issue 2: Updated all 32 BF3 weapon Lua files
+  - Changed SWEP.ViewModel from "models/bf3/weapons/<weapon>.mdl" to "models/weapons/c_<weapon>.mdl"
+  - Set SWEP.UseHands = true (was false or missing)
+
+- Fixed roll bug: Wrote scripts/align_bone_rolls.py
+  - Parses c_arms_citizen.smd to get reference bone rotations
+  - For each weapon SMD, replaces hand bone rotations with c_arms_citizen reference
+  - Uses quaternion math to re-bake animation keyframes:
+    new_keyframe_rot = new_bind * inverse(old_bind) * keyframe_rot
+  - Preserves world-space motion while changing local bone orientation
+  - Processes all SMD files (reference + animations) for each weapon
+
+- Wrote scripts/update_qc_definebones.py
+  - Updates $definebone lines in QC to match the new SMD bind pose
+  - Ensures studiomdl uses the corrected bone rotations
+
+- Re-compiled all 32 weapons: 32/32 SUCCESS
+  - 192 .mdl files in compile/Battlefield3/ bundle
+  - Also packaged 32 Lua files + autorun in compile/Battlefield3/lua/
+
+Stage Summary:
+- All 32 BF3 weapons now have proper c_hands support:
+  * UseHands = true in all Lua files
+  * ViewModel path points to c_<weapon>.mdl
+  * Bone rotations aligned to c_arms_citizen reference (roll bug fixed)
+  * Missing arm bones added to sv98 and mp412
+- The c_hands mesh should now render correctly without twisting
+- Weapon mesh positions preserved (bone positions unchanged)
+- Animations re-baked to preserve world-space motion
+
+Artifacts:
+- /home/z/my-project/scripts/align_bone_rolls.py (bone roll alignment)
+- /home/z/my-project/scripts/add_missing_arm_bones.py (add missing arm bones)
+- /home/z/my-project/scripts/update_qc_definebones.py (update QC definebone)
+- /home/z/my-project/compile/Battlefield3/ (192 .mdl files + 32 Lua files)
+- /home/z/my-project/repos/bf3_sweps_fresh/lua/weapons/ (updated Lua with UseHands=true)
