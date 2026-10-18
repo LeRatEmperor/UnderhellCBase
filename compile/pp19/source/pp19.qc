@@ -110,44 +110,6 @@ $definebone "anim_ValveBiped.Bip01_R_Finger42" "anim_ValveBiped.Bip01_R_Finger41
 $definebone "BIZON_Rail" "" -2.012597 -8.036591 -1.31326 0 0 0 0 0 0 0 0 0
 
 $definebone "ValveBiped.Bip01_Spine4" "" 0.000000 0.000000 0.000000 -90.000153 -79.749996 -89.999924 0 0 0 0 0 0
-$definebone "ValveBiped.Bip01_L_Clavicle" "ValveBiped.Bip01_Spine4" 0.422655 -0.727136 67.002932 90.343333 16.280984 -0.319014 0 0 0 0 0 0
-$definebone "ValveBiped.Bip01_L_UpperArm" "ValveBiped.Bip01_L_Clavicle" 0.880480 -65.310276 0.526739 -1.770057 -40.030492 93.342134 0 0 0 0 0 0
-$definebone "ValveBiped.Bip01_L_Forearm" "ValveBiped.Bip01_L_UpperArm" -8.884360 -56.490138 8.047336 1.137712 -40.049592 89.552845 0 0 0 0 0 0
-$definebone "ValveBiped.Bip01_L_Hand" "ValveBiped.Bip01_L_Forearm" -18.006929 -15.627590 -47.382807 -88.148366 -43.853833 -91.463521 0 0 0 0 0 0
-$definebone "ValveBiped.Bip01_L_Finger0" "ValveBiped.Bip01_L_Hand" 0.088502 -48.720048 16.359029 -0.797611 -5.806733 82.271929 0 0 0 0 0 0
-$definebone "ValveBiped.Bip01_L_Finger01" "ValveBiped.Bip01_L_Finger0" -11.592825 -45.526350 16.540109 -2.096092 -5.474663 82.952964 0 0 0 0 0 0
-$definebone "ValveBiped.Bip01_L_Finger02" "ValveBiped.Bip01_L_Finger01" -21.218228 -40.877357 16.655264 -3.904893 -4.374199 92.078032 0 0 0 0 0 0
-$definebone "ValveBiped.Bip01_L_Finger1" "ValveBiped.Bip01_L_Hand" -19.586679 -23.643011 -41.103978 -44.858107 -83.070868 -119.280138 0 0 0 0 0 0
-$definebone "ValveBiped.Bip01_L_Finger11" "ValveBiped.Bip01_L_Finger1" -27.537639 -15.619090 -39.397107 71.860529 -73.308400 103.890388 0 0 0 0 0 0
-$definebone "ValveBiped.Bip01_L_Finger12" "ValveBiped.Bip01_L_Finger11" -32.128741 -2.046822 -38.343778 79.541183 -59.672450 70.840228 0 0 0 0 0 0
-$definebone "ValveBiped.Bip01_L_Finger2" "ValveBiped.Bip01_L_Hand" -23.452180 -18.986595 -42.780478 -55.056445 -81.904918 -129.203280 0 0 0 0 0 0
-$definebone "ValveBiped.Bip01_L_Finger21" "ValveBiped.Bip01_L_Finger2" -31.137740 -4.042704 -41.078036 70.806651 -74.839011 73.881921 0 0 0 0 0 0
-$definebone "ValveBiped.Bip01_L_Finger22" "ValveBiped.Bip01_L_Finger21" -30.769257 9.535294 -39.910940 78.809445 -62.795498 41.485652 0 0 0 0 0 0
-$definebone "ValveBiped.Bip01_L_Finger3" "ValveBiped.Bip01_L_Hand" -28.562225 -5.450171 -44.698840 -95.829169 -83.579391 -109.411732 0 0 0 0 0 0
-$definebone "ValveBiped.Bip01_L_Finger31" "ValveBiped.Bip01_L_Finger3" -28.665431 10.149744 -43.169405 94.777892 -82.163065 29.928314 0 0 0 0 0 0
-$definebone "ValveBiped.Bip01_L_Finger32" "ValveBiped.Bip01_L_Finger31" -22.070404 21.925986 -41.984254 91.211238 -57.501023 8.028223 0 0 0 0 0 0
-$definebone "ValveBiped.Bip01_L_Finger4" "ValveBiped.Bip01_L_Hand" -30.920000 0.066759 -44.441948 -89.846201 -85.119010 -139.453210 0 0 0 0 0 0
-$definebone "ValveBiped.Bip01_L_Finger41" "ValveBiped.Bip01_L_Finger4" -29.595962 11.519553 -43.134143 89.962304 -69.686868 19.457506 0 0 0 0 0 0
-$definebone "ValveBiped.Bip01_L_Finger42" "ValveBiped.Bip01_L_Finger41" -25.287681 19.970740 -42.450138 89.976784 -55.689568 2.249044 0 0 0 0 0 0
-$definebone "ValveBiped.Bip01_R_Clavicle" "ValveBiped.Bip01_Spine4" 0.481883 -0.727104 -67.001333 -94.458518 -16.327851 -0.318795 0 0 0 0 0 0
-$definebone "ValveBiped.Bip01_R_UpperArm" "ValveBiped.Bip01_R_Clavicle" 0.880463 -65.304254 -0.530884 1.770286 40.030705 93.342159 0 0 0 0 0 0
-$definebone "ValveBiped.Bip01_R_Forearm" "ValveBiped.Bip01_R_UpperArm" -8.884453 -56.484150 -8.051506 -1.137506 40.049818 89.552856 0 0 0 0 0 0
-$definebone "ValveBiped.Bip01_R_Hand" "ValveBiped.Bip01_R_Forearm" -18.006884 -15.631841 47.376847 88.620996 43.854015 -91.463577 0 0 0 0 0 0
-$definebone "ValveBiped.Bip01_R_Finger0" "ValveBiped.Bip01_R_Hand" 0.084300 -48.714913 -16.362063 1.170930 5.809052 82.255021 0 0 0 0 0 0
-$definebone "ValveBiped.Bip01_R_Finger01" "ValveBiped.Bip01_R_Finger0" -11.595328 -45.520616 -16.543213 2.451105 5.396417 82.839007 0 0 0 0 0 0
-$definebone "ValveBiped.Bip01_R_Finger02" "ValveBiped.Bip01_R_Finger01" -21.217202 -40.871858 -16.656727 4.208404 4.175184 91.955635 0 0 0 0 0 0
-$definebone "ValveBiped.Bip01_R_Finger1" "ValveBiped.Bip01_R_Hand" -19.587367 -23.646159 41.097432 45.268225 83.070713 -119.279457 0 0 0 0 0 0
-$definebone "ValveBiped.Bip01_R_Finger11" "ValveBiped.Bip01_R_Finger1" -27.539333 -15.621830 39.390561 -71.476923 73.308695 103.891241 0 0 0 0 0 0
-$definebone "ValveBiped.Bip01_R_Finger12" "ValveBiped.Bip01_R_Finger11" -32.131428 -2.048611 38.337231 -79.169547 59.672615 70.840435 0 0 0 0 0 0
-$definebone "ValveBiped.Bip01_R_Finger2" "ValveBiped.Bip01_R_Hand" -23.452870 -18.990164 42.774152 55.450411 81.904761 -129.202615 0 0 0 0 0 0
-$definebone "ValveBiped.Bip01_R_Finger21" "ValveBiped.Bip01_R_Finger2" -31.140141 -4.045433 41.071712 -70.439593 74.839143 73.881767 0 0 0 0 0 0
-$definebone "ValveBiped.Bip01_R_Finger22" "ValveBiped.Bip01_R_Finger21" -30.772563 9.533766 39.904618 -78.450811 62.795634 41.485657 0 0 0 0 0 0
-$definebone "ValveBiped.Bip01_R_Finger3" "ValveBiped.Bip01_R_Hand" -28.563043 -5.455024 44.693455 96.064490 83.559813 -109.407032 0 0 0 0 0 0
-$definebone "ValveBiped.Bip01_R_Finger31" "ValveBiped.Bip01_R_Finger3" -28.668973 10.145610 43.164071 -94.995708 82.178868 29.483370 0 0 0 0 0 0
-$definebone "ValveBiped.Bip01_R_Finger32" "ValveBiped.Bip01_R_Finger31" -22.075614 21.922501 41.978877 -91.264486 57.521105 7.754124 0 0 0 0 0 0
-$definebone "ValveBiped.Bip01_R_Finger4" "ValveBiped.Bip01_R_Hand" -30.921163 0.061762 44.436759 90.104535 85.086730 -139.395831 0 0 0 0 0 0
-$definebone "ValveBiped.Bip01_R_Finger41" "ValveBiped.Bip01_R_Finger4" -29.599523 11.514975 43.129017 -90.025833 69.721910 19.197910 0 0 0 0 0 0
-$definebone "ValveBiped.Bip01_R_Finger42" "ValveBiped.Bip01_R_Finger41" -25.292813 19.966258 42.444851 -90.015899 55.726213 2.016718 0 0 0 0 0 0
 $BoneMerge "ValveBiped.Bip01_Spine4"
 $BoneMerge "ValveBiped.Bip01_L_Clavicle"
 $BoneMerge "ValveBiped.Bip01_L_UpperArm"

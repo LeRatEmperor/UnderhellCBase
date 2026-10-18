@@ -51,27 +51,27 @@ nodes
   47 "1" -1
   48 "2" -1
   49 "ValveBiped.Bip01_Spine4" -1
-  50 "ValveBiped.Bip01_L_UpperArm" -1
-  51 "ValveBiped.Bip01_L_Forearm" 50
-  52 "ValveBiped.Bip01_L_Hand" 51
-  53 "ValveBiped.Bip01_L_Finger0" 52
-  54 "ValveBiped.Bip01_L_Finger01" 53
-  55 "ValveBiped.Bip01_L_Finger02" 54
-  56 "ValveBiped.Bip01_L_Finger1" 52
-  57 "ValveBiped.Bip01_L_Finger11" 56
-  58 "ValveBiped.Bip01_L_Finger12" 57
-  59 "ValveBiped.Bip01_L_Finger2" 52
-  60 "ValveBiped.Bip01_L_Finger21" 59
-  61 "ValveBiped.Bip01_L_Finger22" 60
-  62 "ValveBiped.Bip01_L_Finger3" 52
-  63 "ValveBiped.Bip01_L_Finger31" 62
-  64 "ValveBiped.Bip01_L_Finger32" 63
-  65 "ValveBiped.Bip01_L_Finger4" 52
-  66 "ValveBiped.Bip01_L_Finger41" 65
-  67 "ValveBiped.Bip01_L_Finger42" 66
-  68 "ValveBiped.Bip01_R_UpperArm" -1
-  69 "ValveBiped.Bip01_R_Forearm" 68
-  70 "ValveBiped.Bip01_R_Hand" 69
+  50 "ValveBiped.Bip01_L_UpperArm" 20
+  51 "ValveBiped.Bip01_L_Forearm" 21
+  52 "ValveBiped.Bip01_L_Hand" 22
+  53 "ValveBiped.Bip01_L_Finger0" 23
+  54 "ValveBiped.Bip01_L_Finger01" 24
+  55 "ValveBiped.Bip01_L_Finger02" 25
+  56 "ValveBiped.Bip01_L_Finger1" 35
+  57 "ValveBiped.Bip01_L_Finger11" 36
+  58 "ValveBiped.Bip01_L_Finger12" 37
+  59 "ValveBiped.Bip01_L_Finger2" 32
+  60 "ValveBiped.Bip01_L_Finger21" 33
+  61 "ValveBiped.Bip01_L_Finger22" 34
+  62 "ValveBiped.Bip01_L_Finger3" 26
+  63 "ValveBiped.Bip01_L_Finger31" 27
+  64 "ValveBiped.Bip01_L_Finger32" 28
+  65 "ValveBiped.Bip01_L_Finger4" 29
+  66 "ValveBiped.Bip01_L_Finger41" 30
+  67 "ValveBiped.Bip01_L_Finger42" 31
+  68 "ValveBiped.Bip01_R_UpperArm" 1
+  69 "ValveBiped.Bip01_R_Forearm" 2
+  70 "ValveBiped.Bip01_R_Hand" 3
 end
 skeleton
   time 0

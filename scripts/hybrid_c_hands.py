@@ -730,6 +730,13 @@ def add_new_bones_to_smd(smd_path, new_bone_data, weapon_world):
     if not new_bone_ids:
         return 0
     
+    # Build a mapping from ValveBiped bone name to anim_* bone name
+    # Each new ValveBiped bone should be a child of the corresponding anim_* bone
+    # (NOT of the previous bone in the c_arms hierarchy)
+    anim_parent_map = {}
+    for bone_name, _ in HAND_BONE_HIERARCHY:
+        anim_parent_map[bone_name] = f"anim_{bone_name}"
+    
     # Process the file
     new_lines = []
     in_nodes = False
@@ -751,13 +758,13 @@ def add_new_bones_to_smd(smd_path, new_bone_data, weapon_world):
                 for bone_name, parent_name in HAND_BONE_HIERARCHY:
                     if bone_name in new_bone_ids:
                         bid = new_bone_ids[bone_name]
-                        if parent_name and parent_name in new_bone_ids:
-                            pid = new_bone_ids[parent_name]
-                        elif bone_name == "ValveBiped.Bip01_Spine4":
+                        # Each new bone's parent is the corresponding anim_* bone
+                        # (NOT the previous bone in the c_arms hierarchy)
+                        # This ensures the new bone follows the BF3 animation
+                        if bone_name == "ValveBiped.Bip01_Spine4":
                             pid = -1  # Spine4 is root
                         else:
-                            # Parent is an anim_* bone
-                            anim_parent = f"anim_{parent_name}"
+                            anim_parent = anim_parent_map.get(bone_name, f"anim_{bone_name}")
                             pid = bone_name_to_id.get(anim_parent, -1)
                         new_lines.append(f'  {bid} "{bone_name}" {pid}\n')
                         changes += 1
@@ -846,29 +853,21 @@ def update_qc_hybrid(qc_path, new_bone_data):
                      '// REMOVED: hands bodygroup (c_hands provides arm mesh)',
                      content, flags=re.IGNORECASE | re.DOTALL)
     
-    # Add $definebone for new ValveBiped bones
+    # Add $definebone for Spine4 ONLY (other new bones are defined by SMD source)
+    # DO NOT add $definebone for the hand bones — let SMD source define them
+    # (studiomdl's g_bOverridePreDefinedBones causes conflicts when both are present)
     definebone_lines = []
-    for bone_name, parent_name in HAND_BONE_HIERARCHY:
-        if bone_name in new_bone_data:
-            px, py, pz, rx, ry, rz = new_bone_data[bone_name]
-            # Convert radians to degrees for QC
-            rx_deg = math.degrees(rx)
-            ry_deg = math.degrees(ry)
-            rz_deg = math.degrees(rz)
-            
-            if bone_name == "ValveBiped.Bip01_Spine4":
-                qc_parent = ""
-            elif parent_name in new_bone_data:
-                qc_parent = parent_name
-            else:
-                qc_parent = f"anim_{parent_name}"
-            
-            definebone_lines.append(
-                f'$definebone "{bone_name}" "{qc_parent}" '
-                f'{px:.6f} {py:.6f} {pz:.6f} '
-                f'{rx_deg:.6f} {ry_deg:.6f} {rz_deg:.6f} '
-                f'0 0 0 0 0 0'
-            )
+    if 'ValveBiped.Bip01_Spine4' in new_bone_data:
+        px, py, pz, rx, ry, rz = new_bone_data['ValveBiped.Bip01_Spine4']
+        rx_deg = math.degrees(rx)
+        ry_deg = math.degrees(ry)
+        rz_deg = math.degrees(rz)
+        definebone_lines.append(
+            f'$definebone "ValveBiped.Bip01_Spine4" "" '
+            f'{px:.6f} {py:.6f} {pz:.6f} '
+            f'{rx_deg:.6f} {ry_deg:.6f} {rz_deg:.6f} '
+            f'0 0 0 0 0 0'
+        )
     
     # Add $bonemerge for new ValveBiped bones
     bonemerge_lines = []
