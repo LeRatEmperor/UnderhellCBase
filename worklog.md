@@ -581,3 +581,62 @@ Stage Summary:
 Artifacts:
 - /home/z/my-project/scripts/simple_c_hands.py (simplified pipeline)
 - GitHub commit: 07fefa4b (pushed)
+
+---
+Task ID: search-filesystem-stub
+Agent: main (Super Z)
+Task: User asked "can you search for what you need on your own?" - find filesystem_stdio.so for studiomdl
+
+Work Log:
+- Researched options for getting filesystem_stdio.so (Valve proprietary, not in open SDK)
+- Searched GitHub: PluginyCS/BasePack has filesystem_stdio.so but it's for CS 1.6 (GoldSrc, 32-bit) — wrong engine
+- Found MSteam/studiomdl-linux (32-bit Linux studiomdl build) - uses podman + scout SDK container, requires prebuilt .so from Steam install
+- Discovered existing BROKEN stub at /home/z/my-project/repos/source-sdk-2013/game/bin/bin/linux64/filesystem_stdio.so (16KB)
+  * Was created Oct 18 07:37 (today, earlier session)
+  * Has vtable1 + vtable2 manually laid out
+  * Bug: IsSteam() was at wrong vtable slot (vtable2+0x88 was fs_mkdir, not IsSteam)
+  * Caused studiomdl to fail with "Should not be using filesystem_steam anymore!"
+
+- Discovered the studiomdl binary is 64-bit (not 32-bit as MSteam's approach)
+- The 64-bit studiomdl loads filesystem_stdio.so from <exedir>/bin/linux64/filesystem_stdio.so (nested path)
+  * This is because FileSystem_GetExecutableDir appends PLATFORM_BIN_DIR ("bin/linux64") if not already there
+
+- Wrote /home/z/my-project/scripts/build_stub/gen_fs_stub.py
+  * Parses IAppSystem + IBaseFileSystem + IFileSystem from source-sdk-2013 headers
+  * Generates a C++ stub class that inherits from IFileSystem (so compiler lays out vtable correctly)
+  * Implements Open/Read/Write/Close/Size/Seek/Tell using POSIX fopen/fread/fwrite/fclose
+  * Implements IsSteam() returning false (CRITICAL - studiomdl refuses to mount if true)
+  * Other methods return safe defaults (0/false/nullptr)
+- Built stub with proper compiler flags (-DPOSIX -DLINUX -DGNUC -DPLATFORM_64BITS -DSTATIC_TIER0 -DTRACK_BLOCKING_IO)
+- Total: 5 IAppSystem + 17 IBaseFileSystem + 113 IFileSystem = 135 pure virtual methods implemented
+
+- Testing studiomdl with new stub:
+  * Stub loads correctly via CreateInterface("VFileSystem022")
+  * Connect/Init/IsSteam all called and return correct values
+  * studiomdl no longer says "Should not be using filesystem_steam anymore!"
+  * QC file (m416.qc) is successfully loaded via Open/Size/Read/Close
+  * BUT: studiomdl exits with code 0 (or segfault 139) without producing .mdl output
+  * ParseScript appears to exit silently without calling Open for SMD files
+  * Issue is likely a remaining vtable layout mismatch or some method returning wrong value
+
+- Restored previously compiled .mdl files from /home/z/my-project/_backup_battlefield3/Battlefield3/ to /home/z/my-project/compile/Battlefield3/
+  * 192 files (32 weapons × {mdl, vvd, dx80.vtx, dx90.vtx, sw.vtx, xbox.vtx})
+  * These were compiled in the previous successful run (simplify-c-hands task)
+  * They have the simplified c_hands approach (BF3 bones preserved, bonemerge added, v_hands stripped)
+
+Stage Summary:
+- filesystem_stdio.so stub written and built (52400 bytes, 135 IFileSystem methods implemented)
+- studiomdl loads the stub correctly and IsSteam() returns false (no more "Should not be using filesystem_steam" error)
+- QC file is read successfully via the stub's Open/Size/Read/Close
+- BLOCKING ISSUE: studiomdl exits silently (code 0 or segfault 139) after reading QC, before processing $bodygroup
+- The compiled .mdl files from the previous run are restored to compile/Battlefield3/
+- The previous "32/32 SUCCESS" compilation was done in an earlier state that I cannot reproduce now
+- The stub needs further debugging to identify which IFileSystem method's vtable slot is wrong
+
+Artifacts:
+- /home/z/my-project/scripts/build_stub/gen_fs_stub.py (stub generator)
+- /home/z/my-project/scripts/build_stub/filesystem_stdio_stub.cpp (generated C++ source)
+- /home/z/my-project/scripts/build_stub/filesystem_stdio.so (compiled stub)
+- /home/z/my-project/repos/source-sdk-2013/game/bin/bin/linux64/filesystem_stdio.so (stub in studiomdl's load path)
+- /home/z/my-project/repos/source-sdk-2013/game/bin/filesystem_stdio.so (copy)
+- /home/z/my-project/compile/Battlefield3/ (restored 192 .mdl files from backup)
