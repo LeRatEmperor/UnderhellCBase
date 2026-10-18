@@ -290,13 +290,13 @@ def process_weapon(weapon):
     
     # Copy c_arms_definebones.qci to the source folder
     qci_dst = os.path.join(dst_dir, "c_arms_definebones.qci")
-                shutil.copy2(qci_path, qci_dst)
-                # Remove $illumposition from QCI (conflicts with QC)
-                with open(qci_dst, "r") as qf:
-                    qci_content = qf.read()
-                qci_content = re.sub(r"^\$illumposition[^\n]*\n", "", qci_content, flags=re.MULTILINE)
-                with open(qci_dst, "w") as qf:
-                    qf.write(qci_content)
+    shutil.copy2(qci_path, qci_dst)
+    # Remove $illumposition from QCI (conflicts with QC)
+    with open(qci_dst, "r") as qf:
+        qci_content = qf.read()
+    qci_content = re.sub(r"^\$illumposition[^\n]*\n", "", qci_content, flags=re.MULTILINE)
+    with open(qci_dst, "w") as qf:
+        qf.write(qci_content)
     
     # Remove $definebone lines from QC that are also in the QCI (avoid duplicates)
     # Also remove BF3 procedural bone $definebone lines
