@@ -15,7 +15,7 @@ $bodygroup "m98b"
 }
 // REMOVED: hands bodygroup
 
-$surfaceprop ""
+$surfaceprop "default"
 $contents "solid"
 $illumposition 14.927000 -0.836000 -5.726000
 
@@ -23,30 +23,11 @@ $cdmaterials ""
 $cdmaterials ""
 $cdmaterials ""
 
-$texturegroup "skinfamilies"
-{
-	{
-		"m98b_sight"
-		"reticle"
-		"reflex"
-		"lens"
-		"kobra"
-		"acog"
-		"reticle_acog"
-		"eotech"
-		"reticle_eotech"
-		"lens_eotech"
-		"scope_ballistic"
-		"m98b"
-		"suppressor"
-	}
-}
-
 $bbox -9.198000 -9.953000 -12.186000 39.051998 8.282000 0.733000
 $cbox 0 0 0 0 0 0
 
-$attachment "1" "Muzzle_Flash_1" 1.0000 0.0000 0.0000 rotate 0.0000 0.0000 1.0000
-$attachment "2" "Shell_Ejection" -1.0000 0.0000 -0.0000 rotate 0.0000 0.0000 1.0000
+$attachment "1" "Muzzle_Flash_1" 1.000000 0.000000 0.000000 rotate 0.000000 0.000000 1.000000
+$attachment "2" "Shell_Ejection" -1.000000 0.000000 -0.000000 rotate 0.000000 0.000000 1.000000
 
 $definebone "M98_Body" "" -2.190128 -20.547756 -2.763069 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000
 $definebone "M98_Magazine" "" -2.195648 -11.891459 -4.929236 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000
@@ -151,7 +132,6 @@ $BoneMerge "ValveBiped.Bip01_R_Finger4"
 $BoneMerge "ValveBiped.Bip01_R_Finger41"
 $BoneMerge "ValveBiped.Bip01_R_Finger42"
 
-
 $include "c_arms_definebones.qci"
 
 $sequence "idle" {
@@ -178,3 +158,4 @@ $sequence "reload_empty" {
 	"m98b_anims/reload_empty.smd"
 	fps 30
 }
+

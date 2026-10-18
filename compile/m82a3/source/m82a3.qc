@@ -6,7 +6,7 @@ $bodygroup "m82a3"
 	studio "m82a3.smd"
 }
 
-$surfaceprop ""
+$surfaceprop "default"
 $contents "solid"
 $illumposition -3.377000 10.715000 -6.046000
 
@@ -14,20 +14,11 @@ $cdmaterials ""
 $cdmaterials ""
 $cdmaterials ""
 
-$texturegroup "skinfamilies"
-{
-	{
-		"m82a3"
-		"scope_ballistic"
-		"lens"
-	}
-}
-
 $bbox -11.619000 -40.188000 -11.350000 42.257999 5.788000 1.192000
 $cbox 0 0 0 0 0 0
 
-$attachment "1" "1" 1.0000 0.0000 0.0000 rotate -37.5000 0.0000 1.0000
-$attachment "2" "2" -0.0000 -1.0000 0.0000 rotate -14.0000 1.0000 -0.0000
+$attachment "1" "1" 1.000000 0.000000 0.000000 rotate -37.500004 0.000000 1.000000
+$attachment "2" "2" -0.000000 -1.000000 0.000000 rotate -13.999999 1.000000 -0.000000
 
 $definebone "Dummy01" "" -1.860503 11.619324 -8.794808 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000
 $definebone "Right_U_Arm" "Dummy01" 0.000000 0.000000 0.000000 0.314064 -0.654374 -0.585663 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000
@@ -119,7 +110,6 @@ $BoneMerge "ValveBiped.Bip01_R_Finger4"
 $BoneMerge "ValveBiped.Bip01_R_Finger41"
 $BoneMerge "ValveBiped.Bip01_R_Finger42"
 
-
 $include "c_arms_definebones.qci"
 
 $sequence "idle" {
@@ -146,3 +136,4 @@ $sequence "reload_empty" {
 	"m82a3_anims/reload_empty.smd"
 	fps 30
 }
+

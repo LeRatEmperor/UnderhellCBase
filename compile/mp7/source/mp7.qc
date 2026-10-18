@@ -23,7 +23,7 @@ $bodygroup "mp7"
 }
 // REMOVED: hands bodygroup
 
-$surfaceprop ""
+$surfaceprop "default"
 $contents "solid"
 $illumposition -51.030998 1.042000 -13.860000
 
@@ -31,30 +31,11 @@ $cdmaterials ""
 $cdmaterials ""
 $cdmaterials ""
 
-$texturegroup "skinfamilies"
-{
-	{
-		"reticle"
-		"reflex"
-		"lens"
-		"kobra"
-		"acog"
-		"reticle_acog"
-		"eotech"
-		"reticle_eotech"
-		"lens_eotech"
-		"mp7"
-		"muzzle"
-		"suppressor"
-		"laser"
-	}
-}
-
 $bbox -8.595000 -9.768000 -12.275000 19.381001 8.260000 0.588000
 $cbox 0 0 0 0 0 0
 
-$attachment "1" "muzzle_flash" 1.0000 0.0000 0.0000 rotate 0.0000 0.0000 1.0000
-$attachment "2" "shell_ejection" 0.6209 0.7660 0.1664 rotate 0.0000 -0.7399 0.6428
+$attachment "1" "muzzle_flash" 1.000000 0.000000 0.000000 rotate 0.000000 0.000000 1.000000
+$attachment "2" "shell_ejection" 0.620885 0.766044 0.166366 rotate 0.000000 -0.739942 0.642788
 
 $definebone "Mp7_Body" "" 1.312189 1.728190 0.482725 -1.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000
 $definebone "Mp7_Magazine" "" 1.312189 1.728192 0.482723 -1.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000
@@ -154,7 +135,6 @@ $BoneMerge "ValveBiped.Bip01_R_Finger4"
 $BoneMerge "ValveBiped.Bip01_R_Finger41"
 $BoneMerge "ValveBiped.Bip01_R_Finger42"
 
-
 $include "c_arms_definebones.qci"
 
 $sequence "idle" {
@@ -181,3 +161,4 @@ $sequence "fire" {
 	"mp7_anims/fire.smd"
 	fps 30
 }
+

@@ -14,7 +14,7 @@ $bodygroup "sv98"
 	studio "sv98.smd"
 }
 
-$surfaceprop ""
+$surfaceprop "default"
 $contents "solid"
 $illumposition 11.874000 -3.253000 -6.016000
 
@@ -44,8 +44,8 @@ $texturegroup "skinfamilies"
 $bbox -7.477000 -28.874001 -11.906000 31.225000 4.231000 1.061000
 $cbox 0 0 0 0 0 0
 
-$attachment "muzzle" "Base" -0.0000 1.0000 0.0000 rotate 0.0000 -1.0000 -0.0000
-$attachment "ejectbrass" "Base" -0.7071 0.0000 0.7071 rotate 0.0000 -0.0000 -1.0000
+$attachment "muzzle" "Base" -0.000000 1.000000 0.000000 rotate 0.000000 -1.000000 -0.000000
+$attachment "ejectbrass" "Base" -0.707107 0.000000 0.707107 rotate 0.000000 -0.000000 -1.000000
 
 $definebone "Base" "" -2.762827 -10.694886 -1.985199 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000
 $definebone "Bolt2" "Base" -0.007069 4.169496 -0.010798 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000
@@ -118,3 +118,4 @@ $sequence "reload_empty" {
 	"sv98_anims/reload_empty.smd"
 	fps 30
 }
+

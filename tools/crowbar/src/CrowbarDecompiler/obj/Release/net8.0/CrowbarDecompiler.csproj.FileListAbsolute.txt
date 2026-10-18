@@ -1,0 +1,15 @@
+/home/z/my-project/tools/crowbar/src/CrowbarDecompiler/bin/Release/net8.0/CrowbarDecompiler
+/home/z/my-project/tools/crowbar/src/CrowbarDecompiler/bin/Release/net8.0/CrowbarDecompiler.deps.json
+/home/z/my-project/tools/crowbar/src/CrowbarDecompiler/bin/Release/net8.0/CrowbarDecompiler.runtimeconfig.json
+/home/z/my-project/tools/crowbar/src/CrowbarDecompiler/bin/Release/net8.0/CrowbarDecompiler.dll
+/home/z/my-project/tools/crowbar/src/CrowbarDecompiler/bin/Release/net8.0/CrowbarDecompiler.pdb
+/home/z/my-project/tools/crowbar/src/CrowbarDecompiler/obj/Release/net8.0/CrowbarDecompiler.GeneratedMSBuildEditorConfig.editorconfig
+/home/z/my-project/tools/crowbar/src/CrowbarDecompiler/obj/Release/net8.0/CrowbarDecompiler.AssemblyInfoInputs.cache
+/home/z/my-project/tools/crowbar/src/CrowbarDecompiler/obj/Release/net8.0/CrowbarDecompiler.AssemblyInfo.cs
+/home/z/my-project/tools/crowbar/src/CrowbarDecompiler/obj/Release/net8.0/CrowbarDecompiler.csproj.CoreCompileInputs.cache
+/home/z/my-project/tools/crowbar/src/CrowbarDecompiler/obj/Release/net8.0/CrowbarDecompiler.sourcelink.json
+/home/z/my-project/tools/crowbar/src/CrowbarDecompiler/obj/Release/net8.0/CrowbarDecompiler.dll
+/home/z/my-project/tools/crowbar/src/CrowbarDecompiler/obj/Release/net8.0/refint/CrowbarDecompiler.dll
+/home/z/my-project/tools/crowbar/src/CrowbarDecompiler/obj/Release/net8.0/CrowbarDecompiler.pdb
+/home/z/my-project/tools/crowbar/src/CrowbarDecompiler/obj/Release/net8.0/CrowbarDecompiler.genruntimeconfig.cache
+/home/z/my-project/tools/crowbar/src/CrowbarDecompiler/obj/Release/net8.0/ref/CrowbarDecompiler.dll

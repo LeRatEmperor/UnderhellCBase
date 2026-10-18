@@ -10,7 +10,7 @@ $bodygroup "hands"
 	blank
 }
 
-$surfaceprop ""
+$surfaceprop "default"
 $contents "solid"
 $illumposition 6.451000 -3.270000 -11.676000
 
@@ -31,15 +31,15 @@ $texturegroup "skinfamilies"
 $bbox -17.924999 -15.376000 -25.945999 30.827000 8.836000 2.593000
 $cbox 0 0 0 0 0 0
 
-$attachment "muzzle" "A_Muzzle" 1.0000 -0.0000 0.0000 rotate 0.0000 -0.0000 1.0000
-$attachment "muzzle_supp" "A_Muzzle_Supp" 1.0000 -0.0000 0.0000 rotate 0.0000 -0.0000 1.0000
-$attachment "2" "A_Eject" 1.0000 -0.0000 -0.0000 rotate 0.0000 -0.0000 1.0000
-$attachment "muzzle_ads" "A_Muzzle_Ironsight" 1.0000 0.0000 -0.0000 rotate 0.0000 0.0000 1.0000
-$attachment "Suppressor" "A_Suppressor" 1.0000 0.0000 0.0000 rotate 0.0000 0.0000 1.0000
-$attachment "Laser" "A_Underbarrel" 1.0000 -0.0000 0.0000 rotate 0.0000 -0.0000 1.0000
-$attachment "Modkit" "A_Modkit" 1.0000 0.0000 0.0000 rotate 0.0000 0.0000 1.0000
-$attachment "Optic" "A_Optic" 1.0000 0.0000 0.0000 rotate 0.0000 0.0000 1.0000
-$attachment "Foregrip" "A_Foregrip" 1.0000 0.0000 0.0000 rotate 0.0000 0.0000 1.0000
+$attachment "muzzle" "A_Muzzle" 1.000000 -0.000000 0.000000 rotate 0.000000 -0.000000 1.000000
+$attachment "muzzle_supp" "A_Muzzle_Supp" 1.000000 -0.000000 0.000000 rotate 0.000000 -0.000000 1.000000
+$attachment "2" "A_Eject" 1.000000 -0.000000 -0.000000 rotate 0.000000 -0.000000 1.000000
+$attachment "muzzle_ads" "A_Muzzle_Ironsight" 1.000000 0.000000 -0.000000 rotate 0.000000 0.000000 1.000000
+$attachment "Suppressor" "A_Suppressor" 1.000000 0.000000 0.000000 rotate 0.000000 0.000000 1.000000
+$attachment "Laser" "A_Underbarrel" 1.000000 -0.000000 0.000000 rotate 0.000000 -0.000000 1.000000
+$attachment "Modkit" "A_Modkit" 1.000000 0.000000 0.000000 rotate 0.000000 0.000000 1.000000
+$attachment "Optic" "A_Optic" 1.000000 0.000000 0.000000 rotate 0.000000 0.000000 1.000000
+$attachment "Foregrip" "A_Foregrip" 1.000000 0.000000 0.000000 rotate 0.000000 0.000000 1.000000
 
 $definebone "L Clavicle" "" 3.491543 8.830969 -9.976974 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000
 $definebone "L UpperArm" "L Clavicle" 5.853647 -0.000001 0.000000 -0.487879 0.515110 -0.489086 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000
@@ -150,3 +150,4 @@ $sequence "reload_end" {
 	"870mcs_anims/reload_end.smd"
 	fps 30
 }
+

@@ -10,7 +10,7 @@ $bodygroup "suppressor"
 	studio "g18.smd"
 }
 
-$surfaceprop ""
+$surfaceprop "default"
 $contents "solid"
 $illumposition 4.412000 0.611000 -13.339000
 
@@ -30,8 +30,8 @@ $texturegroup "skinfamilies"
 $bbox -8.894000 -7.609000 -25.945999 17.716999 8.831000 -0.732000
 $cbox 0 0 0 0 0 0
 
-$attachment "1" "muzzle_flash" 1.0000 -0.0000 0.0000 rotate 0.2000 -0.0000 1.0000
-$attachment "2" "shell_ejection" 0.8660 -0.5000 0.0000 rotate -0.0000 0.5000 0.8660
+$attachment "1" "muzzle_flash" 1.000000 -0.000000 0.000000 rotate 0.200001 -0.000000 1.000000
+$attachment "2" "shell_ejection" 0.866025 -0.500000 0.000000 rotate -0.000000 0.500000 0.866025
 
 $definebone "(null)" "" 1.983461 8.830967 -25.945992 0.000000 0.000000 -0.707106 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000
 $definebone "Pelvis" "(null)" 0.000000 0.000000 0.000000 -0.500000 -0.500000 -0.500000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000
@@ -176,3 +176,4 @@ $sequence "fire_empty" {
 	"g18_anims/fire_empty.smd"
 	fps 30
 }
+

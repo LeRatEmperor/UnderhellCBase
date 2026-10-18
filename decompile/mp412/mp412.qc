@@ -6,7 +6,7 @@ $bodygroup "mp412"
 	studio "mp412.smd"
 }
 
-$surfaceprop ""
+$surfaceprop "default"
 $contents "solid"
 $illumposition -3.334000 5.962000 -8.123000
 
@@ -26,7 +26,7 @@ $texturegroup "skinfamilies"
 $bbox -9.122000 -10.830000 -12.133000 22.993999 7.455000 1.444000
 $cbox 0 0 0 0 0 0
 
-$attachment "1" "Muzzleflash" -1.0000 -0.0000 0.0000 rotate 0.0000 -0.0000 1.0000
+$attachment "1" "Muzzleflash" -1.000000 -0.000000 0.000000 rotate 0.000000 -0.000000 1.000000
 
 $definebone "l-upperarm-movement" "" 6.000000 3.058743 -5.344038 -0.004937 0.248350 -0.483104 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000
 $definebone "l-upperarm" "l-upperarm-movement" -2.128412 1.394681 -0.606004 0.929810 -0.153230 -0.269877 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000
@@ -123,3 +123,4 @@ $sequence "fire_empty" {
 	"mp412_anims/fire_empty.smd"
 	fps 30
 }
+

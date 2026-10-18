@@ -14,7 +14,7 @@ $bodygroup "m249"
 	studio "m249.smd"
 }
 
-$surfaceprop ""
+$surfaceprop "default"
 $contents "solid"
 $illumposition 9.278000 1.553000 -8.124000
 
@@ -22,33 +22,13 @@ $cdmaterials ""
 $cdmaterials ""
 $cdmaterials ""
 
-$texturegroup "skinfamilies"
-{
-	{
-		"reticle"
-		"reflex"
-		"lens"
-		"kobra"
-		"acog"
-		"reticle_acog"
-		"eotech"
-		"reticle_eotech"
-		"lens_eotech"
-		"m249"
-		"muzzle"
-		"suppressor"
-		"m249_bullets"
-		"m249_misc"
-	}
-}
-
 $bbox -13.187000 -12.125000 -16.347000 31.743000 15.230000 0.099000
 $cbox 0 0 0 0 0 0
 
-$attachment "1" "a" 1.0000 0.0000 0.0000 rotate 0.0000 0.0000 1.0000
-$attachment "2" "s" 1.0000 0.0000 0.0000 rotate 0.0000 0.0000 1.0000
-$attachment "3" "a" -0.0000 0.0000 1.0000 rotate -19.0000 0.0000 1.0000
-$attachment "4" "a" 1.0000 0.0000 0.0000 rotate 8.0000 0.0000 1.0000
+$attachment "1" "a" 1.000000 0.000000 0.000000 rotate 0.000000 0.000000 1.000000
+$attachment "2" "s" 1.000000 0.000000 0.000000 rotate 0.000000 0.000000 1.000000
+$attachment "3" "a" -0.000000 0.000000 1.000000 rotate -19.000000 0.000000 1.000000
+$attachment "4" "a" 1.000000 0.000000 0.000000 rotate 8.000002 0.000000 1.000000
 
 $definebone "body" "" -2.958619 -9.459352 -6.840805 0.500000 -0.500000 -0.500000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000
 $definebone "box" "body" 5.435676 0.447883 -0.000001 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000
@@ -147,7 +127,6 @@ $BoneMerge "ValveBiped.Bip01_R_Finger4"
 $BoneMerge "ValveBiped.Bip01_R_Finger41"
 $BoneMerge "ValveBiped.Bip01_R_Finger42"
 
-
 $include "c_arms_definebones.qci"
 
 $sequence "idle1" {
@@ -169,3 +148,4 @@ $sequence "reload" {
 	"m249_anims/reload.smd"
 	fps 30
 }
+

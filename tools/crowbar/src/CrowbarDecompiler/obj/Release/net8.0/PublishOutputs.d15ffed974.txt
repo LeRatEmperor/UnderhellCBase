@@ -1,0 +1,5 @@
+/home/z/my-project/tools/crowbar/bin/CrowbarDecompiler
+/home/z/my-project/tools/crowbar/bin/CrowbarDecompiler.dll
+/home/z/my-project/tools/crowbar/bin/CrowbarDecompiler.deps.json
+/home/z/my-project/tools/crowbar/bin/CrowbarDecompiler.runtimeconfig.json
+/home/z/my-project/tools/crowbar/bin/CrowbarDecompiler.pdb

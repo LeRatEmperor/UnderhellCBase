@@ -1,30 +1,30 @@
 // Decompiled reference SMD for m93r
 version 1
 nodes
-0 "(null)" -1
+0 "ValveBiped.Bip01_Root" -1
 1 "Pelvis" 0
 2 "Spine" 1
 3 "Spine1" 2
 4 "Neck" 3
-5 "R Clavicle" 4
-6 "R UpperArm" 5
-7 "R Forearm" 6
-8 "R Hand" 7
-9 "R Finger0" 8
-10 "R Finger01" 9
-11 "R Finger02" 10
-15 "R Finger1" 8
-16 "R Finger11" 15
-17 "R Finger12" 16
-21 "R Finger2" 8
-22 "R Finger21" 21
-23 "R Finger22" 22
-27 "R Finger3" 8
-28 "R Finger31" 27
-29 "R Finger32" 28
-33 "R Finger4" 8
-34 "R Finger41" 33
-35 "R Finger42" 34
+5 "ValveBiped.Bip01_R_Clavicle" 4
+6 "ValveBiped.Bip01_R_UpperArm" 5
+7 "ValveBiped.Bip01_R_Forearm" 6
+8 "ValveBiped.Bip01_R_Hand" 7
+9 "ValveBiped.Bip01_R_Finger0" 8
+10 "ValveBiped.Bip01_R_Finger01" 9
+11 "ValveBiped.Bip01_R_Finger02" 10
+15 "ValveBiped.Bip01_R_Finger1" 8
+16 "ValveBiped.Bip01_R_Finger11" 15
+17 "ValveBiped.Bip01_R_Finger12" 16
+21 "ValveBiped.Bip01_R_Finger2" 8
+22 "ValveBiped.Bip01_R_Finger21" 21
+23 "ValveBiped.Bip01_R_Finger22" 22
+27 "ValveBiped.Bip01_R_Finger3" 8
+28 "ValveBiped.Bip01_R_Finger31" 27
+29 "ValveBiped.Bip01_R_Finger32" 28
+33 "ValveBiped.Bip01_R_Finger4" 8
+34 "ValveBiped.Bip01_R_Finger41" 33
+35 "ValveBiped.Bip01_R_Finger42" 34
 40 "R ForeTwist" 6
 41 "R ForeTwist1" 40
 43 "R ForeTwist2" 41
@@ -41,25 +41,25 @@ nodes
 58 "usp_hammer" 52
 59 "usp_magazine" 52
 60 "usp_bullets" 59
-61 "L Clavicle" 4
-62 "L UpperArm" 61
-63 "L Forearm" 62
-64 "L Hand" 63
-65 "L Finger0" 64
-66 "L Finger01" 65
-67 "L Finger02" 66
-71 "L Finger1" 64
-72 "L Finger11" 71
-73 "L Finger12" 72
-77 "L Finger2" 64
-78 "L Finger21" 77
-79 "L Finger22" 78
-83 "L Finger3" 64
-84 "L Finger31" 83
-85 "L Finger32" 84
-89 "L Finger4" 64
-90 "L Finger41" 89
-91 "L Finger42" 90
+61 "ValveBiped.Bip01_L_Clavicle" 4
+62 "ValveBiped.Bip01_L_UpperArm" 61
+63 "ValveBiped.Bip01_L_Forearm" 62
+64 "ValveBiped.Bip01_L_Hand" 63
+65 "ValveBiped.Bip01_L_Finger0" 64
+66 "ValveBiped.Bip01_L_Finger01" 65
+67 "ValveBiped.Bip01_L_Finger02" 66
+71 "ValveBiped.Bip01_L_Finger1" 64
+72 "ValveBiped.Bip01_L_Finger11" 71
+73 "ValveBiped.Bip01_L_Finger12" 72
+77 "ValveBiped.Bip01_L_Finger2" 64
+78 "ValveBiped.Bip01_L_Finger21" 77
+79 "ValveBiped.Bip01_L_Finger22" 78
+83 "ValveBiped.Bip01_L_Finger3" 64
+84 "ValveBiped.Bip01_L_Finger31" 83
+85 "ValveBiped.Bip01_L_Finger32" 84
+89 "ValveBiped.Bip01_L_Finger4" 64
+90 "ValveBiped.Bip01_L_Finger41" 89
+91 "ValveBiped.Bip01_L_Finger42" 90
 96 "L ForeTwist" 62
 97 "L ForeTwist1" 96
 98 "L ForeTwist2" 97

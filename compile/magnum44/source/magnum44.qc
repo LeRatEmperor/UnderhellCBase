@@ -7,7 +7,7 @@ $bodygroup "magnum44"
 }
 // REMOVED: hands bodygroup
 
-$surfaceprop ""
+$surfaceprop "default"
 $contents "solid"
 $illumposition 4.379000 0.784000 -2.747000
 
@@ -15,18 +15,10 @@ $cdmaterials ""
 $cdmaterials ""
 $cdmaterials ""
 
-$texturegroup "skinfamilies"
-{
-	{
-		"magnum44"
-		"magnum44_bullets"
-	}
-}
-
 $bbox -9.037000 -9.049000 -12.381000 17.794001 10.623000 6.926000
 $cbox 0 0 0 0 0 0
 
-$attachment "1" "muzzle" 1.0000 0.0000 0.0000 rotate 0.0000 0.0000 1.0000
+$attachment "1" "muzzle" 1.000000 0.000000 0.000000 rotate 0.000000 0.000000 1.000000
 
 $definebone "base" "" 0.008779 1.770679 -0.936522 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000
 $definebone "flip" "base" 0.108669 -2.432133 -0.071752 -0.707107 -0.000000 -0.707107 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000
@@ -140,7 +132,6 @@ $BoneMerge "ValveBiped.Bip01_R_Finger4"
 $BoneMerge "ValveBiped.Bip01_R_Finger41"
 $BoneMerge "ValveBiped.Bip01_R_Finger42"
 
-
 $include "c_arms_definebones.qci"
 
 $sequence "idle" {
@@ -167,3 +158,4 @@ $sequence "fire_empty" {
 	"magnum44_anims/fire_empty.smd"
 	fps 30
 }
+

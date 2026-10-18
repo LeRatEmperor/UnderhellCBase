@@ -23,7 +23,7 @@ $bodygroup "acwr"
 }
 // REMOVED: hands bodygroup
 
-$surfaceprop ""
+$surfaceprop "default"
 $contents "solid"
 $illumposition 13.379000 0.398000 -7.488000
 
@@ -31,32 +31,11 @@ $cdmaterials ""
 $cdmaterials ""
 $cdmaterials ""
 
-$texturegroup "skinfamilies"
-{
-	{
-		"acwr"
-		"reticle"
-		"reflex"
-		"lens"
-		"kobra"
-		"acog"
-		"reticle_acog"
-		"eotech"
-		"reticle_eotech"
-		"lens_eotech"
-		"muzzle"
-		"suppressor"
-		"grip"
-		"laser"
-		"acwr_tape"
-	}
-}
-
 $bbox -18.131001 -25.058001 -17.273001 27.955999 9.570000 4.074000
 $cbox 0 0 0 0 0 0
 
-$attachment "muzzle" "A_Muzzle" 1.0000 0.0000 0.0000 rotate 0.0000 0.0000 1.0000
-$attachment "shell" "A_Eject" 1.0000 0.0000 0.0000 rotate -0.0000 0.0000 1.0000
+$attachment "muzzle" "A_Muzzle" 1.000000 0.000000 0.000000 rotate 0.000000 0.000000 1.000000
+$attachment "shell" "A_Eject" 1.000000 0.000000 0.000000 rotate -0.000000 0.000000 1.000000
 
 $definebone "ValveBiped.Bip01_L_Clavicle" "" 3.491543 8.830969 -9.976974 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000
 $definebone "ValveBiped.Bip01_L_UpperArm" "ValveBiped.Bip01_L_Clavicle" 5.853647 -0.000001 0.000000 -0.487879 0.515110 -0.489086 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000
@@ -223,7 +202,6 @@ $BoneMerge "ValveBiped.Bip01_R_Finger4"
 $BoneMerge "ValveBiped.Bip01_R_Finger41"
 $BoneMerge "ValveBiped.Bip01_R_Finger42"
 
-
 $include "c_arms_definebones.qci"
 
 $sequence "base_idle" {
@@ -275,3 +253,4 @@ $sequence "foregrip_reload_empty" {
 	"acwr_anims/foregrip_reload_empty.smd"
 	fps 30
 }
+

@@ -26,7 +26,7 @@ $bodygroup "hands"
 	blank
 }
 
-$surfaceprop ""
+$surfaceprop "default"
 $contents "solid"
 $illumposition 7.049000 -3.270000 -11.762000
 
@@ -60,16 +60,16 @@ $texturegroup "skinfamilies"
 $bbox -15.569000 -15.376000 -25.945999 29.666000 8.836000 2.422000
 $cbox 0 0 0 0 0 0
 
-$attachment "muzzle" "A_Muzzle" 1.0000 -0.0000 0.0000 rotate 0.0000 -0.0000 1.0000
-$attachment "muzzle_gl" "A_GLMuzzle" 1.0000 -0.0000 0.0000 rotate 0.0000 -0.0000 1.0000
-$attachment "muzzle_supp" "A_Muzzle_Supp" 1.0000 -0.0000 0.0000 rotate 0.0000 -0.0000 1.0000
-$attachment "2" "A_Eject" 1.0000 -0.0000 0.0000 rotate 0.0000 -0.0000 1.0000
-$attachment "muzzle_ads" "A_Muzzle_Ironsight" 1.0000 0.0000 -0.0000 rotate 0.0000 0.0000 1.0000
-$attachment "Suppressor" "A_Suppressor" 1.0000 0.0000 0.0000 rotate 0.0000 0.0000 1.0000
-$attachment "Modkit" "A_Modkit" 1.0000 -0.0000 0.0000 rotate 0.0000 -0.0000 1.0000
-$attachment "Laser" "A_Underbarrel" 1.0000 -0.0000 0.0000 rotate 0.0000 -0.0000 1.0000
-$attachment "Optic" "A_Optic" 1.0000 0.0000 0.0000 rotate 0.0000 0.0000 1.0000
-$attachment "Foregrip" "A_Foregrips" 1.0000 0.0000 0.0000 rotate 0.0000 0.0000 1.0000
+$attachment "muzzle" "A_Muzzle" 1.000000 -0.000000 0.000000 rotate 0.000000 -0.000000 1.000000
+$attachment "muzzle_gl" "A_GLMuzzle" 1.000000 -0.000000 0.000000 rotate 0.000000 -0.000000 1.000000
+$attachment "muzzle_supp" "A_Muzzle_Supp" 1.000000 -0.000000 0.000000 rotate 0.000000 -0.000000 1.000000
+$attachment "2" "A_Eject" 1.000000 -0.000000 0.000000 rotate 0.000000 -0.000000 1.000000
+$attachment "muzzle_ads" "A_Muzzle_Ironsight" 1.000000 0.000000 -0.000000 rotate 0.000000 0.000000 1.000000
+$attachment "Suppressor" "A_Suppressor" 1.000000 0.000000 0.000000 rotate 0.000000 0.000000 1.000000
+$attachment "Modkit" "A_Modkit" 1.000000 -0.000000 0.000000 rotate 0.000000 -0.000000 1.000000
+$attachment "Laser" "A_Underbarrel" 1.000000 -0.000000 0.000000 rotate 0.000000 -0.000000 1.000000
+$attachment "Optic" "A_Optic" 1.000000 0.000000 0.000000 rotate 0.000000 0.000000 1.000000
+$attachment "Foregrip" "A_Foregrips" 1.000000 0.000000 0.000000 rotate 0.000000 0.000000 1.000000
 
 $definebone "ValveBiped.Bip01_L_Clavicle" "" 3.491543 8.830969 -9.976974 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000
 $definebone "ValveBiped.Bip01_L_UpperArm" "ValveBiped.Bip01_L_Clavicle" 5.853647 -0.000001 0.000000 -0.487879 0.515110 -0.489086 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000
@@ -200,3 +200,4 @@ $sequence "foregrip_reload_empty" {
 	"aks74u_anims/foregrip_reload_empty.smd"
 	fps 30
 }
+

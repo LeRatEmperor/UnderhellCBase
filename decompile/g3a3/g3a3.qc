@@ -26,7 +26,7 @@ $bodygroup "hands"
 	blank
 }
 
-$surfaceprop ""
+$surfaceprop "default"
 $contents "solid"
 $illumposition -7.613000 0.707000 -9.110000
 
@@ -59,15 +59,15 @@ $texturegroup "skinfamilies"
 $bbox -33.201000 -5.851000 -20.721001 17.975000 7.265000 2.501000
 $cbox 0 0 0 0 0 0
 
-$attachment "muzzle" "b_wpn_muzzle" 1.0000 0.0000 0.0000 rotate 0.0000 0.0000 1.0000
-$attachment "muzzle_supp" "b_wpn_muzzle" 1.0000 0.0000 0.0000 rotate 8.0700 0.0000 1.0000
-$attachment "2" "b_wpn_eject" 1.0000 -0.0000 -0.0000 rotate 0.0000 -0.0000 1.0000
-$attachment "Suppressor" "a_suppressor" 1.0000 0.0000 0.0000 rotate 0.0000 0.0000 1.0000
-$attachment "Laser" "a_laserflashlight" 1.0000 0.0000 0.0000 rotate 0.0000 0.0000 1.0000
-$attachment "Optic" "A_Optic" 1.0000 0.0000 0.0000 rotate 0.0000 0.0000 1.0000
-$attachment "Foregrip" "b_wpn_foregrip" 1.0000 0.0000 0.0000 rotate 0.0000 0.0000 1.0000
-$attachment "Magazine" "b_wpn_mag" 1.0000 0.0000 0.0000 rotate 0.0000 0.0000 1.0000
-$attachment "camera" "b_camera" -0.0000 1.0000 0.0000 rotate 0.0000 -1.0000 -0.0000
+$attachment "muzzle" "b_wpn_muzzle" 1.000000 0.000000 0.000000 rotate 0.000000 0.000000 1.000000
+$attachment "muzzle_supp" "b_wpn_muzzle" 1.000000 0.000000 0.000000 rotate 8.070000 0.000000 1.000000
+$attachment "2" "b_wpn_eject" 1.000000 -0.000000 -0.000000 rotate 0.000000 -0.000000 1.000000
+$attachment "Suppressor" "a_suppressor" 1.000000 0.000000 0.000000 rotate 0.000000 0.000000 1.000000
+$attachment "Laser" "a_laserflashlight" 1.000000 0.000000 0.000000 rotate 0.000000 0.000000 1.000000
+$attachment "Optic" "A_Optic" 1.000000 0.000000 0.000000 rotate 0.000000 0.000000 1.000000
+$attachment "Foregrip" "b_wpn_foregrip" 1.000000 0.000000 0.000000 rotate 0.000000 0.000000 1.000000
+$attachment "Magazine" "b_wpn_mag" 1.000000 0.000000 0.000000 rotate 0.000000 0.000000 1.000000
+$attachment "camera" "b_camera" -0.000000 1.000000 0.000000 rotate 0.000000 -1.000000 -0.000000
 
 $definebone "b_root" "" 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000
 $definebone "b_ch_middle" "b_root" -0.000002 0.000007 -20.720551 0.000000 -0.000000 -0.707106 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000
@@ -263,3 +263,4 @@ $sequence "foregrip_reload_empty" {
 	"g3a3_anims/foregrip_reload_empty.smd"
 	fps 30
 }
+

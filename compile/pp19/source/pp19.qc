@@ -15,7 +15,7 @@ $bodygroup "pp19"
 }
 // REMOVED: hands bodygroup
 
-$surfaceprop ""
+$surfaceprop "default"
 $contents "solid"
 $illumposition 3.100000 -0.024000 -6.694000
 
@@ -23,31 +23,11 @@ $cdmaterials ""
 $cdmaterials ""
 $cdmaterials ""
 
-$texturegroup "skinfamilies"
-{
-	{
-		"reticle"
-		"reflex"
-		"lens"
-		"kobra"
-		"acog"
-		"reticle_acog"
-		"eotech"
-		"reticle_eotech"
-		"lens_eotech"
-		"pp19"
-		"muzzle"
-		"suppressor"
-		"pp19_tape"
-		"V_hands"
-	}
-}
-
 $bbox -12.947000 -11.067000 -13.651000 19.148001 11.018000 0.264000
 $cbox 0 0 0 0 0 0
 
-$attachment "1" "Muzzle_Flash" 1.0000 0.0000 0.0000 rotate 0.0000 0.0000 1.0000
-$attachment "2" "Shell_Eject" 1.0000 0.0000 -0.0000 rotate 0.0000 0.0000 1.0000
+$attachment "1" "Muzzle_Flash" 1.000000 0.000000 0.000000 rotate 0.000000 0.000000 1.000000
+$attachment "2" "Shell_Eject" 1.000000 0.000000 -0.000000 rotate 0.000000 0.000000 1.000000
 
 $definebone "BIZON_Body" "" -2.012597 -14.537454 -1.876409 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000
 $definebone "BIZON_Magazine" "" -2.012596 -16.605995 -3.392382 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000
@@ -151,7 +131,6 @@ $BoneMerge "ValveBiped.Bip01_R_Finger4"
 $BoneMerge "ValveBiped.Bip01_R_Finger41"
 $BoneMerge "ValveBiped.Bip01_R_Finger42"
 
-
 $include "c_arms_definebones.qci"
 
 $sequence "idle" {
@@ -178,3 +157,4 @@ $sequence "reload_empty" {
 	"pp19_anims/reload_empty.smd"
 	fps 30
 }
+

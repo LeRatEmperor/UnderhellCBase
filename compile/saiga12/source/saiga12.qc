@@ -7,7 +7,7 @@ $bodygroup "saiga12"
 }
 // REMOVED: hands bodygroup
 
-$surfaceprop ""
+$surfaceprop "default"
 $contents "solid"
 $illumposition -5.962000 -3.334000 -8.123000
 
@@ -15,18 +15,11 @@ $cdmaterials ""
 $cdmaterials ""
 $cdmaterials ""
 
-$texturegroup "skinfamilies"
-{
-	{
-		"saiga12"
-	}
-}
-
 $bbox -6.784000 -9.750000 -28.584999 26.424000 8.251000 6.986000
 $cbox 0 0 0 0 0 0
 
-$attachment "1" "Muzzle_Flash" 1.0000 0.0000 0.0000 rotate 0.0000 0.0000 1.0000
-$attachment "2" "Shell_Ejection" 1.0000 0.0000 0.0000 rotate 0.0000 0.0000 1.0000
+$attachment "1" "Muzzle_Flash" 1.000000 0.000000 0.000000 rotate 0.000000 0.000000 1.000000
+$attachment "2" "Shell_Ejection" 1.000000 0.000000 0.000000 rotate 0.000000 0.000000 1.000000
 
 $definebone "Saiga12k" "" -1.912251 -7.946754 -2.472074 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000
 $definebone "Saiga_Bolt" "" -2.025490 -12.156538 -3.311307 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000
@@ -133,7 +126,6 @@ $BoneMerge "ValveBiped.Bip01_R_Finger4"
 $BoneMerge "ValveBiped.Bip01_R_Finger41"
 $BoneMerge "ValveBiped.Bip01_R_Finger42"
 
-
 $include "c_arms_definebones.qci"
 
 $sequence "idle1" {
@@ -160,3 +152,4 @@ $sequence "reload_empty" {
 	"saiga12_anims/reload_empty.smd"
 	fps 30
 }
+

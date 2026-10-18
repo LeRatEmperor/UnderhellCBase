@@ -15,3 +15,14 @@ repos/tfa_wwii_original/
 repos/tfa_wwii_original/
 tool-results/
 source_repos/
+tools/studiomdl/bin/
+tools/crowbar/bin/
+tools/blender/
+
+# Tool binaries (large, kept on disk only)
+tools/studiomdl/bin/
+tools/crowbar/bin/
+tools/dotnet/
+tools/blender/
+*.deb
+*.tar.xz

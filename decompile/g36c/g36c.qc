@@ -26,7 +26,7 @@ $bodygroup "hands"
 	blank
 }
 
-$surfaceprop ""
+$surfaceprop "default"
 $contents "solid"
 $illumposition -29.188999 -15.245000 -4.520000
 
@@ -59,13 +59,13 @@ $texturegroup "skinfamilies"
 $bbox -37.731998 2.803000 -12.341000 29.336000 73.652000 3.147000
 $cbox 0 0 0 0 0 0
 
-$attachment "muzzle" "A_Muzzle" 1.0000 0.0000 0.0000 rotate 0.0000 0.0000 1.0000
-$attachment "muzzle_supp" "A_Muzzle_Supp" 1.0000 0.0000 0.0000 rotate 0.0000 0.0000 1.0000
-$attachment "2" "A_Eject" 1.0000 -0.0000 -0.0000 rotate 0.0000 -0.0000 1.0000
-$attachment "Suppressor" "A_Suppressor" 1.0000 -0.0000 0.0000 rotate 0.0000 -0.0000 1.0000
-$attachment "Laser" "A_Underbarrel" 1.0000 0.0000 0.0000 rotate 0.0000 0.0000 1.0000
-$attachment "Optic" "A_Optic" 1.0000 0.0000 -0.0000 rotate 0.0000 0.0000 1.0000
-$attachment "Foregrip" "A_Foregrip" 1.0000 -0.0000 0.0000 rotate -0.0000 -0.0000 1.0000
+$attachment "muzzle" "A_Muzzle" 1.000000 0.000000 0.000000 rotate 0.000000 0.000000 1.000000
+$attachment "muzzle_supp" "A_Muzzle_Supp" 1.000000 0.000000 0.000000 rotate 0.000000 0.000000 1.000000
+$attachment "2" "A_Eject" 1.000000 -0.000000 -0.000000 rotate 0.000000 -0.000000 1.000000
+$attachment "Suppressor" "A_Suppressor" 1.000000 -0.000000 0.000000 rotate 0.000000 -0.000000 1.000000
+$attachment "Laser" "A_Underbarrel" 1.000000 0.000000 0.000000 rotate 0.000000 0.000000 1.000000
+$attachment "Optic" "A_Optic" 1.000000 0.000000 -0.000000 rotate 0.000000 0.000000 1.000000
+$attachment "Foregrip" "A_Foregrip" 1.000000 -0.000000 0.000000 rotate -0.000002 -0.000000 1.000000
 
 $definebone "L Clavicle" "" -27.570877 67.798546 -8.338637 0.000299 0.060652 -0.004925 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000
 $definebone "L UpperArm" "L Clavicle" 5.853643 -0.000023 -0.000001 -0.094433 0.351102 -0.662697 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000
@@ -185,3 +185,4 @@ $sequence "foregrip_reload_empty" {
 	"g36c_anims/foregrip_reload_empty.smd"
 	fps 30
 }
+

@@ -26,7 +26,7 @@ $bodygroup "hands"
 	blank
 }
 
-$surfaceprop ""
+$surfaceprop "default"
 $contents "solid"
 $illumposition -1.471000 0.632000 -7.332000
 
@@ -59,14 +59,14 @@ $texturegroup "skinfamilies"
 $bbox -17.077000 -8.127000 -18.665001 14.136000 9.392000 4.001000
 $cbox 0 0 0 0 0 0
 
-$attachment "muzzle" "A_Muzzle" 1.0000 0.0000 0.0000 rotate 0.0000 0.0000 1.0000
-$attachment "muzzle_supp" "A_Muzzle_Supp" 1.0000 0.0000 0.0000 rotate 0.0000 0.0000 1.0000
-$attachment "2" "A_Eject" 1.0000 0.0000 0.0000 rotate 0.0000 0.0000 1.0000
-$attachment "muzzle_ads" "A_Muzzle_Ironsight" 1.0000 0.0000 -0.0000 rotate 0.0000 0.0000 1.0000
-$attachment "Suppressor" "A_Suppressor" 1.0000 0.0000 0.0000 rotate 0.0000 0.0000 1.0000
-$attachment "Modkit" "A_Modkit" 1.0000 0.0000 0.0000 rotate 0.0000 0.0000 1.0000
-$attachment "Laser" "A_Underbarrel" 1.0000 -0.0000 0.0000 rotate 0.0000 -0.0000 1.0000
-$attachment "Optic" "A_Optic" 1.0000 0.0000 0.0000 rotate 0.0000 0.0000 1.0000
+$attachment "muzzle" "A_Muzzle" 1.000000 0.000000 0.000000 rotate 0.000000 0.000000 1.000000
+$attachment "muzzle_supp" "A_Muzzle_Supp" 1.000000 0.000000 0.000000 rotate 0.000000 0.000000 1.000000
+$attachment "2" "A_Eject" 1.000000 0.000000 0.000000 rotate 0.000000 0.000000 1.000000
+$attachment "muzzle_ads" "A_Muzzle_Ironsight" 1.000000 0.000000 -0.000000 rotate 0.000000 0.000000 1.000000
+$attachment "Suppressor" "A_Suppressor" 1.000000 0.000000 0.000000 rotate 0.000000 0.000000 1.000000
+$attachment "Modkit" "A_Modkit" 1.000000 0.000000 0.000000 rotate 0.000000 0.000000 1.000000
+$attachment "Laser" "A_Underbarrel" 1.000000 -0.000000 0.000000 rotate 0.000000 -0.000000 1.000000
+$attachment "Optic" "A_Optic" 1.000000 0.000000 0.000000 rotate 0.000000 0.000000 1.000000
 
 $definebone "L Clavicle" "" 3.491543 8.830969 -9.976974 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000
 $definebone "L UpperArm" "L Clavicle" 5.853647 -0.000001 0.000000 -0.487879 0.515110 -0.489086 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000
@@ -191,3 +191,4 @@ $sequence "foregrip_reload_empty" {
 	"ump45_anims/foregrip_reload_empty.smd"
 	fps 30
 }
+

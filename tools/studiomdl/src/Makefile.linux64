@@ -1,0 +1,40 @@
+CXX        ?= g++
+CC         ?= gcc
+ARCH_FLAGS := -march=x86-64 -mcx16
+SRCDIR     := ../..
+PUBLIC     := $(SRCDIR)/public
+COMMON     := ../common
+NVT_DIR    := ../nvtristriplib
+LIB_PUBLIC := $(SRCDIR)/lib/public/linux64
+LIB_COMMON := $(SRCDIR)/lib/common/linux64
+OUTBINDIR  := $(SRCDIR)/../game/bin
+TARGET     := $(OUTBINDIR)/studiomdl
+OBJDIR     := obj-linux64
+DEFINES := -DPOSIX -D_POSIX -DLINUX -D_LINUX -DGNUC -DCOMPILER_GCC -DNDEBUG -DPROTECTED_THINGS_DISABLE -D_DLL_EXT=.so -DRAD_TELEMETRY_DISABLED -DVPC -DARCH=x86_64
+INCLUDES := -I. -I./compat -I$(COMMON) -I$(NVT_DIR) -I$(PUBLIC) -I$(PUBLIC)/tier0 -I$(PUBLIC)/tier1 -I$(PUBLIC)/mathlib -I$(SRCDIR) -I$(COMMON)
+WARN := -Wno-write-strings -Wno-multichar -Wno-unknown-pragmas -Wno-unused-parameter -Wno-unused-value -Wno-unused-variable -Wno-unused-function -Wno-unused-but-set-variable -Wno-missing-field-initializers -Wno-sign-compare -Wno-reorder -Wno-invalid-offsetof -Wno-strict-aliasing -Wno-narrowing -Wno-conversion-null -Wno-deprecated-declarations -Wno-int-to-pointer-cast -Wno-pointer-to-int-cast -Wno-format -Wno-format-security -Werror=return-type
+CXXFLAGS := $(ARCH_FLAGS) -O2 -fpermissive -fno-strict-aliasing -fno-omit-frame-pointer -fvisibility=hidden -fPIC -std=gnu++0x -pipe -Usprintf -Ustrncpy $(DEFINES) $(INCLUDES) $(WARN) -MMD -MP
+CFLAGS   := $(ARCH_FLAGS) -O2 -fno-strict-aliasing -fno-omit-frame-pointer -fPIC -pipe $(DEFINES) $(INCLUDES) $(WARN) -MMD -MP
+LDFLAGS  := $(ARCH_FLAGS) -Wl,--build-id -Wl,-rpath,'$$ORIGIN'
+LIBS := -L$(LIB_PUBLIC) -L$(LIB_COMMON) -Wl,--start-group -l:tier2.a -l:tier1.a -l:mathlib.a -Wl,--end-group -ltier0 -lvstdlib -ldl -lpthread -lm -lrt -latomic
+LOCAL_SRCS := studiomdl.cpp write.cpp simplify.cpp optimize.cpp unifylods.cpp collisionmodel.cpp objsupport.cpp mrmsupport.cpp v1support.cpp perfstats.cpp matsys.cpp hardwarematrixstate.cpp hardwarevertexcache.cpp memalloc_stub.cpp finite_math_stubs.cpp
+COMMON_SRCS := $(COMMON)/cmdlib.cpp $(COMMON)/scriplib.cpp $(COMMON)/physdll.cpp $(COMMON)/filesystem_tools.cpp $(COMMON)/mstristrip.cpp
+PUBLIC_SRCS := $(PUBLIC)/collisionutils.cpp $(PUBLIC)/filesystem_helpers.cpp $(PUBLIC)/filesystem_init.cpp $(PUBLIC)/studio.cpp $(PUBLIC)/bone_setup.cpp $(PUBLIC)/tier0/memoverride.cpp
+NVT_SRCS := $(NVT_DIR)/nvtristrip_stub.cpp
+ALL_SRCS := $(LOCAL_SRCS) $(COMMON_SRCS) $(PUBLIC_SRCS) $(NVT_SRCS)
+OBJS := $(addprefix $(OBJDIR)/, $(notdir $(ALL_SRCS:.cpp=.o)))
+VPATH := . $(COMMON) $(PUBLIC) $(PUBLIC)/tier0 $(NVT_DIR)
+.PHONY: all clean
+all: $(TARGET)
+$(OBJDIR):
+	@mkdir -p $@
+$(OUTBINDIR):
+	@mkdir -p $@
+$(OBJDIR)/%.o: %.cpp | $(OBJDIR)
+	$(CXX) $(CXXFLAGS) -c $< -o $@
+$(TARGET): $(OBJS) | $(OUTBINDIR)
+	$(CXX) $(LDFLAGS) -o $@ $(OBJS) $(LIBS)
+	@echo "Built $@"
+-include $(OBJS:.o=.d)
+clean:
+	rm -rf $(OBJDIR) $(TARGET)
