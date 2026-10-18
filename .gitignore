@@ -15,6 +15,7 @@ repos/tfa_wwii_original/
 repos/tfa_wwii_original/
 tool-results/
 source_repos/
+<<<<<<< HEAD
 tools/studiomdl/bin/
 tools/crowbar/bin/
 tools/blender/
@@ -26,3 +27,27 @@ tools/dotnet/
 tools/blender/
 *.deb
 *.tar.xz
+=======
+
+# Backup archives - too large for git, keep on disk only
+tools/archives/
+tools/blender-4.2.0-linux-x64/
+tools/dotnet/
+tools/blender.tar.xz
+*.blend
+*.blend1
+repos/gmod-animations/
+repos/gmod-sdk/
+repos/source-net/
+
+# Downloaded .deb packages (not part of project)
+*.deb
+
+# Pipeline intermediate files
+compile/*/source/models/
+compile/*/compiled/
+/tmp/
+
+# Don't track .deb packages
+*.deb
+>>>>>>> af8e51f72233f79e1f56ef3085a5cc5e2f78bed3
