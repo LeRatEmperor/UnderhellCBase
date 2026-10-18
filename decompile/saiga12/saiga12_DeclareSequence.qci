@@ -1,0 +1,7 @@
+// 
+
+$declaresequence "idle1"
+$declaresequence "draw"
+$declaresequence "fire"
+$declaresequence "reload"
+$declaresequence "reload_empty"
