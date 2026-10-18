@@ -1,7 +1,0 @@
-// 
-
-$declaresequence "idle"
-$declaresequence "draw"
-$declaresequence "fire"
-$declaresequence "reload"
-$declaresequence "reload_empty"

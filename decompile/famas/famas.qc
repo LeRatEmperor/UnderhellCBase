@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 // Decompiled from famas.mdl
 $modelname "weapons/c_famas.mdl"
 
@@ -17,35 +16,6 @@ $bodygroup "grip"
 $bodygroup "laser"
 {
 	studio "famas.smd"
-=======
-// 
-
-$modelname "bf3\weapons\famas.mdl"
-
-$bodygroup "sight"
-{
-	blank
-	studio "reflex.smd"
-	studio "kobra.smd"
-	studio "acog.smd"
-	studio "eotech.smd"
-}
-$bodygroup "barrel"
-{
-	studio "default.smd"
-	studio "muzzle.smd"
-	studio "suppressor.smd"
-}
-$bodygroup "grip"
-{
-	blank
-	studio "grip.smd"
-}
-$bodygroup "laser"
-{
-	blank
-	studio "laser.smd"
->>>>>>> af8e51f72233f79e1f56ef3085a5cc5e2f78bed3
 }
 $bodygroup "famas"
 {
@@ -53,7 +23,6 @@ $bodygroup "famas"
 }
 $bodygroup "hands"
 {
-<<<<<<< HEAD
 	blank
 }
 
@@ -64,21 +33,6 @@ $illumposition 3.647000 1.760000 -7.303000
 $cdmaterials ""
 $cdmaterials ""
 $cdmaterials ""
-=======
-	studio "hands.smd"
-}
-
-
-$surfaceprop "default"
-
-$contents "solid"
-
-$illumposition 1.76 -3.647 -7.303
-
-$cdmaterials "models\bf3\weapons\rifles\"
-$cdmaterials "models\bf3\weapons\att\"
-$cdmaterials "models\weapons\v_models\hands\"
->>>>>>> af8e51f72233f79e1f56ef3085a5cc5e2f78bed3
 
 $texturegroup "skinfamilies"
 {
@@ -102,7 +56,6 @@ $texturegroup "skinfamilies"
 	}
 }
 
-<<<<<<< HEAD
 $bbox -14.910000 -5.528000 -18.316999 22.204000 9.047000 3.712000
 $cbox 0 0 0 0 0 0
 
@@ -215,251 +168,50 @@ $definebone "CAM_Movement" "" 0.000000 0.000000 0.000000 -0.006923 -0.704284 -0.
 $sequence "base_idle" {
 	"famas_anims/base_idle.smd"
 	fps 30
-=======
-$attachment "muzzle" "A_Muzzle" 0 0 0 rotate -0 -0 0
-$attachment "muzzle_supp" "A_Muzzle_Supp" 0 0 0 rotate -0 0 0
-$attachment "2" "A_Eject" -0 0 0 rotate -0 0 0
-$attachment "muzzle_ads" "A_Muzzle_Ironsight" 0 0 0 rotate -0 0 0
-$attachment "camera" "camera" 0 0 0 rotate -0 0 0
-$attachment "Suppressor" "A_Suppressor" 0 0 0 rotate -0 0 0
-$attachment "Laser" "A_Underbarrel" 0 0 0 rotate -0 0 0
-$attachment "Optic" "A_Optic" 0 0 0 rotate -0 0 0
-$attachment "Foregrip" "A_Foregrip" 0 0 0 rotate -0 0 0
-
-$cbox 0 0 0 0 0 0
-
-$bbox -14.91 -5.528 -18.317 22.204 9.047 3.712
-
-$definebone "L Clavicle" "" 3.491543 8.830969 -9.976974 0 0.000057 0 0 0 0 0 0 0
-$definebone "L UpperArm" "L Clavicle" 5.853647 -0.000001 0 2.606709 -90.52118 -90.385901 0 0 0 0 0 0
-$definebone "L Forearm" "L UpperArm" 10.390535 -0.000002 0.000001 -0 -6.123426 0 0 0 0 0 0 0
-$definebone "L Hand" "L Forearm" 8.525425 -0.000002 0 2.753062 3.862882 -91.214711 0 0 0 0 0 0
-$definebone "L Finger0" "L Hand" 0.555143 0.315172 -0.822494 36.110722 33.914171 115.151566 0 0 0 0 0 0
-$definebone "L Finger01" "L Finger0" 1.556972 0.000002 -0.000002 -0.000005 9.52932 0 0 0 0 0 0 0
-$definebone "L Finger02" "L Finger01" 1.22109 -0.000002 0.000001 -0.000012 13.764626 -0.000003 0 0 0 0 0 0
-$definebone "L Finger1" "L Hand" 2.828093 -0.209482 -1.286462 1.166311 -3.007112 7.059473 0 0 0 0 0 0
-$definebone "L Finger11" "L Finger1" 1.382519 0.000001 0.000004 -0.000003 5.705115 0 0 0 0 0 0 0
-$definebone "L Finger12" "L Finger11" 0.865905 -0.000001 -0.000003 -0.000003 1.676707 0 0 0 0 0 0 0
-$definebone "L Finger2" "L Hand" 2.813033 -0.266274 -0.544265 -0.523171 -4.898962 4.980264 0 0 0 0 0 0
-$definebone "L Finger21" "L Finger2" 1.445751 0 0 -0.000003 8.18986 0.000003 0 0 0 0 0 0
-$definebone "L Finger22" "L Finger21" 1.053753 -0.000002 0.000002 -0.000003 -1.49399 0.000003 0 0 0 0 0 0
-$definebone "L Finger3" "L Hand" 2.689438 -0.34286 0.236189 -0.363545 -3.72474 7.4665 0 0 0 0 0 0
-$definebone "L Finger31" "L Finger3" 1.439796 -0.000002 -0.000001 -0.000003 3.307803 0 0 0 0 0 0 0
-$definebone "L Finger32" "L Finger31" 0.98299 0.000001 -0.000001 -0.000003 -5.220043 0.000003 0 0 0 0 0 0
-$definebone "L Finger4" "L Hand" 2.426952 -0.353602 1.013784 -0.774241 -8.678418 5.197188 0 0 0 0 0 0
-$definebone "L Finger41" "L Finger4" 1.104664 0.000001 0 -0.000003 4.531697 -0.000001 0 0 0 0 0 0
-$definebone "L Finger42" "L Finger41" 0.908442 0.000001 -0.000001 -0.000003 -3.232686 -0.000001 0 0 0 0 0 0
-$definebone "L ForeTwist" "L UpperArm" 10.390535 -0.000002 0.000001 -0 -6.123426 -0.152006 0 0 0 0 0 0
-$definebone "L ForeTwist1" "L ForeTwist" 1.217918 -0.000003 0 -0 0.000003 -0.152006 0 0 0 0 0 0
-$definebone "L ForeTwist2" "L ForeTwist1" 1.217918 -0.000002 -0.000003 -0 0.000003 -0.152006 0 0 0 0 0 0
-$definebone "L ForeTwist3" "L ForeTwist2" 1.217917 -0.000002 -0.000004 -0 0.000003 -0.152006 0 0 0 0 0 0
-$definebone "L ForeTwist4" "L ForeTwist3" 1.217916 0.000003 -0.000001 -0 0.000003 -0.152006 0 0 0 0 0 0
-$definebone "L ForeTwist5" "L ForeTwist4" 1.217918 0 -0.000003 -0 0.000003 -0.152006 0 0 0 0 0 0
-$definebone "L ForeTwist6" "L ForeTwist5" 1.217916 0 0.000001 -0 0.000003 -0.152006 0 0 0 0 0 0
-$definebone "R Clavicle" "" 0.47538 8.830965 -9.976974 -0.000019 -179.999937 180.000005 0 0 0 0 0 0
-$definebone "R UpperArm" "R Clavicle" 5.853648 0.000001 0 -2.606709 -90.52118 90.385901 0 0 0 0 0 0
-$definebone "R Forearm" "R UpperArm" 10.390536 -0.000002 0 -0 -6.123426 0 0 0 0 0 0 0
-$definebone "R Hand" "R Forearm" 8.525427 0.000001 0 -2.753062 3.862882 91.214711 0 0 0 0 0 0
-$definebone "R Finger0" "R Hand" 0.55514 0.315171 0.822496 -36.110712 33.914171 -115.151566 0 0 0 0 0 0
-$definebone "R Finger01" "R Finger0" 1.556972 0 0 -0.000002 9.529332 -0.000003 0 0 0 0 0 0
-$definebone "R Finger02" "R Finger01" 1.221088 -0.000002 0 -0.000005 13.764635 -0.000003 0 0 0 0 0 0
-$definebone "R Finger1" "R Hand" 2.828091 -0.209481 1.286462 -1.166311 -3.007112 -7.059472 0 0 0 0 0 0
-$definebone "R Finger11" "R Finger1" 1.382519 0 -0.000002 0.000002 5.70511 0.000003 0 0 0 0 0 0
-$definebone "R Finger12" "R Finger11" 0.86591 -0 0.000003 0.000002 1.6767 0.000003 0 0 0 0 0 0
-$definebone "R Finger2" "R Hand" 2.813031 -0.266276 0.544264 0.523168 -4.89896 -4.980265 0 0 0 0 0 0
-$definebone "R Finger21" "R Finger2" 1.445755 -0 0 0.000001 8.18986 -0.000003 0 0 0 0 0 0
-$definebone "R Finger22" "R Finger21" 1.05375 -0 -0.000003 0.000002 -1.493987 -0.000003 0 0 0 0 0 0
-$definebone "R Finger3" "R Hand" 2.689442 -0.34286 -0.236188 0.363542 -3.72474 -7.4665 0 0 0 0 0 0
-$definebone "R Finger31" "R Finger3" 1.439795 -0 0.000001 0.000001 3.307801 0.000001 0 0 0 0 0 0
-$definebone "R Finger32" "R Finger31" 0.982989 0 0.000002 0.000001 -5.220044 -0.000001 0 0 0 0 0 0
-$definebone "R Finger4" "R Hand" 2.426953 -0.353604 -1.013783 0.774238 -8.678418 -5.197187 0 0 0 0 0 0
-$definebone "R Finger41" "R Finger4" 1.104666 0 0.000001 -0 4.531694 0 0 0 0 0 0 0
-$definebone "R Finger42" "R Finger41" 0.908442 -0 0.000002 -0 -3.232686 0.000001 0 0 0 0 0 0
-$definebone "R ForeTwist" "R UpperArm" 10.390536 -0.000002 0 -0 -6.123426 0.152006 0 0 0 0 0 0
-$definebone "R ForeTwist1" "R ForeTwist" 1.217917 0.000002 -0 -0 0.000004 0.152006 0 0 0 0 0 0
-$definebone "R ForeTwist2" "R ForeTwist1" 1.217918 -0.000002 -0 -0 0.000003 0.152006 0 0 0 0 0 0
-$definebone "R ForeTwist3" "R ForeTwist2" 1.217918 0.000002 0 -0 0.000003 0.152006 0 0 0 0 0 0
-$definebone "R ForeTwist4" "R ForeTwist3" 1.217916 0.000001 0 -0 0.000003 0.152006 0 0 0 0 0 0
-$definebone "R ForeTwist5" "R ForeTwist4" 1.217918 0.000001 0 -0 0.000003 0.152006 0 0 0 0 0 0
-$definebone "R ForeTwist6" "R ForeTwist5" 1.217916 0.000001 0 -0 0.000003 0.152006 0 0 0 0 0 0
-$definebone "(null)" "" 1.983461 8.830967 -25.945992 0 -89.999921 0 0 0 0 0 0 0
-$definebone "Pelvis" "(null)" 0 0 0 -89.999982 -89.999921 0 0 0 0 0 0 0
-$definebone "Spine" "Pelvis" 3.24214 -0.005069 0.000005 -0.000057 0.045607 -0.000229 0 0 0 0 0 0
-$definebone "Spine1" "Spine" 6.363438 -0.005069 0 -0 -0 0 0 0 0 0 0 0
-$definebone "Neck" "Spine1" 6.363436 -0.002058 0 -0 -0 0 0 0 0 0 0 0
-$definebone "FAM_MAIN" "" -2.599743 -11.95453 -3.800601 0 0 0 0 0 0 0 0 0
-$definebone "FAM_MAG_RELEASE" "FAM_MAIN" 0.007674 4.962811 -0.934264 -0 0 0 0 0 0 0 0 0
-$definebone "FAM_MAGAZINE" "FAM_MAIN" -0.000003 6.395597 -1.654393 -0 0 0 0 0 0 0 0 0
-$definebone "FAM_BULLET_MAIN" "FAM_MAGAZINE" -0.11881 -0.065419 2.054317 -0 0 0 0 0 0 0 0 0
-$definebone "FAM_BULLETS" "FAM_MAGAZINE" -0.118478 -0.065419 1.737719 -0 0 0 0 0 0 0 0 0
-$definebone "FAM_TRIGGER" "FAM_MAIN" -0.043907 -0.441948 -0.673573 -0 0 0 0 0 0 0 0 0
-$definebone "FAM_BOLT" "FAM_MAIN" 0.016472 -1.774496 1.703275 -0 0 0 0 0 0 0 0 0
-$definebone "FAM_BOLT_HANDLE" "FAM_BOLT" 0.00046 -0.120476 -0.363187 -0 0 0 0 0 0 0 0 0
-$definebone "FAMAS_SIGHT" "FAM_MAIN" 0.014103 -7.235753 2.358691 -0 0 0 0 0 0 0 0 0
-$definebone "A_Optic" "FAM_MAIN" -0.00114 -1.080784 3.777362 -0.000019 -180.000005 -90.000016 0 0 0 0 0 0
-$definebone "A_Muzzle_Ironsight" "FAM_MAIN" 2.599741 -10.852775 3.711483 -0 -90.000098 0 0 0 0 0 0 0
-$definebone "A_Foregrip" "FAM_MAIN" 0.029664 -4.359653 -0.897634 -0 179.999909 0 0 0 0 0 0 0
-$definebone "A_Underbarrel" "FAM_MAIN" 0.002434 -7.569705 0.687202 -0 -89.999982 -89.999982 0 0 0 0 0 0
-$definebone "A_Suppressor" "FAM_MAIN" -0.00788 -11.116035 0.676175 -0 179.999964 0 0 0 0 0 0 0
-$definebone "A_Muzzle_Supp" "FAM_MAIN" -0.00788 -19.032196 0.684833 -0 -89.999982 89.999982 0 0 0 0 0 0
-$definebone "A_LaserFlashlight" "FAM_MAIN" 0.010177 -8.554111 0.683143 0.000036 -90.000016 -180.000005 0 0 0 0 0 0
-$definebone "A_Muzzle" "FAM_MAIN" -0.008317 -12.853469 0.672902 0.000057 -89.999982 89.999982 0 0 0 0 0 0
-$definebone "A_Eject" "FAM_MAIN" -0.730943 8.039146 0.993207 -7.292951 -162.546809 -2.991126 0 0 0 0 0 0
-$definebone "SLING_BONE_01" "FAM_MAIN" 0.012741 -7.969989 0.684858 88.162736 89.999811 -90.002161 0 0 0 0 0 0
-$definebone "SLING_BONE_02" "SLING_BONE_01" 1.046484 0 0 0.000172 -5.847435 0.001948 0 0 0 0 0 0
-$definebone "SLING_BONE_03" "SLING_BONE_02" 1.420767 0.000055 0 0 -13.652209 0 0 0 0 0 0 0
-$definebone "SLING_BONE_04" "SLING_BONE_03" 1.408961 -0.000002 0 0 -14.272726 0 0 0 0 0 0 0
-$definebone "SLING_BONE_05" "SLING_BONE_04" 1.214037 0 -0 -0.000057 -13.315424 0 0 0 0 0 0 0
-$definebone "SLING_BONE_06" "SLING_BONE_05" 1.019244 -0.00001 0 0.000057 -14.970125 0 0 0 0 0 0 0
-$definebone "SLING_BONE_07" "SLING_BONE_06" 1.049126 0.000001 0 0.010256 -10.404224 0.000057 0 0 0 0 0 0
-$definebone "SLING_BONE_08" "SLING_BONE_07" 1.505385 0.000007 0 0.515605 -2.798037 0.001833 0 0 0 0 0 0
-$definebone "SLING_BONE_09" "SLING_BONE_08" 1.943114 0.000003 0 -0.080443 -3.895481 0.020455 0 0 0 0 0 0
-$definebone "SLING_BONE_10" "SLING_BONE_09" 1.999505 -0.000016 0 -0.155443 -7.043254 0.01547 0 0 0 0 0 0
-$definebone "SLING_BONE_11" "SLING_BONE_10" 2.023267 0.000066 0 0.28963 -6.450187 0.000458 0 0 0 0 0 0
-$definebone "SLING_BONE_12" "SLING_BONE_11" 1.602904 -0.000002 0 1.923533 -7.844307 -2.841928 0 0 0 0 0 0
-$definebone "SLING_BONE_13" "SLING_BONE_12" 2.383555 -0.000039 0 1.459838 -18.659855 -25.011212 0 0 0 0 0 0
-$definebone "SLING_BONE_14" "SLING_BONE_13" 1.883695 0 0 7.605837 -10.426283 -18.952976 0 0 0 0 0 0
-$definebone "SLING_BONE_15" "SLING_BONE_14" 1.848095 -0.000005 0 14.087542 -5.611957 -29.479182 0 0 0 0 0 0
-$definebone "SLING_BONE_16" "SLING_BONE_15" 1.96004 -0.000001 0 -2.464067 -1.748099 -1.49381 0 0 0 0 0 0
-$definebone "SLING_BONE_17" "SLING_BONE_16" 1.396478 -0 0 -26.056176 2.605636 -14.41716 0 0 0 0 0 0
-$definebone "SLING_BONE_18" "SLING_BONE_17" 1.036103 0.000004 0 -10.99811 -1.089656 0.57336 0 0 0 0 0 0
-$definebone "camera" "" 0 0 0 0 -90.000037 0 0 0 0 0 0 0
-$definebone "CAM_Movement" "" 0 0 0 -5.368384 -175.715386 89.547004 0 0 0 0 0 0
-
-
-$sectionframes 30 40
-
-$sequence "base_idle" {
-	"famas_anims/base_idle.smd"
-	activity "ACT_VM_IDLE" 1
-	fadein 0.2
-	fadeout 0.2
-	fps 30
-	loop
->>>>>>> af8e51f72233f79e1f56ef3085a5cc5e2f78bed3
 }
 
 $sequence "base_draw" {
 	"famas_anims/base_draw.smd"
-<<<<<<< HEAD
 	fps 30
-=======
-	activity "ACT_VM_DRAW" 1
-	{ event 5004 0 "bf3.draw" }
-	fadein 0.2
-	fadeout 0.2
-	snap
-	fps 31
->>>>>>> af8e51f72233f79e1f56ef3085a5cc5e2f78bed3
 }
 
 $sequence "base_fire" {
 	"famas_anims/base_fire.smd"
-<<<<<<< HEAD
-=======
-	activity "ACT_VM_PRIMARYATTACK" 1
-	fadein 0.2
-	fadeout 0.2
-	snap
->>>>>>> af8e51f72233f79e1f56ef3085a5cc5e2f78bed3
 	fps 30
 }
 
 $sequence "base_reload" {
 	"famas_anims/base_reload.smd"
-<<<<<<< HEAD
 	fps 30
-=======
-	activity "ACT_VM_RELOAD" 1
-	{ event 5004 28 "bf3_famas.clipout" }
-	{ event 5004 66 "bf3_famas.clipin" }
-	fadein 0.3
-	fadeout 0.6
-	fps 35.1
->>>>>>> af8e51f72233f79e1f56ef3085a5cc5e2f78bed3
 }
 
 $sequence "base_reload_empty" {
 	"famas_anims/base_reload_empty.smd"
-<<<<<<< HEAD
 	fps 30
-=======
-	activity "ACT_VM_RELOAD_EMPTY" 1
-	{ event 5004 28 "bf3_famas.clipout" }
-	{ event 5004 85 "bf3_famas.clipin" }
-	{ event 5004 122 "bf3_famas.boltpull" }
-	fadein 0.3
-	fadeout 0.6
-	fps 35.86
->>>>>>> af8e51f72233f79e1f56ef3085a5cc5e2f78bed3
 }
 
 $sequence "foregrip_idle" {
 	"famas_anims/foregrip_idle.smd"
-<<<<<<< HEAD
 	fps 30
-=======
-	activity "ACT_VM_IDLE_FOREGRIP" 1
-	fadein 0.4
-	fadeout 0.2
-	fps 30
-	loop
->>>>>>> af8e51f72233f79e1f56ef3085a5cc5e2f78bed3
 }
 
 $sequence "foregrip_draw" {
 	"famas_anims/foregrip_draw.smd"
-<<<<<<< HEAD
 	fps 30
-=======
-	activity "ACT_VM_DRAW_FOREGRIP" 1
-	{ event 5004 0 "bf3.draw" }
-	fadein 0.2
-	fadeout 0.2
-	snap
-	fps 31
->>>>>>> af8e51f72233f79e1f56ef3085a5cc5e2f78bed3
 }
 
 $sequence "foregrip_fire" {
 	"famas_anims/foregrip_fire.smd"
-<<<<<<< HEAD
-=======
-	activity "ACT_VM_PRIMARYATTACK_FOREGRIP" 1
-	fadein 0.2
-	fadeout 0.2
-	snap
->>>>>>> af8e51f72233f79e1f56ef3085a5cc5e2f78bed3
 	fps 30
 }
 
 $sequence "foregrip_reload" {
 	"famas_anims/foregrip_reload.smd"
-<<<<<<< HEAD
 	fps 30
-=======
-	activity "ACT_VM_RELOAD_FOREGRIP" 1
-	{ event 5004 28 "bf3_famas.clipout" }
-	{ event 5004 66 "bf3_famas.clipin" }
-	fadein 0.3
-	fadeout 0.6
-	fps 35.1
->>>>>>> af8e51f72233f79e1f56ef3085a5cc5e2f78bed3
 }
 
 $sequence "foregrip_reload_empty" {
 	"famas_anims/foregrip_reload_empty.smd"
-<<<<<<< HEAD
 	fps 30
 }
 
-=======
-	activity "ACT_VM_RELOAD_EMPTY_FOREGRIP" 1
-	{ event 5004 28 "bf3_famas.clipout" }
-	{ event 5004 85 "bf3_famas.clipin" }
-	{ event 5004 122 "bf3_famas.boltpull" }
-	fadein 0.3
-	fadeout 0.6
-	fps 35.86
-}
->>>>>>> af8e51f72233f79e1f56ef3085a5cc5e2f78bed3

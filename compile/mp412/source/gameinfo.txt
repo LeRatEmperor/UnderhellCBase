@@ -1,10 +1,6 @@
 "GameInfo"
 {
-<<<<<<< HEAD
 	game "BF3"
-=======
-	game "mp412"
->>>>>>> af8e51f72233f79e1f56ef3085a5cc5e2f78bed3
 	FileSystem
 	{
 		SearchPaths

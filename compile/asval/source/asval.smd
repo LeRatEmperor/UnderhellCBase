@@ -53,11 +53,11 @@ nodes
 49 "ValveBiped.Bip01_R_ForeTwist4" 48
 50 "ValveBiped.Bip01_R_ForeTwist5" 49
 51 "ValveBiped.Bip01_R_ForeTwist6" 50
-52 "(null)" -1
-53 "Pelvis" 52
-54 "Spine" 53
-55 "Spine1" 54
-56 "Neck" 55
+52 "ValveBiped.Bip01_Root" -1
+53 "ValveBiped.Bip01_Pelvis" 52
+54 "ValveBiped.Bip01_Spine" 53
+55 "ValveBiped.Bip01_Spine1" 54
+56 "ValveBiped.Bip01_Neck1" 55
 57 "Weapon" -1
 58 "Magazine" 57
 59 "Bullets" 58
