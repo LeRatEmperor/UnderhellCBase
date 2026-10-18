@@ -1,0 +1,11 @@
+"GameInfo"
+{
+	game "ump45"
+	FileSystem
+	{
+		SearchPaths
+		{
+			Game		.
+		}
+	}
+}

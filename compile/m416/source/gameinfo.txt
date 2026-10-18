@@ -1,6 +1,6 @@
 "GameInfo"
 {
-	game "BF3 Weapons"
+	game "m416"
 	FileSystem
 	{
 		SearchPaths

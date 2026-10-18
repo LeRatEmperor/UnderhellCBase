@@ -1,0 +1,11 @@
+"GameInfo"
+{
+	game "m1911"
+	FileSystem
+	{
+		SearchPaths
+		{
+			Game		.
+		}
+	}
+}

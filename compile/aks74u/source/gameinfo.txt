@@ -1,0 +1,11 @@
+"GameInfo"
+{
+	game "aks74u"
+	FileSystem
+	{
+		SearchPaths
+		{
+			Game		.
+		}
+	}
+}

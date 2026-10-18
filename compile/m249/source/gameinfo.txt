@@ -1,0 +1,11 @@
+"GameInfo"
+{
+	game "m249"
+	FileSystem
+	{
+		SearchPaths
+		{
+			Game		.
+		}
+	}
+}

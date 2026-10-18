@@ -1,0 +1,11 @@
+"GameInfo"
+{
+	game "magnum44"
+	FileSystem
+	{
+		SearchPaths
+		{
+			Game		.
+		}
+	}
+}

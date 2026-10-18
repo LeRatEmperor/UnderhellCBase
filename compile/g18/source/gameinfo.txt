@@ -1,0 +1,11 @@
+"GameInfo"
+{
+	game "g18"
+	FileSystem
+	{
+		SearchPaths
+		{
+			Game		.
+		}
+	}
+}

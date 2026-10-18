@@ -1,0 +1,11 @@
+"GameInfo"
+{
+	game "scarh"
+	FileSystem
+	{
+		SearchPaths
+		{
+			Game		.
+		}
+	}
+}

@@ -1,0 +1,11 @@
+"GameInfo"
+{
+	game "g36c"
+	FileSystem
+	{
+		SearchPaths
+		{
+			Game		.
+		}
+	}
+}

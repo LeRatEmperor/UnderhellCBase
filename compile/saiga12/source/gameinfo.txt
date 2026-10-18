@@ -1,0 +1,11 @@
+"GameInfo"
+{
+	game "saiga12"
+	FileSystem
+	{
+		SearchPaths
+		{
+			Game		.
+		}
+	}
+}

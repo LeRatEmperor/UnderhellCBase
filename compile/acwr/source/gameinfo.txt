@@ -1,0 +1,11 @@
+"GameInfo"
+{
+	game "acwr"
+	FileSystem
+	{
+		SearchPaths
+		{
+			Game		.
+		}
+	}
+}

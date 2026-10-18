@@ -1,0 +1,11 @@
+"GameInfo"
+{
+	game "g3a3"
+	FileSystem
+	{
+		SearchPaths
+		{
+			Game		.
+		}
+	}
+}

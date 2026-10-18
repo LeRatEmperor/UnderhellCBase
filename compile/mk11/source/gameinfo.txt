@@ -1,0 +1,11 @@
+"GameInfo"
+{
+	game "mk11"
+	FileSystem
+	{
+		SearchPaths
+		{
+			Game		.
+		}
+	}
+}

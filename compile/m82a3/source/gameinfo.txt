@@ -1,0 +1,11 @@
+"GameInfo"
+{
+	game "m82a3"
+	FileSystem
+	{
+		SearchPaths
+		{
+			Game		.
+		}
+	}
+}

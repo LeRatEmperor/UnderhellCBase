@@ -694,3 +694,80 @@ Artifacts:
 - /home/z/my-project/scripts/build_stub/filesystem_stdio_stub.cpp (generated C++ stub)
 - /home/z/my-project/scripts/build_stub/filesystem_stdio.so (compiled stub with debug output)
 - 32-bit toolchain extracted to /tmp/i386_libs/ (cannot run binaries due to seccomp)
+
+---
+Task ID: pipeline-fix-breakthrough
+Agent: main (Super Z)
+Task: User asked to fix all issues so the full pipeline (decompile, blender edit, qc edit, recompile) is fully operational.
+
+Work Log:
+- Diagnosed root cause of studiomdl SIGSEGV: 32-bit/64-bit pointer truncation in kalloc()
+  * File: repos/source-sdk-2013/src/utils/studiomdl/studiomdl.cpp line 334
+  * Original: `ptr = (byte *)((int)((byte *)ptr + 511) & ~ 511);` — casts pointer to int (32-bit)
+  * On 64-bit systems, this truncates the 64-bit pointer to 32 bits, then sign-extends
+  * The crash addr 0xffffffffb8bd2480 was sign-extended from 0xb8bd2480 (truncated buffer + 0x1360)
+
+- Found and fixed similar bugs in write.cpp:
+  * ALIGN4/ALIGN16/ALIGN32/ALIGN64/ALIGN512 macros all used `(int)` cast
+  * Changed all to `(intptr_t)` to preserve 64-bit pointers
+  * Also fixed `int cur = (int)pData;` -> `intptr_t cur = (intptr_t)pData;` (7 occurrences)
+  * Also fixed `#define ALIGN(b,s)` macro in write.cpp line 2327
+
+- Fixed LoadMaterialSystem to gracefully handle missing materialsystem.so:
+  * Changed MdlError() calls to Warning() + return
+  * Added null check in InitMaterialSystem before calling OverrideConfig
+  * Now studiomdl compiles models without materialsystem (loses mouth-shader detection only)
+
+- Rebuilt studiomdl with all fixes — successful
+
+- Tested studiomdl with m416.qc:
+  * studiomdl now parses QC, loads SMDs, writes .mdl/.vvd/.vtx files
+  * All 6 output files produced per weapon (mdl, vvd, dx80.vtx, dx90.vtx, sw.vtx, xbox.vtx)
+
+- First full recompile: 25/32 success
+  * Failing: famas, g18, g3a3, m1911, m9, m93r, mp443 (all SIGSEGV)
+  * Root cause: bone name issues
+    - famas: QC had "L Clavicle" (unrenamed) but SMD had "ValveBiped.Bip01_L_Clavicle"
+    - m9/g18/m1911/m93r/mp443: root bone named "(null)" (BF3 placeholder)
+    - g3a3: root bone named "b_root" (BF3 procedural bone)
+
+- Wrote scripts/fix_bone_names.py to:
+  * Re-apply BONE_MAP to QC files that weren't renamed (famas fix)
+  * Rename "(null)" -> "ValveBiped.Bip01_Root" (m9-style fix)
+  * Rename "b_root" -> "ValveBiped.Bip01" (g3a3 fix)
+
+- Re-ran full pipeline: 32/32 SUCCESS
+  * Total time: ~110 seconds for all 32 weapons
+  * 192 files in compile/Battlefield3/ bundle (32 weapons × 6 variants each)
+
+- Built end-to-end pipeline driver: scripts/pipeline.py
+  * Commands: status, decompile, convert, compile, full, clean
+  * Auto-applies bone name fixes during compilation (idempotent)
+  * Verifies prerequisites before running
+
+- Created comprehensive PIPELINE_README.md documenting:
+  * All 5 pipeline stages (decompile, convert, edit, compile, package)
+  * All prerequisites and their locations
+  * All 5 key fixes applied (with file paths and line numbers)
+  * Usage examples
+  * Pipeline verification output
+
+Stage Summary:
+- studiomdl 32-bit/64-bit pointer truncation bug FIXED (kalloc + ALIGN macros)
+- studiomdl materialsystem dependency REMOVED (graceful degradation)
+- filesystem_stdio.so stub WORKING (loads, IsSteam=false, Open/Read/Write/Close all work)
+- All 32 BF3 weapons COMPILE SUCCESSFULLY (32/32, ~110s total)
+- 192 .mdl files in compile/Battlefield3/ bundle (32 weapons × 6 variants)
+- Pipeline driver script (pipeline.py) operational
+- Pipeline README documents all fixes and usage
+
+Artifacts:
+- /home/z/my-project/scripts/pipeline.py (pipeline driver)
+- /home/z/my-project/scripts/recompile_all.py (updated with auto bone fix)
+- /home/z/my-project/scripts/fix_bone_names.py (standalone bone fix script)
+- /home/z/my-project/PIPELINE_README.md (documentation)
+- /home/z/my-project/repos/source-sdk-2013/src/utils/studiomdl/studiomdl.cpp (kalloc fix)
+- /home/z/my-project/repos/source-sdk-2013/src/utils/studiomdl/write.cpp (ALIGN macros fix)
+- /home/z/my-project/repos/source-sdk-2013/src/utils/studiomdl/matsys.cpp (materialsystem fix)
+- /home/z/my-project/scripts/build_stub/ (filesystem_stdio.so stub generator)
+- /home/z/my-project/compile/Battlefield3/ (192 compiled .mdl files)

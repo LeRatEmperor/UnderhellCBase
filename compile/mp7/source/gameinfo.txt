@@ -1,0 +1,11 @@
+"GameInfo"
+{
+	game "mp7"
+	FileSystem
+	{
+		SearchPaths
+		{
+			Game		.
+		}
+	}
+}

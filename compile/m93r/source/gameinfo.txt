@@ -1,0 +1,11 @@
+"GameInfo"
+{
+	game "m93r"
+	FileSystem
+	{
+		SearchPaths
+		{
+			Game		.
+		}
+	}
+}

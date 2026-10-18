@@ -1,0 +1,11 @@
+"GameInfo"
+{
+	game "pp19"
+	FileSystem
+	{
+		SearchPaths
+		{
+			Game		.
+		}
+	}
+}

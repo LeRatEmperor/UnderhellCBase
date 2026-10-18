@@ -29,3 +29,11 @@ repos/source-net/
 
 # Downloaded .deb packages (not part of project)
 *.deb
+
+# Pipeline intermediate files
+compile/*/source/models/
+compile/*/compiled/
+/tmp/
+
+# Don't track .deb packages
+*.deb
