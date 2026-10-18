@@ -26,3 +26,6 @@ tools/blender.tar.xz
 repos/gmod-animations/
 repos/gmod-sdk/
 repos/source-net/
+
+# Downloaded .deb packages (not part of project)
+*.deb
