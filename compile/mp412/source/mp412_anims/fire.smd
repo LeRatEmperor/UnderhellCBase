@@ -2,7 +2,7 @@
 version 1
 nodes
   0 "l-upperarm-movement" -1
-  3 "lwrist" 2
+  3 "ValveBiped.Bip01_L_Hand" 2
   4 "ValveBiped.Bip01_L_Finger1" 3
   5 "ValveBiped.Bip01_L_Finger11" 4
   6 "ValveBiped.Bip01_L_Finger12" 5
@@ -18,9 +18,9 @@ nodes
   16 "ValveBiped.Bip01_L_Finger0" 3
   17 "ValveBiped.Bip01_L_Finger01" 16
   18 "ValveBiped.Bip01_L_Finger02" 17
-  19 "l-forearm-twist" 2
+  19 "ValveBiped.Bip01_L_ForeTwist" 2
   20 "r-upperarm-movement" -1
-  23 "r-rist" 22
+  23 "ValveBiped.Bip01_R_Hand" 22
   24 "ValveBiped.Bip01_R_Finger1" 23
   25 "ValveBiped.Bip01_R_Finger11" 24
   26 "ValveBiped.Bip01_R_Finger12" 25
@@ -36,7 +36,7 @@ nodes
   36 "ValveBiped.Bip01_R_Finger0" 23
   37 "ValveBiped.Bip01_R_Finger01" 36
   38 "ValveBiped.Bip01_R_Finger02" 37
-  39 "r-forearm-twist" 22
+  39 "ValveBiped.Bip01_R_ForeTwist" 22
   40 "MP412" -1
   41 "MP412_Hammer" -1
   42 "MP412_Trigger" -1

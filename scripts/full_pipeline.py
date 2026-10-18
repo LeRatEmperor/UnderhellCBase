@@ -79,6 +79,11 @@ def build_bone_map():
         bm[f"{sl}-forearm"] = f"ValveBiped.Bip01_{side}_Forearm"
         bm[f"{sl}_upperarm"] = f"ValveBiped.Bip01_{side}_UpperArm"
         bm[f"{sl}_wrist"] = f"ValveBiped.Bip01_{side}_Hand"
+        # Additional variants for weapons like sv98/mp412 that use no separator
+        bm[f"{sl}wrist"] = f"ValveBiped.Bip01_{side}_Hand"
+        bm[f"{sl}-rist"] = f"ValveBiped.Bip01_{side}_Hand"  # typo in sv98: "r-rist"
+        bm[f"{sl}-forearm-twist"] = f"ValveBiped.Bip01_{side}_ForeTwist"
+        bm[f"{sl}_forearm_twist"] = f"ValveBiped.Bip01_{side}_ForeTwist"
         for fn, fnum in fwords.items():
             for sn, sseg in swords.items():
                 bm[f"{sl}-{fn}-{sn}"] = f"ValveBiped.Bip01_{side}_Finger{fnum}{sseg}"

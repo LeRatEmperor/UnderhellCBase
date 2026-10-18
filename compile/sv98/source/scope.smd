@@ -6,7 +6,7 @@ nodes
   2 "Bolt1" 1
   3 "Mag" 0
   4 "l-upperarm-movement" -1
-  7 "lwrist" 6
+  7 "ValveBiped.Bip01_L_Hand" 6
   8 "ValveBiped.Bip01_L_Finger1" 7
   9 "ValveBiped.Bip01_L_Finger11" 8
   10 "ValveBiped.Bip01_L_Finger12" 9
@@ -22,9 +22,9 @@ nodes
   20 "ValveBiped.Bip01_L_Finger0" 7
   21 "ValveBiped.Bip01_L_Finger01" 20
   22 "ValveBiped.Bip01_L_Finger02" 21
-  23 "l-forearm-twist" 6
+  23 "ValveBiped.Bip01_L_ForeTwist" 6
   24 "r-upperarm-movement" -1
-  27 "r-rist" 26
+  27 "ValveBiped.Bip01_R_Hand" 26
   28 "ValveBiped.Bip01_R_Finger1" 27
   29 "ValveBiped.Bip01_R_Finger11" 28
   30 "ValveBiped.Bip01_R_Finger12" 29
@@ -40,7 +40,7 @@ nodes
   40 "ValveBiped.Bip01_R_Finger0" 27
   41 "ValveBiped.Bip01_R_Finger01" 40
   42 "ValveBiped.Bip01_R_Finger02" 41
-  43 "r-forearm-twist" 26
+  43 "ValveBiped.Bip01_R_ForeTwist" 26
   44 "SV" -1
   45 "Mesh_0011" 44
 end
