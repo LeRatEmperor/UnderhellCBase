@@ -6,7 +6,7 @@ $bodygroup "saiga12"
 {
 	studio "saiga12.smd"
 }
-// REMOVED: hands bodygroup (c_hands provides arm mesh)
+// REMOVED: hands bodygroup
 
 
 $surfaceprop "default"
@@ -48,8 +48,8 @@ $definebone "ValveBiped.Bip01_Pelvis" "ValveBiped.Bip01" 0 0 0 -89.999982 -89.99
 $definebone "ValveBiped.Bip01_Spine" "ValveBiped.Bip01_Pelvis" 4.019418 -0.003332 0.000006 -0.000057 0.045607 -0.000229 0 0 0 0 0 0
 $definebone "ValveBiped.Bip01_Spine1" "ValveBiped.Bip01_Spine" 4.183875 -0.004077 0 -0.023549 -0.039076 0.000057 0 0 0 0 0 0
 $definebone "ValveBiped.Bip01_Neck1" "ValveBiped.Bip01_Spine1" 5.120475 -0.002087 0 -0 0 0 0 0 0 0 0 0
-$definebone "anim_ValveBiped.Bip01_L_Clavicle" "ValveBiped.Bip01_Neck1" 0.000001 0.002084 1.508082 -89.999982 179.954366 0 0 0 0 0 0 0
-$definebone "anim_ValveBiped.Bip01_L_UpperArm" "anim_ValveBiped.Bip01_L_Clavicle" 5.853648 -0 0 -0.106398 -89.622805 -89.845224 0 0 0 0 0 0
+$definebone "ValveBiped.Bip01_L_Clavicle" "ValveBiped.Bip01_Neck1" 0.000001 0.002084 1.508082 -89.999982 179.954366 0 0 0 0 0 0 0
+$definebone "anim_ValveBiped.Bip01_L_UpperArm" "ValveBiped.Bip01_L_Clavicle" 5.853648 -0 0 -0.106398 -89.622805 -89.845224 0 0 0 0 0 0
 $definebone "anim_ValveBiped.Bip01_L_Forearm" "anim_ValveBiped.Bip01_L_UpperArm" 9.961164 -0 0 -0 -0.726854 -0 0 0 0 0 0 0
 $definebone "anim_ValveBiped.Bip01_L_Hand" "anim_ValveBiped.Bip01_L_Forearm" 8.503072 0 0 -0.48266 0.98629 -89.951454 0 0 0 0 0 0
 $definebone "anim_ValveBiped.Bip01_L_Finger0" "anim_ValveBiped.Bip01_L_Hand" 0.75662 0.677738 -1.164278 26.757083 24.397465 99.663313 0 0 0 0 0 0
@@ -67,8 +67,8 @@ $definebone "anim_ValveBiped.Bip01_L_Finger32" "anim_ValveBiped.Bip01_L_Finger31
 $definebone "anim_ValveBiped.Bip01_L_Finger4" "anim_ValveBiped.Bip01_L_Hand" 3.272118 0.110096 1.013748 -3.90809 22.484523 -10.975865 0 0 0 0 0 0
 $definebone "anim_ValveBiped.Bip01_L_Finger41" "anim_ValveBiped.Bip01_L_Finger4" 0.753933 0.000001 0 -0.000002 21.277877 -0.000002 0 0 0 0 0 0
 $definebone "anim_ValveBiped.Bip01_L_Finger42" "anim_ValveBiped.Bip01_L_Finger41" 0.703491 -0.000004 0 -0.000002 17.192298 -0.000003 0 0 0 0 0 0
-$definebone "anim_ValveBiped.Bip01_R_Clavicle" "ValveBiped.Bip01_Neck1" 0.000001 0.002092 -1.508082 89.999982 179.954366 0 0 0 0 0 0 0
-$definebone "anim_ValveBiped.Bip01_R_UpperArm" "anim_ValveBiped.Bip01_R_Clavicle" 5.853648 0 0 0.10743 -89.622573 89.892325 0 0 0 0 0 0
+$definebone "ValveBiped.Bip01_R_Clavicle" "ValveBiped.Bip01_Neck1" 0.000001 0.002092 -1.508082 89.999982 179.954366 0 0 0 0 0 0 0
+$definebone "anim_ValveBiped.Bip01_R_UpperArm" "ValveBiped.Bip01_R_Clavicle" 5.853648 0 0 0.10743 -89.622573 89.892325 0 0 0 0 0 0
 $definebone "anim_ValveBiped.Bip01_R_Forearm" "anim_ValveBiped.Bip01_R_UpperArm" 9.961167 0 0 -0 -0.724963 0 0 0 0 0 0 0
 $definebone "anim_ValveBiped.Bip01_R_Hand" "anim_ValveBiped.Bip01_R_Forearm" 8.503076 -0 0 0.48266 0.985774 89.951454 0 0 0 0 0 0
 $definebone "anim_ValveBiped.Bip01_R_Finger0" "anim_ValveBiped.Bip01_R_Hand" 0.756618 0.677738 1.164277 -26.757075 24.397453 -99.663313 0 0 0 0 0 0
@@ -87,9 +87,6 @@ $definebone "anim_ValveBiped.Bip01_R_Finger4" "anim_ValveBiped.Bip01_R_Hand" 3.2
 $definebone "anim_ValveBiped.Bip01_R_Finger41" "anim_ValveBiped.Bip01_R_Finger4" 0.753937 0 0 -0 21.277877 0.000001 0 0 0 0 0 0
 $definebone "anim_ValveBiped.Bip01_R_Finger42" "anim_ValveBiped.Bip01_R_Finger41" 0.703492 0 0.000001 -0.000003 17.192286 0.000001 0 0 0 0 0 0
 
-$definebone "ValveBiped.Bip01_Spine4" "" 0.000000 0.000000 0.000000 -90.000153 -79.749996 -89.999924 0 0 0 0 0 0
-$BoneMerge "ValveBiped.Bip01_Spine4"
-$BoneMerge "ValveBiped.Bip01_L_Clavicle"
 $BoneMerge "ValveBiped.Bip01_L_UpperArm"
 $BoneMerge "ValveBiped.Bip01_L_Forearm"
 $BoneMerge "ValveBiped.Bip01_L_Hand"
@@ -108,7 +105,6 @@ $BoneMerge "ValveBiped.Bip01_L_Finger32"
 $BoneMerge "ValveBiped.Bip01_L_Finger4"
 $BoneMerge "ValveBiped.Bip01_L_Finger41"
 $BoneMerge "ValveBiped.Bip01_L_Finger42"
-$BoneMerge "ValveBiped.Bip01_R_Clavicle"
 $BoneMerge "ValveBiped.Bip01_R_UpperArm"
 $BoneMerge "ValveBiped.Bip01_R_Forearm"
 $BoneMerge "ValveBiped.Bip01_R_Hand"

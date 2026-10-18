@@ -29,7 +29,7 @@ $bodygroup "mp7"
 {
 	studio "mp7.smd"
 }
-// REMOVED: hands bodygroup (c_hands provides arm mesh)
+// REMOVED: hands bodygroup
 
 
 $surfaceprop "default"
@@ -76,8 +76,8 @@ $definebone "Mp7_BoltRelease" "" 1.312188 1.72819 0.482723 0 0 -179.999964 0 0 0
 $definebone "Mp7_Foregrip" "" 1.312189 1.728189 0.482722 0 0 -179.999964 0 0 0 0 0 0
 $definebone "shell_ejection" "" -2.743761 -10.212969 -3.251182 -22.071481 -150.113447 0 0 0 0 0 0 0
 $definebone "muzzle_flash" "" -2.525776 -19.332973 -2.973041 0 -89.999982 0 0 0 0 0 0 0
-$definebone "anim_ValveBiped.Bip01_L_Clavicle" "" 1.510186 2.670961 -6.828427 0.004125 0 -0.039076 0 0 0 0 0 0
-$definebone "anim_ValveBiped.Bip01_L_UpperArm" "anim_ValveBiped.Bip01_L_Clavicle" 5.853649 -0 0 -0.104221 -89.622805 -89.845224 0 0 0 0 0 0
+$definebone "ValveBiped.Bip01_L_Clavicle" "" 1.510186 2.670961 -6.828427 0.004125 0 -0.039076 0 0 0 0 0 0
+$definebone "anim_ValveBiped.Bip01_L_UpperArm" "ValveBiped.Bip01_L_Clavicle" 5.853649 -0 0 -0.104221 -89.622805 -89.845224 0 0 0 0 0 0
 $definebone "anim_ValveBiped.Bip01_L_Forearm" "anim_ValveBiped.Bip01_L_UpperArm" 9.961163 0 0 0 -0.729261 0 0 0 0 0 0 0
 $definebone "anim_ValveBiped.Bip01_L_Hand" "anim_ValveBiped.Bip01_L_Forearm" 8.503069 0 0 -0.48266 0.986576 -89.951454 0 0 0 0 0 0
 $definebone "anim_ValveBiped.Bip01_L_Finger0" "anim_ValveBiped.Bip01_L_Hand" 0.756623 0.677738 -1.164276 26.757068 24.397465 99.663313 0 0 0 0 0 0
@@ -95,8 +95,8 @@ $definebone "anim_ValveBiped.Bip01_L_Finger32" "anim_ValveBiped.Bip01_L_Finger31
 $definebone "anim_ValveBiped.Bip01_L_Finger4" "anim_ValveBiped.Bip01_L_Hand" 3.272117 0.110096 1.013747 -3.908089 22.484522 -10.975865 0 0 0 0 0 0
 $definebone "anim_ValveBiped.Bip01_L_Finger41" "anim_ValveBiped.Bip01_L_Finger4" 0.753935 -0.000001 0 -0.000001 21.277882 0.000002 0 0 0 0 0 0
 $definebone "anim_ValveBiped.Bip01_L_Finger42" "anim_ValveBiped.Bip01_L_Finger41" 0.703493 0.000002 0 -0.000003 17.192295 0.000002 0 0 0 0 0 0
-$definebone "anim_ValveBiped.Bip01_R_Clavicle" "" -1.505977 2.670953 -6.827188 -0.042972 -179.999677 -179.96095 0 0 0 0 0 0
-$definebone "anim_ValveBiped.Bip01_R_UpperArm" "anim_ValveBiped.Bip01_R_Clavicle" 5.853648 0 0 0.103935 -89.622518 89.892325 0 0 0 0 0 0
+$definebone "ValveBiped.Bip01_R_Clavicle" "" -1.505977 2.670953 -6.827188 -0.042972 -179.999677 -179.96095 0 0 0 0 0 0
+$definebone "anim_ValveBiped.Bip01_R_UpperArm" "ValveBiped.Bip01_R_Clavicle" 5.853648 0 0 0.103935 -89.622518 89.892325 0 0 0 0 0 0
 $definebone "anim_ValveBiped.Bip01_R_Forearm" "anim_ValveBiped.Bip01_R_UpperArm" 9.961164 0.000001 0 -0 -0.729261 -0 0 0 0 0 0 0
 $definebone "anim_ValveBiped.Bip01_R_Hand" "anim_ValveBiped.Bip01_R_Forearm" 8.503071 0 0 0.48266 0.986576 89.951454 0 0 0 0 0 0
 $definebone "anim_ValveBiped.Bip01_R_Finger0" "anim_ValveBiped.Bip01_R_Hand" 0.756617 0.677738 1.164276 -26.757066 24.397465 -99.663313 0 0 0 0 0 0
@@ -115,9 +115,6 @@ $definebone "anim_ValveBiped.Bip01_R_Finger4" "anim_ValveBiped.Bip01_R_Hand" 3.2
 $definebone "anim_ValveBiped.Bip01_R_Finger41" "anim_ValveBiped.Bip01_R_Finger4" 0.753936 0 -0 0.000001 21.277882 -0.000005 0 0 0 0 0 0
 $definebone "anim_ValveBiped.Bip01_R_Finger42" "anim_ValveBiped.Bip01_R_Finger41" 0.703496 0.000004 0 0.000003 17.192283 -0.000004 0 0 0 0 0 0
 
-$definebone "ValveBiped.Bip01_Spine4" "" 0.000000 0.000000 0.000000 -90.000153 -79.749996 -89.999924 0 0 0 0 0 0
-$BoneMerge "ValveBiped.Bip01_Spine4"
-$BoneMerge "ValveBiped.Bip01_L_Clavicle"
 $BoneMerge "ValveBiped.Bip01_L_UpperArm"
 $BoneMerge "ValveBiped.Bip01_L_Forearm"
 $BoneMerge "ValveBiped.Bip01_L_Hand"
@@ -136,7 +133,6 @@ $BoneMerge "ValveBiped.Bip01_L_Finger32"
 $BoneMerge "ValveBiped.Bip01_L_Finger4"
 $BoneMerge "ValveBiped.Bip01_L_Finger41"
 $BoneMerge "ValveBiped.Bip01_L_Finger42"
-$BoneMerge "ValveBiped.Bip01_R_Clavicle"
 $BoneMerge "ValveBiped.Bip01_R_UpperArm"
 $BoneMerge "ValveBiped.Bip01_R_Forearm"
 $BoneMerge "ValveBiped.Bip01_R_Hand"

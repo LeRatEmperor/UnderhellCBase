@@ -96,8 +96,9 @@ $definebone "Sight_Ironsight_Battlesight" "" -2.413706 -10.466678 -0.078088 0 0 
 $definebone "Barrel_KACSilencer" "" -2.355 -14.541517 -1.274725 0 0 0 0 0 0 0 0 0
 $definebone "Barrel_GemtechSilencer" "" -2.355 -14.670494 -1.221097 0 0 0 0 0 0 0 0 0
 
-$definebone "ValveBiped.Bip01_Spine4" "" 0.000000 0.000000 0.000000 -90.000153 -79.749996 -89.999924 0 0 0 0 0 0
-$BoneMerge "ValveBiped.Bip01_Spine4"
+$BoneMerge "ValveBiped.Bip01_L_UpperArm"
+$BoneMerge "ValveBiped.Bip01_L_Forearm"
+$BoneMerge "ValveBiped.Bip01_L_Hand"
 $BoneMerge "ValveBiped.Bip01_L_Finger0"
 $BoneMerge "ValveBiped.Bip01_L_Finger01"
 $BoneMerge "ValveBiped.Bip01_L_Finger02"
@@ -113,6 +114,9 @@ $BoneMerge "ValveBiped.Bip01_L_Finger32"
 $BoneMerge "ValveBiped.Bip01_L_Finger4"
 $BoneMerge "ValveBiped.Bip01_L_Finger41"
 $BoneMerge "ValveBiped.Bip01_L_Finger42"
+$BoneMerge "ValveBiped.Bip01_R_UpperArm"
+$BoneMerge "ValveBiped.Bip01_R_Forearm"
+$BoneMerge "ValveBiped.Bip01_R_Hand"
 $BoneMerge "ValveBiped.Bip01_R_Finger0"
 $BoneMerge "ValveBiped.Bip01_R_Finger01"
 $BoneMerge "ValveBiped.Bip01_R_Finger02"

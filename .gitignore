@@ -24,3 +24,5 @@ tools/blender.tar.xz
 *.blend
 *.blend1
 repos/gmod-animations/
+repos/gmod-sdk/
+repos/source-net/
