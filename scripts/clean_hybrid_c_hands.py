@@ -37,7 +37,7 @@ C_ARMS_SMD = Path("/home/z/my-project/repos/gmod-animations/c_arms_citizen.smd")
 
 HAND_MATERIALS = {"v_hands", "sleeve_diffuse", "sleeve_diff", "t_phoenix"}
 
-# The 36 ValveBiped bones we need (matching Ghosts pattern — NO Spine4, NO Clavicle)
+# The ValveBiped bones we need (matching Ghosts pattern + Wrist/Ulna for c_arms mesh)
 # Each entry: (valvebiped_name, anim_parent_name)
 # The anim_parent is the BF3 bone (after renaming) that the ValveBiped bone will be a child of
 VALVEBIPED_BONES = [
@@ -45,6 +45,9 @@ VALVEBIPED_BONES = [
     ("ValveBiped.Bip01_L_UpperArm", "anim_ValveBiped.Bip01_L_UpperArm"),
     ("ValveBiped.Bip01_L_Forearm", "anim_ValveBiped.Bip01_L_Forearm"),
     ("ValveBiped.Bip01_L_Hand", "anim_ValveBiped.Bip01_L_Hand"),
+    # Left Wrist and Ulna (children of Forearm — needed because c_arms mesh is weighted to them)
+    ("ValveBiped.Bip01_L_Wrist", "anim_ValveBiped.Bip01_L_Forearm"),
+    ("ValveBiped.Bip01_L_Ulna", "anim_ValveBiped.Bip01_L_Forearm"),
     # Left fingers (15 bones: 5 fingers × 3 segments)
     ("ValveBiped.Bip01_L_Finger0", "anim_ValveBiped.Bip01_L_Finger0"),
     ("ValveBiped.Bip01_L_Finger01", "anim_ValveBiped.Bip01_L_Finger01"),
@@ -65,6 +68,9 @@ VALVEBIPED_BONES = [
     ("ValveBiped.Bip01_R_UpperArm", "anim_ValveBiped.Bip01_R_UpperArm"),
     ("ValveBiped.Bip01_R_Forearm", "anim_ValveBiped.Bip01_R_Forearm"),
     ("ValveBiped.Bip01_R_Hand", "anim_ValveBiped.Bip01_R_Hand"),
+    # Right Wrist and Ulna (children of Forearm)
+    ("ValveBiped.Bip01_R_Wrist", "anim_ValveBiped.Bip01_R_Forearm"),
+    ("ValveBiped.Bip01_R_Ulna", "anim_ValveBiped.Bip01_R_Forearm"),
     # Right fingers (15 bones)
     ("ValveBiped.Bip01_R_Finger0", "anim_ValveBiped.Bip01_R_Finger0"),
     ("ValveBiped.Bip01_R_Finger01", "anim_ValveBiped.Bip01_R_Finger01"),
@@ -611,7 +617,13 @@ def convert_weapon(weapon, c_arms_world):
     print(f"    Parsed bind pose: {len(bind_pose)} bones")
     
     # Step 5: Compute local transforms for new ValveBiped bones
-    # local = inverse(anim_bone_world) * c_arms_bone_world
+    # KEY INSIGHT from Ghosts weapons:
+    # The ValveBiped bones should be at the SAME WORLD POSITION as their anim_* parents
+    # (so the c_arms mesh renders near the weapon, not 40 units away)
+    # But they should have c_arms_citizen's ROTATION (so fingers are oriented correctly)
+    #
+    # local = inverse(anim_world) * (c_arms_rotation + anim_position)
+    # This means: keep the anim bone's position, but use c_arms_citizen's rotation
     new_bone_data = {}
     for vb_name, anim_parent in VALVEBIPED_BONES:
         if anim_parent not in weapon_world_by_name:
@@ -622,7 +634,15 @@ def convert_weapon(weapon, c_arms_world):
         anim_world = weapon_world_by_name[anim_parent]
         c_arms_mat = c_arms_world[vb_name]
         
-        local = np.matmul(np.linalg.inv(anim_world), c_arms_mat)
+        # Build a matrix that uses anim_world's POSITION but c_arms_mat's ROTATION
+        # Extract rotation from c_arms_mat
+        c_arms_rot = c_arms_mat.copy()
+        c_arms_rot[0,3] = anim_world[0,3]  # Use anim bone's position
+        c_arms_rot[1,3] = anim_world[1,3]
+        c_arms_rot[2,3] = anim_world[2,3]
+        
+        # local = inverse(anim_world) * combined
+        local = np.matmul(np.linalg.inv(anim_world), c_arms_rot)
         
         px, py, pz = local[0,3], local[1,3], local[2,3]
         rx, ry, rz = matrix_to_euler(local)
