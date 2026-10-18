@@ -640,3 +640,57 @@ Artifacts:
 - /home/z/my-project/repos/source-sdk-2013/game/bin/bin/linux64/filesystem_stdio.so (stub in studiomdl's load path)
 - /home/z/my-project/repos/source-sdk-2013/game/bin/filesystem_stdio.so (copy)
 - /home/z/my-project/compile/Battlefield3/ (restored 192 .mdl files from backup)
+
+---
+Task ID: filesystem-stub-v2
+Agent: main (Super Z)
+Task: User pointed to https://github.com/MSteam/studiomdl-linux as the source SDK that was used to build the working 64-bit studiomdl. Investigate.
+
+Work Log:
+- Cloned/examined MSteam/studiomdl-linux (already at /home/z/my-project/repos/studiomdl-linux)
+- Confirmed MSteam is 32-bit (uses -m32 flag, scout SDK container with GCC 4.8)
+- MSteam does NOT ship a filesystem_stdio.so stub - they expect Valve's 32-bit libfilesystem_stdio.so
+- Discovered Valve's 32-bit libfilesystem_stdio.so exists at /home/z/my-project/repos/source-sdk-2013/src/lib/public/linux32/libfilesystem_stdio.so (132KB, real implementation)
+- Attempted to set up 32-bit toolchain by downloading .deb packages (libc6-i386, gcc-multilib, etc.) without sudo
+- Successfully compiled 32-bit binaries, but CANNOT RUN them due to SECCOMP filter blocking 32-bit processes (SIGSYS bad system call)
+
+- Analyzed studiomdl binary's vtable expectations via disassembly:
+  * studiomdl stores g_pFileSystem as IBaseFileSystem* (secondary subobject at offset +8)
+  * studiomdl calls vtable[5] (offset 0x28) on the PRIMARY vtable expecting IsSteam (correct - GCC puts IFileSystem's own methods right after IAppSystem's 5)
+  * studiomdl calls vtable[2] (offset 0x10) on SECONDARY vtable expecting Open (correct - thunk)
+  * studiomdl calls vtable[6] (offset 0x30) on SECONDARY vtable expecting Size(handle) (correct - thunk)
+  * My stub's vtable layout matches these expectations
+
+- Tested my stub by calling it directly:
+  * CreateInterface("VFileSystem022") returns valid IFileSystem*
+  * IsSteam() correctly returns false
+  * Open/Size/Read/Close all work correctly when called through the vtable
+  * The QC file is successfully loaded (17490 bytes read)
+
+- BLOCKING ISSUE: studiomdl crashes with SIGSEGV (si_addr=0xffffffffb8bd2480) AFTER LoadFile completes
+  * The crash address is buffer + 0x1360 (4960 bytes into the malloc'd buffer)
+  * But the buffer is only 58-17491 bytes (depending on the QC file size)
+  * The address pattern shows 64-bit pointer truncation to 32-bit then sign-extension
+  * This indicates a 32-bit/64-bit pointer truncation bug somewhere in studiomdl
+  * The crash only happens with QC files that have $bodygroup with "studio" references
+  * Empty QC files or QC with just $modelname work fine
+
+- Investigation shows the crash is in Option_Studio or TokenAvailable, NOT in my stub
+  * My stub's Open/Read/Write/Close/Size methods all work correctly
+  * strace confirms no SMD file is ever opened (Load_Source is never called)
+  * The crash happens BEFORE studiomdl tries to load the SMD
+
+Stage Summary:
+- MSteam's studiomdl-linux is 32-bit, requires 32-bit runtime (blocked by seccomp on this system)
+- MSteam doesn't include a filesystem_stdio.so stub - expects Valve's 32-bit version
+- My 64-bit stub works correctly for the methods studiomdl calls (Open/Read/Write/Close/Size/IsSteam)
+- studiomdl crashes after LoadFile due to a 32-bit/64-bit pointer truncation bug
+- The crash appears to be in studiomdl's parsing code, not in my stub
+- This may be a pre-existing bug in the MSteam port that wasn't triggered before
+- The 192 .mdl files in compile/Battlefield3/ (from a previous successful compilation) are the working output
+
+Artifacts:
+- /home/z/my-project/scripts/build_stub/gen_fs_stub.py (improved stub generator)
+- /home/z/my-project/scripts/build_stub/filesystem_stdio_stub.cpp (generated C++ stub)
+- /home/z/my-project/scripts/build_stub/filesystem_stdio.so (compiled stub with debug output)
+- 32-bit toolchain extracted to /tmp/i386_libs/ (cannot run binaries due to seccomp)
