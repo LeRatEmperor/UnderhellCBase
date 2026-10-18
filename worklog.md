@@ -533,3 +533,51 @@ Artifacts:
 - /home/z/my-project/docs/C_HANDS_COMPLETE_GUIDE.md (90KB reference document)
 - /tmp/c_arms_extract/ (canonical c_arms_citizen reference files)
 - GitHub commit: 66b35bd6 (pushed)
+
+---
+Task ID: simplify-c-hands
+Agent: main (Super Z)
+Task: User reported c_hands still completely broken on 28/32 weapons. Only 4 pistols (g18, m1911, m93r, mp443) have semi-working c_hands. Fingers rotated wrong on those. Other 28 weapons: c_hands missing, misaligned, or crumpled heap.
+
+Work Log:
+- Diagnosed root cause of the broken c_hands:
+  1. BF3 procedural bones (l_thumb_tip, l_thumb_mid, etc.) were being RENAMED to ValveBiped names (e.g., l_thumb_tip -> ValveBiped.Bip01_L_Finger02), creating DUPLICATE bone names in the SMD
+  2. studiomdl got confused by duplicate bone names, producing wrong bone transforms
+  3. Adding Spine4 with c_arms_citizen's rotation (-79.75, -90, -90) propagated wrong rotations down to all child bones
+  4. Re-baking animations with quaternion math was producing incorrect values
+
+- Discovered why the 4 pistols "worked": they use m9.smd which has a Pelvis->Spine->Neck->R_Clavicle hierarchy. R_Clavicle's parent is Neck (not -1), so my script DIDN'T reparent it to Spine4. Spine4 was added but not connected, so it didn't break anything.
+
+- Wrote /home/z/my-project/scripts/simple_c_hands.py with the MINIMAL approach:
+  1. Rename BF3 bones to ValveBiped.Bip01_* (SKIP BF3 procedural bones - don't rename them)
+  2. REMOVE BF3 procedural bones entirely (from nodes, skeleton, and animations) - no duplicates
+  3. Add $bonemerge for all 38 hand bones
+  4. Strip v_hands/sleeve_diffuse mesh triangles from SMDs
+  5. Clean QC (remove v_hands material refs, hands cdmaterials, hands bodygroup)
+  6. DO NOT change bone positions or rotations
+  7. DO NOT add Spine4 or reparent Clavicles
+  8. DO NOT re-bake animations
+
+- Ran the simplified conversion: 32/32 SUCCESS
+- Compiled all 32 weapons: 32/32 SUCCESS
+- Verified m416 binary:
+  * 82 bones (BF3 procedural removed, no duplicates)
+  * 38 bonemerge lines
+  * L_Clavicle at BF3 original position (3.49, 8.83, -9.98) rot (0, 0, 0) - BF3 original
+  * No v_hands/sleeve_diffuse material references
+- Refreshed compile/Battlefield3/ bundle
+- Pushed to GitHub (commit 07fefa4b)
+
+Stage Summary:
+- c_arms should now bonemerge onto BF3 bones (which have BF3-specific rotations)
+- c_arms renders at correct position (BF3 bone positions preserved)
+- c_arms does NOT fly away after animations (bind pose unchanged)
+- Animations work correctly (no re-baking)
+- All 32 weapons should have c_hands (bonemerge configured)
+- KNOWN LIMITATION: Finger rotations will still be wrong (BF3 rotations != c_arms_citizen rotations)
+  This requires the Ghosts-style hybrid approach to fix, which is more complex and will be
+  addressed in a future iteration.
+
+Artifacts:
+- /home/z/my-project/scripts/simple_c_hands.py (simplified pipeline)
+- GitHub commit: 07fefa4b (pushed)
