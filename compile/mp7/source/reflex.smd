@@ -1,13 +1,13 @@
 // 
 version 1
 nodes
-  0 "Mp7_Body" -1
-  1 "Mp7_Magazine" -1
-  2 "Mp7_Trigger" -1
-  3 "Mp7_BoltRelease" -1
-  4 "Mp7_Foregrip" -1
-  5 "shell_ejection" -1
-  6 "muzzle_flash" -1
+  0 "Mp7_Body" 57
+  1 "Mp7_Magazine" 57
+  2 "Mp7_Trigger" 57
+  3 "Mp7_BoltRelease" 57
+  4 "Mp7_Foregrip" 57
+  5 "shell_ejection" 57
+  6 "muzzle_flash" 57
   7 "ValveBiped.Bip01_L_Clavicle" -1
   8 "ValveBiped.Bip01_L_UpperArm" 7
   9 "ValveBiped.Bip01_L_Forearm" 8
@@ -27,6 +27,12 @@ nodes
   23 "ValveBiped.Bip01_L_Finger4" 10
   24 "ValveBiped.Bip01_L_Finger41" 23
   25 "ValveBiped.Bip01_L_Finger42" 24
+  26 "ValveBiped.Bip01_L_ForeTwist" 8
+  27 "ValveBiped.Bip01_L_ForeTwist1" 26
+  28 "ValveBiped.Bip01_L_ForeTwist2" 27
+  29 "ValveBiped.Bip01_L_ForeTwist3" 28
+  30 "ValveBiped.Bip01_L_ForeTwist4" 29
+  31 "ValveBiped.Bip01_L_ForeTwist5" 30
   32 "ValveBiped.Bip01_R_Clavicle" -1
   33 "ValveBiped.Bip01_R_UpperArm" 32
   34 "ValveBiped.Bip01_R_Forearm" 33
@@ -46,6 +52,13 @@ nodes
   48 "ValveBiped.Bip01_R_Finger4" 35
   49 "ValveBiped.Bip01_R_Finger41" 48
   50 "ValveBiped.Bip01_R_Finger42" 49
+  51 "ValveBiped.Bip01_R_ForeTwist" 33
+  52 "ValveBiped.Bip01_R_ForeTwist1" 51
+  53 "ValveBiped.Bip01_R_ForeTwist2" 52
+  54 "ValveBiped.Bip01_R_ForeTwist3" 53
+  55 "ValveBiped.Bip01_R_ForeTwist4" 54
+  56 "ValveBiped.Bip01_R_ForeTwist5" 55
+  57 "ValveBiped.Bip01_Spine4" -1
 end
 skeleton
   time 0
@@ -75,6 +88,12 @@ skeleton
     23 3.272117 0.110096 1.013747 -0.191565 -0.068209 0.392429
     24 0.753935 -0.000001 0.000000 0.000000 -0.000000 0.371369
     25 0.703493 0.000002 0.000000 0.000000 -0.000000 0.300062
+    26 9.961163 0.000000 0.000000 0.000121 0.000000 -0.012728
+    27 1.417177 0.000000 0.000000 0.000121 -0.000000 -0.000000
+    28 1.417180 -0.000000 0.000000 0.000121 0.000000 -0.000000
+    29 1.417174 0.000000 0.000001 0.000121 -0.000000 0.000000
+    30 1.417179 0.000000 0.000000 0.000121 0.000000 -0.000000
+    31 1.417177 -0.000000 0.000000 0.000121 0.000000 -0.000000
     32 -1.505977 2.670953 -6.827188 -3.140911 -0.000750 -3.141587
     33 5.853648 0.000000 0.000000 1.568917 0.001814 -1.564208
     34 9.961164 0.000001 0.000000 -0.000000 -0.000000 -0.012728
@@ -94,6 +113,12 @@ skeleton
     48 3.272116 0.110096 -1.013746 0.191565 0.068209 0.392429
     49 0.753936 0.000000 -0.000000 -0.000000 0.000000 0.371369
     50 0.703496 0.000004 0.000000 -0.000000 0.000000 0.300062
+    51 9.961164 0.000001 0.000000 -0.000121 -0.000000 -0.012728
+    52 1.417178 -0.000000 0.000000 -0.000121 -0.000000 0.000000
+    53 1.417179 0.000000 0.000000 -0.000121 -0.000000 0.000000
+    54 1.417178 0.000000 -0.000000 -0.000121 -0.000000 0.000000
+    55 1.417182 0.000000 -0.000000 -0.000121 -0.000000 0.000000
+    56 1.417176 0.000000 -0.000000 -0.000121 -0.000000 0.000000
 end
 triangles
 reticle

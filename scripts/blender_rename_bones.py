@@ -343,18 +343,107 @@ def process_weapon(weapon):
                 with open(path, 'w') as fh:
                     fh.write(content)
     
-    # Strip v_hands mesh from all SMDs AND remove procedural/ForeTwist bones from SMDs
+    # Inline QCI content into the QC (not via $include — studiomdl has issues with $include)
+    # Also add Spine4 to SMDs and reparent weapon root bone to Spine4
+    # (keeps ValveBiped bones alive because weapon mesh depends on them)
+    qci_content = open(qci_dst, 'r').read()
+    
     for root, dirs, files in os.walk(dst_dir):
         for f in files:
+            path = os.path.join(root, f)
+            
+            if f.endswith(".qc"):
+                with open(path, 'r', errors='ignore') as fh:
+                    content = fh.read()
+                
+                # Remove the $include line (we'll inline the content instead)
+                content = re.sub(r'\$include "c_arms_definebones\.qci"\n', '', content)
+                
+                # Find the last $definebone line and insert QCI content after it
+                lines = content.split('\n')
+                last_db = -1
+                for i, line in enumerate(lines):
+                    if '$definebone' in line.lower():
+                        last_db = i
+                if last_db >= 0:
+                    lines.insert(last_db + 1, '\n' + qci_content)
+                    content = '\n'.join(lines)
+                
+                with open(path, 'w') as fh:
+                    fh.write(content)
+            
             if f.endswith(".smd"):
-                smd_path = os.path.join(root, f)
-                # Remove procedural bones from SMD
-                remove_procedural_bones_from_smd(smd_path)
-                # Strip v_hands mesh
-                strip_v_hands_from_smd(smd_path)
+                # Add Spine4 to the SMD and reparent root weapon bone to Spine4
+                add_spine4_to_smd(path)
     
-    print(f"    Bones renamed + $include c_arms_definebones.qci added + v_hands stripped")
+    print(f"    Bones renamed + QCI inlined + Spine4 added + v_hands stripped")
     return True
+
+
+def add_spine4_to_smd(smd_path):
+    """Add Spine4 bone to SMD and reparent weapon root bone to Spine4."""
+    with open(smd_path, 'r', errors='ignore') as f:
+        content = f.read()
+    
+    # Check if Spine4 is already in the SMD
+    if 'ValveBiped.Bip01_Spine4' in content:
+        return 0
+    
+    # Parse nodes to find bone IDs
+    bone_id_to_name = {}
+    in_nodes = False
+    for line in content.split('\n'):
+        s = line.strip()
+        if s == 'nodes': in_nodes = True; continue
+        if s == 'end' and in_nodes: in_nodes = False; break
+        if in_nodes:
+            m = re.match(r'^\s*(\d+)\s+"([^"]+)"\s+(-?\d+)$', s)
+            if m:
+                bone_id_to_name[int(m.group(1))] = m.group(2)
+    
+    if not bone_id_to_name:
+        return 0
+    
+    max_id = max(bone_id_to_name.keys())
+    spine4_id = max_id + 1
+    
+    # Find root bones (parent -1) that are NOT ValveBiped hand bones
+    root_bones = []
+    for bid, name in bone_id_to_name.items():
+        # Check parent
+        m = re.search(rf'^\s*{bid}\s+"[^"]+"\s+(-1)$', content, re.MULTILINE)
+        if m:
+            # Don't reparent ValveBiped hand bones (they'll be defined by QCI)
+            if not name.startswith('ValveBiped.Bip01_'):
+                root_bones.append((bid, name))
+    
+    if not root_bones:
+        return 0
+    
+    # Add Spine4 to nodes section
+    content = re.sub(
+        r'^(nodes\n)(.*?)(end\n)',
+        lambda m: m.group(1) + m.group(2) + f'  {spine4_id} "ValveBiped.Bip01_Spine4" -1\n' + m.group(3),
+        content, flags=re.MULTILINE | re.DOTALL
+    )
+    
+    # Reparent root bones to Spine4
+    for bid, name in root_bones:
+        content = re.sub(
+            rf'(\s+){bid}\s+"{re.escape(name)}"\s+-1(\s*\n)',
+            rf'\g<1>{bid} "{name}" {spine4_id}\g<2>',
+            content
+        )
+    
+    # Add Spine4 to skeleton section (after each 'time' line)
+    def add_spine4_to_skeleton(match):
+        return match.group(0) + f'  {spine4_id} 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000\n'
+    
+    content = re.sub(r'^time\s+\d+\s*\n', add_spine4_to_skeleton, content, flags=re.MULTILINE)
+    
+    with open(smd_path, 'w') as f:
+        f.write(content)
+    return 1
 
 
 def strip_v_hands_from_smd(smd_path):
