@@ -1,0 +1,4 @@
+"GameInfo"
+{
+	game "BF3 Weapons"
+}
