@@ -1,1 +1,0 @@
-$modelname "test.mdl"
