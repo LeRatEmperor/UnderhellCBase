@@ -1,0 +1,11 @@
+# Dependencies of the workspace scripts
+
+# Python
+lupa>=2.7          # Python wrapper for LuaJIT, used by cuh_sim_driver.py
+
+# Node.js (installed globally via /home/z/my-project/.local)
+# - billion-context
+# - @z_ai/coding-helper
+# - @anthropic-ai/claude-code
+
+# Lua (provided by lupa's bundled LuaJIT — no system Lua needed for the sim)

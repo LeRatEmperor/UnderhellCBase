@@ -1,0 +1,31 @@
+{
+  "hooks": {
+    "enabled": true,
+    "events": {
+      "SessionStart": [
+        {
+          "hooks": [
+            {
+              "type": "process",
+              "command": "node",
+              "args": [
+                "/home/z/my-project/.local/lib/node_modules/billion-context/dist/zcode/bootstrap-hook.js"
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "mcp": {
+    "servers": {
+      "bili": {
+        "type": "stdio",
+        "command": "node",
+        "args": [
+          "/home/z/my-project/.local/lib/node_modules/billion-context/dist/zcode/mcp-entry.js"
+        ]
+      }
+    }
+  }
+}
