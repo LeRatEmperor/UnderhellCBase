@@ -206,6 +206,7 @@ function SWEP:InitStatCache()
         "ViewSlideRecoilUp", "ViewSlideRecoilRight", "ZoomFov",
         "IronsightSpeed", "IronsightEaseIn", "ZoomSpeedIn", "ZoomSpeedOut",
         "IronSightTime", "MoveSpeed", "IronRecoilMultiplier",
+        "Silenced",
     }
     for _, key in ipairs(topLevel) do
         if string.find(key, "%.") then
