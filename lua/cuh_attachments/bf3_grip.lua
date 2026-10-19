@@ -28,14 +28,17 @@ ATTACHMENT.WeaponTable = {
     },
 
     -- Override each animation key individually to use the foregrip_* variant.
-    -- CUH's ApplyAttachments Step 5 merges per-key into SWEP.Animations (pcall'd for functions).
-    -- Since each value here is a string (not a function), it's a direct assignment.
+    -- Includes sprint_idle/in/out so sprinting also uses the foregrip anims
+    -- (BF3 models don't have dedicated sprint sequences — they reuse idle/draw).
     ["Animations"] = {
         ["shoot"]        = "foregrip_fire",
         ["reload"]       = "foregrip_reload",
         ["reload_empty"] = "foregrip_reload_empty",
         ["idle"]         = "foregrip_idle",
         ["draw"]         = "foregrip_draw",
+        ["sprint_idle"]  = "foregrip_idle",
+        ["sprint_in"]    = "foregrip_draw",
+        ["sprint_out"]   = "foregrip_draw",
     },
 }
 

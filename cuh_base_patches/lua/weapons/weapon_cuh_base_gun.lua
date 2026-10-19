@@ -701,15 +701,35 @@ end
 
 function SWEP:ApplyBodygroupsVM(vm)
     if not IsValid(vm) then return end
+    -- RESET previously-applied bodygroups to 0 first.
+    -- Without this, removing an attachment that set Bodygroup[0]=5 leaves
+    -- the viewmodel with bodygroup 0 still at 5 (scope model stays on rail).
+    -- We track every bodygroup index we've ever set, and reset them all
+    -- to 0 before applying the new set.
+    if self._prevBodygroups_V then
+        for bg, _ in pairs(self._prevBodygroups_V) do
+            vm:SetBodygroup(bg, 0)
+        end
+    end
+    self._prevBodygroups_V = {}
+    -- Now apply the current bodygroup overrides
     for bg, val in pairs(self.Bodygroups_V or {}) do
         vm:SetBodygroup(bg, val)
+        self._prevBodygroups_V[bg] = true   -- track for next frame's reset
     end
 end
 
 function SWEP:ApplyBodygroupsWM(wm)
     if not IsValid(wm) then return end
+    if self._prevBodygroups_W then
+        for bg, _ in pairs(self._prevBodygroups_W) do
+            wm:SetBodygroup(bg, 0)
+        end
+    end
+    self._prevBodygroups_W = {}
     for bg, val in pairs(self.Bodygroups_W or {}) do
         wm:SetBodygroup(bg, val)
+        self._prevBodygroups_W[bg] = true
     end
 end
 
@@ -1106,6 +1126,13 @@ function SWEP:ApplyAttachments()
     print("[CUH-DBG]   post-rebuild VElement barrel _csModel = "
         .. tostring(self.ViewModelElements and self.ViewModelElements["barrel"] and self.ViewModelElements["barrel"]._csModel))
     print("[CUH-DBG] <<< ApplyAttachments returning")
+
+    -- Force-refresh the idle animation so the viewmodel picks up any
+    -- Animations overrides immediately (e.g. grip swaps idle to foregrip_idle).
+    -- Without this, the old idle keeps playing until the next shoot/reload event.
+    if CLIENT and IsValid(self.Owner) then
+        self:EasySendWeaponAnim("idle", ACT_VM_IDLE)
+    end
 end
 
 -- ============================================================

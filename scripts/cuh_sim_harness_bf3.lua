@@ -431,3 +431,53 @@ wep:SetAttachment(4, 0)
 check("After revert: Animations['shoot'] = 'base_fire' (restored)",
       wep.Animations["shoot"] == "base_fire",
       "got=" .. tostring(wep.Animations["shoot"]))
+
+-- ============================================================
+-- 9. Bodygroup reset: verify scope bodygroup reverts when removed
+-- ============================================================
+print("\n--- Step 9: bodygroup reset ---")
+
+-- Attach scope (sets Bodygroups_V[0] = 5)
+wep:SetAttachment(1, 4)   -- slot 1 (optic), option 4 (bf3_acog)
+check("After acog: Bodygroups_V[0] = 3",
+      wep.Bodygroups_V and wep.Bodygroups_V[0] == 3,
+      "got=" .. tostring(wep.Bodygroups_V and wep.Bodygroups_V[0]))
+
+-- Remove scope (select None)
+wep:SetAttachment(1, 0)
+check("After acog removed: Bodygroups_V[0] is nil/0 (not 3)",
+      not wep.Bodygroups_V or wep.Bodygroups_V[0] == nil or wep.Bodygroups_V[0] ~= 3,
+      "got=" .. tostring(wep.Bodygroups_V and wep.Bodygroups_V[0]))
+
+-- Attach grip (sets Bodygroups_V[2] = 1)
+wep:SetAttachment(4, 1)
+check("After grip: Bodygroups_V[2] = 1",
+      wep.Bodygroups_V and wep.Bodygroups_V[2] == 1,
+      "got=" .. tostring(wep.Bodygroups_V and wep.Bodygroups_V[2]))
+
+-- Remove grip
+wep:SetAttachment(4, 0)
+check("After grip removed: Bodygroups_V[2] is nil/0 (not 1)",
+      not wep.Bodygroups_V or wep.Bodygroups_V[2] == nil or wep.Bodygroups_V[2] ~= 1,
+      "got=" .. tostring(wep.Bodygroups_V and wep.Bodygroups_V[2]))
+
+-- ============================================================
+-- 10. Sprint animation keys exist
+-- ============================================================
+print("\n--- Step 10: sprint animation keys ---")
+check("Animations['sprint_idle'] exists",
+      wep.Animations and wep.Animations["sprint_idle"] ~= nil,
+      "got=" .. tostring(wep.Animations and wep.Animations["sprint_idle"]))
+check("Animations['sprint_in'] exists",
+      wep.Animations and wep.Animations["sprint_in"] ~= nil,
+      "got=" .. tostring(wep.Animations and wep.Animations["sprint_in"]))
+check("Animations['sprint_out'] exists",
+      wep.Animations and wep.Animations["sprint_out"] ~= nil,
+      "got=" .. tostring(wep.Animations and wep.Animations["sprint_out"]))
+
+-- After grip attached, sprint keys should be foregrip variants
+wep:SetAttachment(4, 1)
+check("After grip: Animations['sprint_idle'] = 'foregrip_idle'",
+      wep.Animations and wep.Animations["sprint_idle"] == "foregrip_idle",
+      "got=" .. tostring(wep.Animations and wep.Animations["sprint_idle"]))
+wep:SetAttachment(4, 0)

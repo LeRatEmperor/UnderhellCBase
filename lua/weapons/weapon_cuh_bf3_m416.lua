@@ -112,7 +112,7 @@ SWEP.IronSightsAng = Vector(0.3, 0.05, 0)
 SWEP.IronSightTime = 0.45     -- CUH requires this (default ADS transition time)
 
 -- Sprint / alt-aim / inspect (CUH reads these)
-SWEP.RunSightsPos    = Vector(5.786, -5, -1)
+SWEP.RunSightsPos    = Vector(5.786, 0, -1)
 SWEP.RunSightsAng    = Vector(-10.778, 57.573, 0)
 SWEP.AlternativePos  = Vector(0, 0, 0)
 SWEP.AlternativeAng  = Angle(0, 0, 0)
@@ -160,7 +160,9 @@ SWEP.MuzzleFlashLightSize  = 128
 
 SWEP.NoShell  = false
 SWEP.ShellHeat = 0.8
-SWEP.Shell     = "models/weapons/shell_556.mdl"   -- 5.56mm rifle shell
+-- Don't set SWEP.Shell — let the CUH base default to "models/weapons/shell_9mm.mdl"
+-- (ships with GMod). Setting it to "models/weapons/shell_556.mdl" caused error signs
+-- because that model doesn't exist in the user's GMod install.
 SWEP.ShellDelay = 0
 
 -- ============================================================
@@ -198,8 +200,16 @@ SWEP.Animations = {
     ["draw"]         = "base_draw",
     ["first_draw"]   = "base_draw",
 
-    -- BF3 models don't have dedicated iron/sprint/inspect sequences —
-    -- fall back to the base idle and let CUH use ACT_VM_* fallbacks.
+    -- Sprint: BF3 models don't have dedicated sprint sequences, so we
+    -- map sprint_idle to the regular idle and sprint_in/out to draw.
+    -- When grip is attached, the grip's WeaponTable.Animations overrides
+    -- these keys to the foregrip_* variants.
+    ["sprint_idle"]  = "base_idle",
+    ["sprint_in"]    = "base_draw",
+    ["sprint_out"]   = "base_draw",
+
+    -- Ironsights (BF3 models don't have dedicated ADS anims —
+    -- fall back to base idle for iron transitions)
     ["iron_in"]      = "base_idle",
     ["iron_idle"]    = "base_idle",
     ["iron_out"]     = "base_idle",
