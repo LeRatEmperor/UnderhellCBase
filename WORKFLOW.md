@@ -8,7 +8,7 @@
 - **Work repo (push target)**: `LeRatEmperor/UnderhellCBase`
   - All my work goes here.
   - SSH clone URL: git@github.com:LeRatEmperor/UnderhellCBase.git
-  - Deploy key registered: SHA256:HD9JBDuhTz35p1uTXq1zuCk6NU74v/U+a1c7wOPJxXA
+  - Deploy key registered: SHA256:6u1tTiKvZOGtXFfaBoBydzRmgKSYX2Hz4D6UIWADNBk
 
 ## SSH setup
 
