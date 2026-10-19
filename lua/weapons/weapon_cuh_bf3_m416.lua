@@ -208,8 +208,8 @@ SWEP.Animations = {
     -- When grip is attached, the grip's WeaponTable.Animations overrides
     -- these keys to the foregrip_* variants.
     ["sprint_idle"]  = "base_idle",
-    ["sprint_in"]    = "base_draw",
-    ["sprint_out"]   = "base_draw",
+    ["sprint_in"]    = "base_idle",
+    ["sprint_out"]   = "base_idle",
 
     -- Ironsights (BF3 models don't have dedicated ADS anims —
     -- fall back to base idle for iron transitions)
@@ -237,8 +237,8 @@ SWEP.ViewModelElements = {
         type = "Model",
         model = "models/tfa/lbeam.mdl",
         bone = "Weapon",   -- capital W — matches m416.mdl's actual bone name
-        pos = Vector(-1.4, 7.899, 3.6),
-        ang = Angle(0, -90, 0),   -- CUH reads elem.ang (NOT elem.angle)
+        pos = Vector(1.4, 7.899, 3.6),   -- flipped X from -1.4 to 1.4 (was on wrong side)
+        ang = Angle(0, -90, 0),
         size = Vector(0.5, 0.5, 0.5),
         material = "",
         skin = 0,
