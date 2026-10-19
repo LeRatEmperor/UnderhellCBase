@@ -1,15 +1,11 @@
 -- cuh_console_relay.lua
 -- Place in: lua/autorun/server/cuh_console_relay.lua
 --
--- File-based relay that lets an external script execute Lua inside GMod.
--- Uses file polling (no socket library needed).
+-- GMod-side relay. Polls data/cuh_relay/cmd.txt for Lua commands,
+-- executes them, writes output to data/cuh_relay/out_<ID>.txt.
 --
--- Protocol:
---   Python writes: data/cuh_relay/cmd.txt  (first line = command ID, rest = Lua code)
---   GMod reads, executes, writes: data/cuh_relay/out_<ID>.txt (output)
---   Python reads the output file.
---
--- Security: ONLY run on a local/trusted server. Allows arbitrary Lua execution.
+-- The Windows sync script (cuh_relay_sync.bat) handles copying files
+-- between GitHub and the GMod data directory.
 
 cuh_relay = cuh_relay or {}
 

@@ -1,111 +1,120 @@
 #!/usr/bin/env python3
-"""cuh_relay_client.py — Client for the GMod console relay.
+"""cuh_relay_client.py — Send Lua commands to GMod via GitHub relay.
 
-Sends Lua commands to a running GMod server via the file-based relay
-and receives the output.
+Writes commands to the cuh-relay branch on UnderhellCBase, then polls
+for output files that the Windows sync script pushes back.
 
 Usage:
-    python3 cuh_relay_client.py
-
-This opens an interactive prompt where you can type Lua commands.
-The commands are executed inside the running GMod server and the
-output is displayed.
-
-Prerequisites:
-    - GMod server running with cuh_console_relay.lua installed
-    - The GMod server's data/ directory must be accessible at the
-      path specified by GMOD_DATA_DIR below
+    python3 cuh_relay_client.py "lua command here"
+    python3 cuh_relay_client.py --interactive
 """
 
-import os
-import sys
-import time
-import uuid
-import textwrap
+import os, sys, time, uuid, subprocess, tempfile, json
 
-# CONFIG: Set this to your GMod server's data directory.
-# For a local listen server: typically garrysmod/data/
-# For a dedicated server: typically <server_root>/garrysmod/data/
-# You can also set the GMOD_DATA_DIR environment variable.
-GMOD_DATA_DIR = os.environ.get("GMOD_DATA_DIR", "/home/z/.steam/steam/steamapps/common/GarrysMod/garrysmod/data")
+REPO_DIR = "/home/z/my-project/repos/cuh-relay-bridge"
+REPO_URL = "git@github.com:LeRatEmperor/UnderhellCBase.git"
+BRANCH = "cuh-relay"
+GIT_SSH = "/home/z/.venv/bin/python3 /home/z/my-project/scripts/git-ssh-wrapper.py"
 
-# For this container, we'll use a shared directory
-# The GMod relay reads/writes files in data/cuh_relay/
-RELAY_DIR = os.path.join(GMOD_DATA_DIR, "cuh_relay")
+
+def ensure_repo():
+    """Clone or update the relay repo."""
+    if not os.path.exists(REPO_DIR):
+        os.makedirs(REPO_DIR)
+        env = os.environ.copy()
+        env["GIT_SSH_COMMAND"] = GIT_SSH
+        subprocess.run(["git", "init"], cwd=REPO_DIR, capture_output=True)
+        subprocess.run(["git", "remote", "add", "origin", REPO_URL], cwd=REPO_DIR, capture_output=True)
+        # Create orphan branch
+        subprocess.run(["git", "checkout", "--orphan", BRANCH], cwd=REPO_DIR, capture_output=True)
+        subprocess.run(["git", "commit", "--allow-empty", "-m", "Init relay branch"],
+                       cwd=REPO_DIR, capture_output=True)
+        env["GIT_SSH_COMMAND"] = GIT_SSH
+        subprocess.run(["git", "push", "--force", "origin", BRANCH], cwd=REPO_DIR,
+                       env=env, capture_output=True)
+    else:
+        # Pull latest (in case there are output files from the Windows side)
+        env = os.environ.copy()
+        env["GIT_SSH_COMMAND"] = GIT_SSH
+        subprocess.run(["git", "fetch", "origin"], cwd=REPO_DIR, env=env, capture_output=True)
+        subprocess.run(["git", "reset", "--hard", f"origin/{BRANCH}"], cwd=REPO_DIR, capture_output=True)
 
 
 def send_command(lua_code):
-    """Send a Lua command to GMod and return the output."""
+    """Send a Lua command and wait for output."""
     cmd_id = str(uuid.uuid4())[:8]
 
-    # Write command file: first line = ID, rest = Lua code
-    cmd_path = os.path.join(RELAY_DIR, "cmd.txt")
+    # Write command file
+    cmd_path = os.path.join(REPO_DIR, "cmd.txt")
     content = f"{cmd_id}\n{lua_code}"
 
-    os.makedirs(RELAY_DIR, exist_ok=True)
     with open(cmd_path, "w") as f:
         f.write(content)
 
+    # Commit and push
+    env = os.environ.copy()
+    env["GIT_SSH_COMMAND"] = GIT_SSH
+    subprocess.run(["git", "add", "cmd.txt"], cwd=REPO_DIR, capture_output=True)
+    subprocess.run(["git", "commit", "-m", f"Relay cmd {cmd_id}"], cwd=REPO_DIR, capture_output=True)
+    subprocess.run(["git", "push", "origin", BRANCH], cwd=REPO_DIR, env=env, capture_output=True)
+
+    print(f"[relay] Command {cmd_id} pushed. Waiting for GMod to execute...")
+
     # Poll for output file
-    out_path = os.path.join(RELAY_DIR, f"out_{cmd_id}.txt")
-    timeout = 10  # seconds
+    out_file = f"out_{cmd_id}.txt"
+    timeout = 60  # seconds — user needs to have GMod running + sync script
     start = time.time()
 
     while time.time() - start < timeout:
+        time.sleep(3)
+        # Pull to check for output
+        subprocess.run(["git", "fetch", "origin"], cwd=REPO_DIR, env=env, capture_output=True)
+        subprocess.run(["git", "reset", "--hard", f"origin/{BRANCH}"], cwd=REPO_DIR, capture_output=True)
+
+        out_path = os.path.join(REPO_DIR, out_file)
         if os.path.exists(out_path):
             with open(out_path, "r") as f:
                 output = f.read()
-            os.remove(out_path)
+            # Clean up
+            subprocess.run(["git", "rm", out_file], cwd=REPO_DIR, capture_output=True)
+            subprocess.run(["git", "commit", "-m", f"Relay output consumed {cmd_id}"],
+                          cwd=REPO_DIR, capture_output=True)
+            subprocess.run(["git", "push", "origin", BRANCH], cwd=REPO_DIR, env=env, capture_output=True)
             return output
-        time.sleep(0.2)
 
-    return f"[TIMEOUT] No response after {timeout}s. Is the relay running?"
+        elapsed = int(time.time() - start)
+        if elapsed % 10 == 0:
+            print(f"[relay] Still waiting... ({elapsed}s elapsed)")
+
+    return f"[TIMEOUT] No response after {timeout}s. Is GMod running + sync script active?"
 
 
 def main():
-    print(f"[CUH Relay] GMod data dir: {GMOD_DATA_DIR}")
-    print(f"[CUH Relay] Relay dir: {RELAY_DIR}")
-    print(f"[CUH Relay] Type Lua commands. Ctrl+C to exit.")
-    print()
+    if len(sys.argv) < 2:
+        print("Usage:")
+        print(f"  {sys.argv[0]} 'lua command here'")
+        print(f"  {sys.argv[0]} --interactive")
+        sys.exit(1)
 
-    # Check if the relay directory exists
-    if not os.path.exists(RELAY_DIR):
-        os.makedirs(RELAY_DIR, exist_ok=True)
-        print(f"[CUH Relay] Created relay directory. Make sure GMod is running with the relay script.")
+    ensure_repo()
 
-    # Test connection
-    print("[CUH Relay] Testing connection...")
-    result = send_command('print("CUH relay connected! Server time: " .. tostring(CurTime()))')
-    print(f"[CUH Relay] Response: {result}")
-    print()
-
-    if "TIMEOUT" in result:
-        print("[CUH Relay] Could not connect. Make sure:")
-        print("  1. GMod is running")
-        print("  2. cuh_console_relay.lua is installed in lua/autorun/server/")
-        print(f"  3. GMod's data directory is at: {GMOD_DATA_DIR}")
-        print("  4. You can set GMOD_DATA_DIR env var to override")
-        return
-
-    # Interactive loop
-    while True:
-        try:
-            cmd = input("lua> ").strip()
-            if not cmd:
-                continue
-            if cmd in ("exit", "quit"):
+    if sys.argv[1] == "--interactive":
+        print("[relay] Interactive mode. Type Lua commands. Ctrl+C to exit.")
+        while True:
+            try:
+                cmd = input("lua> ").strip()
+                if not cmd: continue
+                if cmd in ("exit", "quit"): break
+                result = send_command(cmd)
+                print(result)
+                print()
+            except (KeyboardInterrupt, EOFError):
+                print("\n[relay] Bye!")
                 break
-
-            # Multi-line support: if the line ends with a backslash, read more
-            while cmd.endswith("\\"):
-                cmd = cmd[:-1] + "\n" + input("... ")
-
-            result = send_command(cmd)
-            print(result)
-            print()
-        except (KeyboardInterrupt, EOFError):
-            print("\n[CUH Relay] Bye!")
-            break
+    else:
+        cmd = " ".join(sys.argv[1:])
+        result = send_command(cmd)
+        print(result)
 
 
 if __name__ == "__main__":
