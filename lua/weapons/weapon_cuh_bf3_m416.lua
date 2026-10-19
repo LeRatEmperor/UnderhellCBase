@@ -288,9 +288,69 @@ function SWEP:ShootAnimation()
     return "shoot"
 end
 
+-- ============================================================
+-- Ironsight + sprint animation handlers
+-- (copied from weapon_xm4_bo6.lua — the working CUH reference)
+-- ============================================================
+
+function SWEP:HandleIronsightsAnimations()
+    local ply = self:GetOwner()
+    if not IsValid(ply) or not ply:IsPlayer() then return end
+    if self:GetUHBool("Running") then
+        self.wasZooming = self:GetUHBool("Zooming")
+        return
+    end
+    if self:GetUHBool("Reloading") then return end
+    if self._meleeActive then return end
+
+    local isZooming = self:GetUHBool("Zooming")
+    if self.wasZooming == nil then self.wasZooming = false end
+
+    local vm = ply:GetViewModel()
+    if not IsValid(vm) then return end
+
+    if isZooming and not self.wasZooming then
+        self:EasySendWeaponAnim("iron_in", ACT_VM_DEPLOY)
+    elseif not isZooming and self.wasZooming then
+        self:EasySendWeaponAnim("iron_out", ACT_VM_UNDEPLOY)
+    elseif isZooming then
+        if vm:GetCycle() >= 1 then
+            self:EasySendWeaponAnim("iron_idle", ACT_VM_IDLE_DEPLOYED)
+        end
+    end
+    self.wasZooming = isZooming
+end
+
+function SWEP:HandleSprintingAnimations()
+    local ply = self:GetOwner()
+    if not IsValid(ply) or not ply:IsPlayer() then return end
+
+    local isRunning = self:GetUHBool("Running")
+    if self.wasRunning == nil then self.wasRunning = false end
+
+    local vm = ply:GetViewModel()
+    if not IsValid(vm) then return end
+
+    if isRunning and not self.wasRunning then
+        if not self:GetUHBool("Reloading") then
+            self:EasySendWeaponAnim("sprint_in", ACT_VM_SPRINT_ENTER)
+        end
+    elseif not isRunning and self.wasRunning then
+        if not self:GetUHBool("Reloading") then
+            self:EasySendWeaponAnim("sprint_out", ACT_VM_SPRINT_LEAVE)
+        end
+    elseif isRunning and not self:GetUHBool("Reloading") then
+        if vm:GetCycle() >= 1 then
+            self:EasySendWeaponAnim("sprint_idle", ACT_VM_SPRINT_IDLE)
+        end
+    end
+    self.wasRunning = isRunning
+end
+
 function SWEP:Think()
     BaseClass.Think(self)
-    -- Per-weapon Think logic could go here
+    self:HandleIronsightsAnimations()
+    self:HandleSprintingAnimations()
 end
 
 function SWEP:PrimaryAttack()
@@ -313,6 +373,7 @@ function SWEP:Reload()
 end
 
 function SWEP:Holster(wep)
-    -- CRITICAL: must pass self explicitly (cuh_base_analysis.md §7.4)
+    self.wasZooming = false
+    self.wasRunning = false
     return BaseClass.Holster(self, wep)
 end

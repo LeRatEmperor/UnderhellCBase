@@ -26,24 +26,18 @@ ATTACHMENT.WeaponTable = {
         ["IronAccuracy"] = function(wep, stat) return stat * 0.9 end,
     },
 
-    -- CUH reads wep:GetNWBool("Silenced") in PrimaryAttack to:
-    --   - choose Primary.SilSound vs Primary.Sound
-    --   - append "_sil" to the animation lookup key
-    -- ApplyAttachments Step 5 calls SetStat on each WeaponTable key, which
-    -- for boolean values just sets wep[<key>] = true. But "Silenced" is checked
-    -- via GetNWBool (a network var), not via self.Silenced, so the WeaponTable
-    -- entry alone doesn't work. We need an Attach() side-effect.
-    -- The CUH base restores _defaultSnapshot when attachments are removed,
-    -- but SetNWBool isn't part of the snapshot. This means once silenced,
-    -- the weapon stays silenced until re-deploy. Known limitation.
+    -- Set Silenced = true via the stat cache so both client and server
+    -- agree. The CUH base's PrimaryAttack checks self:GetNWBool("Silenced")
+    -- for sound/animation selection. We set BOTH the stat (self.Silenced)
+    -- AND the NW bool (in Attach/Detach) so it works regardless of which
+    -- code path reads it.
+    ["Silenced"] = true,
 }
 
 function ATTACHMENT:Attach(wep)
     wep:SetNWBool("Silenced", true)
 end
 
--- Detach is NEVER CALLED by the CUH base (see cuh_base_analysis.md §7.2)
--- To un-silence: select "None" in the muzzle slot, then re-deploy the weapon.
 function ATTACHMENT:Detach(wep)
     wep:SetNWBool("Silenced", false)
 end
