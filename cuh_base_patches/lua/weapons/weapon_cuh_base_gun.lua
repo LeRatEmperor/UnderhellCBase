@@ -1017,8 +1017,10 @@ function SWEP:ApplyAttachments()
                     --       },
                     --   }
                     if att.WeaponTable and att.WeaponTable.Animations then
+                        print("[CUH-DBG]       Animations override from attId=" .. tostring(attId) .. ":")
                         if not self.Animations then self.Animations = {} end
                         for animKey, animVal in pairs(att.WeaponTable.Animations) do
+                            print("[CUH-DBG]         Animations['" .. tostring(animKey) .. "'] = " .. tostring(animVal))
                             if isfunction(animVal) then
                                 local cur = self.Animations[animKey]
                                 local ok, newVal = pcall(animVal, self, cur)

@@ -348,3 +348,86 @@ end
 print("\n" .. string.rep("=", 70))
 print(string.format("[SIM] PASSED %d / %d checks", _RESULT_PASS, _RESULT_PASS + _RESULT_FAILS))
 print(string.rep("=", 70))
+
+-- ============================================================
+-- 8. Grip attachment: verify full fire/reload animation swap
+-- ============================================================
+print("\n--- Step 8: grip attachment full animation swap ---")
+
+-- First reset to no grip
+wep:SetAttachment(4, 0)
+
+-- Verify base state: Animations['shoot'] = 'base_fire'
+check("Before grip: Animations['shoot'] = 'base_fire'",
+      wep.Animations["shoot"] == "base_fire",
+      "got=" .. tostring(wep.Animations["shoot"]))
+check("Before grip: Animations['reload'] = 'base_reload'",
+      wep.Animations["reload"] == "base_reload",
+      "got=" .. tostring(wep.Animations["reload"]))
+
+-- Simulate ShootAnimation() return value
+local shootKey = wep.ShootAnimation and wep:ShootAnimation() or "shoot"
+check("ShootAnimation() returns 'shoot'", shootKey == "shoot",
+      "got=" .. tostring(shootKey))
+
+-- Simulate PrimaryAttack's lookupKey construction
+local lookupKey = shootKey  -- not zooming, not silenced
+check(string.format("Before grip: lookupKey '%s' in Animations", lookupKey),
+      wep.Animations and wep.Animations[lookupKey] ~= nil,
+      "value=" .. tostring(wep.Animations and wep.Animations[lookupKey]))
+check(string.format("Before grip: Animations['%s'] = 'base_fire'", lookupKey),
+      wep.Animations[lookupKey] == "base_fire",
+      "got=" .. tostring(wep.Animations[lookupKey]))
+
+-- Now attach grip
+print("  Attaching grip...")
+wep:SetAttachment(4, 1)
+
+-- Verify grip swapped the animations
+check("After grip: Animations['shoot'] = 'foregrip_fire'",
+      wep.Animations["shoot"] == "foregrip_fire",
+      "got=" .. tostring(wep.Animations["shoot"]))
+check("After grip: Animations['reload'] = 'foregrip_reload'",
+      wep.Animations["reload"] == "foregrip_reload",
+      "got=" .. tostring(wep.Animations["reload"]))
+check("After grip: Animations['reload_empty'] = 'foregrip_reload_empty'",
+      wep.Animations["reload_empty"] == "foregrip_reload_empty",
+      "got=" .. tostring(wep.Animations["reload_empty"]))
+check("After grip: Animations['idle'] = 'foregrip_idle'",
+      wep.Animations["idle"] == "foregrip_idle",
+      "got=" .. tostring(wep.Animations["idle"]))
+check("After grip: Animations['draw'] = 'foregrip_draw'",
+      wep.Animations["draw"] == "foregrip_draw",
+      "got=" .. tostring(wep.Animations["draw"]))
+
+-- Simulate the full PrimaryAttack animation lookup chain
+shootKey = wep.ShootAnimation and wep:ShootAnimation() or "shoot"
+lookupKey = shootKey  -- not zooming, not silenced
+check(string.format("After grip: lookupKey '%s' resolves to 'foregrip_fire'", lookupKey),
+      wep.Animations[lookupKey] == "foregrip_fire",
+      "got=" .. tostring(wep.Animations[lookupKey]))
+
+-- Verify EasySendWeaponAnim would find the sequence
+local animData = wep.Animations[lookupKey]
+local vm = wep.Owner:GetViewModel()
+local seq = vm:LookupSequence(animData)
+check(string.format("After grip: LookupSequence('%s') = %d (valid)", animData, seq),
+      seq and seq >= 0,
+      "seq=" .. tostring(seq))
+
+-- Now simulate the Reload animation lookup
+local reloadKey = "reload"  -- not empty, not silenced
+local reloadAnim = wep.Animations[reloadKey]
+check(string.format("After grip: Animations['%s'] = 'foregrip_reload'", reloadKey),
+      reloadAnim == "foregrip_reload",
+      "got=" .. tostring(reloadAnim))
+local reloadSeq = vm:LookupSequence(reloadAnim)
+check(string.format("After grip: LookupSequence('%s') = %d (valid)", reloadAnim, reloadSeq),
+      reloadSeq and reloadSeq >= 0,
+      "seq=" .. tostring(reloadSeq))
+
+-- Revert
+wep:SetAttachment(4, 0)
+check("After revert: Animations['shoot'] = 'base_fire' (restored)",
+      wep.Animations["shoot"] == "base_fire",
+      "got=" .. tostring(wep.Animations["shoot"]))
