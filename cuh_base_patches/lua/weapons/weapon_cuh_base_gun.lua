@@ -701,21 +701,15 @@ end
 
 function SWEP:ApplyBodygroupsVM(vm)
     if not IsValid(vm) then return end
-    -- RESET previously-applied bodygroups to 0 first.
-    -- Without this, removing an attachment that set Bodygroup[0]=5 leaves
-    -- the viewmodel with bodygroup 0 still at 5 (scope model stays on rail).
-    -- We track every bodygroup index we've ever set, and reset them all
-    -- to 0 before applying the new set.
     if self._prevBodygroups_V then
         for bg, _ in pairs(self._prevBodygroups_V) do
             vm:SetBodygroup(bg, 0)
         end
     end
     self._prevBodygroups_V = {}
-    -- Now apply the current bodygroup overrides
     for bg, val in pairs(self.Bodygroups_V or {}) do
         vm:SetBodygroup(bg, val)
-        self._prevBodygroups_V[bg] = true   -- track for next frame's reset
+        self._prevBodygroups_V[bg] = true
     end
 end
 
@@ -734,12 +728,6 @@ function SWEP:ApplyBodygroupsWM(wm)
 end
 
 function SWEP:ResetBodygroups()
-    -- SNAPSHOT default bodygroup values the first time we run, so we
-    -- can actively restore them later. Without this, clearing
-    -- self.Bodygroups_V = {} just empties the table — but the actual
-    -- viewmodel mesh keeps its previously-set bodygroup values, so
-    -- removed attachments leave their bodygroup swaps in place
-    -- (e.g. scope bodygroup stays on the rail after the scope is removed).
     if not self._defaultBodygroups_V then
         self._defaultBodygroups_V = {}
         if self.Bodygroups_V then
@@ -756,11 +744,6 @@ function SWEP:ResetBodygroups()
             end
         end
     end
-
-    -- Restore Bodygroups_V/W to the weapon's defaults (NOT empty {}).
-    -- This means an attachment that set Bodygroups_V[0] = 5 will have
-    -- that overridden by the default (typically 0) when the attachment
-    -- is removed.
     self.Bodygroups_V = table.Copy(self._defaultBodygroups_V)
     self.Bodygroups_W = table.Copy(self._defaultBodygroups_W)
     self._currentSightBG = nil
@@ -786,25 +769,7 @@ function SWEP:ApplyAttachments()
     end
     if not self._statOrigins then self:InitStatCache() end
 
-    -- 0. CALL DETACH ON PREVIOUSLY-EQUIPPED ATTACHMENTS.
-    -- Before we reset stats / VElements / bodygroups (Step 1+), call
-    -- att:Detach(self) on every attachment that is currently equipped.
-    -- This gives attachments a chance to undo side-effects that aren't
-    -- tracked by the stat cache (e.g. SetNWBool("Silenced"), custom
-    -- networked state, external entity creation).
-    --
-    -- We compare each slot's CURRENT sel value (which is what the user
-    -- is switching FROM) against the NEW sel value (passed via
-    -- self._pendingAttachmentSelections, set by SetAttachment before
-    -- calling ApplyAttachments). If they differ, the old attachment
-    -- is being removed/replaced — call Detach.
-    --
-    -- NOTE: After Detach runs, we DON'T update .sel — SetAttachment
-    -- already set it. We just iterate to find what was equipped BEFORE
-    -- this ApplyAttachments call. The simplest approach: capture the
-    -- previous sel values in SetAttachment BEFORE updating .sel, and
-    -- store them on self._prevSelections (cleared at the end of
-    -- ApplyAttachments).
+    -- 0. CALL DETACH ON PREVIOUSLY-EQUIPPED ATTACHMENTS
     if self._prevSelections then
         for slot, prevSel in pairs(self._prevSelections) do
             if prevSel and prevSel > 0 then
@@ -819,7 +784,6 @@ function SWEP:ApplyAttachments()
                             local ok, err = pcall(prevAtt.Detach, prevAtt, self)
                             if not ok then
                                 print("[CUH-DBG]     ERROR in att:Detach: " .. tostring(err))
-                                ErrorNoHalt("[CUH] Attachment " .. tostring(prevAttId) .. " Detach() failed: " .. tostring(err) .. "\n")
                             end
                         end
                     end
@@ -1037,10 +1001,8 @@ function SWEP:ApplyAttachments()
                     --       },
                     --   }
                     if att.WeaponTable and att.WeaponTable.Animations then
-                        print("[CUH-DBG]       Animations override from attId=" .. tostring(attId) .. ":")
                         if not self.Animations then self.Animations = {} end
                         for animKey, animVal in pairs(att.WeaponTable.Animations) do
-                            print("[CUH-DBG]         Animations['" .. tostring(animKey) .. "'] = " .. tostring(animVal))
                             if isfunction(animVal) then
                                 local cur = self.Animations[animKey]
                                 local ok, newVal = pcall(animVal, self, cur)
@@ -1127,9 +1089,6 @@ function SWEP:ApplyAttachments()
         .. tostring(self.ViewModelElements and self.ViewModelElements["barrel"] and self.ViewModelElements["barrel"]._csModel))
     print("[CUH-DBG] <<< ApplyAttachments returning")
 
-    -- Force-refresh the idle animation so the viewmodel picks up any
-    -- Animations overrides immediately (e.g. grip swaps idle to foregrip_idle).
-    -- Without this, the old idle keeps playing until the next shoot/reload event.
     if CLIENT and IsValid(self.Owner) then
         self:EasySendWeaponAnim("idle", ACT_VM_IDLE)
     end
@@ -1164,8 +1123,7 @@ function SWEP:SetAttachment(slot, index)
     end
 
     -- CAPTURE previous selection so ApplyAttachments Step 0 can call
-    -- Detach on the previously-equipped attachment in this slot.
-    -- Only captures if the selection is actually changing.
+    -- Detach on the previously-equipped attachment.
     local prevSel = self.Attachments[slot].sel
     if prevSel ~= index then
         self._prevSelections = self._prevSelections or {}
