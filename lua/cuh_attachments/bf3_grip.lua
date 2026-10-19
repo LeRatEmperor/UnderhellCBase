@@ -28,17 +28,20 @@ ATTACHMENT.WeaponTable = {
     },
 
     -- Override each animation key individually to use the foregrip_* variant.
-    -- Includes sprint_idle/in/out so sprinting also uses the foregrip anims
-    -- (BF3 models don't have dedicated sprint sequences — they reuse idle/draw).
+    -- Includes silenced variants (BF3 has no separate silenced anims — same sequence).
+    -- Includes sprint_idle/in/out so sprinting also uses the foregrip anims.
     ["Animations"] = {
-        ["shoot"]        = "foregrip_fire",
-        ["reload"]       = "foregrip_reload",
-        ["reload_empty"] = "foregrip_reload_empty",
-        ["idle"]         = "foregrip_idle",
-        ["draw"]         = "foregrip_draw",
-        ["sprint_idle"]  = "foregrip_idle",
-        ["sprint_in"]    = "foregrip_draw",
-        ["sprint_out"]   = "foregrip_draw",
+        ["shoot"]             = "foregrip_fire",
+        ["shoot_sil"]         = "foregrip_fire",
+        ["reload"]            = "foregrip_reload",
+        ["reload_sil"]        = "foregrip_reload",
+        ["reload_empty"]      = "foregrip_reload_empty",
+        ["reload_empty_sil"]  = "foregrip_reload_empty",
+        ["idle"]              = "foregrip_idle",
+        ["draw"]              = "foregrip_draw",
+        ["sprint_idle"]       = "foregrip_idle",
+        ["sprint_in"]         = "foregrip_draw",
+        ["sprint_out"]        = "foregrip_draw",
     },
 }
 

@@ -194,8 +194,11 @@ SWEP.CUHInspectOnMenu = true
 -- the foregrip_* variants via the attachment's WeaponTable.Animations block.
 SWEP.Animations = {
     ["shoot"]        = "base_fire",
+    ["shoot_sil"]    = "base_fire",           -- BF3 has no silenced anim; reuse base_fire
     ["reload"]       = "base_reload",
+    ["reload_sil"]   = "base_reload",          -- same
     ["reload_empty"] = "base_reload_empty",
+    ["reload_empty_sil"] = "base_reload_empty", -- same
     ["idle"]         = "base_idle",
     ["draw"]         = "base_draw",
     ["first_draw"]   = "base_draw",
@@ -247,6 +250,20 @@ SWEP.ViewModelElements = {
 }
 
 SWEP.WorldModelElements = {}   -- no WElements for BF3 weapons (world models have their own meshes)
+
+-- ============================================================
+-- Default bodygroups
+-- ============================================================
+-- CRITICAL: must set default bodygroup state so ResetBodygroups can
+-- restore to these values when attachments are removed.
+-- BF3 models have 4 attachment bodygroups:
+--   [0] = sight (0=ironsights, 1=reflex, 2=kobra, 3=acog, 4=eotech, 5=scope)
+--   [1] = barrel (0=default, 1=muzzle/compensator, 2=suppressor)
+--   [2] = grip (0=no grip, 1=foregrip)
+--   [3] = laser (0=no laser, 1=laser)
+-- All default to 0 (no attachments equipped).
+SWEP.Bodygroups_V = { [0] = 0, [1] = 0, [2] = 0, [3] = 0 }
+SWEP.Bodygroups_W = { [0] = 0, [1] = 0, [2] = 0, [3] = 0 }
 
 -- ============================================================
 -- Attachments table (CUH format)
