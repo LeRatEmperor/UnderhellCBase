@@ -136,10 +136,19 @@ SWEP.Secondary.IronFOV_Collimator = 60
 -- ============================================================
 -- Penetration / chambering
 -- ============================================================
-SWEP.Penetration = true
+-- CUH expects a NUMBER (penetration depth in units), not a boolean.
+-- TFA's Penetration = true means "enable bullet penetration"; in CUH
+-- that's equivalent to Penetration = 2 (the default depth).
+SWEP.Penetration = 2
 SWEP.Chambering = true   -- M416 has bullet-in-chamber (was implicit in TFA)
 SWEP.ReloadSpeed = 1
 SWEP.TwoHanded = true
+
+-- Use QC reload events: when true, the base plays reload sound events
+-- that are baked into the model's $animation (AE_SHELL or AE_RELOAD
+-- events). BF3 models emit reload sounds via QC events, so we MUST
+-- enable this to hear them.
+SWEP.UseQCReloadEvents = true
 
 -- ============================================================
 -- Muzzle flash + shell
@@ -203,15 +212,20 @@ SWEP.AnimSounds = {}
 -- ============================================================
 -- TFA: SWEP.VElements = { ["laser"] = { type = "Model", ... } }
 -- CUH: SWEP.ViewModelElements = { ["laser"] = { type = "Model", model = "...", ... } }
--- Conversion: keep "type" (CUH's InitVElements checks elem.type == "Model"),
--- drop "rel", drop "color", keep the rest.
+-- Conversion notes:
+--   - Keep "type = 'Model'" (CUH's InitVElements checks elem.type == "Model")
+--   - Drop "rel" (TFA relative-bone field — CUH doesn't have this)
+--   - Drop "color" (TFA per-element color — CUH doesn't support this)
+--   - Use "ang" (NOT "angle") — CUH's DrawVElements reads elem.ang, not elem.angle
+--   - Bone name must EXACTLY match the model's bone name (case-sensitive).
+--     The BF3 m416 model has bone "Weapon" (capital W), NOT "weapon".
 SWEP.ViewModelElements = {
     ["laser"] = {
         type = "Model",
         model = "models/tfa/lbeam.mdl",
-        bone = "weapon",
+        bone = "Weapon",   -- capital W — matches m416.mdl's actual bone name
         pos = Vector(-1.4, 7.899, 3.6),
-        angle = Angle(0, -90, 0),
+        ang = Angle(0, -90, 0),   -- CUH reads elem.ang (NOT elem.angle)
         size = Vector(0.5, 0.5, 0.5),
         material = "",
         skin = 0,
