@@ -1090,12 +1090,26 @@ function SWEP:ApplyAttachments()
         .. tostring(self.ViewModelElements and self.ViewModelElements["barrel"] and self.ViewModelElements["barrel"]._csModel))
     print("[CUH-DBG] <<< ApplyAttachments returning")
 
-    -- Only refresh idle if the weapon is NOT currently deploying.
-    -- Calling idle during deploy overwrites the draw animation and
-    -- blocks weapon use (the SWEP thinks draw is still playing).
-    if CLIENT and IsValid(self.Owner) and self.GetNWFloat and self:GetNWFloat("DeployTime") <= CurTime() then
-        self:EasySendWeaponAnim("idle", ACT_VM_IDLE)
-    end
+    -- ============================================================
+    -- IDLE REFRESH INTENTIONALLY REMOVED (FIX: idle overwrote draw)
+    -- ============================================================
+    -- Previous code called self:EasySendWeaponAnim("idle", ACT_VM_IDLE)
+    -- here (with a guard on GetNWFloat("DeployTime") <= CurTime()).
+    -- That guard was useless because every per-weapon Deploy() override
+    -- (m8a1 line 380, xm4 line 355, bo7_1911 line 487, dcm_1911 line 416,
+    -- kate_*, ghosts_*) sets DeployTime = 0, so the guard always passed
+    -- and the idle was always force-played during deploy, overwriting
+    -- the draw animation on every CUH swep.
+    --
+    -- Safe to remove because:
+    --   * Parent Think / HandleRunning / per-weapon Idle() methods
+    --     already drive the natural idle cycle when no other anim is
+    --     playing (vm:GetCycle() >= 1, not reloading, not sprinting).
+    --   * When user changes an attachment mid-game, the next natural
+    --     idle tick picks up the new Animations["idle"] within ~1-2s.
+    --
+    -- If you need an animation PRIORITY system later, add it to the parent
+    -- SendWeaponAnim / EasySendWeaponAnim dispatcher, NOT to ApplyAttachments.
 end
 
 -- ============================================================
