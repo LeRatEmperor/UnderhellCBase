@@ -31,12 +31,6 @@ SWEP.AdminSpawnable = false
 -- SetAttachment) opened the CUH menu.
 SWEP.IsCUHWeapon = true
 
--- Customization toggle: set SWEP.Customizable = false on weapons that
--- don't have attachments. When false, ApplyAttachments is a no-op
--- (skips the entire attachment pipeline) and the CUH menu won't open.
-SWEP.Customizable = true  -- default: true (WWII Kate weapons)
-SWEP.MeleeEnabled = true  -- default: true (melee bash via E+M1)
-
 -- ============================================================
 -- DEFAULT ATTACHMENT SYSTEM
 -- ============================================================
@@ -71,6 +65,25 @@ function SWEP:GetEffectiveAttachment(slot)
     end
 
     return sel
+end
+
+-- ============================================================
+-- IsAttachmentEquipped — check if a specific attachment is equipped
+-- ============================================================
+-- Used by attachment animation functions to detect other attachments.
+-- Example: tac knife reload checks if extended mags are also equipped.
+function SWEP:IsAttachmentEquipped(attId)
+    if not self.Attachments then return false end
+    for slot = 1, #self.Attachments do
+        local slotData = self.Attachments[slot]
+        if slotData and slotData.atts then
+            local sel = self:GetEffectiveAttachment(slot)
+            if sel and sel > 0 and slotData.atts[sel] == attId then
+                return true
+            end
+        end
+    end
+    return false
 end
 
 -- ============================================================
@@ -737,9 +750,12 @@ end
 -- ============================================================
 
 function SWEP:ApplyAttachments()
-    -- Skip the entire attachment pipeline for non-customizable weapons
-    if self.Customizable == false then return end
-    if not self.Attachments then return end
+    print("[CUH-DBG] >>> ApplyAttachments CALLED  realm=" .. (SERVER and "SERVER" or "CLIENT")
+        .. "  wep=" .. tostring(self) .. "  class=" .. tostring(self.GetClass and self:GetClass() or "?"))
+    if not self.Attachments then
+        print("[CUH-DBG]   ABORT: self.Attachments is nil")
+        return
+    end
     if not self._statOrigins then self:InitStatCache() end
 
     print("[CUH-DBG]   CustomUH.Attachments count = " .. tostring(CustomUH and CustomUH.Attachments and table.Count(CustomUH.Attachments) or "nil"))
