@@ -51,18 +51,7 @@ ATTACHMENT.WeaponTable = {
 -- Drop the HoldType change ("smg" vs "ar2") from the original TFA attachment.
 -- CUH doesn't have WeaponTable.HoldType support and the difference is cosmetic.
 
-function ATTACHMENT:Attach(wep)
-    -- Force-play the foregrip idle animation immediately so the user
-    -- sees the swap right away (no need to shoot first).
-    if CLIENT and IsValid(wep.Owner) then
-        wep:EasySendWeaponAnim("idle", ACT_VM_IDLE)
-    end
-end
-
-function ATTACHMENT:Detach(wep)
-    -- Force-play the regular idle animation immediately so the user
-    -- sees the revert right away.
-    if CLIENT and IsValid(wep.Owner) then
-        wep:EasySendWeaponAnim("idle", ACT_VM_IDLE)
-    end
-end
+-- No Attach/Detach side effects needed.
+-- The ApplyAttachments idle refresh (which respects deploy state)
+-- handles playing the correct idle animation after the Animations
+-- table is swapped.

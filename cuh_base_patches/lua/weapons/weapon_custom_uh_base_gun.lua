@@ -38,7 +38,7 @@ SWEP.SlotPos    = 3
 SWEP.HoldType   = "smg"
 SWEP.FiresUnderwater = false
 SWEP.Weight     = 45
-SWEP.DrawCrosshair = false
+SWEP.DrawCrosshair = true  -- MCV crosshair: enables DoDrawCrosshair hook
 SWEP.DrawAmmo   = true
 SWEP.DrawWeaponInfoBox = false
 
@@ -278,7 +278,7 @@ end
 -- GetShootSound
 -- ============================================================
 function SWEP:GetShootSound()
-    local source = self:GetNWBool("Silenced") or self.Silenced == true and self.Primary.SilSound or self.Primary.Sound
+    local source = self:GetNWBool("Silenced") and self.Primary.SilSound or self.Primary.Sound
     if istable(source) then
         return tostring(source[math.random(1, #source)])
     end
@@ -330,7 +330,7 @@ function SWEP:PrimaryAttack()
 
         -- FIXED: local spread (was global)
         local dmg = math.random(self.Primary.MinDamage, self.Primary.MaxDamage)
-        if self:GetNWBool("Silenced") or self.Silenced == true then
+        if self:GetNWBool("Silenced") then
             dmg = math.Round(dmg * 0.95)
         end
         self:ShootBullets(self.Owner:GetShootPos(), self.Owner:GetAimVector(), dmg, self.Penetration or 2)
@@ -356,7 +356,7 @@ function SWEP:PrimaryAttack()
     if self.ShootAnimation then
         baseAct = self:ShootAnimation()
     end
-    local isSilenced = self:GetNWBool("Silenced") or self.Silenced == true
+    local isSilenced = self:GetNWBool("Silenced")
     local isZooming = self:GetUHBool("Zooming")
     local lookupKey = isZooming and "shoot_ads" or "shoot"
     if isSilenced then lookupKey = lookupKey .. "_sil" end
@@ -482,6 +482,8 @@ function SWEP:ShootGrenade(force)
 end
 
 function SWEP:PostShoot()
+    -- Track last shot time for crosshair kick calculation (MCV-style)
+    self._lastRecoilTime = CurTime()
 end
 
 -- ============================================================
@@ -568,7 +570,7 @@ end
 -- Muzzle flash — FIXED: DynamicLight ID (was 0, now self:EntIndex())
 -- ============================================================
 function SWEP:DoMuzzleFlash()
-    if self:GetNWBool("Silenced") or self.Silenced == true then return end
+    if self:GetNWBool("Silenced") then return end
 
     if self.MuzzleFlashType == "particle" and self.MuzzleFlashParticle and self.MuzzleFlashParticle ~= "" then
         local vm = IsValid(self.Owner) and self.Owner:GetViewModel() or nil
@@ -730,7 +732,7 @@ function SWEP:Reload()
                     self:SendSequence(vm, seq)
                 end
             else
-                local isSilenced = self:GetNWBool("Silenced") or self.Silenced == true
+                local isSilenced = self:GetNWBool("Silenced")
                 local isEmpty = (self:Clip1() <= 0)
                 local animToPlay = nil
 
@@ -760,7 +762,7 @@ function SWEP:Reload()
                 if animToPlay then
                     self:SendAnim(vm, animToPlay, ACT_VM_RELOAD)
                 else
-                    if self:GetNWBool("Silenced") or self.Silenced == true then
+                    if self:GetNWBool("Silenced") then
                         self:SendSequence(vm, vm:SelectWeightedSequence(ACT_VM_RELOAD_SILENCED or ACT_VM_RELOAD))
                     else
                         self:SendSequence(vm, vm:SelectWeightedSequence(ACT_VM_RELOAD))
@@ -862,6 +864,33 @@ function SWEP:FireAnimationEvent(pos, ang, event, options)
         return true
     end
     return true
+end
+
+-- ============================================================
+-- HandleRunning override — block sprint during reload
+-- ============================================================
+-- The parent base's HandleRunning doesn't check if the weapon is
+-- reloading before entering sprint. This causes shotgun shell-by-shell
+-- reload animations to fight with sprint animations (rapid start/stop).
+-- Fix: if reloading, don't enter sprint — wait for reload to complete.
+function SWEP:HandleRunning(ct)
+    if self.GetUHBool and self:GetUHBool("Reloading") then
+        -- If already running, exit sprint (but don't start a new one)
+        if self:GetUHBool("Running") then
+            self:SetUHBool("Running", false)
+            -- Play the exit-sprint animation
+            local act = ACT_VM_LOWERED_TO_IDLE
+            if self.HasSilencer and self:GetNWBool("Silenced") then
+                act = ACT_VM_IDLE_SILENCED
+            end
+            self:SendWeaponAnim(act)
+        end
+        return  -- Don't enter sprint while reloading
+    end
+    -- Not reloading — call the parent's HandleRunning via BaseClass
+    if BaseClass.HandleRunning then
+        BaseClass.HandleRunning(self, ct)
+    end
 end
 
 -- ============================================================
@@ -988,6 +1017,206 @@ function SWEP:AdjustMouseSensitivity()
     end
 end
 
+
+if CLIENT then
+-- ============================================================
+-- MCV-STYLE DYNAMIC CROSSHAIR
+-- Ported from Military Conflict Vietnam (lua/mcv/weapon_common/cl_hud.lua)
+-- ============================================================
+-- Features:
+--   * Spread-following gap (widens with movement, jumping, firing)
+--   * Shot kick (gap kicks open on fire, decays over CH_KickTime)
+--   * Asymmetric interpolation (opens 3x faster than closes)
+--   * Walk bob (figure-of-eight, speed-scaled)
+--   * View-punch following (stays on actual aim point)
+--   * Reload fade (smooth fade out/in)
+--   * ADS fade (smooth fade as you aim down sights)
+--   * Deploy/holster blend (slides in on weapon switch)
+--   * Shadow outline for visibility on any background
+--   * Shotgun circle mode (for multi-pellet weapons)
+--   * Shares color with the 3D2D HUD (uh_hud_r/g/b convars)
+
+local CH_Shadow = Color(0, 0, 0, 0)
+local CH_White = Color(255, 255, 255, 255)
+local CH_Smooth = 12        -- gap follows target at 12/sec (closing)
+local CH_Kick = 0.75        -- extra gap = 0.75x base spread on shot
+local CH_KickTime = 0.15    -- kick decays over 0.15s
+local CH_Bob = 2.5          -- 2.5 ScreenScale units of bob at sprint
+local CH_DeployTime = 0.35  -- seconds for crosshair to fade in on deploy
+
+local function ch_ease(p)
+    p = math.Clamp(p, 0, 1)
+    return 1 - (1 - p) * (1 - p) * (1 - p)
+end
+
+local function ch_shadowrect(x, y, w, h, col)
+    surface.SetDrawColor(col)
+    surface.DrawRect(x, y, w, h)
+    surface.SetDrawColor(0, 0, 0, col.a * 100 / 150)
+    surface.DrawOutlinedRect(x - 1, y - 1, w + 2, h + 2)
+end
+
+function SWEP:DoDrawCrosshair(x, y)
+    -- Suppress during deploy
+    if self:GetNWFloat("DeployTime") > CurTime() then return true end
+
+    -- Track deploy/holster blend (detect weapon switches via frame number)
+    local frame = FrameNumber()
+    local now = CurTime()
+    if self._chLastFrame == nil or frame < self._chLastFrame or frame - self._chLastFrame > 2 then
+        self._chDeployTime = now
+    end
+    self._chLastFrame = frame
+    local blend = ch_ease((now - (self._chDeployTime or now)) / CH_DeployTime)
+
+    -- Track ADS progress (smooth 0..1)
+    local zooming = self.GetUHBool and self:GetUHBool("Zooming") or false
+    if self.ScopeDisabled then zooming = false end
+    local adsTarget = zooming and 1 or 0
+    self._chADS = math.Approach(self._chADS or 0, adsTarget, FrameTime() * 8)
+
+    -- Track reload fade
+    local reloading = self.GetUHBool and self:GetUHBool("Reloading") or false
+    local reloadTarget = reloading and 0 or 1
+    self._chReloadAlpha = math.Approach(self._chReloadAlpha or 1, reloadTarget, FrameTime() * 8)
+
+    -- Calculate visibility alpha (fully fades during ADS and reload)
+    -- During ADS: alpha goes to 0 as _chADS goes to 1 (fully invisible when converged)
+    local a = (1 - self._chADS) * 100 * blend * self._chReloadAlpha
+    if a <= 0 then return true end
+
+    -- Check convar
+    if not GetConVar("uh_crosshair"):GetBool() then return true end
+
+    -- Suppress during 2D scope
+    if self.Use2DScope and zooming then return true end
+
+    -- Use the same color as the 3D2D HUD (uh_hud_r/g/b convars)
+    -- so the crosshair and HUD share the same customizable color
+    local col = Color(
+        GetConVar("uh_hud_r"):GetInt(),
+        GetConVar("uh_hud_g"):GetInt(),
+        GetConVar("uh_hud_b"):GetInt(),
+        a
+    )
+    col.a = a
+
+    -- Follow view punch (crosshair stays on actual aim point)
+    local owner = self:GetOwner()
+    if IsValid(owner) then
+        local aim = owner:EyeAngles() + owner:GetViewPunchAngles() * 2
+        local scr = (owner:EyePos() + aim:Forward() * 4096):ToScreen()
+        if scr.visible and scr.x == scr.x then
+            x, y = scr.x, scr.y
+        end
+    end
+
+    local dot_size = ScreenScale(1)
+    local line_size = ScreenScale(4)
+
+    -- Calculate gap from spread + kick
+    local trueFOV = 90
+    local fovCvar = GetConVar("fov_desired")
+    if fovCvar then trueFOV = fovCvar:GetInt() end
+    if trueFOV < 1 then trueFOV = 90 end
+
+    -- Widescreen fix
+    local ratio = (ScrW() / ScrH()) / (4 / 3)
+    local halfAngle = trueFOV * (0.5 * math.pi / 180)
+    local t = math.tan(halfAngle) * ratio
+    local wsFOV = (180 / math.pi) * math.atan(t) * 2
+    local scale = ScrH() / wsFOV
+
+    -- Base spread
+    local baseSpread = self.Primary and self.Primary.Spread or 0.004
+    local spread = baseSpread * 100
+
+    -- Movement spread
+    local vel = 0
+    local walkSpeed = 200
+    local inAir = false
+    if IsValid(owner) then
+        vel = owner:GetVelocity():Length()
+        walkSpeed = owner:GetWalkSpeed()
+        if walkSpeed < 1 then walkSpeed = 200 end
+        inAir = not owner:IsOnGround()
+    end
+    local moveRatio = math.Clamp(vel / (walkSpeed * 2), 0, 1)
+    local moveSpread = moveRatio * 2
+    if inAir then moveSpread = moveSpread + 3 end
+
+    -- Shot kick — detect via NextPrimaryFire (networked, works on client)
+    -- When a weapon fires, it sets NextPrimaryFire = CurTime() + delay.
+    -- If CurTime() is very close to when NextPrimaryFire was SET (not when
+    -- it expires), the weapon was just fired. We detect the transition:
+    -- the frame NextPrimaryFire INCREASES, a shot was fired.
+    local nextFire = self:GetNextPrimaryFire()
+    if nextFire > (self._chLastNextFire or 0) then
+        -- NextPrimaryFire increased — a shot was fired this frame
+        self._chKickTime = now
+    end
+    self._chLastNextFire = nextFire
+
+    -- Kick decays from the moment of the shot
+    local since = now - (self._chKickTime or 0)
+    local kick = math.Clamp(1 - since / CH_KickTime, 0, 1)
+    kick = kick * kick  -- quadratic decay for smoother feel
+    local kickGap = kick * ScreenScale(12)  -- 12 ScreenScale units of kick
+
+    local target = scale * (spread + moveSpread) + kickGap
+
+    -- ADS convergence: as ADS progresses (0..1), gap shrinks toward 0
+    target = target * (1 - self._chADS)
+
+    -- Smooth interpolation (opens 3x faster than closes, like MCV)
+    local ft = FrameTime()
+    if self._chGap == nil then self._chGap = target end
+    if target > self._chGap then
+        self._chGap = Lerp(math.min(ft * CH_Smooth * 3, 1), self._chGap, target)
+    else
+        self._chGap = Lerp(math.min(ft * CH_Smooth, 1), self._chGap, target)
+    end
+    local gap_size = math.max(self._chGap, 0)
+
+    -- Walk bob (figure of eight)
+    local speed = vel / math.max(walkSpeed * 2.5, 1)
+    if inAir then speed = 0 end
+    self._chBobPhase = (self._chBobPhase or 0) + ft * (6 + speed * 6) * math.min(speed * 3, 1)
+    local bob = CH_Bob * ScreenScale(1) * speed
+    x = x + math.sin(self._chBobPhase) * bob
+    y = y + math.abs(math.cos(self._chBobPhase)) * bob * 0.6
+
+    -- Draw center dot (hide when fully converged during ADS)
+    if self._chADS < 0.95 then
+        ch_shadowrect(x - (dot_size / 2), y - (dot_size / 2), dot_size, dot_size, col)
+    end
+
+    -- Draw crosshair lines or circle
+    local pellets = (self.Primary and self.Primary.NumberofShots) or 1
+    if self.CrosshairCircle or pellets > 1 then
+        local shadow = CH_Shadow
+        shadow.a = a * 100 / 150
+        if gap_size > 1 then
+            surface.DrawCircle(x, y, gap_size, col)
+            surface.DrawCircle(x, y, gap_size - 1, col)
+            surface.DrawCircle(x, y, gap_size + 1, shadow)
+            surface.DrawCircle(x, y, gap_size - 2, shadow)
+        end
+    elseif baseSpread > 0 then
+        -- Only draw prongs if there's a visible gap (or converging)
+        if gap_size > 0 then
+            ch_shadowrect(x - (dot_size / 2), y + (dot_size / 4) + gap_size, dot_size, line_size, col)
+            ch_shadowrect(x - (dot_size / 2), y - (dot_size / 4) - gap_size - line_size, dot_size, line_size, col)
+            ch_shadowrect(x + gap_size, y - (dot_size / 2), line_size, dot_size, col)
+            ch_shadowrect(x - gap_size - line_size, y - (dot_size / 2), line_size, dot_size, col)
+        end
+    end
+
+    return true
+end
+
+end -- end if CLIENT (MCV crosshair block)
+
 -- ============================================================
 -- DrawHUD
 -- ============================================================
@@ -1001,6 +1230,9 @@ if CLIENT then
         if self:GetNWFloat("DeployTime") > CurTime() then return end
 
         local col = Color(GetConVar("uh_hud_r"):GetInt(), GetConVar("uh_hud_g"):GetInt(), GetConVar("uh_hud_b"):GetInt())
+        -- Apply slight transparency for parity with the crosshair and clarity against bright colors
+        local hudAlpha = 200  -- ~78% opacity (crosshair uses ~100/255 = 39%)
+        col.a = hudAlpha
         local pos = {x = ScrW()/2, y = ScrH()/2}
         local movement = LocalPlayer():GetVelocity():Length() / 10
         if movement > 80 then movement = 80 end
@@ -1013,17 +1245,7 @@ if CLIENT then
             pos = self.Owner:GetEyeTrace().HitPos:ToScreen()
         end
 
-        -- Crosshair
-        if (h_crosshair > 0 or drawply) and GetConVar("uh_crosshair"):GetBool() and not (self.Use2DScope and self:GetUHBool("Zooming")) then
-            draw.RoundedBox(0, pos.x - 25 - movement, pos.y - 2, 12, 3, Color(0,0,0,200*h_crosshair))
-            draw.RoundedBox(0, pos.x + 12 + movement, pos.y - 2, 12, 3, Color(0,0,0,200*h_crosshair))
-            draw.RoundedBox(0, pos.x - 2, pos.y - 25 - movement, 3, 12, Color(0,0,0,200*h_crosshair))
-            draw.RoundedBox(0, pos.x - 2, pos.y + 12 + movement, 3, 12, Color(0,0,0,200*h_crosshair))
-            draw.RoundedBox(0, pos.x - 24 - movement, pos.y - 1, 12, 1, Color(255,255,255,255*h_crosshair))
-            draw.RoundedBox(0, pos.x + 11 + movement, pos.y - 1, 12, 1, Color(255,255,255,255*h_crosshair))
-            draw.RoundedBox(0, pos.x - 1, pos.y - 24 - movement, 1, 12, Color(255,255,255,255*h_crosshair))
-            draw.RoundedBox(0, pos.x - 1, pos.y + 11 + movement, 1, 12, Color(255,255,255,255*h_crosshair))
-        end
+        -- Crosshair is now handled by SWEP:DoDrawCrosshair (MCV-style dynamic crosshair)
 
         -- 2D Scope
         if self.Use2DScope and self:GetUHBool("Zooming") and not drawply then
@@ -1076,38 +1298,38 @@ if CLIENT then
         local y = pos.y
         local pr = math.Clamp(clip / self.Primary.ClipSize, 0, 1)
 
-        draw.SimpleText(cliptext, "UH_AmmoLarge", x - 4, y + 1, Color(0,0,0), TEXT_ALIGN_LEFT)
-        draw.SimpleText(cliptext, "UH_AmmoLarge", x - 5, y, Color(255*(1-pr) + col.r*pr, col.g*pr, col.b*pr), TEXT_ALIGN_LEFT)
+        draw.SimpleText(cliptext, "UH_AmmoLarge", x - 4, y + 1, Color(0,0,0,hudAlpha), TEXT_ALIGN_LEFT)
+        draw.SimpleText(cliptext, "UH_AmmoLarge", x - 5, y, Color(255*(1-pr) + col.r*pr, col.g*pr, col.b*pr, hudAlpha), TEXT_ALIGN_LEFT)
 
         y = y + 24
 
         if self:GetNWFloat("ReloadEndTime") > CurTime() or h_reload > 0 then
             local p = math.Clamp(1-(self:GetNWFloat("ReloadEndTime")-CurTime())/math.max(self:GetNWFloat("ReloadTime"), 0.001), 0, 1)
             draw.RoundedBox(0, x - 2, y + 1, 1, 14, Color(0,0,0,255*h_reload))
-            draw.RoundedBox(0, x - 3, y, 1, 14, Color(col.r,col.g,col.b,255*h_reload))
+            draw.RoundedBox(0, x - 3, y, 1, 14, Color(col.r,col.g,col.b,hudAlpha*h_reload))
             draw.RoundedBox(0, x - 5 + textsize, y + 1, 1, 14, Color(0,0,0,255*h_reload))
-            draw.RoundedBox(0, x - 6 + textsize, y, 1, 14, Color(col.r,col.g,col.b,255*h_reload))
+            draw.RoundedBox(0, x - 6 + textsize, y, 1, 14, Color(col.r,col.g,col.b,hudAlpha*h_reload))
             draw.RoundedBox(0, x + 1, y + 3, textsize*p-8, 10, Color(0,0,0,255*h_reload))
-            draw.RoundedBox(0, x, y + 2, textsize*p-8, 10, Color(255*(1-p) + col.r*p, col.g*p, col.b*p, 255*h_reload))
+            draw.RoundedBox(0, x, y + 2, textsize*p-8, 10, Color(255*(1-p) + col.r*p, col.g*p, col.b*p, hudAlpha*h_reload))
         end
 
         y = y + h_reload*14 - 2
 
         if ammocount > 0 then
-            draw.SimpleText(ammotext, "UH_AmmoSmall", x - 4, y + 1, Color(0,0,0), TEXT_ALIGN_LEFT)
-            draw.SimpleText(ammotext, "UH_AmmoSmall", x - 5, y, Color(col.r,col.g,col.b), TEXT_ALIGN_LEFT)
+            draw.SimpleText(ammotext, "UH_AmmoSmall", x - 4, y + 1, Color(0,0,0,hudAlpha), TEXT_ALIGN_LEFT)
+            draw.SimpleText(ammotext, "UH_AmmoSmall", x - 5, y, Color(col.r,col.g,col.b,hudAlpha), TEXT_ALIGN_LEFT)
             y = y + 15
         end
 
-        draw.SimpleText(typetext, "UH_AmmoSmall", x - 4, y + 1, Color(0,0,0), TEXT_ALIGN_LEFT)
-        draw.SimpleText(typetext, "UH_AmmoSmall", x - 5, y, Color(col.r,col.g,col.b), TEXT_ALIGN_LEFT)
+        draw.SimpleText(typetext, "UH_AmmoSmall", x - 4, y + 1, Color(0,0,0,hudAlpha), TEXT_ALIGN_LEFT)
+        draw.SimpleText(typetext, "UH_AmmoSmall", x - 5, y, Color(col.r,col.g,col.b,hudAlpha), TEXT_ALIGN_LEFT)
         y = y + 15
 
         local mode = self:GetNWInt("FireMode")
         if mode == 0 or self.FireModes[mode] then
             local name = self.FireModes[mode] and self.FireModes[mode].name or "Safe"
-            draw.SimpleText(name, "UH_AmmoSmall", x - 4, y + 1, Color(0,0,0), TEXT_ALIGN_LEFT)
-            draw.SimpleText(name, "UH_AmmoSmall", x - 5, y, Color(col.r,col.g,col.b), TEXT_ALIGN_LEFT)
+            draw.SimpleText(name, "UH_AmmoSmall", x - 4, y + 1, Color(0,0,0,hudAlpha), TEXT_ALIGN_LEFT)
+            draw.SimpleText(name, "UH_AmmoSmall", x - 5, y, Color(col.r,col.g,col.b,hudAlpha), TEXT_ALIGN_LEFT)
         end
 
         if GetConVar("uh_sv_grenades"):GetBool() then

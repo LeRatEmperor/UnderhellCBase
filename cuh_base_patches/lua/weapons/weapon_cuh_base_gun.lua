@@ -1090,7 +1090,10 @@ function SWEP:ApplyAttachments()
         .. tostring(self.ViewModelElements and self.ViewModelElements["barrel"] and self.ViewModelElements["barrel"]._csModel))
     print("[CUH-DBG] <<< ApplyAttachments returning")
 
-    if CLIENT and IsValid(self.Owner) then
+    -- Only refresh idle if the weapon is NOT currently deploying.
+    -- Calling idle during deploy overwrites the draw animation and
+    -- blocks weapon use (the SWEP thinks draw is still playing).
+    if CLIENT and IsValid(self.Owner) and self.GetNWFloat and self:GetNWFloat("DeployTime") <= CurTime() then
         self:EasySendWeaponAnim("idle", ACT_VM_IDLE)
     end
 end
