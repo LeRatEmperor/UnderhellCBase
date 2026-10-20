@@ -145,13 +145,14 @@ SWEP.Chambering = true   -- M416 has bullet-in-chamber (was implicit in TFA)
 SWEP.ReloadSpeed = 1
 SWEP.TwoHanded = true
 
--- IronSightsShoot: when true AND zooming (aiming down sights), the shoot
+-- CUH_IronFireProcedural: when true AND zooming (aiming down sights), the shoot
 -- ANIMATION is skipped — the viewmodel stays in iron_idle and the
 -- viewpunch + eye-angle recoil simulates the shot. This prevents the
 -- ironsights from becoming misaligned when the shoot animation resets
 -- (BF3 models don't have dedicated ADS shoot animations).
 -- Applies to ARs/Carbines/SMGs/LMG/DMR. NOT for shotguns/snipers/pistols.
-SWEP.IronSightsShoot = true
+-- CUH-prefixed to avoid conflict with any TFA base field.
+SWEP.CUH_IronFireProcedural = true
 
 -- Use QC reload events: when true, the base plays reload sound events
 -- that are baked into the model's $animation (AE_SHELL or AE_RELOAD
@@ -388,7 +389,8 @@ function SWEP:Think()
     -- Ironsights transitions (iron_in/iron_out/iron_idle)
     self:HandleIronsightsAnimations()
     -- Natural idle (lowest priority — only when nothing else is playing)
-    self:ChooseIdleAnim()
+    -- CUH-prefixed method name to avoid collision with TFA's ChooseIdleAnim
+    self:CUH_ChooseIdleAnim()
 end
 
 function SWEP:PrimaryAttack()
@@ -414,5 +416,6 @@ function SWEP:Holster(wep)
     self.wasZooming = false
     self.wasRunning = false
     self._sprintFactor = 0
+    self._cuhNextIdle = nil
     return BaseClass.Holster(self, wep)
 end

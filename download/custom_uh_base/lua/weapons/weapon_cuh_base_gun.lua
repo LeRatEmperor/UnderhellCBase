@@ -1200,7 +1200,7 @@ function SWEP:SetAttachment(slot, index)
 end
 
 -- ============================================================
--- IDLE ANIMATION SYSTEM (TFA-style ChooseIdleAnim)
+-- IDLE ANIMATION SYSTEM (CUH-ified TFA-style idle)
 -- ============================================================
 -- Plays the "idle" animation key when the weapon is in its "rest" state:
 -- not firing, not reloading, not sprinting, not zooming, not meleeing,
@@ -1210,19 +1210,17 @@ end
 -- else is going on. It does NOT overwrite draw, shoot, reload, sprint,
 -- or ironsight transition animations.
 --
--- Per-weapon tunables:
---   SWEP.Idle_Mode = 0 (disabled), 1 (lua), 2 (model), 3 (both = default)
---   SWEP.Idle_Smooth = 0.05 (seconds before end of anim to start idle)
+-- Per-weapon tunables (CUH-prefixed to avoid conflict with TFA base fields):
+--   SWEP.CUH_IdleMode  = 1 (enabled, default) or 0 (disabled)
+--   SWEP.CUH_IdleSmooth = 0.05 (seconds before end of anim to start idle)
 --
--- Based on TFA Base's ChooseIdleAnim + GetNextIdleAnim scheduling:
---   - TFA's ChooseIdleAnim checks status (idle/inspecting/fidget) and
---     dispatches to ChooseADSAnim/ChooseSprintAnim/ChooseWalkAnim/etc.
---   - TFA schedules the next idle via SetNextIdleAnim(CurTime() + duration)
---   - We use a simpler _nextIdleAnim field + CurTime() check.
-SWEP.Idle_Mode = 3  -- default: both (lua + model)
-SWEP.Idle_Smooth = 0.05
+-- NOTE: TFA base defines SWEP.Idle_Mode, SWEP.Idle_Smooth, and SWEP:ChooseIdleAnim().
+-- We deliberately use CUH-prefixed names so both bases can coexist without
+-- field/method collisions when a server has both TFA and CUH installed.
+SWEP.CUH_IdleMode = 1   -- 1 = enabled (default), 0 = disabled
+SWEP.CUH_IdleSmooth = 0.05
 
-function SWEP:ChooseIdleAnim()
+function SWEP:CUH_ChooseIdleAnim()
     -- Gate: don't play idle during these states
     if not IsValid(self.Owner) then return end
     if self:GetUHBool("Reloading") then return end
@@ -1235,7 +1233,7 @@ function SWEP:ChooseIdleAnim()
 
     -- Timer: don't re-check every frame
     local ct = CurTime()
-    if self._nextIdleAnim and ct < self._nextIdleAnim then return end
+    if self._cuhNextIdle and ct < self._cuhNextIdle then return end
 
     -- Check current viewmodel animation has finished
     local vm = self.Owner:GetViewModel()
@@ -1244,7 +1242,7 @@ function SWEP:ChooseIdleAnim()
         -- Schedule a re-check when the current anim is about to finish
         local remaining = (1 - vm:GetCycle()) * vm:SequenceDuration()
         if remaining > 0.1 then
-            self._nextIdleAnim = ct + remaining - self.Idle_Smooth
+            self._cuhNextIdle = ct + remaining - self.CUH_IdleSmooth
             return
         end
     end
@@ -1254,10 +1252,10 @@ function SWEP:ChooseIdleAnim()
         self:EasySendWeaponAnim("idle", ACT_VM_IDLE)
         -- Schedule next idle check for the duration of the idle anim
         local dur = vm:SequenceDuration()
-        self._nextIdleAnim = ct + math.max(dur - self.Idle_Smooth, 0.1)
+        self._cuhNextIdle = ct + math.max(dur - self.CUH_IdleSmooth, 0.1)
     else
         -- No idle anim defined — check again in 1 second
-        self._nextIdleAnim = ct + 1
+        self._cuhNextIdle = ct + 1
     end
 end
 
@@ -1267,6 +1265,8 @@ end
 -- Handles iron_in / iron_out / iron_idle transitions when the player
 -- aims down sights. Per-weapon SWEPs can override HandleIronsightsAnimations
 -- for custom behavior — this is the default implementation.
+-- NOTE: HandleIronsightsAnimations is NOT a TFA method — it's CUH-specific,
+-- already used by weapon_xm4_bo6, weapon_m8a1_scotia, etc.
 function SWEP:HandleIronsightsAnimations()
     local ply = self:GetOwner()
     if not IsValid(ply) or not ply:IsPlayer() then return end
@@ -1285,26 +1285,26 @@ function SWEP:HandleIronsightsAnimations()
 
     if isZooming and not self.wasZooming then
         self:EasySendWeaponAnim("iron_in", ACT_VM_DEPLOY)
-        self._nextIdleAnim = nil  -- reset idle timer so iron_idle can take over
+        self._cuhNextIdle = nil  -- reset idle timer so iron_idle can take over
     elseif not isZooming and self.wasZooming then
         self:EasySendWeaponAnim("iron_out", ACT_VM_UNDEPLOY)
-        self._nextIdleAnim = nil
+        self._cuhNextIdle = nil
     elseif isZooming then
         -- While zooming, play iron_idle when the current anim finishes
         if vm:GetCycle() >= 1 then
             self:EasySendWeaponAnim("iron_idle", ACT_VM_IDLE_DEPLOYED)
             local dur = vm:SequenceDuration()
-            self._nextIdleAnim = CurTime() + math.max(dur - self.Idle_Smooth, 0.1)
+            self._cuhNextIdle = CurTime() + math.max(dur - self.CUH_IdleSmooth, 0.1)
         end
     end
     self.wasZooming = isZooming
 end
 
 -- ============================================================
--- IRONSIGHTS SHOOT TOGGLE (TFA-style procedural ADS shoot)
+-- IRONSIGHTS SHOOT TOGGLE (CUH-ified procedural ADS shoot)
 -- ============================================================
--- When SWEP.IronSightsShoot = true AND the player is zooming (aiming down
--- sights), the shoot ANIMATION is skipped. The viewmodel stays in
+-- When SWEP.CUH_IronFireProcedural = true AND the player is zooming (aiming
+-- down sights), the shoot ANIMATION is skipped. The viewmodel stays in
 -- iron_idle and the viewpunch + eye-angle recoil (already in the parent's
 -- PrimaryAttack) simulates the shot feedback.
 --
@@ -1313,22 +1313,22 @@ end
 -- to the hip-fire position, misaligning the ironsights until the animation
 -- cycles back.
 --
--- Per-weapon tunable:
---   SWEP.IronSightsShoot = false  (default: play shoot anim normally)
---   SWEP.IronSightsShoot = true   (skip shoot anim when zooming)
+-- Per-weapon tunable (CUH-prefixed to avoid any TFA conflict):
+--   SWEP.CUH_IronFireProcedural = false  (default: play shoot anim normally)
+--   SWEP.CUH_IronFireProcedural = true   (skip shoot anim when zooming)
 --
 -- Set to true on BF3 ARs/Carbines/SMGs/LMG/DMR.
 -- Do NOT set on shotguns/snipers/pistols (they have ADS shoot anims or
 -- don't need this behavior).
-SWEP.IronSightsShoot = false
+SWEP.CUH_IronFireProcedural = false
 
 -- Override EasySendWeaponAnim to intercept shoot anim calls when
--- IronSightsShoot is enabled + zooming. We use BaseClass.EasySendWeaponAnim
+-- CUH_IronFireProcedural is enabled + zooming. We use BaseClass.EasySendWeaponAnim
 -- to delegate to the parent (weapon_custom_uh_base_gun) which handles
 -- the actual sequence lookup + playback.
 function SWEP:EasySendWeaponAnim(lookupanimation, elseifnotfounded)
-    -- Skip shoot animations when IronSightsShoot is enabled and we're zooming
-    if self.IronSightsShoot
+    -- Skip shoot animations when CUH_IronFireProcedural is enabled and we're zooming
+    if self.CUH_IronFireProcedural
        and self:GetUHBool("Zooming")
        and type(lookupanimation) == "string"
        and (lookupanimation == "shoot"
@@ -1347,7 +1347,7 @@ end
 -- ============================================================
 -- Calls BaseClass.Think first (parent handles reload, zoom, HandleBones,
 -- HandleHands, HandleRunning). Does NOT call HandleIronsightsAnimations or
--- ChooseIdleAnim here — each weapon calls those from its own Think if it
+-- CUH_ChooseIdleAnim here — each weapon calls those from its own Think if it
 -- wants them. This avoids double-calling for weapons that already define
 -- their own handlers (xm4, kate, m8a1 all have HandleIronsightsAnimations).
 function SWEP:Think()
@@ -1358,7 +1358,7 @@ end
 -- HOLSTER — clear idle + ironsight state
 -- ============================================================
 function SWEP:Holster(wep)
-    self._nextIdleAnim = nil
+    self._cuhNextIdle = nil
     self.wasZooming = false
     return BaseClass.Holster(self, wep)
 end
