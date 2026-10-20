@@ -216,10 +216,10 @@ function SWEP:InitStatCache()
                 self._statOrigins[key] = self[tbl][field]
             end
         else
-            if self[key] ~= nil then
-                self._statCache[key] = self[key]
-                self._statOrigins[key] = self[key]
-            end
+            -- Always capture topLevel keys (even if nil) so RestoreStat
+            -- can properly revert attachment-set values like "Silenced".
+            self._statCache[key] = self[key]
+            self._statOrigins[key] = self[key]
         end
     end
 

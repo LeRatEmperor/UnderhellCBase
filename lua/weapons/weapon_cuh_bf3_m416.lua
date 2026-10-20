@@ -140,6 +140,7 @@ SWEP.Secondary.IronFOV_Collimator = 60
 -- TFA's Penetration = true means "enable bullet penetration"; in CUH
 -- that's equivalent to Penetration = 2 (the default depth).
 SWEP.Penetration = 2
+SWEP.Silenced  = false   -- explicitly set so InitStatCache captures it
 SWEP.Chambering = true   -- M416 has bullet-in-chamber (was implicit in TFA)
 SWEP.ReloadSpeed = 1
 SWEP.TwoHanded = true
