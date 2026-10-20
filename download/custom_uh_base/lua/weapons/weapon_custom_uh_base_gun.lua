@@ -278,7 +278,7 @@ end
 -- GetShootSound
 -- ============================================================
 function SWEP:GetShootSound()
-    local source = self:GetNWBool("Silenced") and self.Primary.SilSound or self.Primary.Sound
+    local source = self:GetNWBool("Silenced") or self.Silenced == true and self.Primary.SilSound or self.Primary.Sound
     if istable(source) then
         return tostring(source[math.random(1, #source)])
     end
@@ -330,7 +330,7 @@ function SWEP:PrimaryAttack()
 
         -- FIXED: local spread (was global)
         local dmg = math.random(self.Primary.MinDamage, self.Primary.MaxDamage)
-        if self:GetNWBool("Silenced") then
+        if self:GetNWBool("Silenced") or self.Silenced == true then
             dmg = math.Round(dmg * 0.95)
         end
         self:ShootBullets(self.Owner:GetShootPos(), self.Owner:GetAimVector(), dmg, self.Penetration or 2)
@@ -356,7 +356,7 @@ function SWEP:PrimaryAttack()
     if self.ShootAnimation then
         baseAct = self:ShootAnimation()
     end
-    local isSilenced = self:GetNWBool("Silenced")
+    local isSilenced = self:GetNWBool("Silenced") or self.Silenced == true
     local isZooming = self:GetUHBool("Zooming")
     local lookupKey = isZooming and "shoot_ads" or "shoot"
     if isSilenced then lookupKey = lookupKey .. "_sil" end
@@ -475,7 +475,7 @@ function SWEP:ShootGrenade(force)
         -- FIXED: SetOwner instead of direct field assignment
         ent:SetOwner(self.Owner)
         local phys = ent:GetPhysicsObject()
-        if IsValid(phys) then  -- FIXED: IsValid check (was phys != nil)
+        if IsValid(phys) then  -- FIXED: IsValid check (was phys ~= nil)
             phys:ApplyForceCenter(self.Owner:GetAimVector() * force)
         end
     end
@@ -568,7 +568,7 @@ end
 -- Muzzle flash — FIXED: DynamicLight ID (was 0, now self:EntIndex())
 -- ============================================================
 function SWEP:DoMuzzleFlash()
-    if self:GetNWBool("Silenced") then return end
+    if self:GetNWBool("Silenced") or self.Silenced == true then return end
 
     if self.MuzzleFlashType == "particle" and self.MuzzleFlashParticle and self.MuzzleFlashParticle ~= "" then
         local vm = IsValid(self.Owner) and self.Owner:GetViewModel() or nil
@@ -630,7 +630,7 @@ function SWEP:CreateShell(delay, heat)
     if (delay or 0) > 0 then
         timer.Create("CustomUH_Shell_" .. self.Owner:SteamID(), delay, 1, function()
             if not IsValid(self) or not IsValid(self.Owner) then return end
-            if self.Owner:GetActiveWeapon() != self then return end
+            if self.Owner:GetActiveWeapon() ~= self then return end
             local fx = EffectData()
             fx:SetEntity(self)
             fx:SetOrigin(self.Owner:EyePos())
@@ -730,7 +730,7 @@ function SWEP:Reload()
                     self:SendSequence(vm, seq)
                 end
             else
-                local isSilenced = self:GetNWBool("Silenced")
+                local isSilenced = self:GetNWBool("Silenced") or self.Silenced == true
                 local isEmpty = (self:Clip1() <= 0)
                 local animToPlay = nil
 
@@ -760,7 +760,7 @@ function SWEP:Reload()
                 if animToPlay then
                     self:SendAnim(vm, animToPlay, ACT_VM_RELOAD)
                 else
-                    if self:GetNWBool("Silenced") then
+                    if self:GetNWBool("Silenced") or self.Silenced == true then
                         self:SendSequence(vm, vm:SelectWeightedSequence(ACT_VM_RELOAD_SILENCED or ACT_VM_RELOAD))
                     else
                         self:SendSequence(vm, vm:SelectWeightedSequence(ACT_VM_RELOAD))
@@ -806,7 +806,7 @@ function SWEP:Reload()
                             timer.Simple(tbl.delay * scale, function()
                                 if not IsValid(self) or not self:GetUHBool("Reloading") then return end
                                 local owner = self:GetOwner()
-                                if not IsValid(owner) or owner:GetActiveWeapon() != self then return end
+                                if not IsValid(owner) or owner:GetActiveWeapon() ~= self then return end
                                 if tbl.sound and tbl.sound ~= "" and tbl.sound ~= "nil" then
                                     local snd = tbl.sound
                                     if istable(snd) then snd = snd[math.random(1, #snd)] end

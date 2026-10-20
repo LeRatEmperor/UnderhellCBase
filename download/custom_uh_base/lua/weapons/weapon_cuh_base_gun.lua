@@ -206,6 +206,7 @@ function SWEP:InitStatCache()
         "ViewSlideRecoilUp", "ViewSlideRecoilRight", "ZoomFov",
         "IronsightSpeed", "IronsightEaseIn", "ZoomSpeedIn", "ZoomSpeedOut",
         "IronSightTime", "MoveSpeed", "IronRecoilMultiplier",
+        "Silenced",
     }
     for _, key in ipairs(topLevel) do
         if string.find(key, "%.") then
@@ -215,10 +216,10 @@ function SWEP:InitStatCache()
                 self._statOrigins[key] = self[tbl][field]
             end
         else
-            if self[key] ~= nil then
-                self._statCache[key] = self[key]
-                self._statOrigins[key] = self[key]
-            end
+            -- Always capture topLevel keys (even if nil) so RestoreStat
+            -- can properly revert attachment-set values like "Silenced".
+            self._statCache[key] = self[key]
+            self._statOrigins[key] = self[key]
         end
     end
 
@@ -701,21 +702,51 @@ end
 
 function SWEP:ApplyBodygroupsVM(vm)
     if not IsValid(vm) then return end
+    if self._prevBodygroups_V then
+        for bg, _ in pairs(self._prevBodygroups_V) do
+            vm:SetBodygroup(bg, 0)
+        end
+    end
+    self._prevBodygroups_V = {}
     for bg, val in pairs(self.Bodygroups_V or {}) do
         vm:SetBodygroup(bg, val)
+        self._prevBodygroups_V[bg] = true
     end
 end
 
 function SWEP:ApplyBodygroupsWM(wm)
     if not IsValid(wm) then return end
+    if self._prevBodygroups_W then
+        for bg, _ in pairs(self._prevBodygroups_W) do
+            wm:SetBodygroup(bg, 0)
+        end
+    end
+    self._prevBodygroups_W = {}
     for bg, val in pairs(self.Bodygroups_W or {}) do
         wm:SetBodygroup(bg, val)
+        self._prevBodygroups_W[bg] = true
     end
 end
 
 function SWEP:ResetBodygroups()
-    self.Bodygroups_V = {}
-    self.Bodygroups_W = {}
+    if not self._defaultBodygroups_V then
+        self._defaultBodygroups_V = {}
+        if self.Bodygroups_V then
+            for bg, val in pairs(self.Bodygroups_V) do
+                self._defaultBodygroups_V[bg] = val
+            end
+        end
+    end
+    if not self._defaultBodygroups_W then
+        self._defaultBodygroups_W = {}
+        if self.Bodygroups_W then
+            for bg, val in pairs(self.Bodygroups_W) do
+                self._defaultBodygroups_W[bg] = val
+            end
+        end
+    end
+    self.Bodygroups_V = table.Copy(self._defaultBodygroups_V)
+    self.Bodygroups_W = table.Copy(self._defaultBodygroups_W)
     self._currentSightBG = nil
     self._currentMagBG = nil
     if self.SightBGs and self.SightBGs.regular ~= nil then
@@ -738,6 +769,30 @@ function SWEP:ApplyAttachments()
         return
     end
     if not self._statOrigins then self:InitStatCache() end
+
+    -- 0. CALL DETACH ON PREVIOUSLY-EQUIPPED ATTACHMENTS
+    if self._prevSelections then
+        for slot, prevSel in pairs(self._prevSelections) do
+            if prevSel and prevSel > 0 then
+                local slotData = self.Attachments[slot]
+                if slotData and slotData.atts and slotData.atts[prevSel] then
+                    local prevAttId = slotData.atts[prevSel]
+                    if CustomUH and CustomUH.Attachments and CustomUH.Attachments[prevAttId] then
+                        local prevAtt = CustomUH.Attachments[prevAttId]
+                        if prevAtt.Detach then
+                            print("[CUH-DBG]   Step 0: calling att:Detach(self) on slot " .. slot
+                                .. " attId=" .. tostring(prevAttId))
+                            local ok, err = pcall(prevAtt.Detach, prevAtt, self)
+                            if not ok then
+                                print("[CUH-DBG]     ERROR in att:Detach: " .. tostring(err))
+                            end
+                        end
+                    end
+                end
+            end
+        end
+        self._prevSelections = nil
+    end
 
     print("[CUH-DBG]   CustomUH.Attachments count = " .. tostring(CustomUH and CustomUH.Attachments and table.Count(CustomUH.Attachments) or "nil"))
     if CustomUH and CustomUH.Attachments then
@@ -1034,6 +1089,10 @@ function SWEP:ApplyAttachments()
     print("[CUH-DBG]   post-rebuild VElement barrel _csModel = "
         .. tostring(self.ViewModelElements and self.ViewModelElements["barrel"] and self.ViewModelElements["barrel"]._csModel))
     print("[CUH-DBG] <<< ApplyAttachments returning")
+
+    if CLIENT and IsValid(self.Owner) then
+        self:EasySendWeaponAnim("idle", ACT_VM_IDLE)
+    end
 end
 
 -- ============================================================
@@ -1062,6 +1121,14 @@ function SWEP:SetAttachment(slot, index)
         and self.Attachments[slot].default and self.Attachments[slot].default > 0 then
         index = self.Attachments[slot].default
         print("[CUH-DBG]   forceDefault: snapped 0 -> " .. tostring(index))
+    end
+
+    -- CAPTURE previous selection so ApplyAttachments Step 0 can call
+    -- Detach on the previously-equipped attachment.
+    local prevSel = self.Attachments[slot].sel
+    if prevSel ~= index then
+        self._prevSelections = self._prevSelections or {}
+        self._prevSelections[slot] = prevSel
     end
 
     self.Attachments[slot].sel = index

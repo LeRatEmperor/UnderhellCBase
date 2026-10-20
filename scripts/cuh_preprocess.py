@@ -52,9 +52,22 @@ def count_kw(line, *kws):
     return n
 
 
+def _patch_neq_operator(src):
+    """Replace GMod LuaJIT's `!=` with standard Lua's `~=`."""
+    out = []
+    for line in src.split("\n"):
+        stripped = line.lstrip()
+        if stripped.startswith("--"):
+            out.append(line)
+        else:
+            out.append(line.replace("!=", "~="))
+    return "\n".join(out)
+
+
 def preprocess(src):
     """Rewrite `continue` to `goto __cont_N__` + labels, and apply
     other small GMod-LuaJIT->Lua-5.4 patches."""
+    src = _patch_neq_operator(src)
     src = _patch_const_loop_var(src)
     return _convert_continue(src)
 

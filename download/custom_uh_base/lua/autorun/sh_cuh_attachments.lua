@@ -320,6 +320,15 @@ if SERVER then
             print("[CUH-DBG]   forceDefault snapped 0 -> " .. tostring(index))
         end
 
+        -- Capture previous selection BEFORE updating .sel, so ApplyAttachments
+        -- Step 0 can call Detach on the previously-equipped attachment.
+        -- This mirrors what SetAttachment does on the client.
+        local prevSel = wep.Attachments[slot].sel
+        if prevSel ~= index then
+            wep._prevSelections = wep._prevSelections or {}
+            wep._prevSelections[slot] = prevSel
+        end
+
         wep.Attachments[slot].sel = index
         print("[CUH-DBG]   SERVER calling wep:ApplyAttachments() ...")
         wep:ApplyAttachments()

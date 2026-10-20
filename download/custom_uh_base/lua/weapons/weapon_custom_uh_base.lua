@@ -197,6 +197,9 @@ function SWEP:GetViewModelPosition(pos, ang)
     -- angle/offset from the default viewmodel pose (e.g. lower the gun
     -- a bit, or tilt it for a more natural carry position).
     pos, ang = self:Alternative(pos, ang, ft, iftp)
+    -- Procedural sprint pose (applies RunSightsPos/Ang when running).
+    -- Skipped if SWEP.AnimatedSprint is set (model handles sprint via anim).
+    pos, ang = self:Sprint(pos, ang, ft, iftp)
     return pos, ang
 end
 
@@ -248,6 +251,41 @@ function SWEP:Alternative(pos, ang, ft, iftp)
         ang:RotateAroundAxis(ang:Right(),    ap_p * f)
         ang:RotateAroundAxis(ang:Up(),       ap_y * f)
         ang:RotateAroundAxis(ang:Forward(),  ap_r * f)
+    end
+
+    return pos, ang
+end
+
+-- ============================================================
+-- Sprint (procedural sprint pose — applies SWEP.RunSightsPos / RunSightsAng)
+-- ============================================================
+-- When the weapon is sprinting (GetUHBool("Running") == true), smoothly
+-- interpolates the viewmodel toward SWEP.RunSightsPos/Ang. This is the
+-- "procedural sprint" alternative to model-driven sprint animations
+-- (SWEP.AnimatedSprint). When AnimatedSprint is true, weapons are
+-- expected to play ACT_VM_SPRINT_* sequences and this offset is skipped.
+function SWEP:Sprint(pos, ang, ft, iftp)
+    if self.AnimatedSprint then return pos, ang end
+    if not self.RunSightsPos and not self.RunSightsAng then return pos, ang end
+
+    local targetSprint = self:GetUHBool("Running") and 1 or 0
+    if iftp then
+        self._sprintFactor = Lerp(math.Clamp(ft * 10, 0, 1), self._sprintFactor or 0, targetSprint)
+    end
+
+    if self._sprintFactor and self._sprintFactor > 0.01 then
+        local sp = self.RunSightsPos or vector_origin
+        local sa = self.RunSightsAng or angle_zero
+        local sf = self._sprintFactor
+        pos = pos + ang:Right()   * sp.x * sf
+            + ang:Forward() * sp.y * sf
+            + ang:Up()      * sp.z * sf
+        local sp_p, sp_y, sp_r = 0, 0, 0
+        if isangle(sa) then sp_p, sp_y, sp_r = sa.p, sa.y, sa.r
+        elseif isvector(sa) then sp_p, sp_y, sp_r = sa.x, sa.y, sa.z end
+        ang:RotateAroundAxis(ang:Right(),   sp_p * sf)
+        ang:RotateAroundAxis(ang:Up(),      sp_y * sf)
+        ang:RotateAroundAxis(ang:Forward(), sp_r * sf)
     end
 
     return pos, ang
