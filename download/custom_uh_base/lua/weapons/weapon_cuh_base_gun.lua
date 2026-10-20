@@ -1090,9 +1090,39 @@ function SWEP:ApplyAttachments()
         .. tostring(self.ViewModelElements and self.ViewModelElements["barrel"] and self.ViewModelElements["barrel"]._csModel))
     print("[CUH-DBG] <<< ApplyAttachments returning")
 
-    if CLIENT and IsValid(self.Owner) then
-        self:EasySendWeaponAnim("idle", ACT_VM_IDLE)
-    end
+    -- ============================================================
+    -- IDLE REFRESH INTENTIONALLY REMOVED (FIX: idle overwrote draw)
+    -- ============================================================
+    -- Previous code called self:EasySendWeaponAnim("idle", ACT_VM_IDLE)
+    -- here unconditionally. ApplyAttachments is invoked from:
+    --   * PlayerSwitchWeapon -> LoadAttachments (fires on weapon switch,
+    --     i.e. DURING Deploy)
+    --   * timer.Simple(0, ApplyAttachments) from per-weapon Deploy()
+    --     overrides (m8a1, xm4, kate, ghosts)
+    --   * SetAttachment (when the user clicks an attachment in the menu)
+    --
+    -- In ALL deploy paths, this fired BEFORE (or right as) the deploy
+    -- animation was starting. The "DeployTime" NW var that the previous
+    -- guard relied on is reset to 0 by every per-weapon Deploy() override
+    -- (m8a1 line 380, xm4 line 355, bo7_1911 line 487, dcm_1911 line 416,
+    -- kate_*, ghosts_*). So `0 <= CurTime()` was always TRUE and the
+    -- idle was always force-played, overwriting the draw animation on
+    -- every CUH swep (m416, m8a1, xm4, kate, ghosts).
+    --
+    -- Removing the idle refresh is SAFE because:
+    --   * The parent base class's Think / HandleRunning / Idle() methods
+    --     already drive the natural idle cycle when no other anim is
+    --     playing (not firing, not reloading, not sprinting, deploy done).
+    --   * Per-weapon Idle() functions (e.g. bo7_1911:Idle at line 268)
+    --     call EasySendWeaponAnim("idle", ACT_VM_IDLE) when vm:GetCycle()
+    --     >= 1 — i.e. when the current animation has actually finished.
+    --     This is the CORRECT lowest-priority idle mechanism.
+    --   * When the user changes an attachment mid-game, the next natural
+    --     idle tick (within ~1-2 seconds) picks up the new Animations["idle"]
+    --     value. The cost of this delay is trivial.
+    --
+    -- If you need an animation PRIORITY system later, add it to the parent
+    -- SendWeaponAnim / EasySendWeaponAnim dispatcher, NOT to ApplyAttachments.
 end
 
 -- ============================================================
